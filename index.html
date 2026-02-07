@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>knock twice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0C0A09;
+            color: #E8E6E3;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 300;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .content {
+            position: fixed;
+            bottom: 15vh;
+            left: 8vw;
+            max-width: 400px;
+        }
+
+        h1 {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .line {
+            display: inline;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: reveal 1.2s ease forwards;
+        }
+
+        .line-1 {
+            animation-delay: 0.6s;
+        }
+
+        .line-2 {
+            animation-delay: 1.35s;
+        }
+
+        .line-3 {
+            animation-delay: 2s;
+        }
+
+        .email {
+            display: inline-block;
+            color: #E8E6E3;
+            text-decoration: none;
+            font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+            font-weight: 300;
+            font-style: italic;
+            letter-spacing: 0.03em;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: reveal 1.2s ease forwards;
+            animation-delay: 2.75s;
+            transition: opacity 0.4s ease, color 0.4s ease;
+        }
+
+        .email:hover {
+            color: #fff;
+        }
+
+        @keyframes reveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        @media (max-width: 600px) {
+            .content {
+                left: 6vw;
+                bottom: 20vh;
+                max-width: 85vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="content">
+        <h1><span class="line line-1">Knock Twice </span><span class="line line-2">for </span><span class="line line-3">answers</span></h1>
+        <a href="mailto:hello@knocktwice.studio" class="email">hello@knocktwice.studio</a>
+    </main>
+</body>
+</html>
