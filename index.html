@@ -210,6 +210,54 @@
             .email {
                 font-size: 0.7rem;
             }
+
+            .f1 { animation: float1m 4.2s ease-in-out infinite; }
+            .f2 { animation: float2m 3.7s ease-in-out infinite; }
+            .f3 { animation: float3m 5.1s ease-in-out infinite; }
+            .f4 { animation: float4m 4.8s ease-in-out infinite; }
+            .f5 { animation: float5m 3.3s ease-in-out infinite; }
+            .f6 { animation: float6m 5.6s ease-in-out infinite; }
+            .f7 { animation: float7m 4.4s ease-in-out infinite; }
+
+            @keyframes float1m {
+                0%, 100% { transform: translate(0, 0); }
+                50% { transform: translate(0.9px, -1.4px); }
+            }
+
+            @keyframes float2m {
+                0%, 100% { transform: translate(0, 0); }
+                35% { transform: translate(-1.15px, 0.7px); }
+                70% { transform: translate(0.6px, -0.9px); }
+            }
+
+            @keyframes float3m {
+                0%, 100% { transform: translate(0, 0); }
+                25% { transform: translate(0.7px, 1px); }
+                75% { transform: translate(-0.8px, -0.6px); }
+            }
+
+            @keyframes float4m {
+                0%, 100% { transform: translate(0, 0); }
+                40% { transform: translate(-1px, -1.15px); }
+                80% { transform: translate(0.8px, 0.5px); }
+            }
+
+            @keyframes float5m {
+                0%, 100% { transform: translate(0, 0); }
+                60% { transform: translate(1.15px, 0.6px); }
+            }
+
+            @keyframes float6m {
+                0%, 100% { transform: translate(0, 0); }
+                30% { transform: translate(-0.6px, 1.15px); }
+                60% { transform: translate(0.9px, -0.7px); }
+            }
+
+            @keyframes float7m {
+                0%, 100% { transform: translate(0, 0); }
+                45% { transform: translate(0.8px, -0.8px); }
+                90% { transform: translate(-0.7px, 0.9px); }
+            }
         }
     </style>
 </head>
