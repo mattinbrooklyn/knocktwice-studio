@@ -1,0 +1,824 @@
+/* ==========================================================
+   KNOCK TWICE — Shared Stylesheet
+   ========================================================== */
+
+/* -------------------------
+   RESET & BASE
+------------------------- */
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Screen-reader only — hidden visually but accessible */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* -------------------------
+   SHARED: LOGO WORDMARK
+------------------------- */
+
+.wordmark {
+  position: fixed;
+  left: 2.8%;
+  top: 6.8%;
+  width: 14.2%;
+  z-index: 100;
+}
+
+.wordmark a {
+  display: block;
+}
+
+.wordmark img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Inner pages: keyhole icon positioned where it sits in the full wordmark */
+body:not([data-page="home"]) .wordmark {
+  left: 8.5%;
+  width: 2.9%;
+}
+
+body:not([data-page="home"]) .wordmark a:hover img {
+  filter: brightness(0) saturate(100%) invert(47%) sepia(82%) saturate(384%) hue-rotate(173deg) brightness(96%) contrast(87%);
+}
+
+
+/* -------------------------
+   SHARED: NAVIGATION
+------------------------- */
+
+.nav-menu {
+  position: fixed;
+  left: 2.8%;
+  top: 25%;
+  list-style: none;
+  z-index: 100;
+}
+
+.nav-menu li {
+  margin-bottom: 0.25rem;
+}
+
+.nav-menu a {
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: #32261f;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.nav-menu a:hover {
+  color: #378CDA;
+}
+
+/* Bold the active nav item based on the page identifier */
+body[data-page="about"] .nav-menu a[href="about.html"],
+body[data-page="interiors"] .nav-menu a[href="interiors.html"],
+body[data-page="shop"] .nav-menu a[href="shop.html"],
+body[data-page="contact"] .nav-menu a[href="contact.html"] {
+  font-weight: 700;
+}
+
+/* -------------------------
+   SHARED: DRAGGABLE ITEMS
+------------------------- */
+
+.furniture {
+  position: absolute;
+  display: block;
+  cursor: grab;
+  user-select: none;
+}
+
+.furniture.dragging {
+  cursor: grabbing;
+  z-index: 10;
+}
+
+.furniture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* -------------------------
+   SHARED: FOOTER BAR
+------------------------- */
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8.8%;
+  background-color: #378cda;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.8%;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.footer-socials a {
+  display: block;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.footer-socials svg {
+  width: 100%;
+  height: 100%;
+}
+
+.footer-copy {
+  font-family: 'Handjet', sans-serif;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  color: #f7f2ec;
+  letter-spacing: -0.01em;
+}
+
+/* -------------------------
+   SHARED: ANIMATIONS
+------------------------- */
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spiral-text-dot {
+  fill: #d44;
+}
+
+/* ==========================================================
+   SPLASH PAGE
+   ========================================================== */
+
+.splash {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  background-color: #32261f;
+  overflow: hidden;
+}
+
+/* Keyhole-shaped frame — the "window" in the door. Stays fixed. */
+.splash-frame {
+  width: min(22vw, 12rem);
+  aspect-ratio: 313 / 598;
+  clip-path: url(#keyhole-clip-norm);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.splash-logo {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 48rem) {
+  .splash-frame { width: min(40vw, 10rem); }
+}
+
+@media (max-width: 30rem) {
+  .splash-frame { width: min(45vw, 9rem); }
+}
+
+.eye {
+  transition: transform 0.08s ease-out;
+}
+
+/* Monster face drops down out of the frame */
+.logo-drop {
+  animation: logoDrop 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes logoDrop {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+
+/* -------------------------
+   PAGE CURTAIN — dark overlay that drops to reveal content
+------------------------- */
+
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  background-color: #32261f;
+  z-index: 9999;
+}
+
+.page-curtain.curtain-drop {
+  animation: curtainDrop 0.4s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes curtainDrop {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+
+/* ==========================================================
+   HOME PAGE
+   ========================================================== */
+
+.home {
+  position: relative;
+  width: 100%;
+  height: calc(100vh + 90px);
+  background-color: #f7f2ec;
+  overflow: hidden;
+}
+
+.home-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Home furniture — width-only sizing, natural image proportions */
+.home-content .furniture img {
+  height: auto;
+  object-fit: contain;
+}
+
+.furniture-couch {
+  left: 27.6%;
+  top: 9.4%;
+  width: 29.9%;
+  transform: rotate(-11deg);
+}
+
+.furniture-vase {
+  left: 60.5%;
+  top: 10.7%;
+  width: 13.5%;
+}
+
+.furniture-nightstand {
+  left: 11.3%;
+  top: 32.3%;
+  width: 21.8%;
+}
+
+.furniture-carpet {
+  left: 24.3%;
+  top: 50.1%;
+  width: 31.1%;
+}
+
+.furniture-dresser {
+  left: 54.2%;
+  top: 47.3%;
+  width: 39.5%;
+}
+
+/* Spiral text sticker */
+.spiral-text {
+  position: absolute;
+  left: 77.4%;
+  top: 30.8%;
+  width: 17%;
+  aspect-ratio: 1;
+}
+
+.spiral-text svg {
+  width: 100%;
+  height: 100%;
+  animation: spin 30s linear infinite;
+}
+
+/* ==========================================================
+   ABOUT PAGE
+   ========================================================== */
+
+.about {
+  position: relative;
+  width: 100%;
+  height: calc(100vh + 90px);
+  background-color: #f7f2ec;
+  overflow: hidden;
+}
+
+.about-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.about-heading {
+  position: absolute;
+  left: 21.9%;
+  top: 6.8%;
+  width: 56%;
+  font-family: 'Erica One', cursive;
+  font-size: clamp(2rem, 4.5vw, 4.0625rem);
+  line-height: 1.05;
+  color: #32261f;
+}
+
+.about-body {
+  position: absolute;
+  left: 21.9%;
+  top: 20%;
+  width: 56%;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #32261f;
+}
+
+.about-body p + p {
+  margin-top: 1em;
+}
+
+.about-body .about-subheading {
+  font-family: 'Handjet', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding-top: 2.5em;
+}
+
+.about-paintbrush {
+  position: absolute;
+  left: 6.25%;
+  top: 36.2%;
+  width: 19.4%;
+  z-index: 10;
+}
+
+.about-paintbrush img {
+  width: 100%;
+  height: auto;
+}
+
+.about-bucket {
+  position: absolute;
+  left: 79%;
+  top: 22%;
+  width: 25.4%;
+  transform: rotate(7.63deg);
+}
+
+.about-bucket img {
+  width: 100%;
+  height: auto;
+}
+
+/* Curved scrolling marquee */
+.marquee-wave {
+  position: absolute;
+  top: 78%;
+  left: 0;
+  width: 100%;
+  height: 13%;
+  z-index: 2;
+}
+
+.marquee-wave svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Footer monster */
+.footer-monster {
+  position: absolute;
+  top: 79.9%;
+  left: 0;
+  width: 100%;
+  height: 11.5%;
+  z-index: 1;
+}
+
+.footer-monster svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================
+   INTERIORS PAGE
+   ========================================================== */
+
+.interiors {
+  position: relative;
+  width: 100%;
+  background-color: #f7f2ec;
+  overflow: hidden;
+}
+
+.interiors-content {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1440 / 2399;
+}
+
+
+
+
+.interiors-heading {
+  position: absolute;
+  left: 21.9%;
+  top: 2.9%;
+  width: 56.1%;
+  font-family: 'Erica One', cursive;
+  font-size: clamp(2rem, 4.5vw, 4.0625rem);
+  line-height: 1.05;
+  color: #32261f;
+}
+
+.interiors-body {
+  position: absolute;
+  left: 21.9%;
+  top: 11%;
+  width: 56.1%;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #32261f;
+}
+
+.interiors-body p + p {
+  margin-top: 1em;
+}
+
+/* Pink background monster blob */
+.bg-monster {
+  position: absolute;
+  left: 2.4%;
+  top: 16.1%;
+  width: 64.6%;
+  height: 37%;
+  z-index: 0;
+}
+
+.bg-monster svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Interior photos — masonry layout */
+.int-photo-101 { left: 18.5%; top: 17.2%; width: 36.9%; height: 14.8%; z-index: 1; }
+.int-photo-102 { left: 56.8%; top: 17.2%; width: 24.7%; height: 22.2%; z-index: 1; }
+.int-photo-111 { left: 18.5%; top: 32.8%; width: 36.9%; height: 14.8%; z-index: 1; }
+.int-photo-110 { left: 44.5%; top: 40.2%; width: 36.9%; height: 14.8%; z-index: 1; }
+.int-photo-109 { left: 18.5%; top: 48.4%; width: 24.7%; height: 22.2%; z-index: 1; }
+.int-photo-108 { left: 44.4%; top: 55.8%; width: 36.9%; height: 14.8%; z-index: 1; }
+.int-photo-105 { left: 18.5%; top: 71.4%; width: 36.9%; height: 14.8%; z-index: 1; }
+
+/* Decorative stickers */
+.sticker-flower1 { left: 76.5%; top: 20.4%; width: 7.2%; aspect-ratio: 1; transform: rotate(26.4deg); z-index: 2; }
+.sticker-flower2 { left: 39.9%; top: 53.1%; width: 7.2%; aspect-ratio: 1; transform: rotate(26.4deg); z-index: 2; }
+.sticker-star { left: 72.6%; top: 51.2%; width: 15.9%; transform: rotate(11.43deg); z-index: 2; }
+.sticker-star svg { width: 100%; height: auto; pointer-events: none; }
+.sticker-postit { left: 9.1%; top: 57%; width: 12.2%; transform: rotate(8.69deg); z-index: 2; }
+
+.interiors-spiral {
+  left: 57.6%;
+  top: 43%;
+  width: 17%;
+  aspect-ratio: 1;
+  z-index: 2;
+}
+
+.interiors-spiral svg {
+  width: 100%;
+  height: 100%;
+  animation: spin 30s linear infinite;
+}
+
+.int-footer-monster {
+  position: absolute;
+  top: 91.1%;
+  left: 0;
+  width: 100%;
+  height: 5.2%;
+  z-index: 1;
+}
+
+.int-footer-monster svg {
+  width: 100%;
+  height: 100%;
+}
+
+.interiors-content .footer {
+  height: 3.75%;
+}
+
+/* ==========================================================
+   SHOP PAGE
+   ========================================================== */
+
+.shop {
+  position: relative;
+  width: 100%;
+  background-color: #f7f2ec;
+  overflow: hidden;
+}
+
+.shop-content {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1440 / 2235;
+}
+
+
+
+
+.shop-heading {
+  position: absolute;
+  left: 21.9%;
+  top: 3.13%;
+  width: 36.9%;
+  font-family: 'Erica One', cursive;
+  font-size: clamp(2rem, 4.5vw, 4.0625rem);
+  line-height: 1.05;
+  color: #32261f;
+}
+
+.shop-body {
+  position: absolute;
+  left: 21.9%;
+  top: 11.8%;
+  width: 56.1%;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #32261f;
+}
+
+/* Shopping cart character */
+.shop-cart {
+  position: absolute;
+  left: 70.9%;
+  top: 0.72%;
+  width: 19.8%;
+  transform: rotate(8.64deg);
+}
+
+.shop-cart img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+/* Product grid — placeholder for Shopify storefront */
+.product-grid {
+  position: absolute;
+  left: 21.9%;
+  top: 15.8%;
+  width: 56.2%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.78vw 1.37vw;
+}
+
+.product-card {
+  text-align: center;
+}
+
+.product-image-wrap {
+  background-color: #ED774C;
+  aspect-ratio: 394 / 425;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11% 15.6%;
+  overflow: hidden;
+}
+
+.product-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-name {
+  font-family: 'Handjet', sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #000;
+  margin-top: 0.5rem;
+}
+
+.product-price {
+  font-family: 'Handjet', sans-serif;
+  font-weight: 400;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #000;
+  letter-spacing: -0.01em;
+}
+
+/* Footer monster for shop */
+.shop-footer-monster {
+  position: absolute;
+  top: 89.9%;
+  left: 0;
+  width: 100%;
+  height: 6.1%;
+  z-index: 1;
+}
+
+.shop-footer-monster svg {
+  width: 100%;
+  height: 100%;
+}
+
+.shop-content .footer {
+  height: 4.03%;
+}
+
+/* ==========================================================
+   CONTACT PAGE
+   ========================================================== */
+
+.contact {
+  position: relative;
+  width: 100%;
+  height: calc(100vh + 90px);
+  background-color: #f7f2ec;
+  overflow: hidden;
+}
+
+.contact-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.contact-heading {
+  position: absolute;
+  left: 21.9%;
+  top: 6.8%;
+  width: 36.9%;
+  font-family: 'Erica One', cursive;
+  font-size: clamp(2rem, 4.5vw, 4.0625rem);
+  line-height: 1.05;
+  color: #32261f;
+}
+
+/* "WHO'S THERE?" wavy scrolling marquee */
+.whos-there-marquee {
+  position: absolute;
+  left: 39.4%;
+  top: 9.3%;
+  width: 41.3%;
+  height: 12.6%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.whos-there-marquee svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.contact-body {
+  position: absolute;
+  left: 21.9%;
+  top: 25.8%;
+  width: 56.1%;
+  font-family: 'Instrument Sans', sans-serif;
+  font-size: clamp(0.75rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #32261f;
+}
+
+/* Contact form — will be wired to form service later */
+.contact-form {
+  position: absolute;
+  left: 21.9%;
+  top: 30.9%;
+  width: 56.1%;
+}
+
+.contact-textarea {
+  width: 100%;
+  aspect-ratio: 808 / 194;
+  background: white;
+  border: 2px solid #32261f;
+  border-radius: 14px;
+  padding: 1.25rem;
+  font-family: 'Handjet', sans-serif;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #32261f;
+  letter-spacing: -0.01em;
+  resize: none;
+  display: block;
+}
+
+.contact-textarea::placeholder {
+  color: #9a7555;
+}
+
+.contact-submit {
+  width: 100%;
+  height: 55px;
+  margin-top: 10px;
+  background: #51B18C;
+  border: none;
+  border-radius: 100px;
+  font-family: 'Handjet', sans-serif;
+  font-weight: 600;
+  font-size: clamp(0.7rem, 1vw, 0.875rem);
+  line-height: 1.57;
+  color: #f7f2ec;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+}
+
+.contact-submit:hover {
+  opacity: 0.85;
+}
+
+.contact-footer-monster {
+  position: absolute;
+  top: 79.9%;
+  left: 0;
+  width: 100%;
+  height: 11.5%;
+  z-index: 1;
+}
+
+.contact-footer-monster svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================
+   RESPONSIVE — stack on small screens
+   ========================================================== */
+
+@media (max-width: 48rem) {
+  .home-content {
+    aspect-ratio: auto;
+    min-height: 100vh;
+  }
+
+  .wordmark {
+    width: 30%;
+    left: 5%;
+    top: 3%;
+  }
+
+  .nav-menu {
+    left: 5%;
+    top: 12%;
+  }
+
+  .furniture-couch {
+    width: 50%;
+    left: 20%;
+  }
+
+  .furniture-dresser {
+    width: 55%;
+  }
+
+  .footer {
+    height: auto;
+    padding: 1rem 5%;
+    position: relative;
+  }
+}
