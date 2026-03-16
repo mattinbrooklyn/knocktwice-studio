@@ -128,11 +128,20 @@
     });
   });
 
+  function getLayoutParent(el) {
+    var parent = el.parentElement;
+    while (parent) {
+      if (window.getComputedStyle(parent).display !== 'contents') return parent;
+      parent = parent.parentElement;
+    }
+    return document.documentElement;
+  }
+
   document.addEventListener('mousemove', function(e) {
     if (!active) return;
 
     if (mode === 'drag') {
-      var parentRect = active.parentElement.getBoundingClientRect();
+      var parentRect = getLayoutParent(active).getBoundingClientRect();
       var newLeft = e.clientX - parentRect.left - dragOffsetX;
       var newTop = e.clientY - parentRect.top - dragOffsetY;
       active.style.left = newLeft + 'px';
