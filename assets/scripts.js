@@ -3,6 +3,29 @@
    ========================================================== */
 
 /* -------------------------
+   Mobile Nav Toggle
+   Hamburger opens/closes the full-screen nav overlay
+------------------------- */
+(function() {
+  var toggle = document.querySelector('.nav-toggle');
+  var menu = document.querySelector('.nav-menu');
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener('click', function() {
+    var isOpen = menu.classList.toggle('open');
+    toggle.classList.toggle('open', isOpen);
+  });
+
+  /* Close overlay when a nav link is tapped */
+  menu.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      menu.classList.remove('open');
+      toggle.classList.remove('open');
+    });
+  });
+})();
+
+/* -------------------------
    Eye Tracking (Splash page)
    Moves the keyhole eye toward the cursor
 ------------------------- */
@@ -39,6 +62,9 @@
 (function() {
   var pieces = document.querySelectorAll('.furniture');
   if (!pieces.length) return;
+
+  /* Skip drag/rotate on small screens — conflicts with scrolling */
+  if (window.innerWidth <= 768) return;
 
   var active = null;
   var mode = null;
