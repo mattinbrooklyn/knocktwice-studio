@@ -65,10 +65,6 @@ html, body {
 .nav a.active { font-weight: 700; }
 .nav a:hover  { opacity: 0.65; }
 
-/* ── Monster wave ────────────────────────────────────────────────────── */
-/* Blue background fills any sub-pixel gap between the SVG and the footer */
-.monster-area { background: var(--color-blue); }
-
 /* ── Footer ─────────────────────────────────────────────────────────── */
 /* .footer top value is set per-page since it varies with page height   */
 .footer {
