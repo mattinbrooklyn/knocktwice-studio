@@ -82,19 +82,17 @@
       z-index: 1;
     }
 
-    /* ── "WHO'S THERE?" arc ticker ────────────────────────────────
-       Absolutely positioned at canvas origin (left:0, top:0).
-       The bezier path lives in raw canvas pixel coords — no viewBox
-       distortion — so font metrics are exactly right. clipPath
-       enforces visibility only within x:316–1124 (content column).
-       z-index:2 places it in front of the heading. */
-    #who-arc {
+    /* ── "WHO'S THERE?" marquee ───────────────────────────────────*/
+    .whos-there-marquee {
       position: absolute;
-      left: 0; top: 0;
-      width: 1440px; height: 230px;
+      left: 316px; top: 93px;
+      width: 808px; height: 113px;
       pointer-events: none;
-      overflow: visible;
       z-index: 2;
+    }
+    .whos-there-marquee svg {
+      width: 100%; height: 100%;
+      overflow: visible;
     }
 
     /* ── Body text ─────────────────────────────────────────────────*/
@@ -321,32 +319,19 @@
     <!-- Heading -->
     <h1 class="h1">KNOCK KNOCK</h1>
 
-    <!-- ── "WHO'S THERE?" arc ticker ────────────────────────────────
-         Font: Handjet SemiBold 22px (Figma "Animations/Web" style).
-         Path derived from Figma textPath bounding box (x:316, y:93,
-         w:808, h:113): peak baseline canvas y:111, edge baseline y:203.
-         Quadratic: M -184 203 Q 720 19 1624 203 (symmetric, extended
-         500px beyond Figma bounds on each side for scroll buffer).
-         clipPath restricts visibility to the content column x:316–1124
-         so scrolling text never leaks into the nav area.
-         JS decreases startOffset each frame = right-to-left ticker. -->
-    <svg id="who-arc" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <clipPath id="who-clip">
-          <rect x="316" y="0" width="808" height="220"/>
-        </clipPath>
-        <path id="who-arc-path" d="M -184 203 Q 720 19 1624 203"/>
-      </defs>
-      <g clip-path="url(#who-clip)">
-        <text font-family="'Handjet', sans-serif" font-size="22" font-weight="600"
-              fill="#FA84E3" letter-spacing="-0.22"
-              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2">
-          <textPath id="who-textpath" href="#who-arc-path" startOffset="500">
-            WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp; WHO'S THERE? 👀 &nbsp;&nbsp;
-          </textPath>
+    <div class="whos-there-marquee">
+      <svg viewBox="0 0 600 70" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="whos-path" d="M-1200 40 C-1125 15,-1075 15,-1050 40 C-1025 65,-975 65,-900 40 C-825 15,-775 15,-750 40 C-725 65,-675 65,-600 40 C-525 15,-475 15,-450 40 C-425 65,-375 65,-300 40 C-225 15,-175 15,-150 40 C-125 65,-75 65,0 40 C75 15,125 15,150 40 C175 65,225 65,300 40 C375 15,425 15,450 40 C475 65,525 65,600 40 C675 15,725 15,750 40 C775 65,825 65,900 40 C975 15,1025 15,1050 40 C1075 65,1125 65,1200 40 C1275 15,1325 15,1350 40 C1375 65,1425 65,1500 40 C1575 15,1625 15,1650 40 C1675 65,1725 65,1800 40 C1875 15,1925 15,1950 40 C1975 65,2025 65,2100 40 C2175 15,2225 15,2250 40 C2275 65,2325 65,2400 40 C2475 15,2525 15,2550 40 C2575 65,2625 65,2700 40 C2775 15,2825 15,2850 40 C2875 65,2925 65,3000 40 C3075 15,3125 15,3150 40 C3175 65,3225 65,3300 40 C3375 15,3425 15,3450 40 C3475 65,3525 65,3600 40"/>
+        </defs>
+        <text font-family="'Handjet', sans-serif" font-size="22" font-weight="500" fill="#D4A0C8" letter-spacing="-0.5">
+          <textPath id="whos-textpath" href="#whos-path" startOffset="0">WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  </textPath>
         </text>
-      </g>
-    </svg>
+        <text font-family="'Handjet', sans-serif" font-size="22" font-weight="500" fill="#D4A0C8" letter-spacing="-0.5">
+          <textPath id="whos-textpath2" href="#whos-path" startOffset="800">WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  </textPath>
+        </text>
+      </svg>
+    </div>
 
     <!-- Body copy -->
     <p class="intro">We're so glad you came by. Have something in mind? Just say hello and we'll figure out the rest.</p>
@@ -453,28 +438,6 @@
       el.setAttribute('cx', restX + nx * maxX * strength);
       el.setAttribute('cy', restY + ny * maxY * strength);
     }
-
-    // ── "WHO'S THERE?" arc scroll ──────────────────────────────────
-    // Path: M -184 203 Q 720 19 1624 203. Canvas x:316 is ~500px
-    // along the path from its start (316 - (-184) = 500). Keeping
-    // startOffset ≥ 500 ensures the clip region (x:316–1124) always
-    // has text — no blank frames. Decreasing startOffset scrolls
-    // text right-to-left. Reset is seamless because text repeats
-    // every WHO_REPEAT px.
-    // WHO_REPEAT = Handjet SemiBold 22px advance width of one
-    // "WHO'S THERE? 👀  " segment. Tune if you see a loop seam.
-    const whoTP      = document.getElementById('who-textpath');
-    const WHO_REPEAT = 252; // px — Handjet 22px, one "WHO'S THERE? 👀  " segment
-    const WHO_SPEED  = 0.5; // canvas px per frame at 60fps
-    let   whoOff     = 500 + WHO_REPEAT; // start: first char just past left clip edge
-
-    (function tickWho() {
-      whoOff -= WHO_SPEED;
-      if (whoOff < 500) whoOff += WHO_REPEAT;
-      whoTP.setAttribute('startOffset', whoOff + 'px');
-      requestAnimationFrame(tickWho);
-    })();
-
 
     // Monster wave — SVG viewBox 0 0 1440 110, wave div top at canvas y:824
     const monIrisR = document.getElementById('mon-iris-r');
