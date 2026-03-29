@@ -16,9 +16,9 @@
        scaled by JS to fit the viewport. */
     .page {
       position: absolute;
-      top: 50%; left: 50%;
+      top: 0; left: 0;
       width: 1440px; height: 1024px;
-      transform-origin: center center;
+      transform-origin: top left;
       background: var(--color-bg);
       overflow: hidden;
     }
@@ -325,7 +325,7 @@
 
     function scalePage() {
       scale = window.innerWidth / 1440;
-      page.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      page.style.transform = `scale(${scale})`;
     }
     scalePage();
     window.addEventListener('resize', scalePage);
