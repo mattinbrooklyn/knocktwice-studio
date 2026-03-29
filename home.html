@@ -3,119 +3,538 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Knock Twice — Home</title>
+  <title>Home — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Instrument+Sans:wght@400;700&family=Handjet&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #f7f2ec;
+      cursor: none;
+      overflow: hidden;
+    }
+
+    /* ── Custom cursor ────────────────────────────────────────────
+       Fixed 48×48, follows mouse in viewport coords.
+       Stays outside .page so it's unaffected by the scale transform. */
+    #custom-cursor {
+      position: fixed;
+      left: 0; top: 0;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      transform: translate(-200px, -200px);
+      width: 48px;
+      height: 48px;
+    }
+    #custom-cursor svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ── Page canvas ──────────────────────────────────────────────
+       Fixed 1440×1024 (exact Figma frame size), centered and
+       uniformly scaled by JS to fit the viewport.               */
+    .page {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1440px;
+      height: 1024px;
+      transform-origin: center center;
+      /* JS sets: transform: translate(-50%,-50%) scale(s)        */
+      background: #f7f2ec;
+    }
+
+    /* ── Logo ─────────────────────────────────────────────────── */
+    .logo {
+      position: absolute;
+      left: 40px; top: 70px;
+      width: 204px; height: 80px;
+    }
+    .logo img {
+      width: 100%; height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: left top;
+    }
+
+    /* ── Navigation ───────────────────────────────────────────── */
+    .nav {
+      position: absolute;
+      left: 40px; top: 200px;
+      width: 256px;
+    }
+    .nav a {
+      display: block;
+      font-family: 'Handjet', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 27px;
+      letter-spacing: -0.22px;
+      color: #32261F;
+      text-decoration: none;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      margin-bottom: 8px;
+    }
+    .nav a:hover { opacity: 0.65; }
+
+    /* ── Furniture pieces ─────────────────────────────────────── */
+    .furniture {
+      position: absolute;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .furniture img.base {
+      display: block;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      object-fit: fill;
+    }
+    .furniture .eyes {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    .furniture.is-dragging { z-index: 200; }
+
+    /* ── Circular sticker ─────────────────────────────────────── */
+    .sticker-outer {
+      position: absolute;
+      left: 1115px; top: 315px;
+      width: 176px; height: 176px;
+      overflow: visible; /* text ring must never clip */
+    }
+
+    /* ── Footer — just below the fold ────────────────────────── */
+    .footer {
+      position: absolute;
+      left: 0; top: 1024px;
+      width: 1440px; height: 90px;
+      background: #378CDA;
+      display: flex;
+      align-items: center;
+    }
+    .footer-icons {
+      position: absolute;
+      left: 40px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .footer-icons a {
+      display: flex;
+      align-items: center;
+      width: 20px; height: 20px;
+    }
+    .footer-icons img {
+      width: 100%; height: 100%;
+      display: block;
+    }
+    .footer-copyright {
+      position: absolute;
+      right: 40px;
+      font-family: 'Handjet', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #f7f2ec;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      white-space: nowrap;
+    }
+  </style>
 </head>
-<body data-page="home">
+<body>
 
-  <!-- Dark curtain overlay — drops away to reveal the page -->
-  <div class="page-curtain" id="page-curtain"></div>
-
-  <div class="home">
-    <div class="home-content">
-
-      <!-- ========================
-           HEADER — Logo + Nav
-           ======================== -->
-      <header>
-        <div class="wordmark">
-          <a href="home.html"><img src="assets/logo-wordmark.svg" alt="Knock Twice"></a>
-        </div>
-        <nav>
-          <ul class="nav-menu">
-            <li><a href="about.html">About</a></li>
-            <li><a href="interiors.html">Interiors</a></li>
-            <li><a href="shop.html">Shop</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </nav>
-        <button class="nav-toggle" aria-label="Menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#32261f" stroke-width="2" stroke-linecap="round">
-            <line class="nav-toggle-top" x1="3" y1="6" x2="21" y2="6"/>
-            <line class="nav-toggle-mid" x1="3" y1="12" x2="21" y2="12"/>
-            <line class="nav-toggle-bot" x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </header>
-
-      <!-- ========================
-           MAIN — Draggable furniture
-           ======================== -->
-      <main>
-        <div class="furniture furniture-couch" data-no-rotate>
-          <img src="assets/couch.png" alt="Blue couch with eyes">
-        </div>
-
-        <div class="furniture furniture-vase">
-          <img src="assets/vase.png" alt="Yellow vase with eyes">
-        </div>
-
-        <div class="furniture furniture-nightstand" data-rotate-zone="legs">
-          <img src="assets/nightstand.png" alt="Red nightstand with eyes">
-        </div>
-
-        <div class="furniture furniture-carpet" data-rotate-zone="top-left">
-          <img src="assets/carpet.png" alt="Purple carpet with eyes">
-        </div>
-
-        <div class="furniture furniture-dresser" data-rotate-zone="legs">
-          <img src="assets/dresser.png" alt="Green dresser with eyes">
-        </div>
-
-        <!-- Spiral text sticker -->
-        <div class="spiral-text furniture">
-          <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <path id="text-circle" d="M88,16 a72,72 0 1,1 0,144 a72,72 0 1,1 0,-144" fill="none"/>
-            </defs>
-            <circle cx="88" cy="88" r="72" fill="none" stroke="none"/>
-            <text font-family="'Handjet', sans-serif" font-size="13.5" fill="#32261f" letter-spacing="0.5">
-              <textPath href="#text-circle" startOffset="0%">Make yourself at home. No, seriously—feel free to rearrange the furniture &#x1F41E;</textPath>
-            </text>
-          </svg>
-        </div>
-      </main>
-
-      <!-- ========================
-           FOOTER
-           ======================== -->
-      <footer class="footer">
-        <div class="footer-socials">
-          <a href="#" aria-label="Instagram">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14.9167 5.75H14.925M6.16667 2H14.5C16.8012 2 18.6667 3.86548 18.6667 6.16667V14.5C18.6667 16.8012 16.8012 18.6667 14.5 18.6667H6.16667C3.86548 18.6667 2 16.8012 2 14.5V6.16667C2 3.86548 3.86548 2 6.16667 2ZM13.6667 9.80833C13.7695 10.5019 13.651 11.2102 13.3281 11.8325C13.0052 12.4548 12.4943 12.9595 11.868 13.2747C11.2418 13.5899 10.532 13.6997 9.83982 13.5883C9.1476 13.4769 8.50813 13.1501 8.01237 12.6543C7.5166 12.1585 7.18978 11.5191 7.07839 10.8269C6.967 10.1346 7.07672 9.42491 7.39194 8.79865C7.70716 8.17238 8.21182 7.66145 8.83415 7.33853C9.45649 7.01562 10.1648 6.89716 10.8583 7C11.5658 7.1049 12.2207 7.43455 12.7264 7.94026C13.2321 8.44596 13.5618 9.1009 13.6667 9.80833Z" stroke="#f7f2ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <a href="#" aria-label="TikTok">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 10C20 15.5228 15.5228 20 10 20C4.47725 20 0 15.5228 0 10C0 4.47725 4.4768 0 10 0C15.5232 0 20 4.47725 20 10ZM14.8437 7.24463C13.8984 7.19521 12.95 6.80025 12.4695 5.95244C12.2331 5.53522 12.0834 4.99555 12.0362 4.5191L11.977 4.44519H10.2663V12.1111C10.2663 14.2942 6.8853 14.308 6.8853 12.1111C6.8853 11.4414 7.57859 10.4444 8.28881 10.4444H9.11078V8.66684H8.15522C7.26467 8.66684 6.07044 9.57209 5.62561 10.3148C3.77772 13.3997 7.26512 16.8987 10.3402 15.0739C11.0388 14.6594 11.9993 13.4861 11.9993 12.6445V8.15611L12.0875 8.11114C12.8707 8.67798 13.8717 9.0106 14.8433 9.02262V7.24508L14.8437 7.24463Z" fill="#f7f2ec"/>
-            </svg>
-          </a>
-        </div>
-        <p class="footer-copy">&copy; 2026 Knock Twice Studio. All rights reserved.</p>
-      </footer>
-
-    </div>
+  <!-- ── Custom cursor ─────────────────────────────────────────── -->
+  <div id="custom-cursor">
+    <!-- Open hand (default) — assembled from Figma nodes 7037:185–7037:213 -->
+    <!-- viewBox 0 0 94 100: blue body sits at translate(5.591,5.545), dark/pink outlines surround it -->
+    <svg id="cursor-open" viewBox="0 0 94 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Blue open-hand body -->
+      <g transform="translate(5.591 5.545)">
+        <path fill="#008BE0"
+          d="M82.818 10.9806V66.45H77.4594V78.287H71.9238V88.9096H29.9967V83.2019H24.461V77.7116H18.4205V72.2214H11.9792V61.0234H6.44351V55.5331H0V42.5936H12.8848V48.0312H19.6007V60.9597H25.1363V5.49028H35.4039V42.5936H40.9396V0H51.2093V42.5936H56.745V5.49028H67.0125V42.5936H72.5482V10.9806H82.818ZM80.2273 19.3148V13.9717H74.6916V19.3148H80.2273ZM64.6477 13.1152V7.77424H59.112V13.1152H64.6477ZM48.8423 8.16076V2.81761H43.3066V8.16076H48.8423ZM33.0368 13.1152V7.77424H27.5012V13.1152H33.0368Z"/>
+      </g>
+      <!-- Dark outline rects (#34261E) -->
+      <rect x="88.41" y="16.50" width="5.54"  height="55.47" fill="#34261E"/> <!-- right finger edge -->
+      <rect x="83.05" y="72.00" width="5.54"  height="12.10" fill="#34261E"/> <!-- right palm upper -->
+      <rect x="78.14" y="11.04" width="10.27" height="5.49"  fill="#34261E"/> <!-- top right finger -->
+      <rect x="77.51" y="83.83" width="5.54"  height="10.62" fill="#34261E"/> <!-- right palm lower -->
+      <rect x="77.51" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/> <!-- bottom-right corner -->
+      <rect x="72.60" y="11.04" width="5.54"  height="37.10" fill="#34261E"/> <!-- right inner finger -->
+      <rect x="74.01" y="11.04" width="4.13"  height="5.49"  fill="#34261E"/> <!-- right finger detail -->
+      <rect x="56.80" y="5.50"  width="15.80" height="5.49"  fill="#34261E"/> <!-- top 2nd-right finger -->
+      <rect x="56.80" y="11.04" width="5.54"  height="37.10" fill="#34261E"/> <!-- 2nd finger left edge -->
+      <rect x="46.53" y="0.05"  width="10.27" height="5.49"  fill="#34261E"/> <!-- top middle finger -->
+      <rect x="40.99" y="11.04" width="5.54"  height="37.10" fill="#34261E"/> <!-- middle-left finger -->
+      <rect x="35.59" y="94.45" width="41.93" height="5.49"  fill="#34261E"/> <!-- bottom edge wide -->
+      <rect x="30.73" y="5.55"  width="15.80" height="5.49"  fill="#34261E"/> <!-- top 4th finger -->
+      <rect x="30.05" y="88.75" width="5.54"  height="5.71"  fill="#34261E"/> <!-- lower-left palm -->
+      <rect x="30.05" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/> <!-- bottom-left corner -->
+      <rect x="25.19" y="11.00" width="5.54"  height="55.47" fill="#34261E"/> <!-- 4th finger left edge -->
+      <rect x="23.61" y="83.26" width="6.44"  height="5.49"  fill="#34261E"/> <!-- palm lower-left -->
+      <rect x="25.19" y="48.09" width="3.55"  height="5.49"  fill="#34261E"/> <!-- palm-finger join -->
+      <rect x="18.48" y="48.09" width="6.72"  height="5.49"  fill="#34261E"/> <!-- thumb-top -->
+      <rect x="17.57" y="77.77" width="6.44"  height="5.49"  fill="#34261E"/> <!-- thumb lower -->
+      <rect x="5.59"  y="42.65" width="12.88" height="5.49"  fill="#34261E"/> <!-- thumb outline top -->
+      <rect x="12.03" y="66.57" width="5.54"  height="11.20" fill="#34261E"/> <!-- thumb lower-right -->
+      <rect x="5.59"  y="61.08" width="6.44"  height="5.49"  fill="#34261E"/> <!-- thumb left -->
+      <rect x="0.06"  y="48.30" width="5.54"  height="12.78" fill="#34261E"/> <!-- leftmost thumb -->
+      <!-- Pink fingernail accents (#FA84E3) — one per finger tip -->
+      <rect x="80.28" y="19.52" width="5.54"  height="5.34"  fill="#FA84E3"/> <!-- rightmost nail -->
+      <rect x="64.70" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/> <!-- 2nd nail -->
+      <rect x="48.84" y="8.16"  width="5.54"  height="5.34"  fill="#FA84E3"/> <!-- middle nail -->
+      <rect x="33.04" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/> <!-- 4th nail -->
+    </svg>
+    <!-- Closed/grabbing hand (drag state) -->
+    <svg id="cursor-closed" viewBox="0 0 89 75" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+      <path fill="#378CDA" transform="translate(5.62 5.52)"
+        d="M77.7503 10.9326V41.5965H72.3593V53.3818H66.7901V63.958H24.6091V58.2753H19.0399V52.809H12.9628V47.3426H6.4803V42.154H0V18.0038V17.8442H14.148V36.1301H19.7171V5.46631H30.0491V17.8442H35.6183V5.46631V0H45.9502V5.46631V17.8442H51.5194V5.46631H61.8491V17.8442H67.4183V10.9326H77.7503Z"/>
+      <rect x="83.375" y="16.455" width="5.572" height="30.66"  fill="#32261F"/>
+      <rect x="77.982" y="47.115" width="5.571" height="12.045" fill="#32261F"/>
+      <rect x="73.042" y="10.988" width="10.333" height="5.467" fill="#32261F"/>
+      <rect x="72.42"  y="69.48"  width="5.562" height="5.468"  fill="#32261F"/>
+      <rect x="72.42"  y="58.905" width="5.562" height="10.575" fill="#32261F"/>
+      <rect x="67.471" y="10.988" width="5.571" height="12.374" fill="#32261F"/>
+      <rect x="68.886" y="10.988" width="4.156" height="5.467"  fill="#32261F"/>
+      <rect x="30.233" y="69.48"  width="42.186" height="5.468" fill="#32261F"/>
+      <rect x="51.576" y="5.52"   width="15.895" height="5.467" fill="#32261F"/>
+      <rect x="51.576" y="10.988" width="5.571" height="12.374" fill="#32261F"/>
+      <rect x="41.243" y="0.053"  width="10.332" height="5.468" fill="#32261F"/>
+      <rect x="35.671" y="10.988" width="5.572" height="12.374" fill="#32261F"/>
+      <rect x="25.338" y="5.52"   width="15.905" height="5.467" fill="#32261F"/>
+      <rect x="24.662" y="69.48"  width="5.571" height="5.468"  fill="#32261F"/>
+      <rect x="18.183" y="63.795" width="12.05"  height="5.685" fill="#32261F"/>
+      <rect x="19.776" y="10.988" width="5.562"  height="30.659" fill="#32261F"/>
+      <rect x="18.183" y="58.328" width="6.479"  height="5.467" fill="#32261F"/>
+      <rect x="5.625"  y="17.903" width="14.151" height="5.459" fill="#32261F"/>
+      <rect x="12.104" y="52.86"  width="6.488"  height="5.467" fill="#32261F"/>
+      <rect x="5.625"  y="47.678" width="6.479"  height="5.467" fill="#32261F"/>
+      <rect x="0.053"  y="23.528" width="5.572"  height="24.149" fill="#32261F"/>
+    </svg>
   </div>
 
-  <script src="assets/scripts.js"></script>
+  <div class="page">
+
+    <!-- ── Logo ────────────────────────────────────────────────── -->
+    <div class="logo">
+      <img src="assets/logo-wordmark.svg" alt="Knock Twice">
+    </div>
+
+    <!-- ── Navigation ──────────────────────────────────────────── -->
+    <nav class="nav">
+      <a href="about.html">About</a>
+      <a href="interiors.html">Interiors</a>
+      <a href="experiences.html">Experiences</a>
+      <a href="shop.html">Shop</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+
+    <!-- ── Circular sticker ────────────────────────────────────── -->
+    <!-- Figma text-path node: x:1115 y:315 w:176 h:176 -->
+    <div class="sticker-outer">
+      <!-- Rotating text ring -->
+      <svg style="position:absolute;top:0;left:0;width:176px;height:176px;overflow:visible;"
+           viewBox="0 0 176 176" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="sticker-circle"
+            d="M88,88 m-68,0 a68,68 0 1,1 136,0 a68,68 0 1,1 -136,0"/>
+        </defs>
+        <g>
+          <animateTransform attributeName="transform" type="rotate"
+            from="0 88 88" to="360 88 88" dur="18s" repeatCount="indefinite"/>
+          <text font-family="Handjet, sans-serif" font-size="8.5"
+                fill="#32261F" font-variation-settings="'ELGR' 1, 'ELSH' 2"
+                letter-spacing="0.5">
+            <textPath href="#sticker-circle" textLength="344" lengthAdjust="spacing">
+              Make yourself at home. No, seriously&#8212; feel free to rearrange the furniture &#10022;
+            </textPath>
+          </text>
+        </g>
+      </svg>
+      <!-- Center hand icon: 111×114, centered in 176×176, tilted -21deg -->
+      <div style="position:absolute; left:32.5px; top:31px; width:111px; height:114px;
+                  transform:rotate(-20.98deg); transform-origin:50% 50%;">
+        <svg viewBox="0 0 111 114" width="111" height="114" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <g clip-path="url(#sticker-hand-clip)">
+            <path d="M104.398 13.3113V80.2199H98.0702V94.498H91.5334V107.311H42.0237V100.426H35.487V93.804H28.354V87.1815H20.7452V73.6742H14.2084V67.0517H6.60216V51.4437H21.8172V58.0026H29.745V73.5973H36.2818V6.68874H48.4089V51.4437H54.9457V28.5007H67.2898V51.3801H73.9442V35.1232H85.734V51.4437H92.2708V13.3113H104.398ZM101.603 22.4026V15.9603H95.0659V22.4026H101.603ZM45.5667 15.8702V9.42517H39.0299V15.8702H45.5667Z" fill="#008BE0"/>
+            <path d="M110.935 13.3113V80.2199H104.607H104.398V13.3113H110.935Z" fill="#34261E"/>
+            <path d="M104.607 80.2199V94.8132H98.0702V94.498V80.2199H104.398H104.607Z" fill="#34261E"/>
+            <path d="M104.398 6.68874H92.2708V13.3113H104.398V6.68874Z" fill="#34261E"/>
+            <path d="M101.603 15.9603H95.0659V22.4026H101.603V15.9603Z" fill="#FA84E3"/>
+            <path d="M98.0702 107.311H91.5334V113.934H98.0702V107.311Z" fill="#34261E"/>
+            <path d="M98.0702 94.8132V107.311H91.5334V94.498H98.0702V94.8132Z" fill="#34261E"/>
+            <path d="M92.2708 13.3113V51.4437H85.734V35.1232H86.2883V28.5007H85.734V6.68874H87.3917V13.3113H92.2708Z" fill="#34261E"/>
+            <path d="M92.2708 6.68874H87.3917V13.3113H92.2708V6.68874Z" fill="#34261E"/>
+            <path d="M91.5334 107.311H42.0237V113.934H91.5334V107.311Z" fill="#34261E"/>
+            <path d="M86.2883 28.5007H85.734V35.1232H86.2883V28.5007Z" fill="#34261E"/>
+            <path d="M85.734 28.5007H73.9442V35.1232H85.734V28.5007Z" fill="#34261E"/>
+            <path d="M73.9442 35.1232H67.2898V51.3801H73.9442V35.1232Z" fill="#34261E"/>
+            <path d="M73.9442 28.5007H67.2898V35.1232H73.9442V28.5007Z" fill="#34261E"/>
+            <path d="M67.2898 21.8781H54.9457V28.5007H67.2898V21.8781Z" fill="#34261E"/>
+            <path d="M54.9457 28.5007H48.4089V51.4437H54.9457V28.5007Z" fill="#34261E"/>
+            <path d="M54.9457 21.8781H48.4089V28.5007H54.9457V21.8781Z" fill="#34261E"/>
+            <path d="M54.9457 6.68874H48.4089V21.8781H54.9457V6.68874Z" fill="#34261E"/>
+            <path d="M54.9457 0.0662252V6.68874H48.4089H36.2818V0.0662252H54.9457Z" fill="#34261E"/>
+            <path d="M45.5667 9.42517H39.0299V15.8702H45.5667V9.42517Z" fill="#FA84E3"/>
+            <path d="M42.0237 107.311H35.487V113.934H42.0237V107.311Z" fill="#34261E"/>
+            <path d="M42.0237 100.426H35.487V107.311H42.0237V100.426Z" fill="#34261E"/>
+            <path d="M36.2818 6.68874V73.5973H29.745V58.0026H33.9417V51.3801H29.745V6.68874H36.2818Z" fill="#34261E"/>
+            <path d="M35.487 93.804V100.426H27.8807V93.804H28.354H35.487Z" fill="#34261E"/>
+            <path d="M33.9417 51.3801H29.745V58.0026H33.9417V51.3801Z" fill="#34261E"/>
+            <path d="M29.745 51.3801V58.0026H21.8172V51.4437V51.3801H29.745Z" fill="#34261E"/>
+            <path d="M28.354 87.1815V93.804H27.8807H20.7452V87.1815H28.354Z" fill="#34261E"/>
+            <path d="M21.8172 51.3801V51.4437H6.60216V44.8212H21.8172V51.3801Z" fill="#34261E"/>
+            <path d="M20.7452 73.6742H14.2084V87.1815H20.7452V73.6742Z" fill="#34261E"/>
+            <path d="M14.2084 67.0517H6.60216V73.6742H14.2084V67.0517Z" fill="#34261E"/>
+            <path d="M6.60216 51.6371H0.0653679V67.0517H6.60216V51.6371Z" fill="#34261E"/>
+          </g>
+          <defs>
+            <clipPath id="sticker-hand-clip">
+              <rect width="111" height="114" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── Furniture: Couch ────────────────────────────────────── -->
+    <!-- Figma: x:397 y:96 w:430 h:410, inner rotated 371×345 -->
+    <div class="furniture couch"
+         style="left:397px; top:96px; width:430px; height:410px;">
+      <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+        <div style="width:370.668px; height:345.37px; position:relative;
+                    transform:rotate(-11.01deg); flex-shrink:0; overflow:hidden;">
+          <img class="base" src="assets/furniture-couch.png" alt="Couch">
+          <svg class="eyes" viewBox="0 0 370.668 345.37" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="couch-eye-l-clip">
+                <path transform="translate(173.7 65.7) scale(0.4125 0.4745)"
+                  d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+              </clipPath>
+              <clipPath id="couch-eye-r-clip">
+                <path transform="translate(91.2 76.1) scale(0.5169 0.5878)"
+                  d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+              </clipPath>
+            </defs>
+            <path fill="white" transform="translate(173.7 65.7) scale(0.4125 0.4745)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            <path fill="white" transform="translate(91.2 76.1) scale(0.5169 0.5878)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            <circle clip-path="url(#couch-eye-l-clip)" cx="212.6" cy="77.8" r="17" fill="#32261F"/>
+            <circle clip-path="url(#couch-eye-r-clip)" cx="139.25" cy="86.85" r="21" fill="#32261F"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Furniture: Vase ─────────────────────────────────────── -->
+    <!-- Figma: x:871 y:110 w:194 h:353 -->
+    <div class="furniture vase"
+         style="left:871px; top:110px; width:194px; height:353px;">
+      <img class="base" src="assets/furniture-vase.png" alt="Vase">
+      <svg class="eyes" viewBox="0 0 194 353" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="vase-eye-l-clip">
+            <path transform="translate(106.8 120.4) scale(0.2981 0.4656)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="vase-eye-r-clip">
+            <path transform="translate(61.4 104.1) scale(0.2706 0.4268)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(106.8 120.4) scale(0.2981 0.4656)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(61.4 104.1) scale(0.2706 0.4268)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <circle clip-path="url(#vase-eye-l-clip)" cx="139.85" cy="123.9" r="13" fill="#32261F"/>
+        <circle clip-path="url(#vase-eye-r-clip)" cx="91.05"  cy="107.25" r="12" fill="#32261F"/>
+      </svg>
+    </div>
+
+    <!-- ── Furniture: Nightstand ───────────────────────────────── -->
+    <!-- Figma: x:163 y:331 w:314 h:286 -->
+    <div class="furniture nightstand"
+         style="left:163px; top:331px; width:314px; height:286px;">
+      <img class="base" src="assets/furniture-nightstand.png" alt="Nightstand">
+      <svg class="eyes" viewBox="0 0 314 286" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="nightstand-eye-l-clip">
+            <path transform="translate(210 82.9) scale(0.4333 0.5103)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="nightstand-eye-r-clip">
+            <path transform="translate(122.8 95.7) scale(0.5453 0.6386)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(210 82.9) scale(0.4333 0.5103)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(122.8 95.7) scale(0.5453 0.6386)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <circle clip-path="url(#nightstand-eye-l-clip)" cx="236.9" cy="95.6"  r="18" fill="#32261F"/>
+        <circle clip-path="url(#nightstand-eye-r-clip)" cx="159.4" cy="107"   r="22" fill="#32261F"/>
+      </svg>
+    </div>
+
+    <!-- ── Furniture: Carpet ───────────────────────────────────── -->
+    <!-- Figma: x:350 y:513 w:448 h:275 -->
+    <div class="furniture carpet"
+         style="left:350px; top:513px; width:448px; height:275px;">
+      <img class="base" src="assets/furniture-carpet.png" alt="Carpet">
+      <svg class="eyes" viewBox="0 0 449 275" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="carpet-eye-l-clip">
+            <path transform="translate(260.8 123.3) scale(0.4526 0.6536)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="carpet-eye-r-clip">
+            <path transform="translate(170.1 146.9) scale(0.5687 0.8148)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(260.8 123.3) scale(0.4526 0.6536)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(170.1 146.9) scale(0.5687 0.8148)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <circle clip-path="url(#carpet-eye-l-clip)" cx="283"   cy="118"   r="19" fill="#32261F"/>
+        <circle clip-path="url(#carpet-eye-r-clip)" cx="202"   cy="140"   r="24" fill="#32261F"/>
+      </svg>
+    </div>
+
+    <!-- ── Furniture: Dresser ──────────────────────────────────── -->
+    <!-- Figma: x:780 y:485 w:569 h:303 -->
+    <div class="furniture dresser"
+         style="left:780px; top:485px; width:569px; height:303px;">
+      <img class="base" src="assets/furniture-dresser.png" alt="Dresser">
+      <svg class="eyes" viewBox="0 0 568 303" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="dresser-eye-l-clip">
+            <path transform="translate(242.2 95.3) scale(0.6464 0.7102)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="dresser-eye-r-clip">
+            <path transform="translate(143.9 80.6) scale(0.5854 0.6476)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(242.2 95.3) scale(0.6464 0.7102)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(143.9 80.6) scale(0.5854 0.6476)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <circle clip-path="url(#dresser-eye-l-clip)" cx="273.2" cy="86.75" r="26.5" fill="#32261F"/>
+        <circle clip-path="url(#dresser-eye-r-clip)" cx="167.9" cy="72"    r="24"   fill="#32261F"/>
+      </svg>
+    </div>
+
+    <!-- ── Footer — just below the fold ──────────────────────── -->
+    <footer class="footer">
+      <div class="footer-icons">
+        <a href="#" aria-label="Instagram">
+          <img src="assets/icon-instagram.svg" alt="Instagram">
+        </a>
+        <a href="#" aria-label="TikTok">
+          <img src="assets/icon-tiktok.svg" alt="TikTok">
+        </a>
+      </div>
+      <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+    </footer>
+
+  </div><!-- /.page -->
+
   <script>
-  (function() {
-    var curtain = document.getElementById('page-curtain');
-    if (sessionStorage.getItem('curtain')) {
-      sessionStorage.removeItem('curtain');
-      // Small delay so the page renders underneath first
-      requestAnimationFrame(function() {
-        curtain.classList.add('curtain-drop');
-      });
-    } else {
-      // No curtain needed (direct navigation) — hide immediately
-      curtain.style.display = 'none';
+    // ─── Uniform scale to fit viewport ───────────────────────────
+    // The page is a fixed 1440×1024 canvas. JS scales it uniformly
+    // so it fits entirely within the viewport at any window size,
+    // while preserving exact Figma pixel ratios.
+    const page = document.querySelector('.page');
+    let scale = 1;
+
+    function scalePage() {
+      scale = Math.min(
+        window.innerWidth  / 1440,
+        window.innerHeight / 1024
+      );
+      page.style.transform = `translate(-50%, -50%) scale(${scale})`;
     }
-  })();
+    scalePage();
+    window.addEventListener('resize', scalePage);
+
+    // ─── Custom cursor ────────────────────────────────────────────
+    // Cursor div is fixed 48px, outside the scaled page, so it moves
+    // in true viewport pixels — no scale factor needed here.
+    const cursor       = document.getElementById('custom-cursor');
+    const cursorOpen   = document.getElementById('cursor-open');
+    const cursorClosed = document.getElementById('cursor-closed');
+
+    function setCursorState(state) {
+      if (state === 'grab') {
+        cursorOpen.style.display   = 'none';
+        cursorClosed.style.display = '';
+      } else {
+        cursorOpen.style.display   = '';
+        cursorClosed.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('mousemove', e => {
+      // Offset: middle-fingertip of 94×100 cursor at ≈x=24, y=0 in 48px display
+      cursor.style.transform = `translate(${e.clientX - 24}px, ${e.clientY}px)`;
+    });
+
+    // ─── Draggable furniture ──────────────────────────────────────
+    // Mouse events are in viewport pixels; furniture positions are in
+    // page pixels (pre-scale). Divide by scale to convert between them.
+    let dragging = null;
+    let offsetX  = 0;
+    let offsetY  = 0;
+    let topZ     = 10;
+
+    document.querySelectorAll('.furniture').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        // Convert click offset into page (unscaled) coordinates
+        offsetX = (e.clientX - rect.left) / scale;
+        offsetY = (e.clientY - rect.top)  / scale;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        setCursorState('grab');
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const pageRect = page.getBoundingClientRect();
+      // Convert viewport coords to page coords, then subtract the grab offset
+      const x = (e.clientX - pageRect.left) / scale - offsetX;
+      const y = (e.clientY - pageRect.top)  / scale - offsetY;
+      dragging.style.left = x + 'px';
+      dragging.style.top  = y + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        setCursorState('default');
+      }
+    });
+
+    // Prevent browser image-drag ghost
+    document.querySelectorAll('.furniture img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
   </script>
+
 </body>
 </html>

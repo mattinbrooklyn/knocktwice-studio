@@ -4,69 +4,220 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Knock Twice</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Instrument+Sans:wght@400;700&family=Handjet&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #32261f;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .keyhole {
+      height: min(82vh, 598px);
+      width: auto;
+      /* transform-origin defaults to 50% 50% on HTML elements — correct for centered zoom */
+      will-change: transform;
+    }
+  </style>
 </head>
-<body data-page="splash">
+<body>
 
-  <!-- Hidden SVG: keyhole clip-path for the frame -->
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-    <defs>
-      <clipPath id="keyhole-clip-norm" clipPathUnits="objectBoundingBox">
-        <path d="M1 0.23795 C1 0.15594 0.96458 0.09575 0.89375 0.0575 C0.82292 0.01919 0.70979 0 0.55435 0 H0.44688 C0.29144 0 0.17806 0.01919 0.10686 0.05743 C0.03566 0.09575 0 0.15594 0 0.23795 C0 0.31996 0.03578 0.38093 0.10748 0.42078 C0.14523 0.44183 0.19466 0.45723 0.25541 0.46718 L0.1424 1 H0.85539 L0.7425 0.46769 C0.8046 0.45774 0.85489 0.44215 0.89314 0.42078 C0.96434 0.38093 1 0.31996 1 0.23795Z"/>
-      </clipPath>
-    </defs>
-  </svg>
+  <div class="splash">
+    <svg id="keyhole-svg" class="keyhole" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- ========================
-       SPLASH — Keyhole logo
-       ======================== -->
-  <main class="splash">
-    <div class="splash-frame">
-      <svg class="splash-logo" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Knock Twice — keyhole logo">
-        <defs>
-          <clipPath id="eyelid-clip">
-            <path d="M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z"/>
-          </clipPath>
-        </defs>
-        <!-- Blue creature body — extends beyond viewBox so keyhole is fully filled.
-             Uneven dome top only visible as creature drops out. -->
-        <path d="M-30 700 L-30 70 C20 -15, 90 -35, 160 -20 C220 -8, 280 -30, 343 60 L343 700 Z" fill="#378CDA"/>
-        <!-- Fixed eyelid clip; eye contents move inside to track cursor -->
-        <g clip-path="url(#eyelid-clip)">
-          <g class="eye">
-            <circle cx="157.5" cy="151.5" r="80.5" fill="white"/>
-            <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
-          </g>
-        </g>
-      </svg>
-    </div>
-  </main>
+      <!-- Eye white — hidden during zoom phase -->
+      <circle id="eye-white" cx="157.5" cy="151.5" r="80.5" fill="white"/>
 
-  <script src="assets/scripts.js"></script>
+      <!-- Two-eye whites — shown only during the rise phase -->
+      <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white" style="display:none"/>
+      <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white" style="display:none"/>
+
+      <!--
+        Iris/pupil. JS drives this group's translate for mouse tracking
+        and snaps it during the click animation.
+        Resting center: (165, 114.5) in SVG coords.
+      -->
+      <g id="iris">
+        <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+      </g>
+
+      <!-- Two-eye irises — shown only during the rise phase -->
+      <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F" style="display:none"/>
+      <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F" style="display:none"/>
+
+      <!--
+        Blue keyhole body.
+        The sub-path M89.9509… (opposite winding) cuts the eye-almond
+        window into the fill. During the zoom phase JS replaces this
+        with the solid version (no hole) so the keyhole fills cleanly.
+      -->
+      <path id="keyhole-path"
+        d="M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295ZM89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z"
+        fill="#378CDA"/>
+
+    </svg>
+  </div>
+
   <script>
-  (function() {
-    var splash = document.querySelector('.splash');
-    var frame = splash.querySelector('.splash-frame');
-    var logo = splash.querySelector('.splash-logo');
-    var fired = false;
+    // ─── Elements ────────────────────────────────────────────────
+    const svg            = document.getElementById('keyhole-svg');
+    const iris           = document.getElementById('iris');
+    const eyeWhite       = document.getElementById('eye-white');
+    const keyholePath    = document.getElementById('keyhole-path');
+    const eyeWhiteLeft   = document.getElementById('eye-white-left');
+    const eyeWhiteRight  = document.getElementById('eye-white-right');
+    const irisLeft       = document.getElementById('iris-left');
+    const irisRight      = document.getElementById('iris-right');
 
-    frame.addEventListener('click', function() {
-      if (fired) return;
-      fired = true;
+    // Blue keyhole path WITHOUT any eye sub-paths.
+    // Used during the zoom so the keyhole fills as a solid shape.
+    const SOLID_KEYHOLE = 'M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295Z';
 
-      // Monster face drops down out of the frame
-      logo.classList.add('logo-drop');
+    // Blue keyhole path with TWO almond sub-paths (opposite winding = holes).
+    // Left almond: x 30–145. Right almond: x 168–283. Both at y ≈ 142.
+    const TWO_EYE_KEYHOLE = 'M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295ZM30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796ZM168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z';
 
-      // Signal home page to play curtain reveal, then navigate
-      setTimeout(function() {
-        sessionStorage.setItem('curtain', '1');
-        window.location.href = 'home.html';
-      }, 800);
+
+    // ─── Mouse tracking ──────────────────────────────────────────
+    const IRIS_X = 165;   // iris resting center, SVG coords
+    const IRIS_Y = 114.5;
+    const MAX_X  = 15;    // max travel, SVG units (elliptical envelope)
+    const MAX_Y  = 10;
+
+    let cx = 0, cy = 0;   // current offset
+    let tx = 0, ty = 0;   // target offset
+    let tracking = true;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function tick() {
+      cx = lerp(cx, tx, 0.08);
+      cy = lerp(cy, ty, 0.08);
+      iris.setAttribute('transform', `translate(${cx.toFixed(3)}, ${cy.toFixed(3)})`);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    document.addEventListener('mousemove', e => {
+      if (!tracking) return;
+
+      const r     = svg.getBoundingClientRect();
+      const scale = r.width / 313;
+
+      const eyeVX = r.left + IRIS_X * scale;
+      const eyeVY = r.top  + IRIS_Y * scale;
+
+      const dx   = (e.clientX - eyeVX) / scale;
+      const dy   = (e.clientY - eyeVY) / scale;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 1) { tx = 0; ty = 0; return; }
+
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      // Elliptical max: more horizontal room than vertical
+      const maxR    = 1 / Math.sqrt((nx / MAX_X) ** 2 + (ny / MAX_Y) ** 2);
+      // Ease in — iris is sluggish right on top, reaches full travel at ~60 units away
+      const strength = Math.min(dist / 60, 1);
+
+      tx = nx * maxR * strength;
+      ty = ny * maxR * strength;
     });
-  })();
+
+
+    // ─── Click animation ─────────────────────────────────────────
+    //
+    // Timing (total ~950ms):
+    //   0 –  180ms  Phase 1: Rise   — SVG jumps up ~80px (ease-out)
+    // 180 –  460ms  Phase 2: Drop   — SVG bolts off bottom (ease-in)
+    // 460 –  920ms  Phase 3: Zoom   — solid keyhole scales to fill viewport
+    //  920ms        Navigate to home.html
+    //
+    // The Figma frames give the inner-group deltas that drive this:
+    //   Frame 2 → group offset (+90, +90): body shifts so both eyes
+    //             enter the keyhole window ("startled / rising")
+    //   Frame 3 → group offset (+302, +706): body fully below keyhole
+    //
+    // In our single-SVG setup the whole element translates instead.
+
+    let animating = false;
+
+    document.addEventListener('click', () => {
+      if (animating) return;
+      animating = true;
+      tracking  = false;
+
+      // Snap iris to center — no more tracking
+      tx = 0; ty = 0;
+
+      // ── Phase 1: Rise ──────────────────────────────────────────
+      // Swap to two-eye state before the rise so both eyes are
+      // clearly visible as the creature pops up startled.
+      keyholePath.setAttribute('d', TWO_EYE_KEYHOLE);
+      eyeWhite.style.display      = 'none';
+      iris.style.display          = 'none';
+      eyeWhiteLeft.style.display  = '';
+      eyeWhiteRight.style.display = '';
+      irisLeft.style.display      = '';
+      irisRight.style.display     = '';
+
+      svg.style.transition = 'transform 300ms cubic-bezier(0, 0, 0.3, 1)';
+      svg.style.transform  = 'translateY(-90px)';
+
+      setTimeout(() => {
+
+        // ── Phase 2: Drop ─────────────────────────────────────────
+        // Bolt off the bottom — fast acceleration, no ease-out
+        svg.style.transition = 'transform 280ms cubic-bezier(0.4, 0, 1, 1)';
+        svg.style.transform  = 'translateY(140vh)';
+
+        setTimeout(() => {
+
+          // ── Phase 3: Zoom ─────────────────────────────────────────
+          // While the SVG is off-screen, prep the zoom state:
+          //   • solid keyhole (no eye holes)
+          //   • hide all eye elements so only the blue shape remains
+          keyholePath.setAttribute('d', SOLID_KEYHOLE);
+          eyeWhiteLeft.style.display  = 'none';
+          eyeWhiteRight.style.display = 'none';
+          irisLeft.style.display      = 'none';
+          irisRight.style.display     = 'none';
+
+          // Snap back to center with no transition (1 frame to commit)
+          svg.style.transition = 'none';
+          svg.style.transform  = 'translateY(0)';
+
+          // Two rAFs: first lets the style flush, second starts the transition
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            svg.style.transition = 'transform 460ms cubic-bezier(0.4, 0, 0.6, 1)';
+            svg.style.transform  = 'scale(20)';
+
+            setTimeout(() => {
+              window.location.href = 'home.html';
+            }, 440);
+          }));
+
+        }, 290); // after drop
+
+      }, 310); // after rise
+    });
   </script>
+
 </body>
 </html>

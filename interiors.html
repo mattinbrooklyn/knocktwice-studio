@@ -3,210 +3,737 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Knock Twice — Interiors</title>
+  <title>Interiors — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Instrument+Sans:wght@400;700&family=Handjet&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      background: #f7f2ec;
+      cursor: none;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body::-webkit-scrollbar { display: none; }
+
+    /* ── Custom cursor ──────────────────────────────────────────────
+       Fixed 48×48, outside the scaled canvas, follows mouse in true
+       viewport pixels. Hotspot at middle fingertip ≈ (24, 0). */
+    #custom-cursor {
+      position: fixed;
+      left: 0; top: 0;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      transform: translate(-200px, -200px);
+      width: 48px; height: 48px;
+    }
+    #custom-cursor svg { width: 100%; height: 100%; display: block; }
+
+    /* ── Page scaler wrapper ────────────────────────────────────────
+       Natural document height = PAGE_H × scale, set by JS.
+       Allows vertical scrolling while the canvas is scaled to fit width. */
+    #page-scaler {
+      position: relative;
+      width: 100%;
+    }
+
+    /* ── Page canvas ────────────────────────────────────────────────
+       Fixed 1440 × 6727 (exact Figma frame). Scaled at top-left origin.
+       JS sets #page-scaler height = 6727 × scale so scrolling works. */
+    .page {
+      position: absolute;
+      top: 0; left: 0;
+      width: 1440px; height: 6727px;
+      transform-origin: top left;
+      background: #f7f2ec;
+      overflow: hidden;
+    }
+
+    /* ── Logo ──────────────────────────────────────────────────────*/
+    .logo {
+      position: absolute;
+      left: 40px; top: 61px;
+      width: 52px; height: 100px;
+    }
+    .logo img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: left top; }
+
+    /* ── Navigation ─────────────────────────────────────────────── */
+    .nav {
+      position: absolute;
+      left: 40px; top: 200px;
+      width: 256px;
+    }
+    .nav a {
+      display: block;
+      font-family: 'Handjet', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 27px;
+      letter-spacing: -0.22px;
+      color: #32261F;
+      text-decoration: none;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      margin-bottom: 8px;
+    }
+    .nav a.active { font-weight: 700; }
+    .nav a:hover { opacity: 0.65; }
+
+    /* ── H1 ─────────────────────────────────────────────────────── */
+    .h1 {
+      position: absolute;
+      left: 316px; top: 70px;
+      width: 808px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 65px;
+      line-height: 68px;
+      font-weight: 400;
+      color: #32261F;
+    }
+
+    /* ── Body copy ───────────────────────────────────────────────── */
+    .body-text {
+      position: absolute;
+      left: 316px; top: 236px;
+      width: 808px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: #32261F;
+    }
+    .body-text p { margin-bottom: 0; }
+
+    /* ── Photos ─────────────────────────────────────────────────── */
+    .photo {
+      position: absolute;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+    .photo img {
+      width: 100%; height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* saya-09: portrait shown landscape via -90° rotation.
+       Outer flex container (533×355) centres the rotated inner (355×533). */
+    .photo-rotated {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+    .photo-rotated-inner {
+      flex-shrink: 0;
+      transform: rotate(-90deg);
+    }
+    .photo-rotated-inner img {
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── Checkerboard placeholder ────────────────────────────────── */
+    .placeholder {
+      position: absolute;
+      background-image: url('assets/interior-placeholder.png');
+      background-size: 87.68px 87.68px;
+      background-position: top left;
+      background-repeat: repeat;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .photo.is-dragging,
+    .photo-rotated.is-dragging,
+    .placeholder.is-dragging { opacity: 0.9; }
+
+    /* ── Draggable 3D objects ────────────────────────────────────── */
+    .obj {
+      position: absolute;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+    }
+    .obj > img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    /* Objects with rotation: outer = flex bounding box, inner = rotated */
+    .obj.has-rotation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .obj-inner {
+      flex-shrink: 0;
+    }
+    .obj-inner img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .obj.is-dragging { opacity: 0.9; }
+
+    /* ── Spinning sticker rings ──────────────────────────────────── */
+    .sticker {
+      position: absolute;
+      pointer-events: none;
+      z-index: 8;
+    }
+
+    /* ── Monster wave ────────────────────────────────────────────── */
+    .monster-area {
+      position: absolute;
+      left: 0; top: 6515px;
+      width: 1440px; height: 122px;
+    }
+    .monster-area .wave {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+    .monster-eyes-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    .footer {
+      position: absolute;
+      left: 0; top: 6637px;
+      width: 1440px; height: 90px;
+      background: #378CDA;
+    }
+    .footer-icons {
+      position: absolute;
+      left: 40px; top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 20px;
+    }
+    .footer-icons a { display: block; width: 20px; height: 20px; }
+    .footer-icons img { width: 100%; height: 100%; display: block; }
+    .footer-copyright {
+      position: absolute;
+      right: 40px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Handjet', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 22px;
+      letter-spacing: -0.16px;
+      color: #f7f2ec;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      white-space: nowrap;
+    }
+  </style>
 </head>
-<body data-page="interiors">
+<body>
 
-  <div class="interiors">
-    <div class="interiors-content">
+  <!-- ── Custom cursor ─────────────────────────────────────────── -->
+  <div id="custom-cursor">
+    <svg id="cursor-open" viewBox="0 0 94 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(5.591 5.545)">
+        <path fill="#008BE0"
+          d="M82.818 10.9806V66.45H77.4594V78.287H71.9238V88.9096H29.9967V83.2019H24.461V77.7116H18.4205V72.2214H11.9792V61.0234H6.44351V55.5331H0V42.5936H12.8848V48.0312H19.6007V60.9597H25.1363V5.49028H35.4039V42.5936H40.9396V0H51.2093V42.5936H56.745V5.49028H67.0125V42.5936H72.5482V10.9806H82.818ZM80.2273 19.3148V13.9717H74.6916V19.3148H80.2273ZM64.6477 13.1152V7.77424H59.112V13.1152H64.6477ZM48.8423 8.16076V2.81761H43.3066V8.16076H48.8423ZM33.0368 13.1152V7.77424H27.5012V13.1152H33.0368Z"/>
+      </g>
+      <rect x="88.41" y="16.50" width="5.54"  height="55.47" fill="#34261E"/>
+      <rect x="83.05" y="72.00" width="5.54"  height="12.10" fill="#34261E"/>
+      <rect x="78.14" y="11.04" width="10.27" height="5.49"  fill="#34261E"/>
+      <rect x="77.51" y="83.83" width="5.54"  height="10.62" fill="#34261E"/>
+      <rect x="77.51" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/>
+      <rect x="72.60" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="74.01" y="11.04" width="4.13"  height="5.49"  fill="#34261E"/>
+      <rect x="56.80" y="5.50"  width="15.80" height="5.49"  fill="#34261E"/>
+      <rect x="56.80" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="46.53" y="0.05"  width="10.27" height="5.49"  fill="#34261E"/>
+      <rect x="40.99" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="35.59" y="94.45" width="41.93" height="5.49"  fill="#34261E"/>
+      <rect x="30.73" y="5.55"  width="15.80" height="5.49"  fill="#34261E"/>
+      <rect x="30.05" y="88.75" width="5.54"  height="5.71"  fill="#34261E"/>
+      <rect x="30.05" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/>
+      <rect x="25.19" y="11.00" width="5.54"  height="55.47" fill="#34261E"/>
+      <rect x="23.61" y="83.26" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="25.19" y="48.09" width="3.55"  height="5.49"  fill="#34261E"/>
+      <rect x="18.48" y="48.09" width="6.72"  height="5.49"  fill="#34261E"/>
+      <rect x="17.57" y="77.77" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="5.59"  y="42.65" width="12.88" height="5.49"  fill="#34261E"/>
+      <rect x="12.03" y="66.57" width="5.54"  height="11.20" fill="#34261E"/>
+      <rect x="5.59"  y="61.08" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="0.06"  y="48.30" width="5.54"  height="12.78" fill="#34261E"/>
+      <rect x="80.28" y="19.52" width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="64.70" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="48.84" y="8.16"  width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="33.04" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/>
+    </svg>
+    <svg id="cursor-closed" viewBox="0 0 89 75" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+      <path fill="#378CDA" transform="translate(5.62 5.52)"
+        d="M77.7503 10.9326V41.5965H72.3593V53.3818H66.7901V63.958H24.6091V58.2753H19.0399V52.809H12.9628V47.3426H6.4803V42.154H0V18.0038V17.8442H14.148V36.1301H19.7171V5.46631H30.0491V17.8442H35.6183V5.46631V0H45.9502V5.46631V17.8442H51.5194V5.46631H61.8491V17.8442H67.4183V10.9326H77.7503Z"/>
+      <rect x="83.375" y="16.455" width="5.572"  height="30.66"  fill="#32261F"/>
+      <rect x="77.982" y="47.115" width="5.571"  height="12.045" fill="#32261F"/>
+      <rect x="73.042" y="10.988" width="10.333" height="5.467"  fill="#32261F"/>
+      <rect x="72.42"  y="69.48"  width="5.562"  height="5.468"  fill="#32261F"/>
+      <rect x="72.42"  y="58.905" width="5.562"  height="10.575" fill="#32261F"/>
+      <rect x="67.471" y="10.988" width="5.571"  height="12.374" fill="#32261F"/>
+      <rect x="68.886" y="10.988" width="4.156"  height="5.467"  fill="#32261F"/>
+      <rect x="30.233" y="69.48"  width="42.186" height="5.468"  fill="#32261F"/>
+      <rect x="51.576" y="5.52"   width="15.895" height="5.467"  fill="#32261F"/>
+      <rect x="51.576" y="10.988" width="5.571"  height="12.374" fill="#32261F"/>
+      <rect x="41.243" y="0.053"  width="10.332" height="5.468"  fill="#32261F"/>
+      <rect x="35.671" y="10.988" width="5.572"  height="12.374" fill="#32261F"/>
+      <rect x="25.338" y="5.52"   width="15.905" height="5.467"  fill="#32261F"/>
+      <rect x="24.662" y="69.48"  width="5.571"  height="5.468"  fill="#32261F"/>
+      <rect x="18.183" y="63.795" width="12.05"  height="5.685"  fill="#32261F"/>
+      <rect x="19.776" y="10.988" width="5.562"  height="30.659" fill="#32261F"/>
+      <rect x="18.183" y="58.328" width="6.479"  height="5.467"  fill="#32261F"/>
+      <rect x="5.625"  y="17.903" width="14.151" height="5.459"  fill="#32261F"/>
+      <rect x="12.104" y="52.86"  width="6.488"  height="5.467"  fill="#32261F"/>
+      <rect x="5.625"  y="47.678" width="6.479"  height="5.467"  fill="#32261F"/>
+      <rect x="0.053"  y="23.528" width="5.572"  height="24.149" fill="#32261F"/>
+    </svg>
+  </div>
 
-      <!-- ========================
-           HEADER — Logo + Nav
-           ======================== -->
-      <header>
-        <div class="wordmark">
-          <a href="home.html"><img src="assets/logo-keyhole-dark.svg" alt="Knock Twice"></a>
+  <!-- ── Scrollable page wrapper ─────────────────────────────────── -->
+  <div id="page-scaler">
+
+    <div class="page">
+
+      <!-- Logo -->
+      <div class="logo">
+        <img src="assets/logo-nav-keyhole.svg" alt="Knock Twice">
+      </div>
+
+      <!-- Navigation — "Interiors" is active -->
+      <nav class="nav">
+        <a href="about.html">About</a>
+        <a href="interiors.html" class="active">Interiors</a>
+        <a href="experiences.html">Experiences</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <!-- Headline -->
+      <h1 class="h1">OH. I GUESS YOU LIVE HERE NOW</h1>
+
+      <!-- Intro copy -->
+      <div class="body-text">
+        <p>We design interiors for people who take play seriously and notice the details.</p>
+        <p>We approach the work as industrial designers, which means something is rarely just decorative.</p>
+        <p>&nbsp;</p>
+        <p>Whether you want a full service or creative direction, just reach out and we'll take it from there.</p>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  SAYA PHOTOS                                               -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <!-- saya-01  left:30   top:564  landscape 533×355 -->
+      <div class="photo" style="left:30px; top:564px; width:533px; height:355px;">
+        <img src="assets/interior-saya-01.png" alt="">
+      </div>
+
+      <!-- saya-02  left:522  top:384  landscape 533×355 -->
+      <div class="photo" style="left:522px; top:384px; width:533px; height:355px;">
+        <img src="assets/interior-saya-02.png" alt="">
+      </div>
+
+      <!-- saya-04  left:1085 top:444  portrait 355×533 -->
+      <div class="photo" style="left:1085px; top:444px; width:355px; height:533px;">
+        <img src="assets/interior-saya-04.png" alt="">
+      </div>
+
+      <!-- saya-05  left:551  top:859  portrait 355×533 -->
+      <div class="photo" style="left:551px; top:859px; width:355px; height:533px;">
+        <img src="assets/interior-saya-05.png" alt="">
+      </div>
+
+      <!-- saya-07  left:-42  top:949  landscape 533×355 (bleeds left edge) -->
+      <div class="photo" style="left:-42px; top:949px; width:533px; height:355px;">
+        <img src="assets/interior-saya-07.png" alt="">
+      </div>
+
+      <!-- saya-03  left:936  top:1006 landscape 533×355 -->
+      <div class="photo" style="left:936px; top:1006px; width:533px; height:355px;">
+        <img src="assets/interior-saya-03.png" alt="">
+      </div>
+
+      <!-- saya-08  left:150  top:1334 landscape 533×355 -->
+      <div class="photo" style="left:150px; top:1334px; width:533px; height:355px;">
+        <img src="assets/interior-saya-08.png" alt="">
+      </div>
+
+      <!-- saya-06  left:788  top:1451 landscape 533×355 -->
+      <div class="photo" style="left:788px; top:1451px; width:533px; height:355px;">
+        <img src="assets/interior-saya-06.png" alt="">
+      </div>
+
+      <!-- saya-14  left:87   top:1749 portrait 356×533 -->
+      <div class="photo" style="left:87px; top:1749px; width:356px; height:533px;">
+        <img src="assets/interior-saya-14.png" alt="">
+      </div>
+
+      <!-- saya-11  left:503  top:1866 landscape 533×355 -->
+      <div class="photo" style="left:503px; top:1866px; width:533px; height:355px;">
+        <img src="assets/interior-saya-11.png" alt="">
+      </div>
+
+      <!-- saya-13  left:1096 top:1986 portrait 355×533 -->
+      <div class="photo" style="left:1096px; top:1986px; width:355px; height:533px;">
+        <img src="assets/interior-saya-13.png" alt="">
+      </div>
+
+      <!-- saya-10  left:353  top:2251 portrait 355×533 -->
+      <div class="photo" style="left:353px; top:2251px; width:355px; height:533px;">
+        <img src="assets/interior-saya-10.png" alt="">
+      </div>
+
+      <!-- saya-12  left:771  top:2311 portrait 355×533 -->
+      <div class="photo" style="left:771px; top:2311px; width:355px; height:533px;">
+        <img src="assets/interior-saya-12.png" alt="">
+      </div>
+
+      <!-- saya-09  left:0 top:2632 — portrait image displayed landscape via -90° rotation.
+           Outer flex container (533×355) centres the rotated inner div (355×533). -->
+      <div class="photo-rotated" style="left:0; top:2632px; width:533px; height:355px;">
+        <div class="photo-rotated-inner" style="width:355px; height:533px;">
+          <img src="assets/interior-saya-09.png" alt="" style="width:355px; height:533px;">
         </div>
-        <nav>
-          <ul class="nav-menu">
-            <li><a href="about.html">About</a></li>
-            <li><a href="interiors.html">Interiors</a></li>
-            <li><a href="shop.html">Shop</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </nav>
-        <button class="nav-toggle" aria-label="Menu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#32261f" stroke-width="2" stroke-linecap="round">
-            <line class="nav-toggle-top" x1="3" y1="6" x2="21" y2="6"/>
-            <line class="nav-toggle-mid" x1="3" y1="12" x2="21" y2="12"/>
-            <line class="nav-toggle-bot" x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </header>
+      </div>
 
-      <!-- ========================
-           MAIN — Interior gallery
-           ======================== -->
-      <main>
-        <h1 class="interiors-heading">OH. I GUESS YOU LIVE HERE NOW</h1>
-        <div class="interiors-body">
-          <p>The best projects don't feel like projects.</p>
-          <p>We design interiors for people who are serious about play and notice the details. Full service or just creative direction, reach out and we'll take it from there.</p>
-        </div>
 
-        <!-- Background monster — pink blob with rotated eyes -->
-        <div class="bg-monster">
-          <svg viewBox="0 0 930.91 887.855" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <clipPath id="bg-eye-1-clip">
-                <path d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z" transform="translate(-59.875, -16.755)"/>
-              </clipPath>
-              <clipPath id="bg-eye-2-clip">
-                <path d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z" transform="translate(-63.925, -17.887)"/>
-              </clipPath>
-            </defs>
-            <path d="M711.488 9.64761C538.069 -24.9716 158.129 32.7649 42.0874 196.034C-73.9548 359.304 69.435 584.096 235.798 643.941C402.161 703.787 584.426 923.276 783.298 882.941C982.169 842.606 936.413 519.989 894.298 399.941C852.183 279.894 884.907 44.2668 711.488 9.64761Z" fill="#EC8EDF"/>
-            <!-- Left eye, rotated nearly vertical -->
-            <g transform="translate(184, 175) rotate(-79.27)">
-              <path d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z" fill="white" transform="translate(-59.875, -16.755)"/>
-              <g clip-path="url(#bg-eye-1-clip)">
-                <circle cx="0" cy="10" r="40" fill="#32261F"/>
-              </g>
-            </g>
-            <!-- Right eye -->
-            <g transform="translate(155, 331) rotate(-79.27)">
-              <path d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z" fill="white" transform="translate(-63.925, -17.887)"/>
-              <g clip-path="url(#bg-eye-2-clip)">
-                <circle cx="0" cy="12" r="43" fill="#32261F"/>
-              </g>
-            </g>
-          </svg>
-        </div>
-
-        <!-- Interior photos — all draggable (wrapped for mobile grid) -->
-        <div class="photo-grid">
-          <div class="furniture int-photo-101">
-            <img src="assets/interior-101.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-102">
-            <img src="assets/interior-102.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-111">
-            <img src="assets/interior-111.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-110">
-            <img src="assets/interior-110.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-109">
-            <img src="assets/interior-109.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-108">
-            <img src="assets/interior-108.png" alt="Interior photo">
-          </div>
-          <div class="furniture int-photo-105">
-            <img src="assets/interior-105.png" alt="Interior photo">
-          </div>
-        </div>
-
-        <!-- Stickers — all draggable -->
-        <div class="furniture sticker-flower1">
-          <img src="assets/sticker-flower1.svg" alt="Green flower sticker">
-        </div>
-
-        <div class="furniture sticker-star">
-          <svg viewBox="0 0 229.307 273.041" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <clipPath id="star-eye-1-clip">
-                <path d="M0 8.27102C13.7318 -3.44649 26.0593 -2.04529 37.6019 8.27102C23.8358 11.1619 11.1658 11.4786 0 8.27102Z"/>
-              </clipPath>
-              <clipPath id="star-eye-2-clip">
-                <path d="M0 8.82912C14.3597 -4.02704 27.572 -1.80682 40.145 8.82912C25.4456 11.914 11.9193 12.2536 0 8.82912Z"/>
-              </clipPath>
-            </defs>
-            <path d="M157.397 0L155.354 82.5648L224.118 80.6099L180.528 148.735L229.307 248.913L125.364 193.122L58.7233 273.041L66.0958 154.382L0 84.2856L84.6313 86.0549L157.397 0Z" fill="#FADB4B"/>
-            <g transform="translate(126.8, 111.4)">
-              <path d="M0 8.27102C13.7318 -3.44649 26.0593 -2.04529 37.6019 8.27102C23.8358 11.1619 11.1658 11.4786 0 8.27102Z" fill="white"/>
-              <g clip-path="url(#star-eye-1-clip)">
-                <circle cx="19" cy="9" r="12" fill="#32261F"/>
-              </g>
-            </g>
-            <g transform="translate(76.1, 111)">
-              <path d="M0 8.82912C14.3597 -4.02704 27.572 -1.80682 40.145 8.82912C25.4456 11.914 11.9193 12.2536 0 8.82912Z" fill="white"/>
-              <g clip-path="url(#star-eye-2-clip)">
-                <circle cx="20" cy="10" r="13" fill="#32261F"/>
-              </g>
-            </g>
-          </svg>
-        </div>
-
-        <div class="furniture sticker-flower2">
-          <img src="assets/sticker-flower2.svg" alt="Orange flower sticker">
-        </div>
-
-        <div class="furniture sticker-postit">
-          <img src="assets/sticker-postit.png" alt="Post-it note sticker">
-        </div>
-
-        <!-- Spiral text -->
-        <div class="interiors-spiral furniture">
-          <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <path id="int-text-circle" d="M88,16 a72,72 0 1,1 0,144 a72,72 0 1,1 0,-144" fill="none"/>
-            </defs>
-            <text font-family="'Handjet', sans-serif" font-size="13.5" fill="#32261f" letter-spacing="0.5">
-              <textPath href="#int-text-circle" startOffset="0%">Seriously, playful design for rooms and the people that make them. &#x1F365;</textPath>
-            </text>
-          </svg>
-        </div>
-      </main>
-
-      <!-- ========================
-           FOOTER MONSTER — Blue wave with eyes
-           ======================== -->
-      <div class="int-footer-monster">
-        <svg viewBox="0 0 1440 121.907" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  STICKER RING 1 — between Saya section and Livingroom     -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Center approx (201, 2481); r:68 → outer div 136×136 at (133, 2413) -->
+      <div class="sticker" style="left:133px; top:2413px; width:136px; height:136px;">
+        <svg viewBox="0 0 136 136" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <clipPath id="int-eye-left-clip">
-              <path d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-            </clipPath>
-            <clipPath id="int-eye-right-clip">
-              <path d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-            </clipPath>
+            <path id="ring1-path" d="M68 4 a64 64 0 1 1 -0.001 0"/>
           </defs>
-          <path d="M0 121.907C0 121.907 276.848 -31.6169 650 5.90705C1008 41.9073 1440 121.907 1440 121.907" fill="#378CDA"/>
-          <!-- Left eye -->
-          <g transform="translate(403.1, 38.8)">
-            <path d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z" fill="white"/>
-            <g clip-path="url(#int-eye-left-clip)">
-              <circle cx="64" cy="32" r="43" fill="#32261F"/>
-            </g>
-          </g>
-          <!-- Right eye -->
-          <g transform="translate(564.6, 39.8)">
-            <path d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z" fill="white"/>
-            <g clip-path="url(#int-eye-right-clip)">
-              <circle cx="60" cy="30" r="40" fill="#32261F"/>
-            </g>
+          <g>
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 68 68" to="360 68 68" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, monospace" font-size="8.5" font-weight="600"
+                  fill="#32261F" letter-spacing="1.2">
+              <textPath href="#ring1-path">when the plans turn into something you can walk into ✦ </textPath>
+            </text>
           </g>
         </svg>
       </div>
 
-      <!-- ========================
-           FOOTER
-           ======================== -->
-      <footer class="footer">
-        <div class="footer-socials">
-          <a href="#" aria-label="Instagram">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M14.9167 5.75H14.925M6.16667 2H14.5C16.8012 2 18.6667 3.86548 18.6667 6.16667V14.5C18.6667 16.8012 16.8012 18.6667 14.5 18.6667H6.16667C3.86548 18.6667 2 16.8012 2 14.5V6.16667C2 3.86548 3.86548 2 6.16667 2ZM13.6667 9.80833C13.7695 10.5019 13.651 11.2102 13.3281 11.8325C13.0052 12.4548 12.4943 12.9595 11.868 13.2747C11.2418 13.5899 10.532 13.6997 9.83982 13.5883C9.1476 13.4769 8.50813 13.1501 8.01237 12.6543C7.5166 12.1585 7.18978 11.5191 7.07839 10.8269C6.967 10.1346 7.07672 9.42491 7.39194 8.79865C7.70716 8.17238 8.21182 7.66145 8.83415 7.33853C9.45649 7.01562 10.1648 6.89716 10.8583 7C11.5658 7.1049 12.2207 7.43455 12.7264 7.94026C13.2321 8.44596 13.5618 9.1009 13.6667 9.80833Z" stroke="#f7f2ec" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <a href="#" aria-label="TikTok">
-            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M20 10C20 15.5228 15.5228 20 10 20C4.47725 20 0 15.5228 0 10C0 4.47725 4.4768 0 10 0C15.5232 0 20 4.47725 20 10ZM14.8437 7.24463C13.8984 7.19521 12.95 6.80025 12.4695 5.95244C12.2331 5.53522 12.0834 4.99555 12.0362 4.5191L11.977 4.44519H10.2663V12.1111C10.2663 14.2942 6.8853 14.308 6.8853 12.1111C6.8853 11.4414 7.57859 10.4444 8.28881 10.4444H9.11078V8.66684H8.15522C7.26467 8.66684 6.07044 9.57209 5.62561 10.3148C3.77772 13.3997 7.26512 16.8987 10.3402 15.0739C11.0388 14.6594 11.9993 13.4861 11.9993 12.6445V8.15611L12.0875 8.11114C12.8707 8.67798 13.8717 9.0106 14.8433 9.02262V7.24508L14.8437 7.24463Z" fill="#f7f2ec"/>
-            </svg>
-          </a>
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  LIVINGROOM PLACEHOLDERS (8)                               -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="placeholder" style="left:612px;  top:2987px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:77px;   top:3167px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:1085px; top:3227px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:522px;  top:3432px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:300px;  top:3817px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:953px;  top:3877px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:390px;  top:4232px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:60px;   top:4292px; width:355px; height:533px;"></div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  BEDROOM PLACEHOLDERS (8)                                  -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="placeholder" style="left:522px;  top:4737px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:1085px; top:4767px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:0;      top:5276px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:847px;  top:5242px; width:533px; height:355px;"></div>
+      <div class="placeholder" style="left:462px;  top:5344px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:-30px;  top:5691px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:937px;  top:5687px; width:355px; height:533px;"></div>
+      <div class="placeholder" style="left:445px;  top:6095px; width:533px; height:355px;"></div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  STICKER RING 2 — Bedroom section near footer             -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Center approx (268, 6369); r:68 → outer div 136×136 at (200, 6301) -->
+      <div class="sticker" style="left:200px; top:6301px; width:136px; height:136px;">
+        <svg viewBox="0 0 136 136" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="ring2-path" d="M68 4 a64 64 0 1 1 -0.001 0"/>
+          </defs>
+          <g>
+            <animateTransform attributeName="transform" type="rotate"
+              from="360 68 68" to="0 68 68" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, monospace" font-size="8.5" font-weight="600"
+                  fill="#32261F" letter-spacing="1.2">
+              <textPath href="#ring2-path">when the plans turn into something you can walk into ✦ </textPath>
+            </text>
+          </g>
+        </svg>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  DRAGGABLE 3D OBJECTS                                      -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <!-- Strawberry — no rotation, left:759 top:730 w:246 h:257 -->
+      <div class="obj" id="obj-strawberry" style="left:759px; top:730px; width:246px; height:257px;">
+        <img src="assets/obj-strawberry.png" alt="Strawberry">
+      </div>
+
+      <!-- Cloud — no rotation, left:-156 top:1567 w:371 h:212 (bleeds left) -->
+      <div class="obj" id="obj-cloud" style="left:-156px; top:1567px; width:371px; height:212px;">
+        <img src="assets/obj-cloud.png" alt="Cloud">
+      </div>
+
+      <!-- Red Tulip — outer 434.249×688.444, inner rotate(-15.05deg) 278.046×638.126 -->
+      <div class="obj has-rotation" id="obj-tulip"
+           style="left:1166.87px; top:1454.81px; width:434.249px; height:688.444px;">
+        <div class="obj-inner" style="transform:rotate(-15.05deg); width:278.046px; height:638.126px;">
+          <img src="assets/obj-red-tulip.png" alt="Red Tulip">
         </div>
-        <p class="footer-copy">&copy; 2026 Knock Twice Studio. All rights reserved.</p>
+      </div>
+
+      <!-- Blob Candle Purple — outer 267.76×269.512, inner rotate(-6.71deg) 241×243 -->
+      <div class="obj has-rotation" id="obj-candle-purple"
+           style="left:1235px; top:2897px; width:267.76px; height:269.512px;">
+        <div class="obj-inner" style="transform:rotate(-6.71deg); width:241px; height:243px;">
+          <img src="assets/obj-blob-candle-purple.png" alt="Purple candle">
+        </div>
+      </div>
+
+      <!-- Dice — outer 312.242×327.487, inner rotate(16.05deg) 247.334×269.605 -->
+      <div class="obj has-rotation" id="obj-dice"
+           style="left:49.59px; top:3693.57px; width:312.242px; height:327.487px;">
+        <div class="obj-inner" style="transform:rotate(16.05deg); width:247.334px; height:269.605px;">
+          <img src="assets/obj-dice.png" alt="Dice">
+        </div>
+      </div>
+
+      <!-- Chain — outer 449.232×387.26, inner rotate(-18.14deg) 380×283 -->
+      <div class="obj has-rotation" id="obj-chain"
+           style="left:1110.38px; top:4243.87px; width:449.232px; height:387.26px;">
+        <div class="obj-inner" style="transform:rotate(-18.14deg); width:380px; height:283px;">
+          <img src="assets/obj-chain.png" alt="Chain">
+        </div>
+      </div>
+
+      <!-- Blob Candle Yellow — outer 219.523×239.583, inner rotate(2.69deg) 208.967×230.038 -->
+      <div class="obj has-rotation" id="obj-candle-yellow"
+           style="left:684px; top:5092px; width:219.523px; height:239.583px;">
+        <div class="obj-inner" style="transform:rotate(2.69deg); width:208.967px; height:230.038px;">
+          <img src="assets/obj-blob-candle-yellow.png" alt="Yellow candle">
+        </div>
+      </div>
+
+      <!-- Bust — outer 239.691×352.232, inner rotate(-3.84deg) 217.533×338.435 -->
+      <div class="obj has-rotation" id="obj-bust"
+           style="left:232.84px; top:5659.67px; width:239.691px; height:352.232px;">
+        <div class="obj-inner" style="transform:rotate(-3.84deg); width:217.533px; height:338.435px;">
+          <img src="assets/obj-bust.png" alt="Bust">
+        </div>
+      </div>
+
+      <!-- Cat Clock — outer 164.349×494.786, inner rotate(3.12deg) 138×488 -->
+      <div class="obj has-rotation" id="obj-catclock"
+           style="left:1236px; top:5852px; width:164.349px; height:494.786px;">
+        <div class="obj-inner" style="transform:rotate(3.12deg); width:138px; height:488px;">
+          <img src="assets/obj-cat-clock.png" alt="Cat clock">
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MONSTER WAVE FOOTER                                       -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Wave div at canvas top:6515. Eye whites overlaid in SVG.
+           Right eye: translate(564.63, 38.45), w:119.75  h:33.51
+           Left  eye: translate(403,    37.32), w:127.849 h:35.774
+           Iris centers: right (624.5, 55.2), left (466.9, 55.2), r:30 -->
+      <div class="monster-area" id="monster-area">
+        <img class="wave" src="assets/monster-wave-interiors.svg" alt="">
+        <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+             viewBox="0 0 1440 122" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip">
+              <path transform="translate(564.63 38.45)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip">
+              <path transform="translate(403 37.32)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            </clipPath>
+          </defs>
+          <!-- Eye whites -->
+          <path fill="white" transform="translate(564.63 38.45)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <path fill="white" transform="translate(403 37.32)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <!-- Irises — JS moves cx/cy, clip path keeps them inside eye whites -->
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="624.5" cy="55.2" r="30" fill="#32261F"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="466.9" cy="55.2" r="30" fill="#32261F"/>
+        </svg>
+      </div>
+
+      <!-- Footer bar -->
+      <footer class="footer">
+        <div class="footer-icons">
+          <a href="#" aria-label="Instagram"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+          <a href="#" aria-label="TikTok"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+        </div>
+        <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
       </footer>
 
-    </div>
-  </div>
+    </div><!-- /page -->
+  </div><!-- /page-scaler -->
 
-  <script src="assets/scripts.js"></script>
+
+  <script>
+    // ── Scale to fit viewport width, scroll vertically ─────────────
+    // The canvas is 1440×6727. We scale it so its width matches the
+    // viewport, then set the scaler's natural height so the browser
+    // scroll bar represents the full canvas height.
+    const PAGE_W = 1440;
+    const PAGE_H = 6727;
+    const page   = document.querySelector('.page');
+    const scaler = document.getElementById('page-scaler');
+    let scale = 1;
+
+    function scalePage() {
+      scale = window.innerWidth / PAGE_W;
+      page.style.transform = `scale(${scale})`;
+      scaler.style.height  = (PAGE_H * scale) + 'px';
+    }
+    scalePage();
+    window.addEventListener('resize', scalePage);
+
+
+    // ── Custom cursor ────────────────────────────────────────────────
+    const cursor       = document.getElementById('custom-cursor');
+    const cursorOpen   = document.getElementById('cursor-open');
+    const cursorClosed = document.getElementById('cursor-closed');
+
+    function setCursorState(state) {
+      if (state === 'grab') {
+        cursorOpen.style.display   = 'none';
+        cursorClosed.style.display = '';
+      } else {
+        cursorOpen.style.display   = '';
+        cursorClosed.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.transform = `translate(${e.clientX - 24}px, ${e.clientY}px)`;
+      updateAllEyes(e.clientX, e.clientY);
+    });
+
+
+    // ── Eye tracking ─────────────────────────────────────────────────
+    // getBoundingClientRect() on .page accounts for both scroll offset
+    // and the CSS scale transform, giving true canvas coordinates.
+    function toCanvas(vx, vy) {
+      const r = page.getBoundingClientRect();
+      return { x: (vx - r.left) / scale, y: (vy - r.top) / scale };
+    }
+
+    // Move an SVG circle toward the cursor within an elliptical envelope.
+    // restX/Y: resting center in SVG coords. maxX/Y: max travel in SVG units.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx   = localX - restX;
+      const dy   = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+    }
+
+    // Monster wave sits at canvas y:6515; SVG coords are relative to that.
+    const monIrisR = document.getElementById('mon-iris-r');
+    const monIrisL = document.getElementById('mon-iris-l');
+
+    function moveMonsterEyes(cx, cy) {
+      trackIris(monIrisR, cx, cy - 6515, 624.5, 55.2, 20, 5);
+      trackIris(monIrisL, cx, cy - 6515, 466.9, 55.2, 20, 5);
+    }
+
+    function updateAllEyes(vx, vy) {
+      const { x, y } = toCanvas(vx, vy);
+      moveMonsterEyes(x, y);
+    }
+
+
+    // ── Draggable objects ────────────────────────────────────────────
+    // Mouse coords are in viewport pixels; object positions are in
+    // canvas pixels. Divide by scale to convert between the two.
+    // getBoundingClientRect() on .page already folds in scroll + scale.
+    let dragging = null;
+    let offsetX  = 0;
+    let offsetY  = 0;
+    let topZ     = 10;
+
+    document.querySelectorAll('.obj, .photo, .photo-rotated, .placeholder').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = (e.clientX - rect.left) / scale;
+        offsetY = (e.clientY - rect.top)  / scale;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        setCursorState('grab');
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const pr = page.getBoundingClientRect();
+      dragging.style.left = ((e.clientX - pr.left) / scale - offsetX) + 'px';
+      dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        setCursorState('default');
+      }
+    });
+
+    // Prevent browser native drag on all images and background elements
+    document.querySelectorAll('img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
+  </script>
+
 </body>
 </html>

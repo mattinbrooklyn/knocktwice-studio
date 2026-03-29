@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experiences — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      background: #f7f2ec;
+      cursor: none;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body::-webkit-scrollbar { display: none; }
+
+    #custom-cursor {
+      position: fixed;
+      left: 0; top: 0;
+      pointer-events: none;
+      z-index: 9999;
+      will-change: transform;
+      transform: translate(-200px, -200px);
+      width: 48px; height: 48px;
+    }
+    #custom-cursor svg { width: 100%; height: 100%; display: block; }
+
+    /* Scrollable wrapper — JS sets height = PAGE_H × scale */
+    #page-scaler { position: relative; width: 100%; }
+
+    /* 1440 × 8126 canvas, scaled to fit viewport width */
+    .page {
+      position: absolute;
+      top: 0; left: 0;
+      width: 1440px; height: 8126px;
+      transform-origin: top left;
+      background: #f7f2ec;
+      overflow: hidden;
+    }
+
+    .logo {
+      position: absolute;
+      left: 40px; top: 61px;
+      width: 52px; height: 100px;
+    }
+    .logo img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: left top; }
+
+    .nav {
+      position: absolute;
+      left: 40px; top: 200px;
+      width: 256px;
+    }
+    .nav a {
+      display: block;
+      font-family: 'Handjet', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 27px;
+      letter-spacing: -0.22px;
+      color: #32261F;
+      text-decoration: none;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      margin-bottom: 8px;
+    }
+    .nav a.active { font-weight: 700; }
+    .nav a:hover { opacity: 0.65; }
+
+    .h1 {
+      position: absolute;
+      left: 316px; top: 70px;
+      width: 808px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 65px;
+      line-height: 68px;
+      font-weight: 400;
+      color: #32261F;
+    }
+
+    .body-text {
+      position: absolute;
+      left: 316px; top: 168px;
+      width: 808px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: #32261F;
+    }
+    .body-text p { margin-bottom: 0; }
+
+    /* ── Photos (all draggable) ──────────────────────────────────── */
+    .photo {
+      position: absolute;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+    .photo img {
+      width: 100%; height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Dinner-101: portrait image displayed landscape via -90° rotation */
+    .photo-rotated {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+    .photo-rotated-inner {
+      flex-shrink: 0;
+      transform: rotate(-90deg);
+    }
+    .photo-rotated-inner img {
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .photo.is-dragging,
+    .photo-rotated.is-dragging { opacity: 0.9; }
+
+    /* ── Draggable 3D objects ────────────────────────────────────── */
+    .obj {
+      position: absolute;
+      z-index: 10;
+      cursor: pointer;
+      user-select: none;
+    }
+    .obj > img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .obj.has-rotation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .obj-inner { flex-shrink: 0; }
+    .obj-inner img {
+      display: block;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
+    .obj.is-dragging { opacity: 0.9; }
+
+    /* ── Monster wave ────────────────────────────────────────────── */
+    .monster-area {
+      position: absolute;
+      left: 0; top: 7914px;
+      width: 1440px; height: 122px;
+    }
+    .monster-area .wave {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; display: block;
+    }
+    .monster-eyes-overlay {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; overflow: visible;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    .footer {
+      position: absolute;
+      left: 0; top: 8036px;
+      width: 1440px; height: 90px;
+      background: #378CDA;
+    }
+    .footer-icons {
+      position: absolute; left: 40px; top: 50%;
+      transform: translateY(-50%);
+      display: flex; gap: 20px;
+    }
+    .footer-icons a { display: block; width: 20px; height: 20px; }
+    .footer-icons img { width: 100%; height: 100%; display: block; }
+    .footer-copyright {
+      position: absolute; right: 40px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Handjet', sans-serif;
+      font-size: 16px; font-weight: 400; line-height: 22px;
+      letter-spacing: -0.16px; color: #f7f2ec;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Custom cursor ─────────────────────────────────────────── -->
+  <div id="custom-cursor">
+    <svg id="cursor-open" viewBox="0 0 94 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(5.591 5.545)">
+        <path fill="#008BE0"
+          d="M82.818 10.9806V66.45H77.4594V78.287H71.9238V88.9096H29.9967V83.2019H24.461V77.7116H18.4205V72.2214H11.9792V61.0234H6.44351V55.5331H0V42.5936H12.8848V48.0312H19.6007V60.9597H25.1363V5.49028H35.4039V42.5936H40.9396V0H51.2093V42.5936H56.745V5.49028H67.0125V42.5936H72.5482V10.9806H82.818ZM80.2273 19.3148V13.9717H74.6916V19.3148H80.2273ZM64.6477 13.1152V7.77424H59.112V13.1152H64.6477ZM48.8423 8.16076V2.81761H43.3066V8.16076H48.8423ZM33.0368 13.1152V7.77424H27.5012V13.1152H33.0368Z"/>
+      </g>
+      <rect x="88.41" y="16.50" width="5.54"  height="55.47" fill="#34261E"/>
+      <rect x="83.05" y="72.00" width="5.54"  height="12.10" fill="#34261E"/>
+      <rect x="78.14" y="11.04" width="10.27" height="5.49"  fill="#34261E"/>
+      <rect x="77.51" y="83.83" width="5.54"  height="10.62" fill="#34261E"/>
+      <rect x="77.51" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/>
+      <rect x="72.60" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="74.01" y="11.04" width="4.13"  height="5.49"  fill="#34261E"/>
+      <rect x="56.80" y="5.50"  width="15.80" height="5.49"  fill="#34261E"/>
+      <rect x="56.80" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="46.53" y="0.05"  width="10.27" height="5.49"  fill="#34261E"/>
+      <rect x="40.99" y="11.04" width="5.54"  height="37.10" fill="#34261E"/>
+      <rect x="35.59" y="94.45" width="41.93" height="5.49"  fill="#34261E"/>
+      <rect x="30.73" y="5.55"  width="15.80" height="5.49"  fill="#34261E"/>
+      <rect x="30.05" y="88.75" width="5.54"  height="5.71"  fill="#34261E"/>
+      <rect x="30.05" y="94.45" width="5.54"  height="5.49"  fill="#34261E"/>
+      <rect x="25.19" y="11.00" width="5.54"  height="55.47" fill="#34261E"/>
+      <rect x="23.61" y="83.26" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="25.19" y="48.09" width="3.55"  height="5.49"  fill="#34261E"/>
+      <rect x="18.48" y="48.09" width="6.72"  height="5.49"  fill="#34261E"/>
+      <rect x="17.57" y="77.77" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="5.59"  y="42.65" width="12.88" height="5.49"  fill="#34261E"/>
+      <rect x="12.03" y="66.57" width="5.54"  height="11.20" fill="#34261E"/>
+      <rect x="5.59"  y="61.08" width="6.44"  height="5.49"  fill="#34261E"/>
+      <rect x="0.06"  y="48.30" width="5.54"  height="12.78" fill="#34261E"/>
+      <rect x="80.28" y="19.52" width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="64.70" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="48.84" y="8.16"  width="5.54"  height="5.34"  fill="#FA84E3"/>
+      <rect x="33.04" y="13.32" width="5.54"  height="5.34"  fill="#FA84E3"/>
+    </svg>
+    <svg id="cursor-closed" viewBox="0 0 89 75" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+      <path fill="#378CDA" transform="translate(5.62 5.52)"
+        d="M77.7503 10.9326V41.5965H72.3593V53.3818H66.7901V63.958H24.6091V58.2753H19.0399V52.809H12.9628V47.3426H6.4803V42.154H0V18.0038V17.8442H14.148V36.1301H19.7171V5.46631H30.0491V17.8442H35.6183V5.46631V0H45.9502V5.46631V17.8442H51.5194V5.46631H61.8491V17.8442H67.4183V10.9326H77.7503Z"/>
+      <rect x="83.375" y="16.455" width="5.572"  height="30.66"  fill="#32261F"/>
+      <rect x="77.982" y="47.115" width="5.571"  height="12.045" fill="#32261F"/>
+      <rect x="73.042" y="10.988" width="10.333" height="5.467"  fill="#32261F"/>
+      <rect x="72.42"  y="69.48"  width="5.562"  height="5.468"  fill="#32261F"/>
+      <rect x="72.42"  y="58.905" width="5.562"  height="10.575" fill="#32261F"/>
+      <rect x="67.471" y="10.988" width="5.571"  height="12.374" fill="#32261F"/>
+      <rect x="68.886" y="10.988" width="4.156"  height="5.467"  fill="#32261F"/>
+      <rect x="30.233" y="69.48"  width="42.186" height="5.468"  fill="#32261F"/>
+      <rect x="51.576" y="5.52"   width="15.895" height="5.467"  fill="#32261F"/>
+      <rect x="51.576" y="10.988" width="5.571"  height="12.374" fill="#32261F"/>
+      <rect x="41.243" y="0.053"  width="10.332" height="5.468"  fill="#32261F"/>
+      <rect x="35.671" y="10.988" width="5.572"  height="12.374" fill="#32261F"/>
+      <rect x="25.338" y="5.52"   width="15.905" height="5.467"  fill="#32261F"/>
+      <rect x="24.662" y="69.48"  width="5.571"  height="5.468"  fill="#32261F"/>
+      <rect x="18.183" y="63.795" width="12.05"  height="5.685"  fill="#32261F"/>
+      <rect x="19.776" y="10.988" width="5.562"  height="30.659" fill="#32261F"/>
+      <rect x="18.183" y="58.328" width="6.479"  height="5.467"  fill="#32261F"/>
+      <rect x="5.625"  y="17.903" width="14.151" height="5.459"  fill="#32261F"/>
+      <rect x="12.104" y="52.86"  width="6.488"  height="5.467"  fill="#32261F"/>
+      <rect x="5.625"  y="47.678" width="6.479"  height="5.467"  fill="#32261F"/>
+      <rect x="0.053"  y="23.528" width="5.572"  height="24.149" fill="#32261F"/>
+    </svg>
+  </div>
+
+  <div id="page-scaler">
+    <div class="page">
+
+      <!-- Logo -->
+      <div class="logo">
+        <img src="assets/logo-nav-keyhole.svg" alt="Knock Twice">
+      </div>
+
+      <!-- Navigation — "Experiences" is active -->
+      <nav class="nav">
+        <a href="about.html">About</a>
+        <a href="interiors.html">Interiors</a>
+        <a href="experiences.html" class="active">Experiences</a>
+        <a href="shop.html">Shop</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+
+      <!-- Headline -->
+      <h1 class="h1">TAKE A SEAT</h1>
+
+      <!-- Intro copy -->
+      <div class="body-text">
+        <p>We create the kinds of experiences you feel before you walk in and stay with you well after leaving.</p>
+        <p>&nbsp;</p>
+        <p>From intimate celebrations with loved ones to weekend-long retreats for global communities, we work across scales and priorities to bring ideas to life and vibes to fruition.</p>
+        <p>&nbsp;</p>
+        <p>If you have something in mind, or just a feeling you want to chase, reach out and we will make it happen.</p>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MR. TAO — 7 photos                                       -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:195px; top:360px; width:533px; height:355px;">
+        <img src="assets/exp-mr-tao-1.png" alt="">
+      </div>
+      <div class="photo" style="left:758px; top:438px; width:532px; height:355px;">
+        <img src="assets/exp-mr-tao-3.png" alt="">
+      </div>
+      <div class="photo" style="left:-101px; top:745px; width:532px; height:355px;">
+        <img src="assets/exp-mr-tao-6.png" alt="">
+      </div>
+      <div class="photo" style="left:521px; top:745px; width:355px; height:532px;">
+        <img src="assets/exp-mr-tao-4.png" alt="">
+      </div>
+      <div class="photo" style="left:936px; top:816px; width:532px; height:355px;">
+        <img src="assets/exp-mr-tao-2.png" alt="">
+      </div>
+      <div class="photo" style="left:150px; top:1160px; width:532px; height:355px;">
+        <img src="assets/exp-mr-tao-7.png" alt="">
+      </div>
+      <div class="photo" style="left:788px; top:1261px; width:532px; height:355px;">
+        <img src="assets/exp-mr-tao-5.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  DINNER — 8 photos                                        -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:88px; top:1605px; width:355px; height:532px;">
+        <img src="assets/exp-dinner-151.png" alt="">
+      </div>
+      <div class="photo" style="left:503px; top:1686px; width:532px; height:355px;">
+        <img src="assets/exp-dinner-123.png" alt="">
+      </div>
+      <div class="photo" style="left:1115px; top:1914px; width:355px; height:532px;">
+        <img src="assets/exp-dinner-145.png" alt="">
+      </div>
+      <div class="photo" style="left:405px; top:2011px; width:355px; height:533px;">
+        <img src="assets/exp-dinner-112.png" alt="">
+      </div>
+      <div class="photo" style="left:790px; top:2101px; width:355px; height:532px;">
+        <img src="assets/exp-dinner-138.png" alt="">
+      </div>
+      <div class="photo" style="left:-30px; top:2257px; width:355px; height:532px;">
+        <img src="assets/exp-dinner-108.png" alt="">
+      </div>
+      <div class="photo" style="left:1050px; top:2506px; width:355px; height:532px;">
+        <img src="assets/exp-dinner-102.png" alt="">
+      </div>
+
+      <!-- Dinner-101: portrait displayed landscape via -90° rotation -->
+      <div class="photo-rotated" style="left:195px; top:2664px; width:529.517px; height:355px;">
+        <div class="photo-rotated-inner" style="width:355px; height:529.517px;">
+          <img src="assets/exp-dinner-101.png" alt="" style="width:355px; height:529.517px;">
+        </div>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  WEDDING — 7 photos (displayed normally, no mirror)       -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:0; top:3079px; width:355px; height:533px;">
+        <img src="assets/exp-wedding-228.png" alt="">
+      </div>
+      <div class="photo" style="left:384px; top:3136px; width:533px; height:355px;">
+        <img src="assets/exp-wedding-311.png" alt="">
+      </div>
+      <div class="photo" style="left:856px; top:3373px; width:533px; height:355px;">
+        <img src="assets/exp-wedding-229.png" alt="">
+      </div>
+      <div class="photo" style="left:294px; top:3551px; width:533px; height:355px;">
+        <img src="assets/exp-wedding-222.png" alt="">
+      </div>
+      <div class="photo" style="left:-12px; top:3732px; width:355px; height:533px;">
+        <img src="assets/exp-wedding-309.png" alt="">
+      </div>
+      <div class="photo" style="left:966px; top:3778px; width:355px; height:533px;">
+        <img src="assets/exp-wedding-233.png" alt="">
+      </div>
+      <div class="photo" style="left:403px; top:3936px; width:533px; height:355px;">
+        <img src="assets/exp-wedding-398.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MR. HOTEL — 6 photos                                     -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:757px; top:4341px; width:533px; height:355px;">
+        <img src="assets/exp-mr-hotel-3.png" alt="">
+      </div>
+      <div class="photo" style="left:195px; top:4411px; width:533px; height:356px;">
+        <img src="assets/exp-mr-hotel-1.png" alt="">
+      </div>
+      <div class="photo" style="left:-60px; top:4736px; width:534px; height:355px;">
+        <img src="assets/exp-mr-hotel-4.png" alt="">
+      </div>
+      <div class="photo" style="left:647px; top:4796px; width:533px; height:355px;">
+        <img src="assets/exp-mr-hotel-2.png" alt="">
+      </div>
+      <div class="photo" style="left:254px; top:5057px; width:532px; height:355px;">
+        <img src="assets/exp-mr-hotel-5.png" alt="">
+      </div>
+      <div class="photo" style="left:846px; top:5211px; width:532px; height:355px;">
+        <img src="assets/exp-mr-hotel-6.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MR. BUFFET — 6 photos                                    -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:675px; top:5596px; width:355px; height:533px;">
+        <img src="assets/exp-mr-buffet-6.png" alt="">
+      </div>
+      <div class="photo" style="left:82px; top:5671px; width:533px; height:355px;">
+        <img src="assets/exp-mr-buffet-3.png" alt="">
+      </div>
+      <div class="photo" style="left:1120px; top:5687px; width:355px; height:533px;">
+        <img src="assets/exp-mr-buffet-2.png" alt="">
+      </div>
+      <div class="photo" style="left:460px; top:6085.88px; width:355px; height:533px;">
+        <img src="assets/exp-mr-buffet-5.png" alt="">
+      </div>
+      <div class="photo" style="left:915px; top:6146px; width:355px; height:533px;">
+        <img src="assets/exp-mr-buffet-4.png" alt="">
+      </div>
+      <div class="photo" style="left:-42px; top:6176.88px; width:532px; height:355px;">
+        <img src="assets/exp-mr-buffet-1.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MR. NINE WEST — 6 photos                                 -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <div class="photo" style="left:457px; top:6709.01px; width:533px; height:355px;">
+        <img src="assets/exp-mr-nine-west-1.png" alt="">
+      </div>
+      <div class="photo" style="left:-105px; top:6833.01px; width:532px; height:355px;">
+        <img src="assets/exp-mr-nine-west-3.png" alt="">
+      </div>
+      <div class="photo" style="left:827px; top:6964.01px; width:532px; height:355px;">
+        <img src="assets/exp-mr-nine-west-4.png" alt="">
+      </div>
+      <div class="photo" style="left:235px; top:7114.01px; width:532px; height:355px;">
+        <img src="assets/exp-mr-nine-west-2.png" alt="">
+      </div>
+      <div class="photo" style="left:682px; top:7439.01px; width:532px; height:355px;">
+        <img src="assets/exp-mr-nine-west-6.png" alt="">
+      </div>
+      <div class="photo" style="left:30px; top:7499.01px; width:532px; height:355px;">
+        <img src="assets/exp-mr-nine-west-5.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  DRAGGABLE 3D OBJECTS                                      -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+
+      <!-- Box Tape — outer 97×284, inner rotate(90deg) 284×97 -->
+      <div class="obj has-rotation" id="obj-box-tape"
+           style="left:117px; top:414px; width:97px; height:284px;">
+        <div class="obj-inner" style="transform:rotate(90deg); width:284px; height:97px;">
+          <img src="assets/obj-box-tape.png" alt="Box tape">
+        </div>
+      </div>
+
+      <!-- Yellow Pencil — outer 224.02×421.508, inner rotate(-24.05deg) 49.119×439.653 -->
+      <div class="obj has-rotation" id="obj-yellow-pencil"
+           style="left:1267.36px; top:512.02px; width:224.02px; height:421.508px;">
+        <div class="obj-inner" style="transform:rotate(-24.05deg); width:49.119px; height:439.653px;">
+          <img src="assets/obj-yellow-pencil.png" alt="Yellow pencil">
+        </div>
+      </div>
+
+      <!-- Duct Tape — outer 312.128×90, inner rotate(180deg) same size -->
+      <div class="obj has-rotation" id="obj-duct-tape"
+           style="left:888px; top:1143px; width:312.128px; height:90px;">
+        <div class="obj-inner" style="transform:rotate(180deg); width:312.128px; height:90px;">
+          <img src="assets/obj-duct-tape.png" alt="Duct tape">
+        </div>
+      </div>
+
+      <!-- Pink Eraser — outer 228.433×150.788, inner rotate(-16.85deg) skewX(0.16deg) 209.941×94.039 -->
+      <div class="obj has-rotation" id="obj-pink-eraser"
+           style="left:44.47px; top:1155.73px; width:228.433px; height:150.788px;">
+        <div class="obj-inner" style="transform:rotate(-16.85deg) skewX(0.16deg); width:209.941px; height:94.039px;">
+          <img src="assets/obj-pink-eraser.png" alt="Pink eraser">
+        </div>
+      </div>
+
+      <!-- Grapefruit — no rotation -->
+      <div class="obj" id="obj-grapefruit"
+           style="left:1050px; top:1728px; width:210px; height:221px;">
+        <img src="assets/obj-grapefruit.png" alt="Grapefruit">
+      </div>
+
+      <!-- Halved Plum — no rotation -->
+      <div class="obj" id="obj-halved-plum"
+           style="left:350px; top:2479px; width:220px; height:219px;">
+        <img src="assets/obj-halved-plum.png" alt="Halved plum">
+      </div>
+
+      <!-- Orange 3 — no rotation -->
+      <div class="obj" id="obj-orange-3"
+           style="left:880px; top:2563px; width:212px; height:202px;">
+        <img src="assets/obj-orange-3.png" alt="Orange">
+      </div>
+
+      <!-- Old Fashioned — outer 264.948×316.814, inner rotate(9.06deg) 222.791×285.281 -->
+      <div class="obj has-rotation" id="obj-old-fashioned"
+           style="left:1050.76px; top:3055.82px; width:264.948px; height:316.814px; mix-blend-mode:multiply;">
+        <div class="obj-inner" style="transform:rotate(9.06deg); width:222.791px; height:285.281px;">
+          <img src="assets/obj-old-fashioned.png" alt="Old fashioned">
+        </div>
+      </div>
+
+      <!-- Napkin — outer 331.232×349.709, inner rotate(-12.02deg) 275×299 -->
+      <div class="obj has-rotation" id="obj-napkin"
+           style="left:1207px; top:3586px; width:331.232px; height:349.709px;">
+        <div class="obj-inner" style="transform:rotate(-12.02deg); width:275px; height:299px;">
+          <img src="assets/obj-napkin.png" alt="Napkin">
+        </div>
+      </div>
+
+      <!-- Lemon Wedge — outer 280.75×286.449, inner rotate(142.99deg) scaleY(-1) 188×217 -->
+      <div class="obj has-rotation" id="obj-lemon-wedge"
+           style="left:1089px; top:4667px; width:280.75px; height:286.449px;">
+        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); width:188px; height:217px;">
+          <img src="assets/obj-lemon-wedge.png" alt="Lemon wedge">
+        </div>
+      </div>
+
+      <!-- Chocolate Chip Cookie — no rotation -->
+      <div class="obj" id="obj-cookie"
+           style="left:400px; top:5480px; width:240px; height:231px;">
+        <img src="assets/obj-cookie.png" alt="Chocolate chip cookie">
+      </div>
+
+      <!-- Dark Cherry — outer 257.712×274.626, inner rotate(12.54deg) 211.925×234.206 -->
+      <div class="obj has-rotation" id="obj-dark-cherry"
+           style="left:17px; top:5917px; width:257.712px; height:274.626px;">
+        <div class="obj-inner" style="transform:rotate(12.54deg); width:211.925px; height:234.206px;">
+          <img src="assets/obj-dark-cherry.png" alt="Dark cherry">
+        </div>
+      </div>
+
+      <!-- Orange 1 — outer 200×183, inner rotate(180deg) scaleY(-1) = horizontal flip -->
+      <div class="obj has-rotation" id="obj-orange-1"
+           style="left:196px; top:6679px; width:200px; height:183px;">
+        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); width:200px; height:183px;">
+          <img src="assets/obj-orange-1.png" alt="Orange">
+        </div>
+      </div>
+
+      <!-- White Orchid — outer 260.133×223.552, inner rotate(3.45deg) 248×209 -->
+      <div class="obj has-rotation" id="obj-white-orchid"
+           style="left:1113.93px; top:6724.72px; width:260.133px; height:223.552px;">
+        <div class="obj-inner" style="transform:rotate(3.45deg); width:248px; height:209px;">
+          <img src="assets/obj-white-orchid.png" alt="White orchid">
+        </div>
+      </div>
+
+      <!-- Orange 2 — outer 261.371×256.071, inner rotate(17.93deg) 209.565×201.328 -->
+      <div class="obj has-rotation" id="obj-orange-2"
+           style="left:-71.58px; top:7147.72px; width:261.371px; height:256.071px;">
+        <div class="obj-inner" style="transform:rotate(17.93deg); width:209.565px; height:201.328px;">
+          <img src="assets/obj-orange-2.png" alt="Orange">
+        </div>
+      </div>
+
+      <!-- Paloma — no rotation, mix-blend-multiply -->
+      <div class="obj" id="obj-paloma"
+           style="left:1244px; top:7349px; width:237px; height:326px; mix-blend-mode:multiply;">
+        <img src="assets/obj-paloma.png" alt="Paloma">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  MONSTER WAVE FOOTER                                       -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <div class="monster-area" id="monster-area">
+        <img class="wave" src="assets/monster-wave-interiors.svg" alt="">
+        <svg class="monster-eyes-overlay" viewBox="0 0 1440 122" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip">
+              <path transform="translate(564.63 38.45)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip">
+              <path transform="translate(403 37.32)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            </clipPath>
+          </defs>
+          <path fill="white" transform="translate(564.63 38.45)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <path fill="white" transform="translate(403 37.32)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="624.5" cy="55.2" r="30" fill="#32261F"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="466.9" cy="55.2" r="30" fill="#32261F"/>
+        </svg>
+      </div>
+
+      <!-- Footer bar -->
+      <footer class="footer">
+        <div class="footer-icons">
+          <a href="#" aria-label="Instagram"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+          <a href="#" aria-label="TikTok"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+        </div>
+        <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+      </footer>
+
+    </div><!-- /page -->
+  </div><!-- /page-scaler -->
+
+
+  <script>
+    const PAGE_W = 1440;
+    const PAGE_H = 8126;
+    const page   = document.querySelector('.page');
+    const scaler = document.getElementById('page-scaler');
+    let scale = 1;
+
+    function scalePage() {
+      scale = window.innerWidth / PAGE_W;
+      page.style.transform = `scale(${scale})`;
+      scaler.style.height  = (PAGE_H * scale) + 'px';
+    }
+    scalePage();
+    window.addEventListener('resize', scalePage);
+
+
+    // ── Custom cursor ────────────────────────────────────────────────
+    const cursor       = document.getElementById('custom-cursor');
+    const cursorOpen   = document.getElementById('cursor-open');
+    const cursorClosed = document.getElementById('cursor-closed');
+
+    function setCursorState(state) {
+      if (state === 'grab') {
+        cursorOpen.style.display   = 'none';
+        cursorClosed.style.display = '';
+      } else {
+        cursorOpen.style.display   = '';
+        cursorClosed.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('mousemove', e => {
+      cursor.style.transform = `translate(${e.clientX - 24}px, ${e.clientY}px)`;
+      updateAllEyes(e.clientX, e.clientY);
+    });
+
+
+    // ── Eye tracking ─────────────────────────────────────────────────
+    function toCanvas(vx, vy) {
+      const r = page.getBoundingClientRect();
+      return { x: (vx - r.left) / scale, y: (vy - r.top) / scale };
+    }
+
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX, dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+    }
+
+    const monIrisR = document.getElementById('mon-iris-r');
+    const monIrisL = document.getElementById('mon-iris-l');
+
+    function updateAllEyes(vx, vy) {
+      const { x, y } = toCanvas(vx, vy);
+      trackIris(monIrisR, x, y - 7914, 624.5, 55.2, 20, 5);
+      trackIris(monIrisL, x, y - 7914, 466.9, 55.2, 20, 5);
+    }
+
+
+    // ── Drag (photos + objects) ──────────────────────────────────────
+    let dragging = null, offsetX = 0, offsetY = 0, topZ = 10;
+
+    document.querySelectorAll('.obj, .photo, .photo-rotated').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = (e.clientX - rect.left) / scale;
+        offsetY = (e.clientY - rect.top)  / scale;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        setCursorState('grab');
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const pr = page.getBoundingClientRect();
+      dragging.style.left = ((e.clientX - pr.left) / scale - offsetX) + 'px';
+      dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        setCursorState('default');
+      }
+    });
+
+    document.querySelectorAll('img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
+  </script>
+
+</body>
+</html>
