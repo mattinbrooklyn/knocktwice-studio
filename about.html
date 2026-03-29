@@ -439,7 +439,7 @@
     let scale = 1;
 
     function scalePage() {
-      scale = Math.min(window.innerWidth / 1440, window.innerHeight / 1206);
+      scale = window.innerWidth / 1440;
       page.style.transform = `translate(-50%, -50%) scale(${scale})`;
     }
     scalePage();
