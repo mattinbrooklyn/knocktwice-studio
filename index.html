@@ -16,8 +16,17 @@
       height: 100%;
       background: #32261f;
       overflow: hidden;
-      cursor: pointer;
+      cursor: none;
     }
+
+    #custom-cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; will-change: transform; transform: translate(-200px,-200px); }
+    #cursor-default { display: block; width: 45px; height: 49px; }
+    #cursor-hover   { display: none;  width: 48px; height: 51px; }
+    #cursor-drag    { display: none;  width: 48px; height: 40px; }
+    body[data-cursor="hover"] #cursor-default { display: none; }
+    body[data-cursor="hover"] #cursor-hover   { display: block; }
+    body[data-cursor="drag"]  #cursor-default { display: none; }
+    body[data-cursor="drag"]  #cursor-drag    { display: block; }
 
     .splash {
       position: fixed;
@@ -73,6 +82,7 @@
     </svg>
   </div>
 
+  <script src="assets/scripts.js"></script>
   <script>
     // ─── Elements ────────────────────────────────────────────────
     const svg            = document.getElementById('keyhole-svg');
