@@ -170,15 +170,22 @@
     // ── Scale page ─────────────────────────────────────────────────
     // 1440×1024 canvas (exact Figma frame). Uniform scale keeps all
     // pixel coordinates correct at any viewport size.
-    const PAGE_H = 1110;
-    const page   = document.querySelector('.page');
-    const scaler = document.getElementById('page-scaler');
-    let scale = 1;
+    const page        = document.querySelector('.page');
+    const scaler      = document.getElementById('page-scaler');
+    const monsterArea = document.getElementById('monster-area');
+    const footer      = document.querySelector('.footer');
+    let scale   = 1;
+    let waveTop = 910; // updated each resize
 
     function scalePage() {
-      scale = window.innerWidth / 1440;
+      scale   = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      scaler.style.height = (PAGE_H * scale) + 'px';
+      // Wave top at exactly the fold; footer immediately below the wave
+      waveTop = Math.ceil(window.innerHeight / scale);
+      monsterArea.style.top = waveTop + 'px';
+      footer.style.top      = (waveTop + 110) + 'px';
+      page.style.height     = (waveTop + 200) + 'px';
+      scaler.style.height   = (waveTop + 200) * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
@@ -219,8 +226,8 @@
 
     function updateMonsterEyes(vx, vy) {
       const { x, y } = toCanvas(vx, vy);
-      trackIris(monIrisR, x, y - 910, 633, 39, 20, 5);
-      trackIris(monIrisL, x, y - 910, 476, 38, 20, 5);
+      trackIris(monIrisR, x, y - waveTop, 633, 39, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 476, 38, 20, 5);
     }
   </script>
 

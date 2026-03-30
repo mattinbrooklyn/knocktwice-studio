@@ -300,15 +300,19 @@
     // The page is a fixed 1440×1024 canvas. JS scales it uniformly
     // so it fits entirely within the viewport at any window size,
     // while preserving exact Figma pixel ratios.
-    const PAGE_H = 1024;
     const page   = document.querySelector('.page');
     const scaler = document.getElementById('page-scaler');
+    const footer = document.querySelector('.footer');
     let scale = 1;
 
     function scalePage() {
       scale = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      scaler.style.height = (PAGE_H * scale) + 'px';
+      // Place footer top at exactly the fold (first pixel below viewport)
+      const foldPx = Math.ceil(window.innerHeight / scale);
+      footer.style.top    = foldPx + 'px';
+      page.style.height   = (foldPx + 90) + 'px';
+      scaler.style.height = (foldPx + 90) * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
