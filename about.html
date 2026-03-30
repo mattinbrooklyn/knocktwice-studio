@@ -9,7 +9,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
   <style>
-    html, body { height: 100%; overflow: hidden; }
+    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; }
+    body::-webkit-scrollbar { display: none; }
+
+    #page-scaler { position: relative; width: 100%; }
 
     /* ── Page canvas ────────────────────────────────────────────────
        Fixed 1440×1206 (exact Figma frame), centered and uniformly
@@ -17,7 +20,7 @@
     .page {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 1206px;
+      width: 1440px; height: 1227px;
       transform-origin: top left;
       background: var(--color-bg);
       overflow: hidden;
@@ -177,9 +180,10 @@
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
     .monster-area {
       position: absolute;
-      left: 0; top: 1000px;
+      left: 0; top: 1021px;
       width: 1440px; height: 116px;
       z-index: 5;
+      background: var(--color-blue);
     }
     .monster-area img.wave {
       position: absolute;
@@ -196,7 +200,7 @@
       overflow: visible;
     }
 
-    .footer { top: 1116px; }
+    .footer { top: 1137px; }
 
     /* ── Autonomous eye blink ──────────────────────────────────────── */
     @keyframes blink {
@@ -213,6 +217,7 @@
 </head>
 <body>
 
+  <div id="page-scaler">
   <!-- ── Page canvas ─────────────────────────────────────────────── -->
   <div class="page">
 
@@ -383,18 +388,22 @@
     </footer>
 
   </div><!-- /page -->
+  </div><!-- /#page-scaler -->
 
   <script src="assets/scripts.js"></script>
   <script>
     // ── Scale page ─────────────────────────────────────────────────
     // 1440×1206 canvas (exact Figma frame). Uniform scale keeps all
     // pixel coordinates correct at any viewport size.
-    const page = document.querySelector('.page');
+    const PAGE_H = 1227;
+    const page   = document.querySelector('.page');
+    const scaler = document.getElementById('page-scaler');
     let scale = 1;
 
     function scalePage() {
       scale = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
+      scaler.style.height = (PAGE_H * scale) + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
@@ -436,8 +445,8 @@
     const monIrisL = document.getElementById('mon-iris-l');
 
     function moveMonsterEyes(cx, cy) {
-      trackIris(monIrisR, cx, cy - 1000, 652.9,  49.45, 20, 5);
-      trackIris(monIrisL, cx, cy - 1000, 495.41, 49.46, 20, 5);
+      trackIris(monIrisR, cx, cy - 1021, 652.9,  49.45, 20, 5);
+      trackIris(monIrisL, cx, cy - 1021, 495.41, 49.46, 20, 5);
     }
 
     function updateAllEyes(vx, vy) {
