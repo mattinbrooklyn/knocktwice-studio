@@ -71,6 +71,7 @@ html, body {
   position: absolute;
   left: 0;
   width: 1440px; height: 90px;
+  margin-top: -2px;
   background: var(--color-blue);
   display: flex;
   align-items: center;
