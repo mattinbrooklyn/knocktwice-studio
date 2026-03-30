@@ -567,11 +567,12 @@
       dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
     });
 
-    document.addEventListener('mouseup', () => {
+    document.addEventListener('mouseup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
-        KT.setCursor('default');
+        const under = document.elementFromPoint(e.clientX, e.clientY);
+        KT.setCursor(under && under.closest('.obj, .photo, .photo-rotated, .placeholder') ? 'hover' : 'default');
       }
     });
 
