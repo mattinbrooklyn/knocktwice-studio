@@ -359,7 +359,7 @@
     function animateWhos(ts) {
       if (whosPrev !== null) {
         const dt = Math.min(ts - whosPrev, 50);
-        whosOffset -= 60 * (dt / 1000);
+        whosOffset -= 48 * (dt / 1000);
         if (whosUnit > 0 && whosOffset <= -whosUnit) whosOffset += whosUnit;
         whosTextpath.setAttribute('startOffset', whosOffset.toFixed(2));
       }
