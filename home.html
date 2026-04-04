@@ -64,7 +64,7 @@
       position: absolute;
       top: 88px; left: 88px;
       transform: translate(-50%, -50%) rotate(-20.98deg);
-      perspective: 500px;
+      perspective: 300px;
     }
     .hand-coin {
       width: 110.1px; height: 111.4px;
@@ -77,15 +77,10 @@
       width: 100%; height: 100%;
     }
     /* Front and back faces: full-color hand, only visible from their own side */
-    .hand-front { transform: translateZ(10px);  backface-visibility: hidden; }
-    .hand-back  { transform: translateZ(-10px) rotateY(180deg); backface-visibility: hidden; }
-    /* Edge slices: same hand shape, collapsed to solid dark — no rectangle, no layered look */
-    .hand-e1    { transform: translateZ(7px);  filter: brightness(0.08); }
-    .hand-e2    { transform: translateZ(4px);  filter: brightness(0.08); }
-    .hand-e3    { transform: translateZ(1px);  filter: brightness(0.08); }
-    .hand-e4    { transform: translateZ(-2px); filter: brightness(0.08); }
-    .hand-e5    { transform: translateZ(-5px); filter: brightness(0.08); }
-    .hand-e6    { transform: translateZ(-8px); filter: brightness(0.08); }
+    .hand-front { transform: translateZ(9px);  backface-visibility: hidden; }
+    .hand-back  { transform: translateZ(-9px) rotateY(180deg); backface-visibility: hidden; }
+    /* Edge: 1px-apart silhouette slices — pure black so they fuse into one solid mass */
+    .hand-edge  { filter: brightness(0); }
 
     .footer { top: 934px; }
   </style>
@@ -168,14 +163,25 @@
       <!-- 3D hand coin — HTML layer so CSS preserve-3d works; paths referenced from #hand-px symbol above -->
       <div class="hand-scene">
         <div class="hand-coin">
-          <!-- Edge slices: same hand SVG, brightness(0.08) = near-black silhouette, hand-shaped not rectangular -->
-          <svg class="hand-layer hand-e6" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-e5" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-e4" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-e3" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-e2" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-e1" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <!-- Front and back faces: full-color hand art on both sides -->
+          <!-- Edge: 1px-apart silhouette slices, fuse into one solid hand-shaped mass -->
+          <svg class="hand-layer hand-edge" style="transform:translateZ(8px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(7px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(6px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(5px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(4px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(3px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(2px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(1px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(0px)"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-1px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-2px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-3px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-4px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-5px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-6px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-7px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-edge" style="transform:translateZ(-8px)" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <!-- Front and back faces: full-color hand art -->
           <svg class="hand-layer hand-front" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
           <svg class="hand-layer hand-back"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
         </div>
