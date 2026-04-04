@@ -71,7 +71,18 @@
       width: 394px; height: 394px;
       overflow: hidden;
     }
-    .headshot img { width: 100%; height: 100%; display: block; object-fit: cover; pointer-events: none; }
+    .headshot img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .headshot img.default { opacity: 1; }
+    .headshot img.hover   { opacity: 0; }
+    .headshot:hover img.default { opacity: 0; }
+    .headshot:hover img.hover   { opacity: 1; }
     .headshot-rodrigo { left: 316px; }
     .headshot-matt    { left: 730px; }
 
@@ -249,10 +260,12 @@
 
     <!-- Headshots -->
     <div class="headshot headshot-rodrigo">
-      <img src="assets/headshot-rodrigo.png" alt="Rodrigo Miguel">
+      <img class="default" src="assets/headshot-rodrigo.png" alt="Rodrigo Miguel">
+      <img class="hover"   src="assets/headshot-rodrigo-hover.png" alt="Rodrigo Miguel">
     </div>
     <div class="headshot headshot-matt">
-      <img src="assets/headshot-matt.png" alt="Matt Little">
+      <img class="default" src="assets/headshot-matt.png" alt="Matt Little">
+      <img class="hover"   src="assets/headshot-matt-hover.png" alt="Matt Little">
     </div>
 
     <!-- Rodrigo -->
