@@ -77,9 +77,9 @@
       z-index: 500;
       pointer-events: none;
       transform: translateY(100%);
-      transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    #home-monster.is-visible { transform: translateY(0); }
+    #home-monster.is-visible { transform: translateY(15%); }
 
     #home-monster .monster-ticker {
       width: 100%;
@@ -475,15 +475,18 @@
     const homeMonIrisR  = document.getElementById('home-mon-iris-r');
     const homeMonIrisL  = document.getElementById('home-mon-iris-l');
 
-    function isFullyOffscreen(el) {
+    // True if ≤5% of the element's area is inside the viewport
+    function isMostlyOffscreen(el) {
       const r = el.getBoundingClientRect();
-      return r.right < 0 || r.bottom < 0 ||
-             r.left  > window.innerWidth || r.top > window.innerHeight;
+      if (r.width === 0 || r.height === 0) return true;
+      const visW = Math.max(0, Math.min(window.innerWidth,  r.right)  - Math.max(0, r.left));
+      const visH = Math.max(0, Math.min(window.innerHeight, r.bottom) - Math.max(0, r.top));
+      return (visW * visH) / (r.width * r.height) <= 0.05;
     }
 
     function checkMonsterTrigger() {
       const pieces = document.querySelectorAll('.furniture');
-      const allOff = Array.from(pieces).every(isFullyOffscreen);
+      const allOff = Array.from(pieces).every(isMostlyOffscreen);
       homeMonster.classList.toggle('is-visible', allOff);
     }
 
