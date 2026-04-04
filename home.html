@@ -396,6 +396,24 @@
   </div><!-- /.page -->
   </div><!-- /#page-scaler -->
 
+  <!-- Crossfade from splash: starts black, fades in over 500ms -->
+  <div id="splash-fade" style="position:fixed;inset:0;background:#000;z-index:9999;pointer-events:none;"></div>
+  <script>
+    (function () {
+      var el = document.getElementById('splash-fade');
+      if (sessionStorage.getItem('from-splash')) {
+        sessionStorage.removeItem('from-splash');
+        requestAnimationFrame(function () { requestAnimationFrame(function () {
+          el.style.transition = 'opacity 500ms ease';
+          el.style.opacity    = '0';
+          el.addEventListener('transitionend', function () { el.remove(); }, { once: true });
+        }); });
+      } else {
+        el.remove(); // not coming from splash — no fade needed
+      }
+    }());
+  </script>
+
   <script src="assets/scripts.js"></script>
   <script>
     // ─── Uniform scale to fit viewport ───────────────────────────

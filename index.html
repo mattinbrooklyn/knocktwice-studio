@@ -46,6 +46,9 @@
 </head>
 <body>
 
+  <!-- Full-screen black overlay for the fade-to-black transition -->
+  <div id="fade-overlay" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:9990;"></div>
+
   <div class="splash">
     <svg id="keyhole-svg" class="keyhole" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg">
 
@@ -153,79 +156,56 @@
 
     // ─── Click animation ─────────────────────────────────────────
     //
-    // Timing (total ~950ms):
-    //   0 –  180ms  Phase 1: Rise   — SVG jumps up ~80px (ease-out)
-    // 180 –  460ms  Phase 2: Drop   — SVG bolts off bottom (ease-in)
-    // 460 –  920ms  Phase 3: Zoom   — solid keyhole scales to fill viewport
-    //  920ms        Navigate to home.html
-    //
-    // The Figma frames give the inner-group deltas that drive this:
-    //   Frame 2 → group offset (+90, +90): body shifts so both eyes
-    //             enter the keyhole window ("startled / rising")
-    //   Frame 3 → group offset (+302, +706): body fully below keyhole
-    //
-    // In our single-SVG setup the whole element translates instead.
+    // Timing:
+    //   0 –  100ms  Pause    — nothing moves
+    // 100 –  500ms  Drop     — creature slides off bottom, ease-in (gravity)
+    //               Flash    — two-eye state shows for one frame as it drops
+    // 500 –  800ms  Fade     — screen fades to black (300ms)
+    // 800ms         Navigate — home.html crossfades in (500ms on that side)
 
-    let animating = false;
+    const overlay  = document.getElementById('fade-overlay');
+    let animating  = false;
 
     document.addEventListener('click', () => {
       if (animating) return;
       animating = true;
       tracking  = false;
+      tx = 0; ty = 0; // snap iris, stop tracking
 
-      // Snap iris to center — no more tracking
-      tx = 0; ty = 0;
-
-      // ── Phase 1: Rise ──────────────────────────────────────────
-      // Swap to two-eye state before the rise so both eyes are
-      // clearly visible as the creature pops up startled.
-      keyholePath.setAttribute('d', TWO_EYE_KEYHOLE);
-      eyeWhite.style.display      = 'none';
-      iris.style.display          = 'none';
-      eyeWhiteLeft.style.display  = '';
-      eyeWhiteRight.style.display = '';
-      irisLeft.style.display      = '';
-      irisRight.style.display     = '';
-
-      svg.style.transition = 'transform 300ms cubic-bezier(0, 0, 0.3, 1)';
-      svg.style.transform  = 'translateY(-90px)';
-
+      // ── 100ms pause — nothing moves ───────────────────────────
       setTimeout(() => {
 
-        // ── Phase 2: Drop ─────────────────────────────────────────
-        // Bolt off the bottom — fast acceleration, no ease-out
-        svg.style.transition = 'transform 280ms cubic-bezier(0.4, 0, 1, 1)';
-        svg.style.transform  = 'translateY(140vh)';
+        // Flash two-eye state for exactly one painted frame
+        keyholePath.setAttribute('d', TWO_EYE_KEYHOLE);
+        eyeWhite.style.display      = 'none';
+        iris.style.display          = 'none';
+        eyeWhiteLeft.style.display  = '';
+        eyeWhiteRight.style.display = '';
+        irisLeft.style.display      = '';
+        irisRight.style.display     = '';
 
-        setTimeout(() => {
+        requestAnimationFrame(() => {
 
-          // ── Phase 3: Zoom ─────────────────────────────────────────
-          // While the SVG is off-screen, prep the zoom state:
-          //   • solid keyhole (no eye holes)
-          //   • hide all eye elements so only the blue shape remains
-          keyholePath.setAttribute('d', SOLID_KEYHOLE);
-          eyeWhiteLeft.style.display  = 'none';
-          eyeWhiteRight.style.display = 'none';
-          irisLeft.style.display      = 'none';
-          irisRight.style.display     = 'none';
+          // ── Drop: 400ms ease-in (gravity) ─────────────────────
+          svg.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
+          svg.style.transform  = 'translateY(150vh)';
 
-          // Snap back to center with no transition (1 frame to commit)
-          svg.style.transition = 'none';
-          svg.style.transform  = 'translateY(0)';
+          // ── Fade to black: begins when drop lands ──────────────
+          setTimeout(() => {
+            overlay.style.transition = 'opacity 300ms ease';
+            overlay.style.opacity    = '1';
 
-          // Two rAFs: first lets the style flush, second starts the transition
-          requestAnimationFrame(() => requestAnimationFrame(() => {
-            svg.style.transition = 'transform 460ms cubic-bezier(0.4, 0, 0.6, 1)';
-            svg.style.transform  = 'scale(20)';
-
+            // ── Navigate: home.html fades in from black ────────────
             setTimeout(() => {
+              sessionStorage.setItem('from-splash', '1');
               window.location.href = 'home.html';
-            }, 440);
-          }));
+            }, 300);
 
-        }, 290); // after drop
+          }, 400); // drop duration
 
-      }, 310); // after rise
+        }); // rAF — lets two-eye state paint before drop starts
+
+      }, 100); // initial pause
     });
   </script>
 
