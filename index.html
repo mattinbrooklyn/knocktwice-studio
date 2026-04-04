@@ -69,34 +69,40 @@
 
         <!--
           Splash_Monster — the creature body + eyes.
-          Only this group translates on click, sliding down behind the
-          static clip window above. No other elements move or change.
+          Only this group translates on click. No JS changes any element.
+
+          Eye layout:
+            • Single eye (cy≈151) — visible at rest through the keyhole head.
+              Mouse-tracked iris lives here.
+            • Two eyes (cy≈−140) — positioned above SVG y=0 so they are
+              completely outside the keyhole clip at rest. As the creature
+              drops, this zone descends into the keyhole opening and both
+              eyes briefly pass through — naturally, with no JS involvement.
         -->
         <g id="splash-monster" style="will-change:transform;">
 
-          <!-- Eye whites — both present from load, natural positions -->
-          <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white"/>
-          <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white"/>
-
-          <!--
-            Iris/pupil. JS drives this group's translate for mouse tracking.
-            Resting center: (165, 114.5) in SVG coords.
-          -->
+          <!-- ── Single eye (resting state) ───────────────────── -->
+          <circle cx="157.5" cy="151.5" r="80.5" fill="white"/>
           <g id="iris">
             <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
           </g>
 
-          <!-- Irises — both present from load -->
-          <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F"/>
-          <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F"/>
+          <!-- ── Two eyes (above viewport at rest, flash during drop) ── -->
+          <circle cx="87"  cy="-140" r="60" fill="white"/>
+          <circle cx="226" cy="-140" r="60" fill="white"/>
+          <circle cx="87"  cy="-155" r="36" fill="#32261F"/>
+          <circle cx="226" cy="-155" r="36" fill="#32261F"/>
 
           <!--
             Blue creature body — large rect clipped to the keyhole window.
-            Two eye-socket sub-paths (evenodd) let the eye whites show through.
-            This path never changes — no JS swapping.
+            Three eye-socket sub-paths (fill-rule evenodd):
+              1. Single socket at y≈142 — aligns with the resting single eye.
+              2. Two sockets at y≈−140 — aligns with the two eyes above;
+                 both sockets are outside the keyhole clip at rest so
+                 the holes are invisible until the creature drops.
           -->
-          <path id="keyhole-path" fill="#378CDA" fill-rule="evenodd"
-            d="M-100 -600L413 -600L413 1200L-100 1200Z M30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796Z M168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z"/>
+          <path fill="#378CDA" fill-rule="evenodd"
+            d="M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z M30 -140C68 -176.226 107 -176.226 145 -140C107 -122.347 68 -122.347 30 -140Z M168 -140C206 -176.226 245 -176.226 283 -140C245 -122.347 206 -122.347 168 -140Z"/>
 
         </g>
       </g>
