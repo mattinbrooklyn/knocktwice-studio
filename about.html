@@ -203,6 +203,30 @@
       display: block;
       pointer-events: none;
     }
+    .monster-ticker {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .monster-ticker-inner {
+      display: flex;
+      white-space: nowrap;
+      animation: scroll-left 25s linear infinite;
+    }
+    .monster-ticker-content {
+      flex-shrink: 0;
+      font-family: 'Handjet', sans-serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 27px;
+      letter-spacing: -0.22px;
+      color: var(--color-green);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+    }
     .monster-eyes-overlay {
       position: absolute;
       top: 0; left: 0;
@@ -369,6 +393,12 @@
          Iris centers: right (652.9, 49.45), left (495.41, 49.46) -->
     <div class="monster-area" id="monster-area">
       <img class="wave" src="assets/monster-wave.svg" alt="">
+      <div class="monster-ticker">
+        <div class="monster-ticker-inner">
+          <span class="monster-ticker-content">📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp;</span>
+          <span class="monster-ticker-content" aria-hidden="true">📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp;</span>
+        </div>
+      </div>
       <svg class="monster-eyes-overlay" id="monster-eyes-svg"
            viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
         <defs>
