@@ -78,7 +78,6 @@
       pointer-events: none;
       transform: translateY(100%);
       transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
-      background: #378CDA; /* covers any sub-pixel seam between SVG and fill div */
     }
     #home-monster.is-visible { transform: translateY(15%); }
 
@@ -95,6 +94,7 @@
       width: 100%;
       background: #378CDA;
       height: 50vh;
+      margin-top: -2px; /* closes sub-pixel seam at SVG bottom edge */
     }
   </style>
 </head>
