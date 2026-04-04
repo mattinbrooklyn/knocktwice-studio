@@ -79,13 +79,13 @@
     </nav>
 
     <!-- ── Circular sticker ────────────────────────────────────── -->
-    <!-- Figma: text ring 176×176 (r=88), hand 118.4×119.8 (67.3% of circle — from mobile component) -->
+    <!-- Figma: text ring 176×176, path r=73 (chars extend ~15px outward to r=88, the container edge), hand 118.4×119.8 (67.3%) -->
     <div class="sticker-outer">
       <svg viewBox="0 0 176 176" width="176" height="176" overflow="visible"
            fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <path id="sticker-circle"
-            d="M88,88 m-85,0 a85,85 0 1,1 170,0 a85,85 0 1,1 -170,0"/>
+            d="M88,88 m-73,0 a73,73 0 1,1 146,0 a73,73 0 1,1 -146,0"/>
         </defs>
         <!-- Rotating text ring -->
         <g>
@@ -94,7 +94,7 @@
           <text font-family="Handjet, sans-serif" font-size="22" font-weight="400"
                 fill="#32261F" font-variation-settings="'ELGR' 1, 'ELSH' 2, 'wght' 400"
                 letter-spacing="-0.22">
-            <textPath href="#sticker-circle" textLength="534" lengthAdjust="spacing">
+            <textPath href="#sticker-circle" textLength="459" lengthAdjust="spacing">
               Make yourself at home. No, seriously&#8212; feel free to rearrange the furniture&#8194;👹&#8194;
 </textPath>
           </text>
