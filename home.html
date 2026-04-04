@@ -78,6 +78,7 @@
       pointer-events: none;
       transform: translateY(100%);
       transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #378CDA; /* covers any sub-pixel seam between SVG and fill div */
     }
     #home-monster.is-visible { transform: translateY(15%); }
 
@@ -106,40 +107,41 @@
          y=40 at the peak, leaving 40px above for the ticker text to ride the crest. -->
     <div class="monster-area">
       <svg id="home-monster-eyes-svg"
-           viewBox="0 0 1440 156.154"
+           viewBox="0 0 1440 181.154"
            xmlns="http://www.w3.org/2000/svg"
            preserveAspectRatio="xMidYMin meet">
         <defs>
-          <!-- Ticker text path: 3 arches (same as about.html), arch peak at y=40 -->
-          <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-          <!-- Eye white shapes, y-shifted +40 to sit on the wave surface -->
+          <!-- Text path: peaks at y=40, troughs at y=181.154 (off-screen in blue).
+               Wave arch peaks at y=65 — matching about.html's 25px gap between text and crest. -->
+          <path id="home-wave-text-path" d="M-1440 181.154 C-1440 181.154 -1177 40 -865.166 40 C-577.5 40 0 181.154 0 181.154 C0 181.154 263 40 574.834 40 C862.5 40 1440 181.154 1440 181.154 C1440 181.154 1703 40 2014.834 40 C2302.5 40 2880 181.154 2880 181.154"/>
+          <!-- Eye whites, y-shifted +65 to sit on the wave surface -->
           <clipPath id="home-mon-eye-r-clip">
-            <path transform="translate(593.13 72.7)"
+            <path transform="translate(593.13 97.7)"
               d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
           </clipPath>
           <clipPath id="home-mon-eye-l-clip">
-            <path transform="translate(431.49 71.57)"
+            <path transform="translate(431.49 96.57)"
               d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           </clipPath>
         </defs>
 
-        <!-- Wave fill: same arch as monster-wave.svg but in this coordinate space -->
+        <!-- Wave fill: arch peaks at y=65, matching about.html proportions -->
         <path fill="#378CDA"
-          d="M0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 Z"/>
+          d="M0 181.154 C0 181.154 263 65 574.834 65 C862.5 65 1440 181.154 1440 181.154 Z"/>
 
-        <!-- Eye whites (y +40 from original 116-unit viewBox positions) -->
-        <path fill="white" transform="translate(593.13 72.7)"
+        <!-- Eye whites (y +65 from original 116-unit viewBox) -->
+        <path fill="white" transform="translate(593.13 97.7)"
           d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 71.57)"
+        <path fill="white" transform="translate(431.49 96.57)"
           d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
 
-        <!-- Iris circles (cy +40) -->
+        <!-- Iris circles (cy +65) -->
         <circle id="home-mon-iris-r" clip-path="url(#home-mon-eye-r-clip)"
-          cx="652.9" cy="89.45" r="30" fill="#32261F"/>
+          cx="652.9" cy="114.45" r="30" fill="#32261F"/>
         <circle id="home-mon-iris-l" clip-path="url(#home-mon-eye-l-clip)"
-          cx="495.41" cy="89.46" r="30" fill="#32261F"/>
+          cx="495.41" cy="114.46" r="30" fill="#32261F"/>
 
-        <!-- Ticker text rides the arch crest -->
+        <!-- Ticker text rides the arch crest at y=40, 25px above the wave peak -->
         <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
               style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
           <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
@@ -503,9 +505,9 @@
       if (!eyesSvg) return;
       const r    = eyesSvg.getBoundingClientRect();
       const svgX = (e.clientX - r.left) / r.width  * 1440;
-      const svgY = (e.clientY - r.top)  / r.height * 156.154;
-      trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  89.45, 20, 5);
-      trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 89.46, 20, 5);
+      const svgY = (e.clientY - r.top)  / r.height * 181.154;
+      trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  114.45, 20, 5);
+      trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 114.46, 20, 5);
     });
 
     // Wordmark keyhole iris tracking
