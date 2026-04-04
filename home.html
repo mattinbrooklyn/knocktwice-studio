@@ -55,6 +55,15 @@
       left: 1186px; top: 114px;
       width: 176px; height: 176px;
     }
+    @keyframes coinflip {
+      from { transform: rotateY(0deg); }
+      to   { transform: rotateY(360deg); }
+    }
+    .sticker-hand-spin {
+      animation: coinflip 5s linear infinite;
+      transform-box: fill-box;
+      transform-origin: 50% 50%;
+    }
 
     .footer { top: 934px; }
   </style>
@@ -101,7 +110,7 @@
         </g>
         <!-- Hand icon: centered at (88,88), rotated -20.98deg, scaled to 118.4×119.8px -->
         <g transform="translate(88,88) rotate(-20.98) translate(-55.1,-55.7)">
-          <svg viewBox="0 0 111 114" width="110.1" height="111.4">
+          <svg viewBox="0 0 111 114" width="110.1" height="111.4" class="sticker-hand-spin">
             <defs>
               <clipPath id="sticker-hand-clip">
                 <rect width="111" height="114"/>
