@@ -155,33 +155,6 @@
     .paint-bucket-inner img.base { width: 322px; height: 340px; }
     .paint-bucket-inner .eyes   { width: 322px; height: 340px; }
 
-    /* ── Mailing list ticker ───────────────────────────────────────
-       Infinite horizontal scroll, seamless loop via two identical
-       spans. Animation moves -50% = exactly one span's width.     */
-    .ticker-wrap {
-      position: absolute;
-      left: 0; top: 958px;
-      width: 1440px;
-      overflow: hidden;
-      padding: 18px 0;
-      background: var(--color-bg);
-      z-index: 6;
-    }
-    .ticker-inner {
-      display: flex;
-      white-space: nowrap;
-      animation: scroll-left 30s linear infinite;
-    }
-    .ticker-content {
-      flex-shrink: 0;
-      font-family: 'Handjet', sans-serif;
-      font-size: 22px;
-      font-weight: 400;
-      line-height: 27px;
-      color: var(--color-ink);
-      letter-spacing: -0.22px;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-    }
     @keyframes scroll-left {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
@@ -371,16 +344,6 @@
               cx="57.7" cy="75.4" r="16.37" fill="#32261F"/>
           </g>
         </svg>
-      </div>
-    </div>
-
-    <!-- ── Mailing list ticker ─────────────────────────────────────
-         Two identical spans; -50% animation = one span width = seamless.
-         8 repetitions per span ≈ 3000px, well beyond 1440px viewport. -->
-    <div class="ticker-wrap">
-      <div class="ticker-inner">
-        <span class="ticker-content">📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp;</span>
-        <span class="ticker-content" aria-hidden="true">📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp; 📒 JOIN OUR MAILING LIST &nbsp;&nbsp;</span>
       </div>
     </div>
 
