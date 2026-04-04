@@ -45,3 +45,28 @@
     div.style.transform = 'translate(' + (e.clientX - off[0]) + 'px,' + (e.clientY - off[1]) + 'px)';
   });
 }());
+
+// ── Logo iris tracking ────────────────────────────────────────────
+(function () {
+  var iris  = null;
+  var restX = 27.325, restY = 19.055;
+  var maxX  = 2.5,    maxY  = 1.5;
+
+  document.addEventListener('mousemove', function (e) {
+    if (!iris) iris = document.getElementById('logo-iris');
+    if (!iris) return;
+
+    var rect = iris.ownerSVGElement.getBoundingClientRect();
+    var eyeX = rect.left + rect.width  * 0.53;
+    var eyeY = rect.top  + rect.height * 0.19;
+
+    var dx   = e.clientX - eyeX;
+    var dy   = e.clientY - eyeY;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < 1) { iris.setAttribute('cx', restX); iris.setAttribute('cy', restY); return; }
+
+    var strength = Math.min(dist / 400, 1);
+    iris.setAttribute('cx', restX + (dx / dist) * maxX * strength);
+    iris.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+  });
+}());
