@@ -110,6 +110,56 @@
     .photo-rotated.is-dragging,
     .placeholder.is-dragging { opacity: 0.9; }
 
+    /* ── Hover card overlay ─────────────────────────────────────── */
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: #D1C3B6;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 114px 50px 20px;
+      gap: 16px;
+    }
+    .photo-card:hover .card-overlay { transform: translateY(0); }
+
+    .card-overlay .card-title {
+      width: 433px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 24px;
+      line-height: 27px;
+      font-weight: 400;
+      color: #32261F;
+      margin: 0;
+    }
+    .card-overlay .card-body {
+      width: 433px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: #32261F;
+      margin: 0;
+    }
+    .card-overlay .card-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .card-overlay .card-tag {
+      color: #F7F2EC;
+      border: 2px solid #F7F2EC;
+    }
+    .card-overlay .card-cursor {
+      position: absolute;
+      right: 24px; bottom: 20px;
+      width: 75px; height: 80px;
+      pointer-events: none;
+    }
+
     /* ── Draggable 3D objects ────────────────────────────────────── */
     .obj {
       position: absolute;
@@ -215,8 +265,19 @@
       </div>
 
       <!-- saya-02  left:522  top:384  landscape 533×355 -->
-      <div class="photo" style="left:522px; top:384px; width:533px; height:355px;">
+      <div class="photo photo-card" style="left:522px; top:384px; width:533px; height:355px;">
         <img src="assets/interior-saya-02.png" alt="">
+        <div class="card-overlay">
+          <h3 class="card-title">SAYA'S ROOM</h3>
+          <p class="card-body">A bedroom built to grow up slowly. Whimsical without being juvenile, colorful without a theme — every piece chosen to feel as right in her next home as it does in this one.</p>
+          <div class="card-tags">
+            <span class="card-tag">Children's Interior</span>
+            <span class="card-tag">Creative Direction</span>
+            <span class="card-tag">Design</span>
+            <span class="card-tag">Installation</span>
+          </div>
+          <img class="card-cursor" src="assets/cursor-open.svg" alt="">
+        </div>
       </div>
 
       <!-- saya-04  left:1085 top:444  portrait 355×533 -->
