@@ -62,41 +62,43 @@
       </defs>
 
       <!--
-        Splash_Monster — the creature body + eyes.
-        Clipped to the keyhole window above; only this group moves on click.
-        clip-path uses userSpaceOnUse (default) so the window stays fixed
-        in SVG coordinates while this group translates down through it.
+        Static keyhole window — carries the clip-path and never transforms.
+        Only what falls within the keyhole aperture is visible at any time.
       -->
-      <g id="splash-monster" clip-path="url(#keyhole-clip)" style="will-change:transform;">
-
-        <!-- Eye white — single-eye default state -->
-        <circle id="eye-white" cx="157.5" cy="151.5" r="80.5" fill="white"/>
-
-        <!-- Eye whites — two-eye flash state (shown for one frame on click) -->
-        <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white" style="display:none"/>
-        <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white" style="display:none"/>
+      <g id="keyhole-window" clip-path="url(#keyhole-clip)">
 
         <!--
-          Iris/pupil. JS drives this group's translate for mouse tracking.
-          Resting center: (165, 114.5) in SVG coords.
+          Splash_Monster — the creature body + eyes.
+          Only this group translates on click, sliding down behind the
+          static clip window above. No other elements move or change.
         -->
-        <g id="iris">
-          <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+        <g id="splash-monster" style="will-change:transform;">
+
+          <!-- Eye whites — both present from load, natural positions -->
+          <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white"/>
+          <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white"/>
+
+          <!--
+            Iris/pupil. JS drives this group's translate for mouse tracking.
+            Resting center: (165, 114.5) in SVG coords.
+          -->
+          <g id="iris">
+            <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+          </g>
+
+          <!-- Irises — both present from load -->
+          <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F"/>
+          <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F"/>
+
+          <!--
+            Blue creature body — large rect clipped to the keyhole window.
+            Two eye-socket sub-paths (evenodd) let the eye whites show through.
+            This path never changes — no JS swapping.
+          -->
+          <path id="keyhole-path" fill="#378CDA" fill-rule="evenodd"
+            d="M-100 -600L413 -600L413 1200L-100 1200Z M30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796Z M168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z"/>
+
         </g>
-
-        <!-- Irises — two-eye flash state -->
-        <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F" style="display:none"/>
-        <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F" style="display:none"/>
-
-        <!--
-          Blue creature body — large rect that fills well beyond the clip window.
-          fill-rule="evenodd" lets the eye-socket sub-path punch a hole
-          through the blue so the eye whites underneath show through.
-          JS swaps to TWO_EYE_BODY for the one-frame flash on click.
-        -->
-        <path id="keyhole-path" fill="#378CDA" fill-rule="evenodd"
-          d="M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z"/>
-
       </g>
     </svg>
   </div>
@@ -104,20 +106,9 @@
   <script src="assets/scripts.js"></script>
   <script>
     // ─── Elements ────────────────────────────────────────────────
-    const svg            = document.getElementById('keyhole-svg');
-    const splashMonster  = document.getElementById('splash-monster');
-    const iris           = document.getElementById('iris');
-    const eyeWhite       = document.getElementById('eye-white');
-    const keyholePath    = document.getElementById('keyhole-path');
-    const eyeWhiteLeft   = document.getElementById('eye-white-left');
-    const eyeWhiteRight  = document.getElementById('eye-white-right');
-    const irisLeft       = document.getElementById('iris-left');
-    const irisRight      = document.getElementById('iris-right');
-
-    // Creature body paths — large rect clipped to the keyhole window.
-    // evenodd fill-rule punches eye-socket holes so eye whites show through.
-    const ONE_EYE_BODY = 'M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z';
-    const TWO_EYE_BODY = 'M-100 -600L413 -600L413 1200L-100 1200Z M30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796Z M168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z';
+    const svg           = document.getElementById('keyhole-svg');
+    const splashMonster = document.getElementById('splash-monster');
+    const iris          = document.getElementById('iris');
 
 
     // ─── Mouse tracking ──────────────────────────────────────────
@@ -189,35 +180,24 @@
       // ── 100ms pause — nothing moves ───────────────────────────
       setTimeout(() => {
 
-        // Flash two-eye body for exactly one painted frame
-        keyholePath.setAttribute('d', TWO_EYE_BODY);
-        eyeWhite.style.display      = 'none';
-        iris.style.display          = 'none';
-        eyeWhiteLeft.style.display  = '';
-        eyeWhiteRight.style.display = '';
-        irisLeft.style.display      = '';
-        irisRight.style.display     = '';
+        // ── Drop: Splash_Monster slides behind the static keyhole window ─
+        // The clip path on #keyhole-window never moves, so the aperture
+        // stays frozen while the creature falls through it.
+        splashMonster.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
+        splashMonster.style.transform  = 'translateY(2000px)';
 
-        requestAnimationFrame(() => {
+        // ── Fade to black: begins when drop lands ──────────────
+        setTimeout(() => {
+          overlay.style.transition = 'opacity 300ms ease';
+          overlay.style.opacity    = '1';
 
-          // ── Drop: Splash_Monster falls, keyhole clip stays fixed ─
-          splashMonster.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
-          splashMonster.style.transform  = 'translateY(2000px)';
-
-          // ── Fade to black: begins when drop lands ──────────────
+          // ── Navigate: home.html fades in from black ────────────
           setTimeout(() => {
-            overlay.style.transition = 'opacity 300ms ease';
-            overlay.style.opacity    = '1';
+            sessionStorage.setItem('from-splash', '1');
+            window.location.href = 'home.html';
+          }, 300);
 
-            // ── Navigate: home.html fades in from black ────────────
-            setTimeout(() => {
-              sessionStorage.setItem('from-splash', '1');
-              window.location.href = 'home.html';
-            }, 300);
-
-          }, 400); // drop duration
-
-        }); // rAF — lets two-eye state paint before drop starts
+        }, 400); // drop duration
 
       }, 100); // initial pause
     });
