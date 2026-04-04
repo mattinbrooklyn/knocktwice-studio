@@ -68,9 +68,91 @@
     }
 
     .footer { top: 934px; }
+    /* ── Monster easter egg ──────────────────────────────────────── */
+    /* Rises from the bottom when all furniture is dragged off screen */
+    #home-monster {
+      position: fixed;
+      bottom: 0; left: 0;
+      width: 100%;
+      z-index: 500;
+      pointer-events: none;
+      transform: translateY(100%);
+      transition: transform 2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #home-monster.is-visible { transform: translateY(0); }
+
+    #home-monster .monster-ticker {
+      width: 100%;
+      height: 156px;
+      overflow: hidden;
+      position: relative;
+    }
+    #home-monster .monster-ticker svg { display: block; width: 100%; }
+
+    #home-monster .monster-area {
+      position: relative;
+      width: 100%;
+      line-height: 0;
+    }
+    #home-monster .monster-area .wave {
+      width: 100%; height: auto; display: block;
+    }
+    #home-monster .monster-area .monster-eyes-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+    }
+    /* Blue fill below the wave to the bottom of the viewport */
+    #home-monster .monster-fill {
+      width: 100%;
+      background: #378CDA;
+      height: 50vh;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Monster easter egg — rises when all furniture is off-screen -->
+  <div id="home-monster">
+    <!-- Ticker: same SMIL arch approach as about page, different text -->
+    <div class="monster-ticker">
+      <svg width="1440" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
+        </defs>
+        <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
+              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+          <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+        </text>
+      </svg>
+    </div>
+    <!-- Wave + eyes: same assets/structure as about page, unique IDs -->
+    <div class="monster-area">
+      <img class="wave" src="assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="home-monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <clipPath id="home-mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="home-mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="home-mon-iris-r" clip-path="url(#home-mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="home-mon-iris-l" clip-path="url(#home-mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+    </div>
+    <div class="monster-fill"></div>
+  </div>
 
   <div id="page-scaler">
   <div class="page">
@@ -386,6 +468,46 @@
     // Prevent browser image-drag ghost
     document.querySelectorAll('.furniture img').forEach(img => {
       img.addEventListener('dragstart', e => e.preventDefault());
+    });
+
+    // ─── Monster easter egg ───────────────────────────────────────
+    const homeMonster   = document.getElementById('home-monster');
+    const homeMonIrisR  = document.getElementById('home-mon-iris-r');
+    const homeMonIrisL  = document.getElementById('home-mon-iris-l');
+
+    function isFullyOffscreen(el) {
+      const r = el.getBoundingClientRect();
+      return r.right < 0 || r.bottom < 0 ||
+             r.left  > window.innerWidth || r.top > window.innerHeight;
+    }
+
+    function checkMonsterTrigger() {
+      const pieces = document.querySelectorAll('.furniture');
+      const allOff = Array.from(pieces).every(isFullyOffscreen);
+      homeMonster.classList.toggle('is-visible', allOff);
+    }
+
+    // Re-check after every drop
+    document.addEventListener('mouseup', checkMonsterTrigger);
+
+    // Monster eye tracking — convert clientX/Y to wave SVG coords
+    function trackMonsterIris(el, svgX, svgY, restX, restY, maxX, maxY) {
+      const dx = svgX - restX, dy = svgY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+      const eyesSvg = document.getElementById('home-monster-eyes-svg');
+      if (!eyesSvg) return;
+      const r    = eyesSvg.getBoundingClientRect();
+      const svgX = (e.clientX - r.left) / r.width  * 1440;
+      const svgY = (e.clientY - r.top)  / r.height * 116;
+      trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  49.45, 20, 5);
+      trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 49.46, 20, 5);
     });
 
     // Wordmark keyhole iris tracking
