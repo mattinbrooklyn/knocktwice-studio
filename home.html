@@ -478,7 +478,7 @@
       if (r.width === 0 || r.height === 0) return true;
       const visW = Math.max(0, Math.min(window.innerWidth,  r.right)  - Math.max(0, r.left));
       const visH = Math.max(0, Math.min(window.innerHeight, r.bottom) - Math.max(0, r.top));
-      return (visW * visH) / (r.width * r.height) <= 0.05;
+      return (visW * visH) / (r.width * r.height) <= 0.20;
     }
 
     function checkMonsterTrigger() {
