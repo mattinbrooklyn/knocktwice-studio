@@ -153,27 +153,12 @@
       color: #F7F2EC;
       border: 2px solid #F7F2EC;
     }
-    /* Outer card needs overflow:visible so cursor can hang above the edge.
-       Inner wrapper clips the slide-in overlay animation instead. */
-    .photo.photo-card { overflow: visible; }
-    .photo-card-inner {
+    .card-overlay .card-cursor {
       position: absolute;
-      inset: 0;
-      overflow: hidden;
-    }
-
-    .card-overlay .card-cursor { display: none; } /* cursor lives outside overlay here */
-
-    .card-cursor-top {
-      position: absolute;
-      top: -30px; right: 104px;
+      top: -20px; right: 104px;
       width: 75px; height: 80px;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1;
     }
-    .photo-card:hover .card-cursor-top { opacity: 1; }
 
     /* ── Draggable 3D objects ────────────────────────────────────── */
     .obj {
@@ -281,20 +266,18 @@
 
       <!-- saya-02  left:522  top:384  landscape 533×355 -->
       <div class="photo photo-card" style="left:522px; top:384px; width:533px; height:355px;">
-        <div class="photo-card-inner">
-          <img src="assets/interior-saya-02.png" alt="">
-          <div class="card-overlay">
-            <h3 class="card-title">SAYA'S ROOM</h3>
-            <p class="card-body">A bedroom built to grow up slowly. Whimsical without being juvenile, colorful without a theme — every piece chosen to feel as right in her next home as it does in this one.</p>
-            <div class="card-tags">
-              <span class="card-tag">Children's Interior</span>
-              <span class="card-tag">Creative Direction</span>
-              <span class="card-tag">Design</span>
-              <span class="card-tag">Installation</span>
-            </div>
+        <img src="assets/interior-saya-02.png" alt="">
+        <div class="card-overlay">
+          <h3 class="card-title">SAYA'S ROOM</h3>
+          <p class="card-body">A bedroom built to grow up slowly. Whimsical without being juvenile, colorful without a theme — every piece chosen to feel as right in her next home as it does in this one.</p>
+          <div class="card-tags">
+            <span class="card-tag">Children's Interior</span>
+            <span class="card-tag">Creative Direction</span>
+            <span class="card-tag">Design</span>
+            <span class="card-tag">Installation</span>
           </div>
+          <img class="card-cursor" src="assets/cursor-open.svg" alt="">
         </div>
-        <img class="card-cursor-top" src="assets/cursor-open.svg" alt="">
       </div>
 
       <!-- saya-04  left:1085 top:444  portrait 355×533 -->
