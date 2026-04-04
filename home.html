@@ -59,11 +59,30 @@
       from { transform: rotateY(0deg); }
       to   { transform: rotateY(360deg); }
     }
-    .sticker-hand-spin {
-      animation: coinflip 5s linear infinite;
-      transform-box: fill-box;
-      transform-origin: 50% 50%;
+    /* 3D coin flip — hand lives in an HTML layer so preserve-3d works properly */
+    .hand-scene {
+      position: absolute;
+      top: 88px; left: 88px;
+      transform: translate(-50%, -50%) rotate(-20.98deg);
+      perspective: 500px;
     }
+    .hand-coin {
+      width: 110.1px; height: 111.4px;
+      transform-style: preserve-3d;
+      animation: coinflip 5s linear infinite;
+    }
+    .hand-layer {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+    }
+    .hand-front { transform: translateZ(8px); }
+    .hand-d1    { transform: translateZ(5px);  filter: brightness(0.45); }
+    .hand-d2    { transform: translateZ(2px);  filter: brightness(0.3); }
+    .hand-d3    { transform: translateZ(-1px); filter: brightness(0.2); }
+    .hand-d4    { transform: translateZ(-4px); filter: brightness(0.15); }
+    .hand-back  { transform: translateZ(-7px) rotateY(180deg); background: #1a100a; }
 
     .footer { top: 934px; }
   </style>
@@ -95,6 +114,40 @@
         <defs>
           <path id="sticker-circle"
             d="M88,88 m-85,0 a85,85 0 1,1 170,0 a85,85 0 1,1 -170,0"/>
+          <!-- Hand pixel art — defined once, referenced by HTML depth layers below -->
+          <symbol id="hand-px" viewBox="0 0 111 114">
+            <path d="M104.398 13.3113V80.2199H98.0702V94.498H91.5334V107.311H42.0237V100.426H35.487V93.804H28.354V87.1815H20.7452V73.6742H14.2084V67.0517H6.60216V51.4437H21.8172V58.0026H29.745V73.5973H36.2818V6.68874H48.4089V51.4437H54.9457V28.5007H67.2898V51.3801H73.9442V35.1232H85.734V51.4437H92.2708V13.3113H104.398ZM101.603 22.4026V15.9603H95.0659V22.4026H101.603ZM45.5667 15.8702V9.42517H39.0299V15.8702H45.5667Z" fill="#008BE0"/>
+            <path d="M110.935 13.3113V80.2199H104.607H104.398V13.3113H110.935Z" fill="#34261E"/>
+            <path d="M104.607 80.2199V94.8132H98.0702V94.498V80.2199H104.398H104.607Z" fill="#34261E"/>
+            <path d="M104.398 6.68874H92.2708V13.3113H104.398V6.68874Z" fill="#34261E"/>
+            <path d="M101.603 15.9603H95.0659V22.4026H101.603V15.9603Z" fill="#FA84E3"/>
+            <path d="M98.0702 107.311H91.5334V113.934H98.0702V107.311Z" fill="#34261E"/>
+            <path d="M98.0702 94.8132V107.311H91.5334V94.498H98.0702V94.8132Z" fill="#34261E"/>
+            <path d="M92.2708 13.3113V51.4437H85.734V35.1232H86.2883V28.5007H85.734V6.68874H87.3917V13.3113H92.2708Z" fill="#34261E"/>
+            <path d="M92.2708 6.68874H87.3917V13.3113H92.2708V6.68874Z" fill="#34261E"/>
+            <path d="M91.5334 107.311H42.0237V113.934H91.5334V107.311Z" fill="#34261E"/>
+            <path d="M86.2883 28.5007H85.734V35.1232H86.2883V28.5007Z" fill="#34261E"/>
+            <path d="M85.734 28.5007H73.9442V35.1232H85.734V28.5007Z" fill="#34261E"/>
+            <path d="M73.9442 35.1232H67.2898V51.3801H73.9442V35.1232Z" fill="#34261E"/>
+            <path d="M73.9442 28.5007H67.2898V35.1232H73.9442V28.5007Z" fill="#34261E"/>
+            <path d="M67.2898 21.8781H54.9457V28.5007H67.2898V21.8781Z" fill="#34261E"/>
+            <path d="M54.9457 28.5007H48.4089V51.4437H54.9457V28.5007Z" fill="#34261E"/>
+            <path d="M54.9457 21.8781H48.4089V28.5007H54.9457V21.8781Z" fill="#34261E"/>
+            <path d="M54.9457 6.68874H48.4089V21.8781H54.9457V6.68874Z" fill="#34261E"/>
+            <path d="M54.9457 0.0662252V6.68874H48.4089H36.2818V0.0662252H54.9457Z" fill="#34261E"/>
+            <path d="M45.5667 9.42517H39.0299V15.8702H45.5667V9.42517Z" fill="#FA84E3"/>
+            <path d="M42.0237 107.311H35.487V113.934H42.0237V107.311Z" fill="#34261E"/>
+            <path d="M42.0237 100.426H35.487V107.311H42.0237V100.426Z" fill="#34261E"/>
+            <path d="M36.2818 6.68874V73.5973H29.745V58.0026H33.9417V51.3801H29.745V6.68874H36.2818Z" fill="#34261E"/>
+            <path d="M35.487 93.804V100.426H27.8807V93.804H28.354H35.487Z" fill="#34261E"/>
+            <path d="M33.9417 51.3801H29.745V58.0026H33.9417V51.3801Z" fill="#34261E"/>
+            <path d="M29.745 51.3801V58.0026H21.8172V51.4437V51.3801H29.745Z" fill="#34261E"/>
+            <path d="M28.354 87.1815V93.804H27.8807H20.7452V87.1815H28.354Z" fill="#34261E"/>
+            <path d="M21.8172 51.3801V51.4437H6.60216V44.8212H21.8172V51.3801Z" fill="#34261E"/>
+            <path d="M20.7452 73.6742H14.2084V87.1815H20.7452V73.6742Z" fill="#34261E"/>
+            <path d="M14.2084 67.0517H6.60216V73.6742H14.2084V67.0517Z" fill="#34261E"/>
+            <path d="M6.60216 51.6371H0.0653679V67.0517H6.60216V51.6371Z" fill="#34261E"/>
+          </symbol>
         </defs>
         <!-- Rotating text ring -->
         <g>
@@ -108,50 +161,18 @@
 </textPath>
           </text>
         </g>
-        <!-- Hand icon: centered at (88,88), rotated -20.98deg, scaled to 118.4×119.8px -->
-        <g transform="translate(88,88) rotate(-20.98) translate(-55.1,-55.7)">
-          <svg viewBox="0 0 111 114" width="110.1" height="111.4" class="sticker-hand-spin">
-            <defs>
-              <clipPath id="sticker-hand-clip">
-                <rect width="111" height="114"/>
-              </clipPath>
-            </defs>
-            <g clip-path="url(#sticker-hand-clip)">
-              <path d="M104.398 13.3113V80.2199H98.0702V94.498H91.5334V107.311H42.0237V100.426H35.487V93.804H28.354V87.1815H20.7452V73.6742H14.2084V67.0517H6.60216V51.4437H21.8172V58.0026H29.745V73.5973H36.2818V6.68874H48.4089V51.4437H54.9457V28.5007H67.2898V51.3801H73.9442V35.1232H85.734V51.4437H92.2708V13.3113H104.398ZM101.603 22.4026V15.9603H95.0659V22.4026H101.603ZM45.5667 15.8702V9.42517H39.0299V15.8702H45.5667Z" fill="#008BE0"/>
-              <path d="M110.935 13.3113V80.2199H104.607H104.398V13.3113H110.935Z" fill="#34261E"/>
-              <path d="M104.607 80.2199V94.8132H98.0702V94.498V80.2199H104.398H104.607Z" fill="#34261E"/>
-              <path d="M104.398 6.68874H92.2708V13.3113H104.398V6.68874Z" fill="#34261E"/>
-              <path d="M101.603 15.9603H95.0659V22.4026H101.603V15.9603Z" fill="#FA84E3"/>
-              <path d="M98.0702 107.311H91.5334V113.934H98.0702V107.311Z" fill="#34261E"/>
-              <path d="M98.0702 94.8132V107.311H91.5334V94.498H98.0702V94.8132Z" fill="#34261E"/>
-              <path d="M92.2708 13.3113V51.4437H85.734V35.1232H86.2883V28.5007H85.734V6.68874H87.3917V13.3113H92.2708Z" fill="#34261E"/>
-              <path d="M92.2708 6.68874H87.3917V13.3113H92.2708V6.68874Z" fill="#34261E"/>
-              <path d="M91.5334 107.311H42.0237V113.934H91.5334V107.311Z" fill="#34261E"/>
-              <path d="M86.2883 28.5007H85.734V35.1232H86.2883V28.5007Z" fill="#34261E"/>
-              <path d="M85.734 28.5007H73.9442V35.1232H85.734V28.5007Z" fill="#34261E"/>
-              <path d="M73.9442 35.1232H67.2898V51.3801H73.9442V35.1232Z" fill="#34261E"/>
-              <path d="M73.9442 28.5007H67.2898V35.1232H73.9442V28.5007Z" fill="#34261E"/>
-              <path d="M67.2898 21.8781H54.9457V28.5007H67.2898V21.8781Z" fill="#34261E"/>
-              <path d="M54.9457 28.5007H48.4089V51.4437H54.9457V28.5007Z" fill="#34261E"/>
-              <path d="M54.9457 21.8781H48.4089V28.5007H54.9457V21.8781Z" fill="#34261E"/>
-              <path d="M54.9457 6.68874H48.4089V21.8781H54.9457V6.68874Z" fill="#34261E"/>
-              <path d="M54.9457 0.0662252V6.68874H48.4089H36.2818V0.0662252H54.9457Z" fill="#34261E"/>
-              <path d="M45.5667 9.42517H39.0299V15.8702H45.5667V9.42517Z" fill="#FA84E3"/>
-              <path d="M42.0237 107.311H35.487V113.934H42.0237V107.311Z" fill="#34261E"/>
-              <path d="M42.0237 100.426H35.487V107.311H42.0237V100.426Z" fill="#34261E"/>
-              <path d="M36.2818 6.68874V73.5973H29.745V58.0026H33.9417V51.3801H29.745V6.68874H36.2818Z" fill="#34261E"/>
-              <path d="M35.487 93.804V100.426H27.8807V93.804H28.354H35.487Z" fill="#34261E"/>
-              <path d="M33.9417 51.3801H29.745V58.0026H33.9417V51.3801Z" fill="#34261E"/>
-              <path d="M29.745 51.3801V58.0026H21.8172V51.4437V51.3801H29.745Z" fill="#34261E"/>
-              <path d="M28.354 87.1815V93.804H27.8807H20.7452V87.1815H28.354Z" fill="#34261E"/>
-              <path d="M21.8172 51.3801V51.4437H6.60216V44.8212H21.8172V51.3801Z" fill="#34261E"/>
-              <path d="M20.7452 73.6742H14.2084V87.1815H20.7452V73.6742Z" fill="#34261E"/>
-              <path d="M14.2084 67.0517H6.60216V73.6742H14.2084V67.0517Z" fill="#34261E"/>
-              <path d="M6.60216 51.6371H0.0653679V67.0517H6.60216V51.6371Z" fill="#34261E"/>
-            </g>
-          </svg>
-        </g>
       </svg>
+      <!-- 3D hand coin — HTML layer so CSS preserve-3d works; paths referenced from #hand-px symbol above -->
+      <div class="hand-scene">
+        <div class="hand-coin">
+          <svg class="hand-layer hand-front" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-d1"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-d2"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-d3"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <svg class="hand-layer hand-d4"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
+          <div class="hand-layer hand-back"></div>
+        </div>
+      </div>
     </div>
 
     <!-- ── Furniture: Couch ────────────────────────────────────── -->
