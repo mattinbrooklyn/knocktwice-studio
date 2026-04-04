@@ -75,15 +75,18 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      backface-visibility: hidden;
     }
-    .hand-front { transform: translateZ(8px); }
-    .hand-d1    { transform: translateZ(5px);  filter: brightness(0.45); }
-    .hand-d2    { transform: translateZ(2px);  filter: brightness(0.3); }
-    .hand-d3    { transform: translateZ(-1px); filter: brightness(0.2); }
-    .hand-d4    { transform: translateZ(-4px); filter: brightness(0.15); }
-    /* Back face: same art, flipped — only visible when hand faces away */
-    .hand-back  { transform: translateZ(-7px) rotateY(180deg); }
+    /* Front and back faces: hand art, each only visible from its own side */
+    .hand-front { transform: translateZ(10px); backface-visibility: hidden; }
+    .hand-back  { transform: translateZ(-10px) rotateY(180deg); backface-visibility: hidden; }
+    /* Edge slices: solid fills that form the chunky metal body */
+    .hand-edge  { background: #32261F; }
+    .hand-e1    { transform: translateZ(7px); }
+    .hand-e2    { transform: translateZ(4px); }
+    .hand-e3    { transform: translateZ(1px); }
+    .hand-e4    { transform: translateZ(-2px); }
+    .hand-e5    { transform: translateZ(-5px); }
+    .hand-e6    { transform: translateZ(-8px); }
 
     .footer { top: 934px; }
   </style>
@@ -117,6 +120,8 @@
             d="M88,88 m-85,0 a85,85 0 1,1 170,0 a85,85 0 1,1 -170,0"/>
           <!-- Hand pixel art — defined once, referenced by HTML depth layers below -->
           <symbol id="hand-px" viewBox="0 0 111 114">
+            <!-- Solid background makes the face opaque — no transparent gaps bleeding through -->
+            <rect width="111" height="114" fill="#32261F"/>
             <path d="M104.398 13.3113V80.2199H98.0702V94.498H91.5334V107.311H42.0237V100.426H35.487V93.804H28.354V87.1815H20.7452V73.6742H14.2084V67.0517H6.60216V51.4437H21.8172V58.0026H29.745V73.5973H36.2818V6.68874H48.4089V51.4437H54.9457V28.5007H67.2898V51.3801H73.9442V35.1232H85.734V51.4437H92.2708V13.3113H104.398ZM101.603 22.4026V15.9603H95.0659V22.4026H101.603ZM45.5667 15.8702V9.42517H39.0299V15.8702H45.5667Z" fill="#008BE0"/>
             <path d="M110.935 13.3113V80.2199H104.607H104.398V13.3113H110.935Z" fill="#34261E"/>
             <path d="M104.607 80.2199V94.8132H98.0702V94.498V80.2199H104.398H104.607Z" fill="#34261E"/>
@@ -166,11 +171,15 @@
       <!-- 3D hand coin — HTML layer so CSS preserve-3d works; paths referenced from #hand-px symbol above -->
       <div class="hand-scene">
         <div class="hand-coin">
+          <!-- Solid edge slices — form the thick metal body between the two faces -->
+          <div class="hand-layer hand-edge hand-e6"></div>
+          <div class="hand-layer hand-edge hand-e5"></div>
+          <div class="hand-layer hand-edge hand-e4"></div>
+          <div class="hand-layer hand-edge hand-e3"></div>
+          <div class="hand-layer hand-edge hand-e2"></div>
+          <div class="hand-layer hand-edge hand-e1"></div>
+          <!-- Front and back faces: same hand art on both sides -->
           <svg class="hand-layer hand-front" viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-d1"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-d2"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-d3"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
-          <svg class="hand-layer hand-d4"    viewBox="0 0 111 114"><use href="#hand-px"/></svg>
           <svg class="hand-layer hand-back"  viewBox="0 0 111 114"><use href="#hand-px"/></svg>
         </div>
       </div>
