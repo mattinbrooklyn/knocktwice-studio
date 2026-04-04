@@ -51,37 +51,53 @@
 
   <div class="splash">
     <svg id="keyhole-svg" class="keyhole" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg">
-
-      <!-- Eye white — hidden during zoom phase -->
-      <circle id="eye-white" cx="157.5" cy="151.5" r="80.5" fill="white"/>
-
-      <!-- Two-eye whites — shown only during the rise phase -->
-      <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white" style="display:none"/>
-      <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white" style="display:none"/>
+      <defs>
+        <!--
+          Keyhole window — static clip path, never moves.
+          Defines the visible aperture; only what's inside is ever shown.
+        -->
+        <clipPath id="keyhole-clip">
+          <path d="M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295Z"/>
+        </clipPath>
+      </defs>
 
       <!--
-        Iris/pupil. JS drives this group's translate for mouse tracking
-        and snaps it during the click animation.
-        Resting center: (165, 114.5) in SVG coords.
+        Splash_Monster — the creature body + eyes.
+        Clipped to the keyhole window above; only this group moves on click.
+        clip-path uses userSpaceOnUse (default) so the window stays fixed
+        in SVG coordinates while this group translates down through it.
       -->
-      <g id="iris">
-        <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+      <g id="splash-monster" clip-path="url(#keyhole-clip)" style="will-change:transform;">
+
+        <!-- Eye white — single-eye default state -->
+        <circle id="eye-white" cx="157.5" cy="151.5" r="80.5" fill="white"/>
+
+        <!-- Eye whites — two-eye flash state (shown for one frame on click) -->
+        <circle id="eye-white-left"  cx="87"  cy="128" r="60" fill="white" style="display:none"/>
+        <circle id="eye-white-right" cx="226" cy="128" r="60" fill="white" style="display:none"/>
+
+        <!--
+          Iris/pupil. JS drives this group's translate for mouse tracking.
+          Resting center: (165, 114.5) in SVG coords.
+        -->
+        <g id="iris">
+          <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+        </g>
+
+        <!-- Irises — two-eye flash state -->
+        <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F" style="display:none"/>
+        <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F" style="display:none"/>
+
+        <!--
+          Blue creature body — large rect that fills well beyond the clip window.
+          fill-rule="evenodd" lets the eye-socket sub-path punch a hole
+          through the blue so the eye whites underneath show through.
+          JS swaps to TWO_EYE_BODY for the one-frame flash on click.
+        -->
+        <path id="keyhole-path" fill="#378CDA" fill-rule="evenodd"
+          d="M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z"/>
+
       </g>
-
-      <!-- Two-eye irises — shown only during the rise phase -->
-      <circle id="iris-left"  cx="87"  cy="113" r="36" fill="#32261F" style="display:none"/>
-      <circle id="iris-right" cx="226" cy="113" r="36" fill="#32261F" style="display:none"/>
-
-      <!--
-        Blue keyhole body.
-        The sub-path M89.9509… (opposite winding) cuts the eye-almond
-        window into the fill. During the zoom phase JS replaces this
-        with the solid version (no hole) so the keyhole fills cleanly.
-      -->
-      <path id="keyhole-path"
-        d="M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295ZM89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z"
-        fill="#378CDA"/>
-
     </svg>
   </div>
 
@@ -89,6 +105,7 @@
   <script>
     // ─── Elements ────────────────────────────────────────────────
     const svg            = document.getElementById('keyhole-svg');
+    const splashMonster  = document.getElementById('splash-monster');
     const iris           = document.getElementById('iris');
     const eyeWhite       = document.getElementById('eye-white');
     const keyholePath    = document.getElementById('keyhole-path');
@@ -97,13 +114,10 @@
     const irisLeft       = document.getElementById('iris-left');
     const irisRight      = document.getElementById('iris-right');
 
-    // Blue keyhole path WITHOUT any eye sub-paths.
-    // Used during the zoom so the keyhole fills as a solid shape.
-    const SOLID_KEYHOLE = 'M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295Z';
-
-    // Blue keyhole path with TWO almond sub-paths (opposite winding = holes).
-    // Left almond: x 30–145. Right almond: x 168–283. Both at y ≈ 142.
-    const TWO_EYE_KEYHOLE = 'M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295ZM30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796ZM168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z';
+    // Creature body paths — large rect clipped to the keyhole window.
+    // evenodd fill-rule punches eye-socket holes so eye whites show through.
+    const ONE_EYE_BODY = 'M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z';
+    const TWO_EYE_BODY = 'M-100 -600L413 -600L413 1200L-100 1200Z M30 141.796C68 105.57 107 105.57 145 141.796C107 159.449 68 159.449 30 141.796Z M168 141.796C206 105.57 245 105.57 283 141.796C245 159.449 206 159.449 168 141.796Z';
 
 
     // ─── Mouse tracking ──────────────────────────────────────────
@@ -175,8 +189,8 @@
       // ── 100ms pause — nothing moves ───────────────────────────
       setTimeout(() => {
 
-        // Flash two-eye state for exactly one painted frame
-        keyholePath.setAttribute('d', TWO_EYE_KEYHOLE);
+        // Flash two-eye body for exactly one painted frame
+        keyholePath.setAttribute('d', TWO_EYE_BODY);
         eyeWhite.style.display      = 'none';
         iris.style.display          = 'none';
         eyeWhiteLeft.style.display  = '';
@@ -186,9 +200,9 @@
 
         requestAnimationFrame(() => {
 
-          // ── Drop: 400ms ease-in (gravity) ─────────────────────
-          svg.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
-          svg.style.transform  = 'translateY(150vh)';
+          // ── Drop: Splash_Monster falls, keyhole clip stays fixed ─
+          splashMonster.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
+          splashMonster.style.transform  = 'translateY(2000px)';
 
           // ── Fade to black: begins when drop lands ──────────────
           setTimeout(() => {
