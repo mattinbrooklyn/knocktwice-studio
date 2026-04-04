@@ -170,13 +170,14 @@
       display: block;
       pointer-events: none;
     }
-    /* SVG textPath ticker — 4 tiled wave arches, translates -1440px per cycle */
+    /* SVG textPath ticker — sits 40px above monster-area so text has
+       room at the peak; connected C curve (no M jumps) for smooth flow */
     .monster-ticker {
       position: absolute;
-      top: 1021px;
+      top: 981px;    /* 40px above monster-area (1021px) */
       left: 0;
       width: 1440px;
-      height: 116px;
+      height: 156px; /* 40px top padding + 116px wave height */
       overflow: hidden;
       z-index: 6;
       pointer-events: none;
@@ -347,13 +348,9 @@
          textPath baseline rides the same curve as monster-wave.svg.
          SVG translates -1440px (one arch) per cycle for seamless loop. -->
     <div class="monster-ticker">
-      <svg width="5760" height="116" viewBox="0 0 5760 116.154" xmlns="http://www.w3.org/2000/svg">
+      <svg width="5760" height="156" viewBox="0 0 5760 156.154" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <path id="wave-text-path" d="
-            M0 116.154C0 116.154 263 0 574.834 0C862.5 0 1440 116.154 1440 116.154
-            M1440 116.154C1440 116.154 1703 0 2014.834 0C2302.5 0 2880 116.154 2880 116.154
-            M2880 116.154C2880 116.154 3143 0 3454.834 0C3742.5 0 4320 116.154 4320 116.154
-            M4320 116.154C4320 116.154 4583 0 4894.834 0C5182.5 0 5760 116.154 5760 116.154"/>
+          <path id="wave-text-path" d="M0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154 C2880 156.154 3143 40 3454.834 40 C3742.5 40 4320 156.154 4320 156.154 C4320 156.154 4583 40 4894.834 40 C5182.5 40 5760 156.154 5760 156.154"/>
         </defs>
         <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
               style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
