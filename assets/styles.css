@@ -68,7 +68,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   font-variation-settings: 'ELGR' 1, 'ELSH' 2;
   margin-bottom: 8px;
 }
-.nav a.active { font-weight: 400; }
+.nav a.active { font-weight: 700; }
 .nav a:hover  { opacity: 0.65; }
 
 /* ── Footer ─────────────────────────────────────────────────────────── */
