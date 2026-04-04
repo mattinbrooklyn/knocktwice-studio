@@ -134,6 +134,63 @@
     }
 
     .footer { top: 8036px; }
+
+    /* ── Hover card overlay (Blank Canvas Bash) ─────────────────── */
+    .photo-card { position: relative; }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: #D1C3B6;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    .photo-card:hover .card-overlay { transform: translateY(0); }
+
+    .card-overlay .card-title {
+      position: absolute;
+      left: 50px; top: 114px;
+      width: 433px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 24px;
+      line-height: 27px;
+      font-weight: 400;
+      color: #32261F;
+    }
+    .card-overlay .card-body {
+      position: absolute;
+      left: 50px; top: 156px;
+      width: 433px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: #32261F;
+    }
+    .card-overlay .card-tags {
+      position: absolute;
+      left: 50px; top: 210px;
+      display: flex;
+      gap: 10px;
+    }
+    .card-overlay .card-tag {
+      font-family: 'Handjet', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 22px;
+      color: #F7F2EC;
+      border: 2px solid #F7F2EC;
+      border-radius: 32px;
+      padding: 5px 10px;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+    }
+    .card-overlay .card-cursor {
+      position: absolute;
+      right: 24px; bottom: 20px;
+      width: 75px; height: 80px;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -172,8 +229,17 @@
       <!--  MR. TAO — 7 photos                                       -->
       <!-- ══════════════════════════════════════════════════════════ -->
 
-      <div class="photo" style="left:195px; top:360px; width:533px; height:355px;">
+      <div class="photo photo-card" style="left:195px; top:360px; width:533px; height:355px;">
         <img src="assets/exp-mr-tao-1.png" alt="">
+        <div class="card-overlay">
+          <h3 class="card-title">BLANK CANVAS BASH</h3>
+          <p class="card-body">The Animal Observatory's first US activation — an open-house invitation for children and parents to explore, make, and play.</p>
+          <div class="card-tags">
+            <span class="card-tag">Brand Activation</span>
+            <span class="card-tag">Production</span>
+          </div>
+          <img class="card-cursor" src="assets/cursor-open.svg" alt="">
+        </div>
       </div>
       <div class="photo" style="left:758px; top:438px; width:532px; height:355px;">
         <img src="assets/exp-mr-tao-3.png" alt="">
