@@ -71,6 +71,18 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 .nav a.active { font-weight: 700; }
 .nav a:hover  { color: var(--color-blue); font-weight: 700; }
 
+/* ── Tag pills ──────────────────────────────────────────────────────── */
+.card-tag {
+  font-family: 'Handjet', sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+  border-radius: 32px;
+  padding: 5px 10px;
+  display: inline-block;
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────── */
 /* .footer top value is set per-page since it varies with page height   */
 .footer {
