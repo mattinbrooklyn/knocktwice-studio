@@ -184,11 +184,7 @@
     }
     .monster-ticker svg {
       display: block;
-      animation: wave-ticker-scroll 25s linear infinite;
-    }
-    @keyframes wave-ticker-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-1440px); }
+      /* no CSS animation — SMIL startOffset handles the scroll */
     }
     .monster-eyes-overlay {
       position: absolute;
@@ -347,14 +343,22 @@
     <!-- Wave-following ticker: 4 tiled wave arches, each 1440px wide.
          textPath baseline rides the same curve as monster-wave.svg.
          SVG translates -1440px (one arch) per cycle for seamless loop. -->
+    <!-- Wave ticker: arch path is fixed (matches monster's back).
+         Text slides along it via SMIL startOffset — no translateX.
+         3 identical arches in the path; animating 33.333% scrolls exactly
+         one arch, so the loop is seamless. -->
     <div class="monster-ticker">
-      <svg width="5760" height="156" viewBox="0 0 5760 156.154" xmlns="http://www.w3.org/2000/svg">
+      <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <path id="wave-text-path" d="M0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154 C2880 156.154 3143 40 3454.834 40 C3742.5 40 4320 156.154 4320 156.154 C4320 156.154 4583 40 4894.834 40 C5182.5 40 5760 156.154 5760 156.154"/>
+          <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
+          <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
         </defs>
         <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
               style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-          <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  </textPath>
+          <textPath href="#wave-text-path">
+            📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST
+            <animate attributeName="startOffset" from="33.333%" to="0%" dur="20s" repeatCount="indefinite" calcMode="linear"/>
+          </textPath>
         </text>
       </svg>
     </div>
