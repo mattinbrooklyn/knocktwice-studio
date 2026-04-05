@@ -62,29 +62,37 @@
 
     /* ── Monster footer wave ───────────────────────────────────────
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
+    .monster-ticker {
+      position: absolute;
+      left: 0; top: 845px;
+      width: 1440px; height: 156px;
+      overflow: hidden;
+      z-index: 6;
+      pointer-events: none;
+    }
+    .monster-ticker svg { display: block; }
     .monster-area {
       position: absolute;
       left: 0; top: 910px;
-      width: 1440px; height: 110px;
+      width: 1440px; height: 116px;
       z-index: 5;
-      background: var(--color-blue);
     }
     .monster-area img.wave {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 110px;
+      width: 1440px; height: 116px;
       display: block;
       pointer-events: none;
     }
     .monster-eyes-overlay {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 110px;
+      width: 1440px; height: 116px;
       pointer-events: none;
       overflow: visible;
     }
 
-    .footer { top: 1020px; }
+    .footer { top: 1026px; }
   </style>
 </head>
 <body>
@@ -124,35 +132,43 @@
       <!-- SHOPIFY EMBED GOES HERE -->
     </div>
 
+    <!-- Wave ticker: text rides the arch via SMIL startOffset -->
+    <div class="monster-ticker" id="monster-ticker">
+      <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
+        </defs>
+        <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
+              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+          <textPath href="#wave-text-path">🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON   🛍️ SHOP COMING SOON  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+        </text>
+      </svg>
+    </div>
+
     <!-- ── Monster footer wave ─────────────────────────────────────
-         Blue wave SVG + eye whites + iris circles (cursor-tracking).
-         Wave viewBox: 0 0 1440 110. Wave top at canvas y:824.
-         Eye whites derived from Figma; iris centers approximated:
-           Right: (633, 39) Left: (476, 38)  -->
+         Same wave SVG as about page. Eye whites + iris circles match about. -->
     <div class="monster-area" id="monster-area">
-      <img class="wave" src="assets/monster-wave-shop.svg" alt="">
+      <img class="wave" src="assets/monster-wave.svg" alt="">
       <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-           viewBox="0 0 1440 110" xmlns="http://www.w3.org/2000/svg">
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="mon-eye-r-clip">
-            <path transform="translate(573 22)"
+            <path transform="translate(593.13 32.7)"
               d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
           </clipPath>
           <clipPath id="mon-eye-l-clip">
-            <path transform="translate(412 20)"
+            <path transform="translate(431.49 31.57)"
               d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           </clipPath>
         </defs>
-        <!-- Eye whites -->
-        <path fill="white" transform="translate(573 22)"
+        <path fill="white" transform="translate(593.13 32.7)"
           d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(412 20)"
+        <path fill="white" transform="translate(431.49 31.57)"
           d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <!-- Iris circles (JS moves cx/cy, clip path constrains to eye whites) -->
         <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-          cx="633" cy="39" r="30" fill="#32261F"/>
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
         <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-          cx="476" cy="38" r="30" fill="#32261F"/>
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
       </svg>
     </div>
 
@@ -176,6 +192,7 @@
     const page        = document.querySelector('.page');
     const scaler      = document.getElementById('page-scaler');
     const monsterArea = document.getElementById('monster-area');
+    const ticker      = document.getElementById('monster-ticker');
     const footer      = document.querySelector('.footer');
     let scale   = 1;
     let waveTop = 910; // updated each resize
@@ -183,10 +200,11 @@
     function scalePage() {
       scale   = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      // Wave top at exactly the fold; footer immediately below the wave
+      // Wave top at exactly the fold; ticker sits 65px above wave
       waveTop = Math.ceil(window.innerHeight / scale);
+      ticker.style.top      = (waveTop - 65) + 'px';
       monsterArea.style.top = waveTop + 'px';
-      footer.style.top      = (waveTop + 110) + 'px';
+      footer.style.top      = (waveTop + 116) + 'px';
       page.style.height     = (waveTop + 200) + 'px';
       scaler.style.height   = (waveTop + 200) * scale + 'px';
     }
@@ -229,8 +247,8 @@
 
     function updateMonsterEyes(vx, vy) {
       const { x, y } = toCanvas(vx, vy);
-      trackIris(monIrisR, x, y - waveTop, 633, 39, 20, 5);
-      trackIris(monIrisL, x, y - waveTop, 476, 38, 20, 5);
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
     }
   </script>
 
