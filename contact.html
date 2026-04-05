@@ -142,15 +142,6 @@
     .btn-send:hover { opacity: 0.85; }
 
     /* ── Monster footer wave ───────────────────────────────────────*/
-    .monster-ticker {
-      position: absolute;
-      left: 0; top: 845px;
-      width: 1440px; height: 156px;
-      overflow: hidden;
-      z-index: 6;
-      pointer-events: none;
-    }
-    .monster-ticker svg { display: block; }
     .monster-area {
       position: absolute;
       left: 0; top: 910px;
@@ -233,19 +224,6 @@
 
     <button class="btn-send" type="button">Send</button>
 
-    <!-- Wave ticker: text rides the arch via SMIL startOffset -->
-    <div class="monster-ticker" id="monster-ticker">
-      <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-        </defs>
-        <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
-              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-          <textPath href="#wave-text-path">📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO   📬 SAY HELLO  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
-        </text>
-      </svg>
-    </div>
-
     <!-- ── Monster footer wave ─────────────────────────────────────
          Same wave SVG as about page. Eye whites + iris circles match about. -->
     <div class="monster-area" id="monster-area">
@@ -291,7 +269,6 @@
     const page        = document.querySelector('.page');
     const scaler      = document.getElementById('page-scaler');
     const monsterArea = document.getElementById('monster-area');
-    const ticker      = document.getElementById('monster-ticker');
     const footer      = document.querySelector('.footer');
     let scale   = 1;
     let waveTop = 910; // updated each resize
@@ -299,9 +276,8 @@
     function scalePage() {
       scale   = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      // Wave top at exactly the fold; ticker sits 65px above wave
+      // Wave top at exactly the fold; footer immediately below the wave
       waveTop = Math.ceil(window.innerHeight / scale);
-      ticker.style.top      = (waveTop - 65) + 'px';
       monsterArea.style.top = waveTop + 'px';
       footer.style.top      = (waveTop + 116) + 'px';
       page.style.height     = (waveTop + 200) + 'px';
