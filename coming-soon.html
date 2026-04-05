@@ -308,50 +308,8 @@
     var eyeRClipPath = document.querySelector('#eye-r-clip path');
     var eyeLClipPath = document.querySelector('#eye-l-clip path');
 
-    var waveOffset = 0; // current rendered offset (SVG units)
-    var swayTarget = 0; // where the head is trying to drift to
+    var waveOffset = 0;
     var mouseX = -999, mouseY = -999;
-
-    // ── Sway behaviour ─────────────────────────────────────────────
-    // Sequence: still for 2.5s → drift right → pause → drift left →
-    // settle → then occasional random nudges. No rhythmic loop.
-    var swayActive = false;
-    var swaySequenceDone = false;
-
-    // Smoothly ease waveOffset toward swayTarget each frame
-    function easeOffset() {
-      waveOffset += (swayTarget - waveOffset) * 0.012;
-      if (Math.abs(swayTarget - waveOffset) < 0.5) waveOffset = swayTarget;
-    }
-
-    // Schedule the opening sequence after 2.5s still
-    setTimeout(function() {
-      swayActive = true;
-      swayTarget = 280; // drift right
-      setTimeout(function() {
-        swayTarget = 0;  // pause then drift back left (past centre)
-        setTimeout(function() {
-          swayTarget = -200; // drift left
-          setTimeout(function() {
-            swayTarget = -60; // settle slightly left of centre
-            swaySequenceDone = true;
-            scheduleRandomNudge();
-          }, 4000);
-        }, 3500);
-      }, 3800);
-    }, 2500);
-
-    // After the sequence, occasional lazy random nudges
-    function scheduleRandomNudge() {
-      var delay = 4000 + Math.random() * 8000; // 4–12s between nudges
-      setTimeout(function() {
-        swayTarget = (Math.random() - 0.5) * 500; // random position ±250
-        setTimeout(function() {
-          swayTarget = (Math.random() - 0.4) * 200; // settle somewhere nearby
-          scheduleRandomNudge();
-        }, 3000 + Math.random() * 3000);
-      }, delay);
-    }
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
@@ -367,7 +325,6 @@
     });
 
     function swayLoop() {
-      if (swayActive) easeOffset();
       var o = waveOffset;
 
       // Cream-above-arch path: rectangle across the top, then reversed arch curve back down.
