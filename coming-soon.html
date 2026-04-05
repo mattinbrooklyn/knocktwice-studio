@@ -92,6 +92,8 @@
       display: block;
     }
     #eyes-svg { overflow: visible; }
+    #eyes-svg-mobile { overflow: visible; }
+    .eyes-svg-mobile { display: none; }
 
     /* ── Form card — white box floating over the blue body ────────── */
     .form-card {
@@ -187,6 +189,9 @@
     /* ── Mobile ───────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       .monster-section { height: 80vh; }
+      .wave-wrap { padding-bottom: calc(64 / 440 * 100%); }
+      .eyes-svg-desktop { display: none; }
+      .eyes-svg-mobile { display: block; }
       .form-card {
         width: calc(100% - 2rem);
         padding: 1.5rem 1.875rem;
@@ -293,23 +298,22 @@
 <body>
 
   <!-- Logo — full wordmark -->
-  <a href="home.html" class="logo" aria-label="Knock Twice home">
+  <div class="logo">
     <img src="assets/logo-full.svg" alt="Knock Twice">
-  </a>
+  </div>
 
   <!-- Monster section — blue zone, rises on load -->
   <section class="monster-section" id="monster-section">
 
     <!-- Wave + eyes -->
     <div class="wave-wrap">
-      <svg preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Cream fill above the arch — blue monster-section background shows below.
-             No color boundary at the wave-wrap edge = no seam. -->
+      <!-- Desktop arch wave (hidden on mobile) -->
+      <svg class="eyes-svg-desktop" preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path id="wave-path"
           d="M0 0 L1440 0 L1440 116.154 C1440 116.154 862.5 0 574.834 0 C263 0 0 116.154 0 116.154 Z"
           fill="#f7f2ec"/>
       </svg>
-      <svg id="eyes-svg" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+      <svg id="eyes-svg" class="eyes-svg-desktop" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="eye-r-clip">
             <path transform="translate(593.13 32.7)" d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
@@ -325,6 +329,38 @@
         <g class="eye-blink-group">
           <path id="eye-l-white" fill="white" transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           <circle id="iris-l" clip-path="url(#eye-l-clip)" cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </g>
+      </svg>
+
+      <!-- Mobile dome wave (shown on mobile only) -->
+      <!-- Dome body from Figma: M0 64C0 64 74.9186 0 170 0C281.919 0 440 64 440 64
+           Cream fill is the area ABOVE the dome curve. -->
+      <svg class="eyes-svg-mobile" preserveAspectRatio="none" viewBox="0 0 440 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path id="wave-path-m"
+          d="M0 0 L440 0 L440 64 C440 64 281.919 0 170 0 C74.9186 0 0 64 0 64 Z"
+          fill="#f7f2ec"/>
+      </svg>
+      <!-- Eye positions from Figma mobile frame (dome at y=314, eyes at y=344):
+           Right eye white: translate(197.14, 30.76), path from 80.86×22.48 viewBox
+           Left eye white:  translate(88, 30),        path from 86.33×24 viewBox
+           Iris circles are large (r≈27-29), centered near y=64, clipped to eye-white shape
+           so only the top crescent is visible — the peeking-eye effect. -->
+      <svg id="eyes-svg-mobile" class="eyes-svg-mobile" viewBox="0 0 440 64" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="eye-r-clip-m">
+            <path transform="translate(197.14 30.76)" d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          </clipPath>
+          <clipPath id="eye-l-clip-m">
+            <path transform="translate(88 30)" d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          </clipPath>
+        </defs>
+        <g class="eye-blink-group">
+          <path id="eye-r-white-m" fill="white" transform="translate(197.14 30.76)" d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          <circle id="iris-r-m" clip-path="url(#eye-r-clip-m)" cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path id="eye-l-white-m" fill="white" transform="translate(88 30)" d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          <circle id="iris-l-m" clip-path="url(#eye-l-clip-m)" cx="142" cy="64" r="29" fill="#32261F"/>
         </g>
       </svg>
     </div>
@@ -370,18 +406,45 @@
     }, 500);
 
     // ── Wave sway + eye tracking ───────────────────────────────────
-    var eyesSvg      = document.getElementById('eyes-svg');
-    var irisR        = document.getElementById('iris-r');
-    var irisL        = document.getElementById('iris-l');
-    var wavePath     = document.getElementById('wave-path');
-    var eyeRWhite    = document.getElementById('eye-r-white');
-    var eyeLWhite    = document.getElementById('eye-l-white');
-    var eyeRClipPath = document.querySelector('#eye-r-clip path');
-    var eyeLClipPath = document.querySelector('#eye-l-clip path');
-    var eyeGroups    = document.querySelectorAll('.eye-blink-group');
-
     var waveOffset = 0;
     var mouseX = -999, mouseY = -999;
+    var isMobile = window.matchMedia('(max-width: 600px)').matches;
+
+    var eyesSvg, irisR, irisL, wavePath, eyeRWhite, eyeLWhite, eyeRClipPath, eyeLClipPath, eyeGroups;
+    if (isMobile) {
+      eyesSvg      = document.getElementById('eyes-svg-mobile');
+      irisR        = document.getElementById('iris-r-m');
+      irisL        = document.getElementById('iris-l-m');
+      eyeGroups    = document.querySelectorAll('.eye-blink-group');
+      // wave-path-m is static on mobile (no sway), no need to reference it
+    } else {
+      eyesSvg      = document.getElementById('eyes-svg');
+      irisR        = document.getElementById('iris-r');
+      irisL        = document.getElementById('iris-l');
+      wavePath     = document.getElementById('wave-path');
+      eyeRWhite    = document.getElementById('eye-r-white');
+      eyeLWhite    = document.getElementById('eye-l-white');
+      eyeRClipPath = document.querySelector('#eye-r-clip path');
+      eyeLClipPath = document.querySelector('#eye-l-clip path');
+      eyeGroups    = document.querySelectorAll('.eye-blink-group');
+    }
+
+    // Mobile wander: irises drift autonomously on touch devices
+    var wanderTargetX = 0, wanderTargetY = 0;
+    var wanderCurrentX = 0, wanderCurrentY = 0;
+
+    function scheduleWander() {
+      setTimeout(function() {
+        wanderTargetX = (Math.random() - 0.5) * 36;
+        wanderTargetY = (Math.random() - 0.5) * 8;
+        setTimeout(function() {
+          wanderTargetX = (Math.random() - 0.3) * 10;
+          wanderTargetY = (Math.random() - 0.3) * 4;
+          scheduleWander();
+        }, 1000 + Math.random() * 1500);
+      }, 2000 + Math.random() * 4000);
+    }
+    if (isMobile) scheduleWander();
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
@@ -399,29 +462,34 @@
     function swayLoop() {
       var o = waveOffset;
 
-      // Cream-above-arch path: rectangle across the top, then reversed arch curve back down.
-      // Moving the control points shifts which part of the frame is cream vs blue.
-      wavePath.setAttribute('d',
-        'M0 0 L1440 0 L1440 116.154 C1440 116.154 ' + (862.5+o) + ' 0 ' + (574.834+o) +
-        ' 0 C' + (263+o) + ' 0 0 116.154 0 116.154 Z');
-
-      // Move eye whites and their clip regions with the arch
-      eyeRWhite.setAttribute('transform',    'translate(' + (593.13+o) + ' 32.7)');
-      eyeLWhite.setAttribute('transform',    'translate(' + (431.49+o) + ' 31.57)');
-      eyeRClipPath.setAttribute('transform', 'translate(' + (593.13+o) + ' 32.7)');
-      eyeLClipPath.setAttribute('transform', 'translate(' + (431.49+o) + ' 31.57)');
-
-      // Update iris positions relative to the swayed eye rest positions
-      if (mouseX > -999) {
-        var r = eyesSvg.getBoundingClientRect();
-        var svgX = (mouseX - r.left) / r.width  * 1440;
-        var svgY = (mouseY - r.top)  / r.height * 116;
-        trackIris(irisR, svgX, svgY, 652.9  + o, 49.45, 20, 5);
-        trackIris(irisL, svgX, svgY, 495.41 + o, 49.46, 20, 5);
+      if (isMobile) {
+        // Mobile dome: irises drift via wander, no wave sway to apply
+        wanderCurrentX += (wanderTargetX - wanderCurrentX) * 0.04;
+        wanderCurrentY += (wanderTargetY - wanderCurrentY) * 0.04;
+        irisR.setAttribute('cx', 248.5 + wanderCurrentX);
+        irisR.setAttribute('cy', 62.5  + wanderCurrentY);
+        irisL.setAttribute('cx', 142   + wanderCurrentX);
+        irisL.setAttribute('cy', 64    + wanderCurrentY);
       } else {
-        // No mouse yet — rest positions sway with the wave
-        irisR.setAttribute('cx', 652.9  + o);
-        irisL.setAttribute('cx', 495.41 + o);
+        // Desktop: update arch wave path and eye white positions with waveOffset
+        wavePath.setAttribute('d',
+          'M0 0 L1440 0 L1440 116.154 C1440 116.154 ' + (862.5+o) + ' 0 ' + (574.834+o) +
+          ' 0 C' + (263+o) + ' 0 0 116.154 0 116.154 Z');
+        eyeRWhite.setAttribute('transform',    'translate(' + (593.13+o) + ' 32.7)');
+        eyeLWhite.setAttribute('transform',    'translate(' + (431.49+o) + ' 31.57)');
+        eyeRClipPath.setAttribute('transform', 'translate(' + (593.13+o) + ' 32.7)');
+        eyeLClipPath.setAttribute('transform', 'translate(' + (431.49+o) + ' 31.57)');
+
+        if (mouseX > -999) {
+          var r = eyesSvg.getBoundingClientRect();
+          var svgX = (mouseX - r.left) / r.width  * 1440;
+          var svgY = (mouseY - r.top)  / r.height * 116;
+          trackIris(irisR, svgX, svgY, 652.9  + o, 49.45, 20, 5);
+          trackIris(irisL, svgX, svgY, 495.41 + o, 49.46, 20, 5);
+        } else {
+          irisR.setAttribute('cx', 652.9  + o);
+          irisL.setAttribute('cx', 495.41 + o);
+        }
       }
 
       requestAnimationFrame(swayLoop);

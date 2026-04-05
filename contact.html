@@ -21,7 +21,7 @@
     .page {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 1110px;
+      width: 1440px; height: 1024px;
       transform-origin: top left;
       background: var(--color-bg);
       overflow: hidden;
@@ -145,10 +145,10 @@
        and success wave-rise (inline transform via JS). */
     #monster-group {
       position: absolute;
-      left: 0;
+      left: 0; top: 824px;
       width: 1440px;
       z-index: 5;
-      transform: translateY(180px); /* starts off-screen below */
+      transform: translateY(200px); /* starts just off the page bottom */
       will-change: transform;
     }
     #monster-group.popped-up {
@@ -183,7 +183,7 @@
       overflow: visible;
     }
 
-    .footer { top: 1026px; }
+    .footer { top: 934px; }
 
     /* ── Backdrop ────────────────────────────────────────────────── */
     #modal-backdrop {
@@ -398,23 +398,18 @@
   <script src="assets/scripts.js"></script>
   <script>
     // ── Scale page ─────────────────────────────────────────────────
+    // Fixed 1440×1024 canvas (exact Figma frame), scaled uniformly to viewport.
+    const PAGE_H       = 1024;
     const page         = document.querySelector('.page');
     const scaler       = document.getElementById('page-scaler');
     const monsterGroup = document.getElementById('monster-group');
-    const footer       = document.querySelector('.footer');
     let scale   = 1;
-    let waveTop = 910; // updated each resize
+    let waveTop = 824; // fixed — matches Figma canvas position
 
     function scalePage() {
-      scale   = window.innerWidth / 1440;
-      page.style.transform = `scale(${scale})`;
-      // Wave bottom sits at the fold; only the 60px footer scrolls into view
-      const viewportCanvas   = Math.ceil(window.innerHeight / scale);
-      waveTop                = viewportCanvas - 116;
-      monsterGroup.style.top = waveTop + 'px';
-      footer.style.top       = viewportCanvas + 'px';
-      page.style.height      = (viewportCanvas + 60) + 'px';
-      scaler.style.height    = (viewportCanvas + 60) * scale + 'px';
+      scale = window.innerWidth / 1440;
+      page.style.transform  = `scale(${scale})`;
+      scaler.style.height   = PAGE_H * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
