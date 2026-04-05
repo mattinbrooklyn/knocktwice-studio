@@ -463,6 +463,18 @@
     }
     if (isMobile) scheduleWander();
 
+    // On iOS, height:100% can measure the layout viewport (including browser chrome)
+    // rather than the visual viewport, leaving a cream gap below the monster section.
+    // window.innerHeight is always the true visual viewport height.
+    if (isMobile) {
+      var monsterEl = document.getElementById('monster-section');
+      function fixMonsterHeight() {
+        monsterEl.style.height = Math.round(window.innerHeight * 0.8) + 'px';
+      }
+      fixMonsterHeight();
+      window.addEventListener('resize', fixMonsterHeight);
+    }
+
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
       var dist = Math.sqrt(dx * dx + dy * dy);
