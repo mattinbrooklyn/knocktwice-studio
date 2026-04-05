@@ -45,7 +45,8 @@
     .logo svg { display: block; width: 100%; height: auto; }
 
     /* ── Spacer — cream area above the wave ──────────────────────── */
-    .spacer { flex: 1; min-height: 0; }
+    /* flex: 0 0 12vh keeps monster ~15% higher than flex:1 (which gave ~30vh) */
+    .spacer { flex: 0 0 12vh; }
 
     /* ── Monster section ──────────────────────────────────────────── */
     .monster-section {
@@ -68,6 +69,7 @@
       position: relative;
       width: 100%;
       background: var(--bg); /* cream shows above the wave curve */
+      margin-top: -2px;      /* close the 1px seam from sub-pixel rendering */
       /* Intrinsic aspect ratio of the wave SVG */
       padding-bottom: calc(116.154 / 1440 * 100%);
     }
@@ -117,7 +119,7 @@
 
     .cs-input {
       flex: 1 1 200px;
-      height: 3.125rem;
+      height: 3.4375rem; /* 55px — matches Figma */
       background: white;
       border: 2px solid var(--ink);
       border-radius: 100px;
@@ -134,7 +136,7 @@
 
     .cs-submit {
       flex: 0 0 auto;
-      height: 3.125rem;
+      height: 3.4375rem; /* 55px — matches Figma */
       padding: 0 2rem;
       background: var(--green);
       border: none;
@@ -161,10 +163,9 @@
     .cs-error.visible { display: block; }
 
     .fine-print {
-      font-size: clamp(0.6875rem, 1vw, 0.8125rem);
-      line-height: 1.55;
+      font-size: 0.875rem; /* 14px — matches Figma (Instrument Sans, same as subtext) */
+      line-height: 1.571;  /* 22px */
       color: var(--ink);
-      opacity: 0.55;
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
       font-variation-settings: 'wdth' 100;
     }
