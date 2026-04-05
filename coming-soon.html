@@ -189,37 +189,14 @@
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
     }
 
-    #blue-floor { display: none; }
-
     /* ── Mobile ───────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       /* Use 100% not 100vh — on iOS, 100vh includes browser chrome,
          making body taller than the visible screen and breaking bottom: 0 */
       html, body { height: 100%; }
       body { height: 100%; }
-      #blue-floor {
-        display: block;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 5%;
-        background: #378CDA;
-        z-index: 0;
-        opacity: 0;
-        transition: opacity 800ms ease-out;
-      }
-      .monster-section { height: 80%; }
-      /* Blue patch covers the safe-area gap below the footer on notch phones */
-      body::after {
-        content: '';
-        position: fixed;
-        bottom: 0; left: 0;
-        width: 100%;
-        height: env(safe-area-inset-bottom, 0px);
-        background: var(--blue);
-        z-index: 0;
-      }
+      /* 120vh guarantees the monster always extends past the true viewport bottom */
+      .monster-section { height: 120vh; }
       .cs-footer { padding-bottom: max(0.625rem, env(safe-area-inset-bottom)); }
       .wave-wrap { padding-bottom: calc(64 / 440 * 100%); }
       .logo { width: 119px; top: 30px; left: 20px; }
@@ -334,9 +311,6 @@
     <img src="assets/logo-full.svg" alt="Knock Twice">
   </div>
 
-  <!-- Blue floor — fixed backdrop covers bottom 40% on mobile to fill any gap -->
-  <div id="blue-floor"></div>
-
   <!-- Monster section — blue zone, rises on load -->
   <section class="monster-section" id="monster-section">
 
@@ -438,7 +412,6 @@
     // ── Monster entrance: 500ms delay, rises from below ────────────
     setTimeout(function() {
       document.getElementById('monster-section').classList.add('risen');
-      if (isMobile) document.getElementById('blue-floor').style.opacity = '1';
     }, 500);
 
     // ── Wave sway + eye tracking ───────────────────────────────────
@@ -482,19 +455,7 @@
     }
     if (isMobile) scheduleWander();
 
-    // On iOS, height:100% can measure the layout viewport (including browser chrome)
-    // rather than the visual viewport, leaving a cream gap below the monster section.
-    // window.innerHeight is always the true visual viewport height.
-    if (isMobile) {
-      var monsterEl = document.getElementById('monster-section');
-      function fixMonsterHeight() {
-        monsterEl.style.height = Math.round(window.innerHeight * 0.8) + 'px';
-      }
-      fixMonsterHeight();
-      window.addEventListener('resize', fixMonsterHeight);
-    }
-
-    function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
+function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
       var dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
