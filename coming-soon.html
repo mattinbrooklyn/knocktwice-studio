@@ -146,7 +146,7 @@
       color: var(--ink);
       outline: none;
     }
-    .cs-input { flex: 2; }
+    .cs-input { flex: 2; min-width: 0; }
 
     .cs-input::placeholder { color: #9A7555; opacity: 1; }
     .cs-input.input-error { border-color: #C0392B; color: #C0392B; }
@@ -174,7 +174,7 @@
       font-size: 0.8125rem;
       line-height: 1.4;
       color: #C0392B;
-      margin-bottom: 0.5rem;
+      margin-top: 0.375rem;
       font-variation-settings: 'wdth' 100;
     }
     .cs-error.visible { display: block; }
@@ -195,6 +195,16 @@
       html, body { height: 100%; }
       body { height: 100%; }
       .monster-section { height: 80%; }
+      /* Blue patch covers the safe-area gap below the footer on notch phones */
+      body::after {
+        content: '';
+        position: fixed;
+        bottom: 0; left: 0;
+        width: 100%;
+        height: env(safe-area-inset-bottom, 0px);
+        background: var(--blue);
+        z-index: 0;
+      }
       .cs-footer { padding-bottom: max(0.625rem, env(safe-area-inset-bottom)); }
       .wave-wrap { padding-bottom: calc(64 / 440 * 100%); }
       .logo { width: 119px; top: 30px; left: 20px; }
@@ -217,17 +227,7 @@
         line-height: 17px;
         margin-bottom: 18px;
       }
-      .form-row {
-        flex-direction: column;
-        gap: 20px;
-      }
-      /* Grid reorders error between input and button without flex nesting issues.
-         display:contents collapses form-row so its children join the grid directly. */
-      .form-area { display: grid; grid-template-areas: "input" "error" "button"; }
-      .form-row  { display: contents; }
-      .cs-input  { grid-area: input;  margin-bottom: 20px; }
-      .cs-error  { grid-area: error;  margin-bottom: 12px; }
-      .cs-submit { grid-area: button; }
+      .form-row { flex-direction: column; gap: 20px; }
       .cs-input {
         flex: none;
         width: 100%;
@@ -387,13 +387,11 @@
       <div id="form-default">
         <h2>You're early. We like that. 📬</h2>
         <p class="form-subtext">Slip your email under the door. We won't leave you waiting long.</p>
-        <div class="form-area">
-          <div class="form-row">
-            <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
-            <button class="cs-submit" id="cs-submit">Sign Up</button>
-          </div>
-          <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
+        <div class="form-row">
+          <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
+          <button class="cs-submit" id="cs-submit">Sign Up</button>
         </div>
+        <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
       </div>
       <div class="form-success" id="form-success">
         <h2>We got your note. 💌</h2>
@@ -465,9 +463,9 @@
     }
     if (isMobile) scheduleWander();
 
-    // On iOS, height:100% measures the layout viewport (incl. browser chrome),
-    // making the monster taller than the visible screen. window.innerHeight is
-    // always the true visual viewport height.
+    // On iOS, height:100% can measure the layout viewport (including browser chrome)
+    // rather than the visual viewport, leaving a cream gap below the monster section.
+    // window.innerHeight is always the true visual viewport height.
     if (isMobile) {
       var monsterEl = document.getElementById('monster-section');
       function fixMonsterHeight() {
