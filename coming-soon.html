@@ -188,13 +188,25 @@
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
     }
 
+    /* ── Top section — cream panel above monster on mobile ───────── */
+    /* display:contents on desktop = no visual effect, logo positioned as normal */
+    .top-section { display: contents; }
+
     /* ── Mobile ───────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       /* Use 100% not 100vh — on iOS, 100vh includes browser chrome,
          making body taller than the visible screen and breaking bottom: 0 */
       html, body { height: 100%; }
       html { background: var(--blue); }
-      body { height: 100%; }
+      body { height: 100%; background-color: #378CDA; }
+      .top-section {
+        display: block;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 20vh;
+        background-color: #F5F0E8;
+        z-index: 50;
+      }
       .monster-section { height: 80%; }
       /* Blue patch covers the safe-area gap below the footer on notch phones */
       body::after {
@@ -315,9 +327,12 @@
 </head>
 <body>
 
-  <!-- Logo — full wordmark -->
-  <div class="logo">
-    <img src="assets/logo-full.svg" alt="Knock Twice">
+  <!-- Top section — cream background on mobile, invisible wrapper on desktop -->
+  <div class="top-section">
+    <!-- Logo — full wordmark -->
+    <div class="logo">
+      <img src="assets/logo-full.svg" alt="Knock Twice">
+    </div>
   </div>
 
   <!-- Monster section — blue zone, rises on load -->
