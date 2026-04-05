@@ -531,6 +531,7 @@
       modalBackdrop.style.display  = 'block';
       modalBlueBody.style.display  = 'block';
       successModal.style.display   = 'block';
+      monsterGroup.style.zIndex    = '16'; // rise above the backdrop
       monsterGroup.style.transition = 'transform 600ms ease-out';
       monsterGroup.style.transform  = 'translateY(-' + riseAmount + 'px)';
 
@@ -558,6 +559,7 @@
       messageInput.value = '';
       page.classList.remove('has-email-error', 'has-name-error',
                             'has-input-error', 'has-body-warning');
+      monsterGroup.style.zIndex = '';
       // Re-enable transition for next entrance
       requestAnimationFrame(function() { monsterGroup.style.transition = ''; });
     }
