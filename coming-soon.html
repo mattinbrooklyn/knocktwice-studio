@@ -104,9 +104,9 @@
       font-family: 'Instrument Sans', sans-serif;
       font-size: 14px;
       line-height: 22px;
+      font-weight: 400;
       color: var(--ink);
       margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
-      font-variation-settings: 'wdth' 100, 'wght' 400;
     }
 
     .form-row {
@@ -165,9 +165,10 @@
       font-family: 'Instrument Sans', sans-serif;
       font-size: 14px;
       line-height: 22px;
+      font-weight: 400;
       color: var(--ink);
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
-      font-variation-settings: 'wdth' 100, 'wght' 400;
+      font-variation-settings: 'wdth' 100;
     }
 
     /* ── Success state ────────────────────────────────────────────── */
@@ -309,9 +310,50 @@
     var eyeRClipPath = document.querySelector('#eye-r-clip path');
     var eyeLClipPath = document.querySelector('#eye-l-clip path');
 
-    var waveOffset = 0; // current sway offset in SVG units (shared with iris tracking)
+    var waveOffset = 0; // current rendered offset (SVG units)
+    var swayTarget = 0; // where the head is trying to drift to
     var mouseX = -999, mouseY = -999;
-    var TWO_PI = Math.PI * 2;
+
+    // ── Sway behaviour ─────────────────────────────────────────────
+    // Sequence: still for 2.5s → drift right → pause → drift left →
+    // settle → then occasional random nudges. No rhythmic loop.
+    var swayActive = false;
+    var swaySequenceDone = false;
+
+    // Smoothly ease waveOffset toward swayTarget each frame
+    function easeOffset() {
+      waveOffset += (swayTarget - waveOffset) * 0.012;
+      if (Math.abs(swayTarget - waveOffset) < 0.5) waveOffset = swayTarget;
+    }
+
+    // Schedule the opening sequence after 2.5s still
+    setTimeout(function() {
+      swayActive = true;
+      swayTarget = 280; // drift right
+      setTimeout(function() {
+        swayTarget = 0;  // pause then drift back left (past centre)
+        setTimeout(function() {
+          swayTarget = -200; // drift left
+          setTimeout(function() {
+            swayTarget = -60; // settle slightly left of centre
+            swaySequenceDone = true;
+            scheduleRandomNudge();
+          }, 4000);
+        }, 3500);
+      }, 3800);
+    }, 2500);
+
+    // After the sequence, occasional lazy random nudges
+    function scheduleRandomNudge() {
+      var delay = 4000 + Math.random() * 8000; // 4–12s between nudges
+      setTimeout(function() {
+        swayTarget = (Math.random() - 0.5) * 500; // random position ±250
+        setTimeout(function() {
+          swayTarget = (Math.random() - 0.4) * 200; // settle somewhere nearby
+          scheduleRandomNudge();
+        }, 3000 + Math.random() * 3000);
+      }, delay);
+    }
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
@@ -326,11 +368,8 @@
       mouseX = e.clientX; mouseY = e.clientY;
     });
 
-    // ── Wave sway loop ─────────────────────────────────────────────
-    // Cream fill above the arch shifts ±350 SVG units on a slow ~10s sine cycle,
-    // giving the monster head a wide, lazy side-to-side sway.
     function swayLoop() {
-      waveOffset = Math.sin(Date.now() * TWO_PI / 10000) * 350;
+      if (swayActive) easeOffset();
       var o = waveOffset;
 
       // Cream-above-arch path: rectangle across the top, then reversed arch curve back down.
