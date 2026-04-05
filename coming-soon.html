@@ -206,6 +206,8 @@
         height: 5%;
         background: #378CDA;
         z-index: 0;
+        opacity: 0;
+        transition: opacity 800ms ease-out;
       }
       .monster-section { height: 80%; }
       /* Blue patch covers the safe-area gap below the footer on notch phones */
@@ -436,6 +438,7 @@
     // ── Monster entrance: 500ms delay, rises from below ────────────
     setTimeout(function() {
       document.getElementById('monster-section').classList.add('risen');
+      if (isMobile) document.getElementById('blue-floor').style.opacity = '1';
     }, 500);
 
     // ── Wave sway + eye tracking ───────────────────────────────────
