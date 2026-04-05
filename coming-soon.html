@@ -44,33 +44,8 @@
     }
     .logo svg { display: block; width: 100%; height: auto; }
 
-    /* ── Hero ─────────────────────────────────────────────────────── */
-    .hero {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 8vw, 7rem) clamp(1rem, 3vw, 2rem);
-      min-height: 0; /* allow flex shrink */
-    }
-
-    .hero h1 {
-      font-family: 'Erica One', sans-serif;
-      font-size: clamp(1.75rem, 4.5vw, 4rem);
-      line-height: 1.05;
-      font-weight: 400;
-      color: var(--ink);
-      max-width: 18ch;
-      margin-bottom: clamp(0.5rem, 1.5vw, 1rem);
-    }
-
-    .hero p {
-      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
-      line-height: 1.6;
-      color: var(--ink);
-      max-width: 52ch;
-      font-variation-settings: 'wdth' 100;
-    }
+    /* ── Spacer — cream area above the wave ──────────────────────── */
+    .spacer { flex: 1; min-height: 0; }
 
     /* ── Monster section ──────────────────────────────────────────── */
     .monster-section {
@@ -92,6 +67,7 @@
     .wave-wrap {
       position: relative;
       width: 100%;
+      background: var(--bg); /* cream shows above the wave curve */
       /* Intrinsic aspect ratio of the wave SVG */
       padding-bottom: calc(116.154 / 1440 * 100%);
     }
@@ -252,11 +228,8 @@
     </svg>
   </a>
 
-  <!-- Hero — cream zone -->
-  <main class="hero">
-    <h1>We're doing some light dusting.</h1>
-    <p>Something considered is coming. Leave your email and you'll be the first to know.</p>
-  </main>
+  <!-- Cream spacer — pushes monster section down -->
+  <div class="spacer"></div>
 
   <!-- Monster section — blue zone, rises on load -->
   <section class="monster-section" id="monster-section">
@@ -286,13 +259,13 @@
     <div class="form-card">
       <div id="form-default">
         <h2>Sorry, the doorbell's broken. 🔔</h2>
-        <p class="form-subtext">Leave your email and we'll knock when we're ready.</p>
+        <p class="form-subtext">We're doing some light dusting — leave us your email and we'll knock when we're ready.</p>
         <div class="form-row">
           <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
           <button class="cs-submit" id="cs-submit">Sign Up</button>
         </div>
         <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
-        <p class="fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+        <p class="fine-print">We promise, it'll be worth it :)</p>
       </div>
       <div class="form-success" id="form-success">
         <h2>You're on the list! 💌</h2>
