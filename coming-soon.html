@@ -32,16 +32,31 @@
     }
 
     /* ── Logo ─────────────────────────────────────────────────────── */
+    /* 204px wide at 1440px viewport matches home.html canvas size */
     .logo {
       position: fixed;
-      top: clamp(1.5rem, 4vh, 3rem);
-      left: clamp(1.5rem, 4vw, 3rem);
-      width: clamp(8rem, 18vw, 14rem); /* full wordmark is wider than the keyhole mark */
+      top: clamp(1.25rem, 4vh, 2.5rem);
+      left: clamp(1.25rem, 3vw, 2.5rem);
+      width: clamp(5rem, 14vw, 12.75rem);
       z-index: 100;
       display: block;
       text-decoration: none;
     }
     .logo img { display: block; width: 100%; height: auto; }
+
+    /* ── Eye blink ────────────────────────────────────────────────── */
+    .eye-blink-group {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .eye-blink-group.closing {
+      transform: scaleY(0);
+      transition: transform 60ms ease-in;
+    }
+    .eye-blink-group.opening {
+      transform: scaleY(1);
+      transition: transform 100ms ease-out;
+    }
 
     /* ── Monster section ──────────────────────────────────────────── */
     /* Absolutely pinned to the bottom, 65% of viewport tall.
@@ -303,10 +318,14 @@
             <path transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(593.13 32.7)" d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <circle id="iris-r" clip-path="url(#eye-r-clip)" cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-        <circle id="iris-l" clip-path="url(#eye-l-clip)" cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        <g class="eye-blink-group">
+          <path id="eye-r-white" fill="white" transform="translate(593.13 32.7)" d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <circle id="iris-r" clip-path="url(#eye-r-clip)" cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path id="eye-l-white" fill="white" transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="iris-l" clip-path="url(#eye-l-clip)" cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </g>
       </svg>
     </div>
 
@@ -355,10 +374,11 @@
     var irisR        = document.getElementById('iris-r');
     var irisL        = document.getElementById('iris-l');
     var wavePath     = document.getElementById('wave-path');
-    var eyeRWhite    = document.querySelectorAll('#eyes-svg > path')[0];
-    var eyeLWhite    = document.querySelectorAll('#eyes-svg > path')[1];
+    var eyeRWhite    = document.getElementById('eye-r-white');
+    var eyeLWhite    = document.getElementById('eye-l-white');
     var eyeRClipPath = document.querySelector('#eye-r-clip path');
     var eyeLClipPath = document.querySelector('#eye-l-clip path');
+    var eyeGroups    = document.querySelectorAll('.eye-blink-group');
 
     var waveOffset = 0;
     var mouseX = -999, mouseY = -999;
@@ -407,6 +427,25 @@
       requestAnimationFrame(swayLoop);
     }
     swayLoop();
+
+    // ── Blink ──────────────────────────────────────────────────────
+    // Occasional random blinks — close fast (60ms), open slower (100ms).
+    function blink() {
+      eyeGroups.forEach(function(g) { g.classList.add('closing'); });
+      setTimeout(function() {
+        eyeGroups.forEach(function(g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function() {
+          eyeGroups.forEach(function(g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    function scheduleBlink() {
+      setTimeout(function() { blink(); scheduleBlink(); }, 2000 + Math.random() * 5000);
+    }
+    scheduleBlink();
 
     // ── Form ───────────────────────────────────────────────────────
     var emailInput  = document.getElementById('cs-email');
