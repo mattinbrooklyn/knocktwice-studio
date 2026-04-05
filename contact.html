@@ -142,17 +142,35 @@
     .btn-send:hover { opacity: 0.85; }
 
     /* ── Monster footer wave ───────────────────────────────────────*/
+
+    /* Blue body fill: covers arch corners + any rubber-band overflow */
+    body { background: var(--color-blue); }
+
+    @keyframes monster-surface {
+      /* submerged — slow push upward through water */
+      0%   { transform: translateY(220px); animation-timing-function: cubic-bezier(0.3, 0, 0.5, 1); }
+      /* approaches surface, starts to slow */
+      46%  { transform: translateY(38px);  animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.15); }
+      /* brief hesitation — surface tension pulling it back */
+      60%  { transform: translateY(54px);  animation-timing-function: cubic-bezier(0.15, 0, 0.25, 1.6); }
+      /* breaks through — pops past rest position */
+      76%  { transform: translateY(-22px); animation-timing-function: cubic-bezier(0.35, 0, 0.6, 1); }
+      /* first settle bounce */
+      88%  { transform: translateY(9px);   animation-timing-function: ease-out; }
+      100% { transform: translateY(0); }
+    }
+
     .monster-area {
       position: absolute;
       left: 0; top: 910px;
       width: 1440px; height: 116px;
       z-index: 5;
-      transform: translateY(180px);
+      background: var(--color-blue);
+      transform: translateY(220px);
       will-change: transform;
     }
     .monster-area.popped-up {
-      transform: translateY(0);
-      transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
+      animation: monster-surface 2.2s forwards;
     }
     .monster-area img.wave {
       position: absolute;
