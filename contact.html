@@ -137,22 +137,36 @@
       letter-spacing: -0.16px;
       font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
       cursor: none;
-      transition: opacity 0.15s;
     }
     .btn-send:hover { opacity: 0.85; }
 
-    /* ── Monster footer wave ───────────────────────────────────────*/
-    .monster-area {
+    /* ── Monster footer wave ───────────────────────────────────────
+       #monster-group handles both entrance pop-up (popped-up class)
+       and success wave-rise (inline transform via JS). */
+    #monster-group {
       position: absolute;
-      left: 0; top: 910px;
-      width: 1440px; height: 116px;
+      left: 0;
+      width: 1440px;
       z-index: 5;
-      transform: translateY(180px);
+      transform: translateY(180px); /* starts off-screen below */
       will-change: transform;
     }
-    .monster-area.popped-up {
+    #monster-group.popped-up {
       transform: translateY(0);
       transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
+    }
+    /* Blue body inside group — moves with the wave on success */
+    #modal-blue-body {
+      display: none;
+      position: absolute;
+      left: 0; top: 106px; /* 10px overlap behind wave bottom */
+      width: 1440px; height: 2000px;
+      background: var(--color-blue);
+    }
+    .monster-area {
+      position: absolute;
+      left: 0; top: 0;
+      width: 1440px; height: 116px;
     }
     .monster-area img.wave {
       position: absolute;
@@ -170,6 +184,102 @@
     }
 
     .footer { top: 1026px; }
+
+    /* ── Backdrop ────────────────────────────────────────────────── */
+    #modal-backdrop {
+      display: none;
+      position: absolute;
+      left: 0; top: 0;
+      width: 1440px; height: 2000px;
+      background: rgba(247, 242, 236, 0.88);
+      z-index: 14;
+    }
+
+    /* ── Success confirmation modal ─────────────────────────────── */
+    #success-modal {
+      display: none;
+      position: absolute;
+      left: 256px; top: 527px;
+      width: 929px; height: 199px;
+      background: white;
+      border: 2px solid var(--color-ink);
+      border-radius: 14px;
+      z-index: 17;
+    }
+    #success-modal .sm-close {
+      position: absolute;
+      top: 18px; right: 18px;
+      background: none;
+      border: none;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 18px;
+      color: var(--color-ink);
+      cursor: pointer;
+      line-height: 1;
+      padding: 12px;
+    }
+    #success-modal .sm-heading {
+      position: absolute;
+      left: 60px; top: 60px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 24px;
+      line-height: 27px;
+      font-weight: 400;
+      color: var(--color-ink);
+      margin: 0;
+    }
+    #success-modal .sm-body {
+      position: absolute;
+      left: 60px; top: 117px;
+      width: 809px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: var(--color-ink);
+      font-variation-settings: 'wdth' 100;
+      margin: 0;
+    }
+
+    /* ── Inline validation errors ────────────────────────────────── */
+    .field-error {
+      display: none;
+      position: absolute;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 16px;
+      font-weight: 400;
+      color: #C0392B;
+      margin: 0;
+    }
+    #error-email { left: 316px; top: 361px; }
+    #error-name  { left: 725px; top: 361px; }
+    #error-body  { left: 316px; top: 565px; } /* adjusts via state classes below */
+
+    /* Layout shifts & error visibility per state */
+    .page.has-email-error #error-email,
+    .page.has-name-error  #error-name,
+    .page.has-body-warning #error-body { display: block; }
+
+    /* Input error (email or name): textarea + button shift down 31px */
+    .page.has-input-error .textarea-wrap { top: 392px; }
+    .page.has-input-error .btn-send      { top: 596px; }
+    .page.has-input-error #error-body    { top: 596px; }
+
+    /* Body warning alone: button shifts down 31px, error below unshifted textarea */
+    .page.has-body-warning .btn-send     { top: 596px; }
+
+    /* Both: button shifts 62px total */
+    .page.has-input-error.has-body-warning .btn-send { top: 627px; }
+
+    /* Faded button and red input borders when errors present */
+    .page.has-input-error .btn-send      { opacity: 0.6; }
+    .page.has-email-error .input-row input[name="email"] { border-color: #C0392B; }
+    .page.has-name-error  .input-row input[name="name"]  { border-color: #C0392B; }
+
+    /* Smooth layout transitions */
+    .textarea-wrap { transition: top 150ms ease; }
+    .btn-send      { transition: top 150ms ease, opacity 0.15s; }
   </style>
 </head>
 <body>
@@ -224,37 +334,53 @@
       <input type="text"  name="name"  placeholder="Name*"  autocomplete="off">
     </div>
 
+    <p class="field-error" id="error-email">Hmm. That email doesn't look right. Try again?</p>
+    <p class="field-error" id="error-name">What should we call you?</p>
+
     <div class="textarea-wrap">
       <textarea name="message" placeholder="Knock Twice, we might not hear you the first time..."></textarea>
     </div>
 
-    <button class="btn-send" type="button">Send</button>
+    <p class="field-error" id="error-body">Left this blank. That works, but more info helps.</p>
 
-    <!-- ── Monster footer wave ─────────────────────────────────────
-         Same wave SVG as about page. Eye whites + iris circles match about. -->
-    <div class="monster-area" id="monster-area">
-      <img class="wave" src="assets/monster-wave.svg" alt="">
-      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <clipPath id="mon-eye-r-clip">
-            <path transform="translate(593.13 32.7)"
-              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          </clipPath>
-          <clipPath id="mon-eye-l-clip">
-            <path transform="translate(431.49 31.57)"
-              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          </clipPath>
-        </defs>
-        <path fill="white" transform="translate(593.13 32.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
-      </svg>
+    <button class="btn-send" id="btn-send" type="button">Send</button>
+
+    <!-- ── Monster footer wave + success state ──────────────────── -->
+    <div id="modal-backdrop"></div>
+
+    <div id="monster-group">
+      <!-- Blue body first in DOM so wave renders on top -->
+      <div id="modal-blue-body"></div>
+      <div class="monster-area" id="monster-area">
+        <img class="wave" src="assets/monster-wave.svg" alt="">
+        <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+             viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip">
+              <path transform="translate(593.13 32.7)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip">
+              <path transform="translate(431.49 31.57)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            </clipPath>
+          </defs>
+          <path fill="white" transform="translate(593.13 32.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <path fill="white" transform="translate(431.49 31.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </svg>
+      </div>
+    </div><!-- /#monster-group -->
+
+    <div id="success-modal">
+      <button class="sm-close" aria-label="Close">×</button>
+      <h2 class="sm-heading">SECOND KNOCK RECEIVED! 💌</h2>
+      <p class="sm-body">Your note made it through. We're taking a look and will be in touch soon. In the meantime, feel free to keep poking around.</p>
     </div>
 
     <!-- Footer -->
@@ -272,10 +398,10 @@
   <script src="assets/scripts.js"></script>
   <script>
     // ── Scale page ─────────────────────────────────────────────────
-    const page        = document.querySelector('.page');
-    const scaler      = document.getElementById('page-scaler');
-    const monsterArea = document.getElementById('monster-area');
-    const footer      = document.querySelector('.footer');
+    const page         = document.querySelector('.page');
+    const scaler       = document.getElementById('page-scaler');
+    const monsterGroup = document.getElementById('monster-group');
+    const footer       = document.querySelector('.footer');
     let scale   = 1;
     let waveTop = 910; // updated each resize
 
@@ -283,12 +409,12 @@
       scale   = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
       // Wave bottom sits at the fold; only the 60px footer scrolls into view
-      const viewportCanvas  = Math.ceil(window.innerHeight / scale);
-      waveTop               = viewportCanvas - 116;
-      monsterArea.style.top = waveTop + 'px';
-      footer.style.top      = viewportCanvas + 'px';
-      page.style.height     = (viewportCanvas + 60) + 'px';
-      scaler.style.height   = (viewportCanvas + 60) * scale + 'px';
+      const viewportCanvas   = Math.ceil(window.innerHeight / scale);
+      waveTop                = viewportCanvas - 116;
+      monsterGroup.style.top = waveTop + 'px';
+      footer.style.top       = viewportCanvas + 'px';
+      page.style.height      = (viewportCanvas + 60) + 'px';
+      scaler.style.height    = (viewportCanvas + 60) * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
@@ -297,7 +423,7 @@
     // before the transition fires, so it animates from the correct position.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        monsterArea.classList.add('popped-up');
+        monsterGroup.classList.add('popped-up');
       });
     });
 
@@ -387,6 +513,90 @@
       whosUnit = measureWhosUnit();
       requestAnimationFrame(animateWhos);
     });
+
+    // ── Contact form validation & success state ────────────────────
+    var emailInput   = document.querySelector('.input-row input[name="email"]');
+    var nameInput    = document.querySelector('.input-row input[name="name"]');
+    var messageInput = document.querySelector('.textarea-wrap textarea');
+    var btnSend      = document.getElementById('btn-send');
+    var modalBackdrop = document.getElementById('modal-backdrop');
+    var modalBlueBody = document.getElementById('modal-blue-body');
+    var successModal  = document.getElementById('success-modal');
+
+    var RISE_TARGET = 208; // canvas y where wave settles in success state (matches Figma)
+    var SHEET_URL   = ''; // fill in after Google Sheet is set up
+
+    function openSuccess() {
+      var riseAmount = waveTop - RISE_TARGET;
+      modalBackdrop.style.display  = 'block';
+      modalBlueBody.style.display  = 'block';
+      successModal.style.display   = 'block';
+      monsterGroup.style.transition = 'transform 600ms ease-out';
+      monsterGroup.style.transform  = 'translateY(-' + riseAmount + 'px)';
+
+      if (SHEET_URL) {
+        var email   = emailInput.value.trim();
+        var name    = nameInput.value.trim();
+        var message = messageInput.value.trim();
+        fetch(SHEET_URL + '?email=' + encodeURIComponent(email) +
+              '&name=' + encodeURIComponent(name) +
+              '&message=' + encodeURIComponent(message), { mode: 'no-cors' })
+          .catch(function() {});
+      }
+    }
+
+    function closeSuccess() {
+      // Instant snap back
+      monsterGroup.style.transition = 'none';
+      monsterGroup.style.transform  = '';
+      successModal.style.display    = 'none';
+      modalBackdrop.style.display   = 'none';
+      modalBlueBody.style.display   = 'none';
+      // Reset form and error state
+      emailInput.value   = '';
+      nameInput.value    = '';
+      messageInput.value = '';
+      page.classList.remove('has-email-error', 'has-name-error',
+                            'has-input-error', 'has-body-warning');
+      // Re-enable transition for next entrance
+      requestAnimationFrame(function() { monsterGroup.style.transition = ''; });
+    }
+
+    btnSend.addEventListener('click', function() {
+      var email   = emailInput.value.trim();
+      var name    = nameInput.value.trim();
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      var nameOk  = name.length > 0;
+      var bodyEmpty = messageInput.value.trim().length === 0;
+
+      page.classList.toggle('has-email-error',  !emailOk);
+      page.classList.toggle('has-name-error',   !nameOk);
+      page.classList.toggle('has-input-error',  !emailOk || !nameOk);
+      page.classList.toggle('has-body-warning', bodyEmpty);
+
+      if (emailOk && nameOk) {
+        openSuccess();
+      }
+    });
+
+    // Clear each error as the user corrects it
+    emailInput.addEventListener('input', function() {
+      page.classList.remove('has-email-error');
+      if (!page.classList.contains('has-name-error')) {
+        page.classList.remove('has-input-error');
+      }
+    });
+    nameInput.addEventListener('input', function() {
+      page.classList.remove('has-name-error');
+      if (!page.classList.contains('has-email-error')) {
+        page.classList.remove('has-input-error');
+      }
+    });
+    messageInput.addEventListener('input', function() {
+      page.classList.remove('has-body-warning');
+    });
+
+    document.querySelector('.sm-close').addEventListener('click', closeSuccess);
   </script>
 
 </body>
