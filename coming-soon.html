@@ -169,6 +169,58 @@
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
     }
 
+    /* ── Mobile ───────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .form-card {
+        width: calc(100% - 2rem);
+        padding: 1.5rem 1.875rem;
+        margin: clamp(0.5rem, 2vw, 1rem) auto;
+      }
+      .form-card h2 {
+        font-size: 20px;
+        line-height: 25px;
+        margin-bottom: 10px;
+      }
+      .form-subtext {
+        font-size: 12px;
+        line-height: 17px;
+        margin-bottom: 18px;
+      }
+      .form-row {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .cs-input {
+        flex: none;
+        width: 100%;
+        height: 50px;
+        font-size: 14px;
+        letter-spacing: -0.01em;
+      }
+      .cs-submit {
+        flex: none;
+        width: 100%;
+        height: 50px;
+        background: transparent;
+        border: 2px solid var(--green);
+        color: var(--green);
+        font-size: 14px;
+      }
+      .cs-submit:hover { opacity: 0.85; }
+      .fine-print {
+        font-size: 12px;
+        line-height: 17px;
+      }
+      .form-success h2 {
+        font-size: 20px;
+        line-height: 25px;
+      }
+      .form-success p {
+        font-size: 12px;
+        line-height: 17px;
+      }
+    }
+
     /* ── Success state ────────────────────────────────────────────── */
     .form-success { display: none; }
     .form-success h2 {
