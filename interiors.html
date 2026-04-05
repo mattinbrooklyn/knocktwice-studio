@@ -199,6 +199,13 @@
       pointer-events: none;
       z-index: 8;
     }
+    @keyframes sticker-ring-spin {
+      to { transform: rotate(360deg); }
+    }
+    .sticker-ring-spin {
+      animation: sticker-ring-spin 18s linear infinite;
+      transform-origin: 50% 50%;
+    }
 
     /* ── Monster wave ────────────────────────────────────────────── */
     .monster-area {
@@ -350,18 +357,19 @@
       <!-- ══════════════════════════════════════════════════════════ -->
       <!--  STICKER RING 1 — between Saya section and Livingroom     -->
       <!-- ══════════════════════════════════════════════════════════ -->
-      <!-- Center approx (201, 2481); r:68 → outer div 136×136 at (133, 2413) -->
-      <div class="sticker" style="left:133px; top:2413px; width:136px; height:136px;">
-        <svg viewBox="0 0 136 136" xmlns="http://www.w3.org/2000/svg">
+      <!-- Center (292.5, 2572.5); r:64 + 20px text padding → div 176×176 at (205, 2485) -->
+      <div class="sticker" style="left:205px; top:2485px; width:176px; height:176px;">
+        <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <path id="ring1-path" d="M68 4 a64 64 0 1 1 -0.001 0"/>
+            <path id="ring1-path" d="M88 24 a64 64 0 1 1 -0.001 0"/>
           </defs>
           <g>
             <animateTransform attributeName="transform" type="rotate"
-              from="0 68 68" to="360 68 68" dur="18s" repeatCount="indefinite"/>
-            <text font-family="Handjet, monospace" font-size="8.5" font-weight="600"
-                  fill="#32261F" letter-spacing="1.2">
-              <textPath href="#ring1-path">when the plans turn into something you can walk into ✦ </textPath>
+              from="0 88 88" to="360 88 88" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="14" font-weight="400"
+                  style="font-variation-settings: 'wght' 400"
+                  fill="#32261F" letter-spacing="0">
+              <textPath href="#ring1-path" textLength="402" lengthAdjust="spacing">Where the plans turn into something you can walk into 💅🏽 </textPath>
             </text>
           </g>
         </svg>
@@ -399,18 +407,19 @@
       <!-- ══════════════════════════════════════════════════════════ -->
       <!--  STICKER RING 2 — Bedroom section near footer             -->
       <!-- ══════════════════════════════════════════════════════════ -->
-      <!-- Center approx (268, 6369); r:68 → outer div 136×136 at (200, 6301) -->
-      <div class="sticker" style="left:200px; top:6301px; width:136px; height:136px;">
-        <svg viewBox="0 0 136 136" xmlns="http://www.w3.org/2000/svg">
+      <!-- Center (268, 6369); r:64 + 20px text padding → div 176×176 at (180, 6281) -->
+      <div class="sticker" style="left:180px; top:6281px; width:176px; height:176px;">
+        <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <path id="ring2-path" d="M68 4 a64 64 0 1 1 -0.001 0"/>
+            <path id="ring2-path" d="M88 24 a64 64 0 1 1 -0.001 0"/>
           </defs>
           <g>
             <animateTransform attributeName="transform" type="rotate"
-              from="360 68 68" to="0 68 68" dur="18s" repeatCount="indefinite"/>
-            <text font-family="Handjet, monospace" font-size="8.5" font-weight="600"
-                  fill="#32261F" letter-spacing="1.2">
-              <textPath href="#ring2-path">when the plans turn into something you can walk into ✦ </textPath>
+              from="0 88 88" to="360 88 88" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="14" font-weight="400"
+                  style="font-variation-settings: 'wght' 400"
+                  fill="#32261F" letter-spacing="0">
+              <textPath href="#ring2-path" textLength="402" lengthAdjust="spacing">Where the plans turn into something you can walk into 💅🏽 </textPath>
             </text>
           </g>
         </svg>

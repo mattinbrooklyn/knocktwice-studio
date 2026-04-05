@@ -158,11 +158,21 @@
 
     /* ── Monster footer wave ───────────────────────────────────────
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
-    .monster-area {
+    #monster-group {
       position: absolute;
       left: 0; top: 1021px;
-      width: 1440px; height: 116px;
+      width: 1440px;
       z-index: 5;
+      transition: transform 600ms ease-out;
+    }
+    #monster-group.wave-risen {
+      transform: translateY(-637px);
+      z-index: 16;
+    }
+    .monster-area {
+      position: absolute;
+      left: 0; top: 0;
+      width: 1440px; height: 116px;
     }
     .monster-area img.wave {
       position: absolute;
@@ -181,7 +191,7 @@
       height: 156px; /* 40px top padding + 116px wave height */
       overflow: hidden;
       z-index: 6;
-      pointer-events: none;
+      pointer-events: auto;
     }
     .monster-ticker svg {
       display: block;
@@ -201,6 +211,176 @@
     #brush-iris-l, #brush-iris-r,
     #bucket-iris-l, #bucket-iris-r {
       transition: cx 200ms ease-out, cy 200ms ease-out;
+    }
+    /* ── Newsletter risen state ─────────────────────────────────────── */
+    /* Cream overlay that dims the page content behind the wave */
+    #modal-backdrop {
+      display: none;
+      position: absolute;
+      left: 0; top: 0;
+      width: 1440px; height: 1116px;
+      background: rgba(247, 242, 236, 0.88);
+      z-index: 14;
+    }
+    /* Blue monster body — inside #monster-group, so it moves with the wave.
+       Positioned at top:106px (wave is 116px tall, 10px overlap to prevent seam). */
+    #modal-blue-body {
+      display: none;
+      position: absolute;
+      left: 0; top: 106px;
+      width: 1440px; height: 737px;
+      background: var(--color-blue);
+    }
+    /* Newsletter form window */
+    #newsletter-window {
+      display: none;
+      position: absolute;
+      left: 256px; top: 650px;
+      width: 929px; height: 326px;
+      background: white;
+      border: 2px solid var(--color-ink);
+      border-radius: 14px;
+      z-index: 17;
+    }
+    #newsletter-window .nw-close {
+      position: absolute;
+      top: 30px; right: 30px;
+      background: none;
+      border: none;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 18px;
+      color: var(--color-ink);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+    #newsletter-window .nw-heading {
+      position: absolute;
+      left: 60px; top: 60px;
+      font-family: 'Erica One', sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 27px;
+      color: var(--color-ink);
+      margin: 0;
+    }
+    #newsletter-window .nw-body {
+      position: absolute;
+      left: 60px; top: 117px;
+      width: 809px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      color: var(--color-ink);
+      font-variation-settings: 'wdth' 100;
+      margin: 0;
+    }
+    #newsletter-window .nw-input {
+      position: absolute;
+      left: 60px; top: 164px;
+      width: 533px; height: 55px;
+      box-sizing: border-box;
+      font-family: 'Handjet', sans-serif;
+      font-size: 16px;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      letter-spacing: -0.16px;
+      color: var(--color-ink);
+      background: white;
+      border: 2px solid var(--color-ink);
+      border-radius: 100px;
+      padding: 0 22px;
+      outline: none;
+    }
+    #newsletter-window .nw-input::placeholder {
+      color: #9A7555;
+      opacity: 1;
+    }
+    #newsletter-window .nw-submit {
+      position: absolute;
+      left: 613px; top: 164px;
+      width: 256px; height: 55px;
+      font-family: 'Handjet', sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
+      letter-spacing: -0.16px;
+      color: #F7F2EC;
+      background: #51B18C;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+    }
+    #newsletter-window .nw-fine-print {
+      position: absolute;
+      left: 60px; top: 244px;
+      width: 809px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      font-variation-settings: 'wdth' 100;
+      color: var(--color-ink);
+      opacity: 0.55;
+      margin: 0;
+    }
+    /* Error message — hidden until .state-error */
+    #newsletter-window .nw-error {
+      display: none;
+      position: absolute;
+      left: 60px; top: 229px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 16px;
+      font-weight: 400;
+      font-variation-settings: 'wdth' 100;
+      color: #C0392B;
+      margin: 0;
+    }
+    /* Error state: show error message, shift fine-print down, resize window */
+    #newsletter-window.state-error {
+      top: 632px;
+      height: 352px;
+    }
+    #newsletter-window.state-error .nw-error {
+      display: block;
+    }
+    #newsletter-window.state-error .nw-input {
+      border-color: #C0392B;
+    }
+    #newsletter-window.state-error .nw-fine-print {
+      top: 270px;
+    }
+    /* Success state: hide form, show confirmation, resize window */
+    #newsletter-window.state-success {
+      height: 199px;
+    }
+    #newsletter-window.state-success .nw-body,
+    #newsletter-window.state-success .nw-input,
+    #newsletter-window.state-success .nw-submit,
+    #newsletter-window.state-success .nw-fine-print,
+    #newsletter-window.state-success .nw-error {
+      display: none;
+    }
+    #newsletter-window.state-success .nw-heading {
+      top: 60px;
+    }
+    /* Success body — hidden until .state-success */
+    #newsletter-window .nw-success-body {
+      display: none;
+      position: absolute;
+      left: 60px; top: 117px;
+      width: 809px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: 14px;
+      line-height: 22px;
+      font-weight: 400;
+      font-variation-settings: 'wdth' 100;
+      color: var(--color-ink);
+      margin: 0;
+    }
+    #newsletter-window.state-success .nw-success-body {
+      display: block;
     }
   </style>
 </head>
@@ -358,34 +538,53 @@
       </svg>
     </div>
 
-    <div class="monster-area" id="monster-area">
-      <img class="wave" src="assets/monster-wave.svg" alt="">
-      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <clipPath id="mon-eye-r-clip">
-            <path transform="translate(593.13 32.7)"
-              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          </clipPath>
-          <clipPath id="mon-eye-l-clip">
-            <path transform="translate(431.49 31.57)"
-              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          </clipPath>
-        </defs>
-        <!-- Eye whites -->
-        <path fill="white" transform="translate(593.13 32.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <!-- Iris circles (JS moves cx/cy, clip path constrains to eye whites) -->
-        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
-      </svg>
+    <!-- ── Newsletter risen state ──────────────────────────────────── -->
+    <div id="modal-backdrop"></div>
+    <div id="monster-group">
+      <!-- Blue body first in DOM so wave renders on top -->
+      <div id="modal-blue-body"></div>
+      <div class="monster-area" id="monster-area">
+        <img class="wave" src="assets/monster-wave.svg" alt="">
+        <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+             viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip">
+              <path transform="translate(593.13 32.7)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip">
+              <path transform="translate(431.49 31.57)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            </clipPath>
+          </defs>
+          <!-- Eye whites -->
+          <path fill="white" transform="translate(593.13 32.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <path fill="white" transform="translate(431.49 31.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <!-- Iris circles (JS moves cx/cy, clip path constrains to eye whites) -->
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </svg>
+      </div>
+    </div><!-- /#monster-group -->
+
+    <div id="newsletter-window">
+      <button class="nw-close" aria-label="Close">×</button>
+      <!-- Heading swaps text via JS on success -->
+      <h2 class="nw-heading">JOIN OUR MAILING LIST 📒</h2>
+      <!-- Default form content -->
+      <p class="nw-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
+      <input class="nw-input" type="email" placeholder="Email*" autocomplete="email">
+      <button class="nw-submit">Sign Up</button>
+      <p class="nw-error">Hmm. That email doesn't look right. Try again?</p>
+      <p class="nw-fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+      <!-- Success content -->
+      <p class="nw-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="footer-icons">
         <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
@@ -577,6 +776,61 @@
 
     document.querySelectorAll('.obj img').forEach(img => {
       img.addEventListener('dragstart', e => e.preventDefault());
+    });
+  </script>
+
+  <script>
+    var monsterGroup    = document.getElementById('monster-group');
+    var modalBackdrop   = document.getElementById('modal-backdrop');
+    var modalBlueBody   = document.getElementById('modal-blue-body');
+    var newsletterWindow = document.getElementById('newsletter-window');
+    var nwHeading       = newsletterWindow.querySelector('.nw-heading');
+    var nwInput         = newsletterWindow.querySelector('.nw-input');
+    var nwSubmit        = newsletterWindow.querySelector('.nw-submit');
+
+    function openModal() {
+      modalBackdrop.style.display = 'block';
+      modalBlueBody.style.display = 'block';
+      newsletterWindow.style.display = 'block';
+      monsterGroup.classList.add('wave-risen');
+    }
+
+    function closeModal() {
+      // Hide the form window immediately — it shouldn't slide down with the wave
+      newsletterWindow.style.display = 'none';
+      // Start the wave sliding back down
+      monsterGroup.classList.remove('wave-risen');
+      // Keep backdrop up during the slide so the ticker stays hidden,
+      // then clean everything up once the wave is fully back in place
+      setTimeout(function() {
+        modalBackdrop.style.display = 'none';
+        modalBlueBody.style.display = 'none';
+        // Reset form state for next open
+        newsletterWindow.classList.remove('state-error', 'state-success');
+        nwHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+        nwInput.value = '';
+      }, 620);
+    }
+
+    document.querySelector('.monster-ticker').addEventListener('click', openModal);
+    document.querySelector('.nw-close').addEventListener('click', closeModal);
+
+    // Clear error as soon as user starts correcting their email
+    nwInput.addEventListener('input', function() {
+      newsletterWindow.classList.remove('state-error');
+    });
+
+    nwSubmit.addEventListener('click', function() {
+      var email = nwInput.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!valid) {
+        newsletterWindow.classList.add('state-error');
+        newsletterWindow.classList.remove('state-success');
+      } else {
+        newsletterWindow.classList.remove('state-error');
+        newsletterWindow.classList.add('state-success');
+        nwHeading.textContent = 'YAY, YOU\'RE OFFICIALLY A KNOCKER! 💖';
+      }
     });
   </script>
 

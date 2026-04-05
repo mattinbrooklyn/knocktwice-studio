@@ -136,6 +136,20 @@
 
     .footer { top: 8036px; }
 
+    /* ── Spinning sticker rings ──────────────────────────────────── */
+    .sticker {
+      position: absolute;
+      pointer-events: none;
+      z-index: 8;
+    }
+    @keyframes sticker-ring-spin {
+      to { transform: rotate(360deg); }
+    }
+    .sticker-ring-spin {
+      animation: sticker-ring-spin 18s linear infinite;
+      transform-origin: 50% 50%;
+    }
+
     /* ── Hover card overlay ─────────────────────────────────────── */
     .card-overlay {
       position: absolute;
@@ -300,6 +314,28 @@
 
 
       <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  STICKER RING 1 — between Dinner and Wedding sections     -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Figma: x:825 y:2780 183×183; center (916.5, 2871.5) → div 176×176 at (829, 2784) -->
+      <div class="sticker" style="left:829px; top:2784px; width:176px; height:176px;">
+        <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="exp-ring1-path" d="M88 24 a64 64 0 1 1 -0.001 0"/>
+          </defs>
+          <g>
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 88 88" to="360 88 88" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="14" font-weight="400"
+                  style="font-variation-settings: 'wght' 400"
+                  fill="#32261F" letter-spacing="0">
+              <textPath href="#exp-ring1-path" textLength="402" lengthAdjust="spacing">Where the plans turn into something you can walk into 💅🏽&#xa0;</textPath>
+            </text>
+          </g>
+        </svg>
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
       <!--  WEDDING — 7 photos (displayed normally, no mirror)       -->
       <!-- ══════════════════════════════════════════════════════════ -->
 
@@ -363,6 +399,28 @@
       </div>
       <div class="photo" style="left:846px; top:5211px; width:532px; height:355px;">
         <img src="assets/exp-mr-hotel-6.png" alt="">
+      </div>
+
+
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!--  STICKER RING 2 — before Mr. Buffet section              -->
+      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Figma: x:1068.69 y:5707.81 151.63×151.63; center (1144.5, 5783.6) → div 166×166 at (1062, 5701) -->
+      <div class="sticker" style="left:1062px; top:5701px; width:166px; height:166px;">
+        <svg viewBox="0 0 166 166" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="exp-ring2-path" d="M83 30 a53 53 0 1 1 -0.001 0"/>
+          </defs>
+          <g>
+            <animateTransform attributeName="transform" type="rotate"
+              from="0 83 83" to="360 83 83" dur="18s" repeatCount="indefinite"/>
+            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="12" font-weight="400"
+                  style="font-variation-settings: 'wght' 400"
+                  fill="#32261F" letter-spacing="0">
+              <textPath href="#exp-ring2-path" textLength="333" lengthAdjust="spacing">Because &#x201C;just an event&#x201D; was never the plan 🪩&#xa0;</textPath>
+            </text>
+          </g>
+        </svg>
       </div>
 
 
