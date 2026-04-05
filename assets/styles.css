@@ -55,7 +55,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 .nav {
   position: fixed;
   left: 40px; top: 200px;
-  width: 256px;
+  width: fit-content;
   z-index: 1000;
 }
 .nav a {
