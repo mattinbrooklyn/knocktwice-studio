@@ -66,8 +66,9 @@
     .wave-wrap {
       position: relative;
       width: 100%;
-      background: var(--bg); /* cream matches body — seamless join at top edge */
-      /* Intrinsic aspect ratio of the wave SVG */
+      /* No background — monster-section blue shows through below the arch.
+         The SVG paints cream ABOVE the arch, so there is no color boundary
+         to anti-alias and no seam is possible. */
       padding-bottom: calc(116.154 / 1440 * 100%);
     }
     .wave-wrap svg {
@@ -100,7 +101,9 @@
     }
 
     .form-subtext {
+      font-family: 'Instrument Sans', sans-serif;
       font-size: 0.875rem;
+      font-weight: 400;
       line-height: 1.375rem;
       color: var(--ink);
       margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
@@ -160,7 +163,9 @@
     .cs-error.visible { display: block; }
 
     .fine-print {
+      font-family: 'Instrument Sans', sans-serif;
       font-size: 0.875rem;
+      font-weight: 400;
       line-height: 1.375rem;
       color: var(--ink);
       margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
@@ -233,7 +238,11 @@
     <!-- Wave + eyes -->
     <div class="wave-wrap">
       <svg preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0 116.154C0 116.154 263 0 574.834 0C862.5 0 1440 116.154 1440 116.154" fill="#378CDA"/>
+        <!-- Cream fill above the arch — blue monster-section background shows below.
+             No color boundary at the wave-wrap edge = no seam. -->
+        <path id="wave-path"
+          d="M0 0 L1440 0 L1440 116.154 C1440 116.154 862.5 0 574.834 0 C263 0 0 116.154 0 116.154 Z"
+          fill="#f7f2ec"/>
       </svg>
       <svg id="eyes-svg" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -296,14 +305,15 @@
     var eyesSvg      = document.getElementById('eyes-svg');
     var irisR        = document.getElementById('iris-r');
     var irisL        = document.getElementById('iris-l');
-    var wavePath     = document.querySelector('.wave-wrap svg path');
+    var wavePath     = document.getElementById('wave-path');
     var eyeRWhite    = document.querySelectorAll('#eyes-svg > path')[0];
     var eyeLWhite    = document.querySelectorAll('#eyes-svg > path')[1];
     var eyeRClipPath = document.querySelector('#eye-r-clip path');
     var eyeLClipPath = document.querySelector('#eye-l-clip path');
 
     var waveOffset = 0; // current sway offset in SVG units (shared with iris tracking)
-    var mouseX = -999, mouseY = -999; // last known mouse position
+    var mouseX = -999, mouseY = -999;
+    var TWO_PI = Math.PI * 2;
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
@@ -319,16 +329,17 @@
     });
 
     // ── Wave sway loop ─────────────────────────────────────────────
-    // Shifts the arch's peak ±90px (in 1440-unit SVG space) on a ~7s sine cycle.
-    // Eye whites and clip paths move with it; iris rest positions do too.
+    // Cream fill above the arch shifts ±350 SVG units on a slow ~10s sine cycle,
+    // giving the monster head a wide, lazy side-to-side sway.
     function swayLoop() {
-      waveOffset = Math.sin(Date.now() / 1100) * 90;
+      waveOffset = Math.sin(Date.now() * TWO_PI / 10000) * 350;
       var o = waveOffset;
 
-      // Shift the arch control points; bottom anchors (0 and 1440) stay fixed
+      // Cream-above-arch path: rectangle across the top, then reversed arch curve back down.
+      // Moving the control points shifts which part of the frame is cream vs blue.
       wavePath.setAttribute('d',
-        'M0 116.154C0 116.154 ' + (263+o) + ' 0 ' + (574.834+o) + ' 0C' +
-        (862.5+o) + ' 0 1440 116.154 1440 116.154');
+        'M0 0 L1440 0 L1440 116.154 C1440 116.154 ' + (862.5+o) + ' 0 ' + (574.834+o) +
+        ' 0 C' + (263+o) + ' 0 0 116.154 0 116.154 Z');
 
       // Move eye whites and their clip regions with the arch
       eyeRWhite.setAttribute('transform',    'translate(' + (593.13+o) + ' 32.7)');
