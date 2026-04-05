@@ -177,12 +177,13 @@
     function scalePage() {
       scale   = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      // Wave top at exactly the fold; footer immediately below the wave
-      waveTop = Math.ceil(window.innerHeight / scale);
+      // Wave bottom sits at the fold; only the 60px footer scrolls into view
+      const viewportCanvas  = Math.ceil(window.innerHeight / scale);
+      waveTop               = viewportCanvas - 116;
       monsterArea.style.top = waveTop + 'px';
-      footer.style.top      = (waveTop + 116) + 'px';
-      page.style.height     = (waveTop + 200) + 'px';
-      scaler.style.height   = (waveTop + 200) * scale + 'px';
+      footer.style.top      = viewportCanvas + 'px';
+      page.style.height     = (viewportCanvas + 60) + 'px';
+      scaler.style.height   = (viewportCanvas + 60) * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
