@@ -220,6 +220,13 @@
         flex-direction: column;
         gap: 20px;
       }
+      /* Grid reorders error between input and button without flex nesting issues.
+         display:contents collapses form-row so its children join the grid directly. */
+      .form-area { display: grid; grid-template-areas: "input" "error" "button"; }
+      .form-row  { display: contents; }
+      .cs-input  { grid-area: input;  margin-bottom: 20px; }
+      .cs-error  { grid-area: error;  margin-bottom: 12px; }
+      .cs-submit { grid-area: button; }
       .cs-input {
         flex: none;
         width: 100%;
@@ -379,11 +386,13 @@
       <div id="form-default">
         <h2>You're early. We like that. 📬</h2>
         <p class="form-subtext">Slip your email under the door. We won't leave you waiting long.</p>
-        <div class="form-row">
-          <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
-          <button class="cs-submit" id="cs-submit">Sign Up</button>
+        <div class="form-area">
+          <div class="form-row">
+            <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
+            <button class="cs-submit" id="cs-submit">Sign Up</button>
+          </div>
+          <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
         </div>
-        <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
       </div>
       <div class="form-success" id="form-success">
         <h2>We got your note. 💌</h2>
