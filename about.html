@@ -832,13 +832,9 @@
         newsletterWindow.classList.remove('state-error');
         newsletterWindow.classList.add('state-success');
         nwHeading.textContent = 'YAY, YOU\'RE OFFICIALLY A KNOCKER! 💖';
-        // Send to Google Sheet — fire and forget, success state shows regardless
-        fetch(SHEET_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email })
-        }).catch(function() { /* silent fail — submission already confirmed to user */ });
+        // Send to Google Sheet via GET — no-cors requires a simple request
+        fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
+          .catch(function() { /* silent fail — submission already confirmed to user */ });
       }
     });
   </script>
