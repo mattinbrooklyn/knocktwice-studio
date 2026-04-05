@@ -20,21 +20,19 @@
 
     html, body {
       height: 100%;
-      overflow-x: hidden;
-      scrollbar-width: none;
+      overflow: hidden; /* no scroll — everything fits in 100vh */
     }
-    body::-webkit-scrollbar { display: none; }
 
     body {
       display: flex;
       flex-direction: column;
-      min-height: 100vh;
+      height: 100vh;
       background: var(--bg);
       font-family: 'Instrument Sans', sans-serif;
       color: var(--ink);
     }
 
-    /* ── Logo ──────────────────────────────────────────────────────── */
+    /* ── Logo ─────────────────────────────────────────────────────── */
     .logo {
       position: fixed;
       top: clamp(1rem, 3vw, 1.75rem);
@@ -46,56 +44,56 @@
     }
     .logo svg { display: block; width: 100%; height: auto; }
 
-    /* ── Hero ──────────────────────────────────────────────────────── */
+    /* ── Hero ─────────────────────────────────────────────────────── */
     .hero {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      align-items: flex-start;
-      padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 8vw, 7rem);
-      max-width: 1440px;
-      width: 100%;
-      margin: 0 auto;
+      padding: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 8vw, 7rem) clamp(1rem, 3vw, 2rem);
+      min-height: 0; /* allow flex shrink */
     }
 
     .hero h1 {
       font-family: 'Erica One', sans-serif;
-      font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+      font-size: clamp(1.75rem, 4.5vw, 4rem);
       line-height: 1.05;
       font-weight: 400;
       color: var(--ink);
       max-width: 18ch;
-      margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+      margin-bottom: clamp(0.5rem, 1.5vw, 1rem);
     }
 
     .hero p {
-      font-size: clamp(0.875rem, 1.4vw, 1rem);
+      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
       line-height: 1.6;
       color: var(--ink);
       max-width: 52ch;
       font-variation-settings: 'wdth' 100;
     }
 
-    /* ── Monster section ───────────────────────────────────────────── */
+    /* ── Monster section ──────────────────────────────────────────── */
     .monster-section {
+      position: relative;
       width: 100%;
       background: var(--blue);
-      transform: translateY(100vh);
+      /* Slides up from below on load */
+      transform: translateY(100%);
       will-change: transform;
+      /* flex sizing: tall enough to show wave + card + footer */
+      flex-shrink: 0;
     }
     .monster-section.risen {
       transform: translateY(0);
       transition: transform 800ms ease-out;
     }
 
-    /* ── Wave ──────────────────────────────────────────────────────── */
+    /* ── Wave ─────────────────────────────────────────────────────── */
     .wave-wrap {
       position: relative;
       width: 100%;
-      /* height matches the SVG aspect ratio: 116.154 / 1440 */
+      /* Intrinsic aspect ratio of the wave SVG */
       padding-bottom: calc(116.154 / 1440 * 100%);
-      overflow: visible;
     }
     .wave-wrap svg {
       position: absolute;
@@ -103,43 +101,46 @@
       width: 100%; height: 100%;
       display: block;
     }
-    .wave-svg { overflow: visible; }
+    #eyes-svg { overflow: visible; }
 
-    /* ── Form area ─────────────────────────────────────────────────── */
-    .form-area {
-      width: 100%;
-      max-width: 860px;
-      margin: 0 auto;
-      padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 2rem) clamp(1.5rem, 4vw, 2.5rem);
+    /* ── Form card — white box floating over the blue body ────────── */
+    .form-card {
+      position: relative;
+      z-index: 2;
+      width: min(90%, 860px);
+      margin: clamp(0.75rem, 2vw, 1.5rem) auto clamp(0.75rem, 2vw, 1.25rem);
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 0.875rem;
+      padding: clamp(1.25rem, 3vw, 2rem) clamp(1.25rem, 3.5vw, 2.5rem) clamp(1rem, 2.5vw, 1.5rem);
     }
 
-    .form-area h2 {
+    .form-card h2 {
       font-family: 'Erica One', sans-serif;
-      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-size: clamp(1rem, 2vw, 1.5rem);
       font-weight: 400;
       line-height: 1.15;
-      color: var(--bg);
-      margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+      color: var(--ink);
+      margin-bottom: clamp(0.25rem, 0.75vw, 0.5rem);
     }
 
-    .form-area .form-subtext {
-      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
+    .form-subtext {
+      font-size: clamp(0.75rem, 1.2vw, 0.875rem);
       line-height: 1.55;
-      color: var(--bg);
-      opacity: 0.85;
-      margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+      color: var(--ink);
+      margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
       font-variation-settings: 'wdth' 100;
     }
 
     .form-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.625rem;
-      margin-bottom: 0.5rem;
+      gap: 0.5rem;
+      margin-bottom: 0.375rem;
     }
 
     .cs-input {
-      flex: 1 1 260px;
+      flex: 1 1 200px;
       height: 3.125rem;
       background: white;
       border: 2px solid var(--ink);
@@ -153,7 +154,6 @@
       outline: none;
     }
     .cs-input::placeholder { color: #9A7555; opacity: 1; }
-    .cs-input:focus { border-color: var(--blue); }
     .cs-input.input-error { border-color: #C0392B; }
 
     .cs-submit {
@@ -176,52 +176,46 @@
 
     .cs-error {
       display: none;
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       line-height: 1.4;
-      color: #ff8080;
-      margin-bottom: 0.75rem;
+      color: #C0392B;
+      margin-bottom: 0.5rem;
       font-variation-settings: 'wdth' 100;
     }
     .cs-error.visible { display: block; }
 
     .fine-print {
-      font-size: clamp(0.75rem, 1.1vw, 0.8125rem);
+      font-size: clamp(0.6875rem, 1vw, 0.8125rem);
       line-height: 1.55;
-      color: var(--bg);
+      color: var(--ink);
       opacity: 0.55;
-      margin-top: clamp(0.75rem, 2vw, 1.25rem);
+      margin-top: clamp(0.5rem, 1.5vw, 0.875rem);
       font-variation-settings: 'wdth' 100;
     }
 
-    /* ── Success state ─────────────────────────────────────────────── */
-    .form-success {
-      display: none;
-    }
+    /* ── Success state ────────────────────────────────────────────── */
+    .form-success { display: none; }
     .form-success h2 {
       font-family: 'Erica One', sans-serif;
-      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-size: clamp(1rem, 2vw, 1.5rem);
       font-weight: 400;
-      color: var(--bg);
-      margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+      color: var(--ink);
+      margin-bottom: clamp(0.25rem, 0.75vw, 0.5rem);
     }
     .form-success p {
-      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
+      font-size: clamp(0.75rem, 1.2vw, 0.875rem);
       line-height: 1.55;
-      color: var(--bg);
-      opacity: 0.85;
+      color: var(--ink);
       font-variation-settings: 'wdth' 100;
     }
 
-    /* ── Footer ────────────────────────────────────────────────────── */
+    /* ── Footer ───────────────────────────────────────────────────── */
     .cs-footer {
-      width: 100%;
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 5vw, 2.5rem);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
+      padding: clamp(0.625rem, 1.5vw, 1rem) clamp(1.5rem, 5vw, 2.5rem);
     }
 
     .cs-footer-icons {
@@ -232,14 +226,14 @@
     .cs-footer-icons a {
       display: flex;
       align-items: center;
-      width: 1.25rem;
-      height: 1.25rem;
+      width: 1.125rem;
+      height: 1.125rem;
     }
     .cs-footer-icons img { width: 100%; height: 100%; display: block; }
 
     .cs-footer-copy {
       font-family: 'Handjet', sans-serif;
-      font-size: clamp(0.75rem, 1.2vw, 0.9375rem);
+      font-size: clamp(0.6875rem, 1.1vw, 0.875rem);
       font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
       letter-spacing: -0.01em;
       color: var(--bg);
@@ -258,48 +252,38 @@
     </svg>
   </a>
 
-  <!-- Hero -->
+  <!-- Hero — cream zone -->
   <main class="hero">
     <h1>We're doing some light dusting.</h1>
     <p>Something considered is coming. Leave your email and you'll be the first to know.</p>
   </main>
 
-  <!-- Monster section: wave + form + footer -->
+  <!-- Monster section — blue zone, rises on load -->
   <section class="monster-section" id="monster-section">
 
-    <!-- Wave SVG + eyes overlay -->
+    <!-- Wave + eyes -->
     <div class="wave-wrap">
-      <!-- Wave fill -->
-      <svg class="wave-svg" preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M0 116.154C0 116.154 263 0 574.834 0C862.5 0 1440 116.154 1440 116.154" fill="#378CDA"/>
       </svg>
-      <!-- Eye whites + irises overlay (same coordinate space as wave) -->
-      <svg class="wave-svg" id="eyes-svg" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">
+      <svg id="eyes-svg" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="eye-r-clip">
-            <path transform="translate(593.13 32.7)"
-              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            <path transform="translate(593.13 32.7)" d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
           </clipPath>
           <clipPath id="eye-l-clip">
-            <path transform="translate(431.49 31.57)"
-              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            <path transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           </clipPath>
         </defs>
-        <!-- Eye whites -->
-        <path fill="white" transform="translate(593.13 32.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <!-- Irises -->
+        <path fill="white" transform="translate(593.13 32.7)" d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)" d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
         <circle id="iris-r" clip-path="url(#eye-r-clip)" cx="652.9" cy="49.45" r="30" fill="#32261F"/>
         <circle id="iris-l" clip-path="url(#eye-l-clip)" cx="495.41" cy="49.46" r="30" fill="#32261F"/>
       </svg>
     </div>
 
-    <!-- Form -->
-    <div class="form-area">
-
-      <!-- Default / error state -->
+    <!-- White card floating over the blue body -->
+    <div class="form-card">
       <div id="form-default">
         <h2>Sorry, the doorbell's broken. 🔔</h2>
         <p class="form-subtext">Leave your email and we'll knock when we're ready.</p>
@@ -310,13 +294,10 @@
         <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
         <p class="fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
       </div>
-
-      <!-- Success state -->
       <div class="form-success" id="form-success">
         <h2>You're on the list! 💌</h2>
-        <p class="form-subtext">We'll knock when we're ready. Keep an eye out.</p>
+        <p>We'll knock when we're ready. Keep an eye out.</p>
       </div>
-
     </div>
 
     <!-- Footer -->
@@ -337,7 +318,7 @@
   <script>
     var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
 
-    // ── Monster entrance ───────────────────────────────────────────
+    // ── Monster entrance: 500ms delay, rises from below ────────────
     setTimeout(function() {
       document.getElementById('monster-section').classList.add('risen');
     }, 500);
@@ -348,34 +329,28 @@
     var irisL   = document.getElementById('iris-l');
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
-      var dx = svgX - restX;
-      var dy = svgY - restY;
+      var dx = svgX - restX, dy = svgY - restY;
       var dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 1) {
-        el.setAttribute('cx', restX);
-        el.setAttribute('cy', restY);
-        return;
-      }
-      var strength = Math.min(dist / 300, 1);
-      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
-      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+      if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
+      var s = Math.min(dist / 300, 1);
+      el.setAttribute('cx', restX + (dx / dist) * maxX * s);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * s);
     }
 
     document.addEventListener('mousemove', function(e) {
-      var rect    = eyesSvg.getBoundingClientRect();
-      // Map viewport coords to SVG viewBox coords (0 0 1440 116)
-      var svgX    = (e.clientX - rect.left) / rect.width  * 1440;
-      var svgY    = (e.clientY - rect.top)  / rect.height * 116;
+      var r = eyesSvg.getBoundingClientRect();
+      var svgX = (e.clientX - r.left) / r.width  * 1440;
+      var svgY = (e.clientY - r.top)  / r.height * 116;
       trackIris(irisR, svgX, svgY, 652.9,  49.45, 20, 5);
       trackIris(irisL, svgX, svgY, 495.41, 49.46, 20, 5);
     });
 
     // ── Form ───────────────────────────────────────────────────────
-    var emailInput   = document.getElementById('cs-email');
-    var submitBtn    = document.getElementById('cs-submit');
-    var errorMsg     = document.getElementById('cs-error');
-    var formDefault  = document.getElementById('form-default');
-    var formSuccess  = document.getElementById('form-success');
+    var emailInput  = document.getElementById('cs-email');
+    var submitBtn   = document.getElementById('cs-submit');
+    var errorMsg    = document.getElementById('cs-error');
+    var formDefault = document.getElementById('form-default');
+    var formSuccess = document.getElementById('form-success');
 
     emailInput.addEventListener('input', function() {
       emailInput.classList.remove('input-error');
@@ -384,19 +359,13 @@
 
     submitBtn.addEventListener('click', function() {
       var email = emailInput.value.trim();
-      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-      if (!valid) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         emailInput.classList.add('input-error');
         errorMsg.classList.add('visible');
         return;
       }
-
-      // Success
       formDefault.style.display = 'none';
       formSuccess.style.display = 'block';
-
-      // Fire and forget to Google Sheet
       fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
         .catch(function() {});
     });
