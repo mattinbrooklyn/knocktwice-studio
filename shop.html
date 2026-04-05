@@ -67,6 +67,12 @@
       left: 0; top: 910px;
       width: 1440px; height: 116px;
       z-index: 5;
+      transform: translateY(200px);
+      will-change: transform;
+    }
+    .monster-area.popped-up {
+      transform: translateY(0);
+      transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
     }
     .monster-area img.wave {
       position: absolute;
@@ -188,6 +194,12 @@
     scalePage();
     window.addEventListener('resize', scalePage);
 
+    // Pop the monster up on load with a spring bounce
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterArea.classList.add('popped-up');
+      });
+    });
 
     document.addEventListener('mousemove', e => {
       updateMonsterEyes(e.clientX, e.clientY);
