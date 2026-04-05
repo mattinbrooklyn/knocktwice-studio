@@ -194,10 +194,9 @@
          making body taller than the visible screen and breaking bottom: 0 */
       html, body { height: 100%; }
       body { height: 100%; }
-      /* Full blue background on mobile — matches design intent and covers
-         any safe-area gap the body background would otherwise leave white */
-      body { background: var(--blue); }
-      .monster-section { height: 80%; }
+      /* Extend monster section into the safe area so its blue background
+         covers the home indicator gap. Footer padding keeps content above it. */
+      .monster-section { height: calc(80% + env(safe-area-inset-bottom, 0px)); }
       .cs-footer { padding-bottom: max(0.625rem, env(safe-area-inset-bottom)); }
       .wave-wrap { padding-bottom: calc(64 / 440 * 100%); }
       .logo { width: 119px; top: 30px; left: 20px; }
