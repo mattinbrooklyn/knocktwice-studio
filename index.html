@@ -189,8 +189,13 @@
         // ── Drop: Splash_Monster slides behind the static keyhole window ─
         // The clip path on #keyhole-window never moves, so the aperture
         // stays frozen while the creature falls through it.
-        splashMonster.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
-        splashMonster.style.transform  = 'translateY(2000px)';
+        // Drop distance = viewport height so the eye-flash zone (translateY
+        // ~140–430px) occupies a visible fraction of the total travel.
+        const dropDist = window.innerHeight + 100;
+        splashMonster.style.transition = 'transform 450ms cubic-bezier(0.4, 0, 1, 1)';
+        // Force reflow so transition fires from current state, not skipped.
+        splashMonster.getBoundingClientRect();
+        splashMonster.style.transform  = `translateY(${dropDist}px)`;
 
         // ── Fade to black: begins when drop lands ──────────────
         setTimeout(() => {
@@ -203,7 +208,7 @@
             window.location.href = 'home.html';
           }, 300);
 
-        }, 400); // drop duration
+        }, 450); // drop duration
 
       }, 100); // initial pause
     });
