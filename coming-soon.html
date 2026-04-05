@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Coming Soon — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wdth,wght@75..125,400..700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:    #f7f2ec;
+      --ink:   #32261F;
+      --blue:  #378CDA;
+      --green: #51B18C;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    body::-webkit-scrollbar { display: none; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--bg);
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--ink);
+    }
+
+    /* ── Logo ──────────────────────────────────────────────────────── */
+    .logo {
+      position: fixed;
+      top: clamp(1rem, 3vw, 1.75rem);
+      left: clamp(1rem, 3vw, 1.75rem);
+      width: clamp(1.75rem, 3.5vw, 2.75rem);
+      z-index: 100;
+      display: block;
+      text-decoration: none;
+    }
+    .logo svg { display: block; width: 100%; height: auto; }
+
+    /* ── Hero ──────────────────────────────────────────────────────── */
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: clamp(5rem, 10vw, 8rem) clamp(1.5rem, 8vw, 7rem);
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-family: 'Erica One', sans-serif;
+      font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+      line-height: 1.05;
+      font-weight: 400;
+      color: var(--ink);
+      max-width: 18ch;
+      margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
+    }
+
+    .hero p {
+      font-size: clamp(0.875rem, 1.4vw, 1rem);
+      line-height: 1.6;
+      color: var(--ink);
+      max-width: 52ch;
+      font-variation-settings: 'wdth' 100;
+    }
+
+    /* ── Monster section ───────────────────────────────────────────── */
+    .monster-section {
+      width: 100%;
+      background: var(--blue);
+      transform: translateY(100vh);
+      will-change: transform;
+    }
+    .monster-section.risen {
+      transform: translateY(0);
+      transition: transform 800ms ease-out;
+    }
+
+    /* ── Wave ──────────────────────────────────────────────────────── */
+    .wave-wrap {
+      position: relative;
+      width: 100%;
+      /* height matches the SVG aspect ratio: 116.154 / 1440 */
+      padding-bottom: calc(116.154 / 1440 * 100%);
+      overflow: visible;
+    }
+    .wave-wrap svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+    .wave-svg { overflow: visible; }
+
+    /* ── Form area ─────────────────────────────────────────────────── */
+    .form-area {
+      width: 100%;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: clamp(2rem, 5vw, 3.5rem) clamp(1.5rem, 5vw, 2rem) clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    .form-area h2 {
+      font-family: 'Erica One', sans-serif;
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--bg);
+      margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+
+    .form-area .form-subtext {
+      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
+      line-height: 1.55;
+      color: var(--bg);
+      opacity: 0.85;
+      margin-bottom: clamp(1.25rem, 3vw, 1.75rem);
+      font-variation-settings: 'wdth' 100;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.625rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .cs-input {
+      flex: 1 1 260px;
+      height: 3.125rem;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 100px;
+      padding: 0 1.25rem;
+      font-family: 'Handjet', sans-serif;
+      font-size: 1rem;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      outline: none;
+    }
+    .cs-input::placeholder { color: #9A7555; opacity: 1; }
+    .cs-input:focus { border-color: var(--blue); }
+    .cs-input.input-error { border-color: #C0392B; }
+
+    .cs-submit {
+      flex: 0 0 auto;
+      height: 3.125rem;
+      padding: 0 2rem;
+      background: var(--green);
+      border: none;
+      border-radius: 100px;
+      font-family: 'Handjet', sans-serif;
+      font-size: 1rem;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      letter-spacing: -0.01em;
+      color: var(--bg);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s;
+    }
+    .cs-submit:hover { opacity: 0.85; }
+
+    .cs-error {
+      display: none;
+      font-size: 0.875rem;
+      line-height: 1.4;
+      color: #ff8080;
+      margin-bottom: 0.75rem;
+      font-variation-settings: 'wdth' 100;
+    }
+    .cs-error.visible { display: block; }
+
+    .fine-print {
+      font-size: clamp(0.75rem, 1.1vw, 0.8125rem);
+      line-height: 1.55;
+      color: var(--bg);
+      opacity: 0.55;
+      margin-top: clamp(0.75rem, 2vw, 1.25rem);
+      font-variation-settings: 'wdth' 100;
+    }
+
+    /* ── Success state ─────────────────────────────────────────────── */
+    .form-success {
+      display: none;
+    }
+    .form-success h2 {
+      font-family: 'Erica One', sans-serif;
+      font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+      font-weight: 400;
+      color: var(--bg);
+      margin-bottom: clamp(0.5rem, 1.5vw, 0.75rem);
+    }
+    .form-success p {
+      font-size: clamp(0.8125rem, 1.3vw, 0.9375rem);
+      line-height: 1.55;
+      color: var(--bg);
+      opacity: 0.85;
+      font-variation-settings: 'wdth' 100;
+    }
+
+    /* ── Footer ────────────────────────────────────────────────────── */
+    .cs-footer {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 5vw, 2.5rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .cs-footer-icons {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .cs-footer-icons a {
+      display: flex;
+      align-items: center;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+    .cs-footer-icons img { width: 100%; height: 100%; display: block; }
+
+    .cs-footer-copy {
+      font-family: 'Handjet', sans-serif;
+      font-size: clamp(0.75rem, 1.2vw, 0.9375rem);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      letter-spacing: -0.01em;
+      color: var(--bg);
+      opacity: 0.75;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo -->
+  <a href="home.html" class="logo" aria-label="Knock Twice home">
+    <svg preserveAspectRatio="none" overflow="visible" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+    </svg>
+  </a>
+
+  <!-- Hero -->
+  <main class="hero">
+    <h1>We're doing some light dusting.</h1>
+    <p>Something considered is coming. Leave your email and you'll be the first to know.</p>
+  </main>
+
+  <!-- Monster section: wave + form + footer -->
+  <section class="monster-section" id="monster-section">
+
+    <!-- Wave SVG + eyes overlay -->
+    <div class="wave-wrap">
+      <!-- Wave fill -->
+      <svg class="wave-svg" preserveAspectRatio="none" viewBox="0 0 1440 116.154" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 116.154C0 116.154 263 0 574.834 0C862.5 0 1440 116.154 1440 116.154" fill="#378CDA"/>
+      </svg>
+      <!-- Eye whites + irises overlay (same coordinate space as wave) -->
+      <svg class="wave-svg" id="eyes-svg" viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">
+        <defs>
+          <clipPath id="eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <!-- Eye whites -->
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <!-- Irises -->
+        <circle id="iris-r" clip-path="url(#eye-r-clip)" cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="iris-l" clip-path="url(#eye-l-clip)" cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+    </div>
+
+    <!-- Form -->
+    <div class="form-area">
+
+      <!-- Default / error state -->
+      <div id="form-default">
+        <h2>Sorry, the doorbell's broken. 🔔</h2>
+        <p class="form-subtext">Leave your email and we'll knock when we're ready.</p>
+        <div class="form-row">
+          <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
+          <button class="cs-submit" id="cs-submit">Sign Up</button>
+        </div>
+        <p class="cs-error" id="cs-error">Hmm. That email doesn't look right. Try again?</p>
+        <p class="fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+      </div>
+
+      <!-- Success state -->
+      <div class="form-success" id="form-success">
+        <h2>You're on the list! 💌</h2>
+        <p class="form-subtext">We'll knock when we're ready. Keep an eye out.</p>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="cs-footer">
+      <div class="cs-footer-icons">
+        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+          <img src="assets/icon-instagram.svg" alt="Instagram">
+        </a>
+        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
+          <img src="assets/icon-tiktok.svg" alt="TikTok">
+        </a>
+      </div>
+      <span class="cs-footer-copy">© 2026 Knock Twice Studio. All rights reserved.</span>
+    </footer>
+
+  </section>
+
+  <script>
+    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
+
+    // ── Monster entrance ───────────────────────────────────────────
+    setTimeout(function() {
+      document.getElementById('monster-section').classList.add('risen');
+    }, 500);
+
+    // ── Eye tracking ───────────────────────────────────────────────
+    var eyesSvg = document.getElementById('eyes-svg');
+    var irisR   = document.getElementById('iris-r');
+    var irisL   = document.getElementById('iris-l');
+
+    function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
+      var dx = svgX - restX;
+      var dy = svgY - restY;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      var strength = Math.min(dist / 300, 1);
+      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+    }
+
+    document.addEventListener('mousemove', function(e) {
+      var rect    = eyesSvg.getBoundingClientRect();
+      // Map viewport coords to SVG viewBox coords (0 0 1440 116)
+      var svgX    = (e.clientX - rect.left) / rect.width  * 1440;
+      var svgY    = (e.clientY - rect.top)  / rect.height * 116;
+      trackIris(irisR, svgX, svgY, 652.9,  49.45, 20, 5);
+      trackIris(irisL, svgX, svgY, 495.41, 49.46, 20, 5);
+    });
+
+    // ── Form ───────────────────────────────────────────────────────
+    var emailInput   = document.getElementById('cs-email');
+    var submitBtn    = document.getElementById('cs-submit');
+    var errorMsg     = document.getElementById('cs-error');
+    var formDefault  = document.getElementById('form-default');
+    var formSuccess  = document.getElementById('form-success');
+
+    emailInput.addEventListener('input', function() {
+      emailInput.classList.remove('input-error');
+      errorMsg.classList.remove('visible');
+    });
+
+    submitBtn.addEventListener('click', function() {
+      var email = emailInput.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!valid) {
+        emailInput.classList.add('input-error');
+        errorMsg.classList.add('visible');
+        return;
+      }
+
+      // Success
+      formDefault.style.display = 'none';
+      formSuccess.style.display = 'block';
+
+      // Fire and forget to Google Sheet
+      fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
+        .catch(function() {});
+    });
+  </script>
+
+</body>
+</html>
