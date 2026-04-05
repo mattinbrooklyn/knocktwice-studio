@@ -820,6 +820,8 @@
       newsletterWindow.classList.remove('state-error');
     });
 
+    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbz-PbSMJ2_dIKbuiDMTMVPWlfGgfwv5ByqkOZ00HzUf-ghwhKh2juphEarGMb5-i53T/exec';
+
     nwSubmit.addEventListener('click', function() {
       var email = nwInput.value.trim();
       var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -830,6 +832,13 @@
         newsletterWindow.classList.remove('state-error');
         newsletterWindow.classList.add('state-success');
         nwHeading.textContent = 'YAY, YOU\'RE OFFICIALLY A KNOCKER! 💖';
+        // Send to Google Sheet — fire and forget, success state shows regardless
+        fetch(SHEET_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        }).catch(function() { /* silent fail — submission already confirmed to user */ });
       }
     });
   </script>
