@@ -586,25 +586,26 @@
         },
       ];
 
-      // Resolve DOM refs and prime transform-origin on blink targets
+      // Resolve DOM refs
       pieces.forEach(piece => {
         piece.irises.forEach(iris => { iris.el = document.getElementById(iris.id); });
         piece.eyes.forEach(eye => {
           eye.white = document.getElementById(eye.whiteId);
           eye.clip  = document.getElementById(eye.clipId);
-          [eye.white, eye.clip].forEach(el => {
-            if (!el) return;
-            el.style.transformBox    = 'fill-box';
-            el.style.transformOrigin = 'center';
-          });
         });
       });
 
-      // Animate a single eye closing and re-opening over `duration` ms via RAF
+      // Animate a single eye closing and re-opening over `duration` ms via RAF.
+      // transform-box/origin are set only for the duration of the blink then fully
+      // cleared — leaving them on at rest shifts the clip paths due to SVG/CSS interaction.
       function blink(eye, duration, onDone) {
         const paths = [eye.white, eye.clip].filter(Boolean);
         const start = performance.now();
         const half  = duration / 2;
+        paths.forEach(el => {
+          el.style.transformBox    = 'fill-box';
+          el.style.transformOrigin = 'center';
+        });
         function frame(now) {
           const t = now - start;
           let sy;
@@ -613,7 +614,11 @@
           } else if (t < duration) {
             sy = 0.05 + ((t - half) / half) * 0.95;
           } else {
-            paths.forEach(el => { el.style.transform = ''; });
+            paths.forEach(el => {
+              el.style.transform       = '';
+              el.style.transformBox    = '';
+              el.style.transformOrigin = '';
+            });
             if (onDone) onDone();
             return;
           }
