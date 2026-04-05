@@ -197,17 +197,11 @@
 
     .footer { top: 1137px; }
 
-    /* ── Autonomous eye blink ──────────────────────────────────────── */
-    @keyframes blink {
-      0%, 100% { transform: scaleY(1); }
-      35%, 65% { transform: scaleY(0.05); }
+    /* ── Object eye animation ──────────────────────────────────────── */
+    #brush-iris-l, #brush-iris-r,
+    #bucket-iris-l, #bucket-iris-r {
+      transition: cx 200ms ease-out, cy 200ms ease-out;
     }
-    #brush-eye-group,
-    #bucket-eye-group {
-      transform-box: fill-box;
-      transform-origin: center;
-    }
-    .eye-blinking { animation: blink 0.14s ease-in-out; }
   </style>
 </head>
 <body>
@@ -286,13 +280,15 @@
               d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
           </clipPath>
         </defs>
-        <g id="brush-eye-group">
-          <path fill="white" transform="translate(117.7 98.4)"
+        <g id="brush-eye-r">
+          <path id="brush-lid-r" fill="white" transform="translate(117.7 98.4)"
             d="M0 17.6931C11.9644 -1.0084 26.9782 -3.77549 44.2694 4.22012C29.0986 12.5511 14.2961 17.4632 0 17.6931Z"/>
-          <path fill="white" transform="translate(43.6 117.3)"
-            d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
           <circle id="brush-iris-r" clip-path="url(#brush-eye-r-clip)"
             cx="150.6" cy="92.8" r="15.65" fill="#32261F"/>
+        </g>
+        <g id="brush-eye-l">
+          <path id="brush-lid-l" fill="white" transform="translate(43.6 117.3)"
+            d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
           <circle id="brush-iris-l" clip-path="url(#brush-eye-l-clip)"
             cx="84.2" cy="110.2" r="19.65" fill="#32261F"/>
         </g>
@@ -319,13 +315,15 @@
                 d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
             </clipPath>
           </defs>
-          <g id="bucket-eye-group">
-            <path fill="white" transform="translate(112.2 80.1) scale(1.133 1.12)"
+          <g id="bucket-eye-r">
+            <path id="bucket-lid-r" fill="white" transform="translate(112.2 80.1) scale(1.133 1.12)"
               d="M0 5.06111C23.3024 -5.57823 39.5691 1.143 51.2976 19.7283C31.3899 18.3021 13.9841 13.7951 0 5.06111Z"/>
-            <path fill="white" transform="translate(47.0 61.6) scale(1.132 1.114)"
-              d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
             <circle id="bucket-iris-r" clip-path="url(#bucket-eye-r-clip)"
               cx="127.8" cy="94.1" r="18.05" fill="#32261F"/>
+          </g>
+          <g id="bucket-eye-l">
+            <path id="bucket-lid-l" fill="white" transform="translate(47.0 61.6) scale(1.132 1.114)"
+              d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
             <circle id="bucket-iris-l" clip-path="url(#bucket-eye-l-clip)"
               cx="57.7" cy="75.4" r="16.37" fill="#32261F"/>
           </g>
@@ -463,67 +461,80 @@
       moveMonsterEyes(x, y);
     }
 
-    // ── Autonomous eyes (brush + bucket) ───────────────────────────
-    // These look around and blink on their own — no cursor tracking.
-    const brushIrisR  = document.getElementById('brush-iris-r');
-    const brushIrisL  = document.getElementById('brush-iris-l');
-    const bucketIrisR = document.getElementById('bucket-iris-r');
-    const bucketIrisL = document.getElementById('bucket-iris-l');
+    // ── Object eye animation ───────────────────────────────────────
+    function animateFurnitureEyes(cfg) {
+      var irisL  = cfg.irisL,  irisR  = cfg.irisR;
+      var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
+      var restL  = cfg.restL,  restR  = cfg.restR;
+      var rangeL = cfg.rangeL, rangeR = cfg.rangeR;
 
-    const autoEyeSets = [
-      {
-        group: document.getElementById('brush-eye-group'),
-        irises: [
-          { el: brushIrisR,  restX: 150.6, restY: 92.8,  maxX: 5, maxY: 3 },
-          { el: brushIrisL,  restX: 84.2,  restY: 110.2, maxX: 5, maxY: 3 },
-        ]
-      },
-      {
-        group: document.getElementById('bucket-eye-group'),
-        irises: [
-          { el: bucketIrisR, restX: 127.8, restY: 94.1, maxX: 5, maxY: 3 },
-          { el: bucketIrisL, restX: 57.7,  restY: 75.4, maxX: 5, maxY: 3 },
-        ]
+      function look() {
+        var angle = Math.random() * Math.PI * 2;
+        var mag   = Math.random();
+        var dx    = Math.cos(angle) * mag;
+        var dy    = Math.sin(angle) * mag;
+        irisL.setAttribute('cx', restL.x + dx * rangeL);
+        irisL.setAttribute('cy', restL.y + dy * rangeL);
+        irisR.setAttribute('cx', restR.x + dx * rangeR);
+        irisR.setAttribute('cy', restR.y + dy * rangeR);
+        setTimeout(look, 3000 + Math.random() * 3000);
       }
-    ];
 
-    function scheduleEyeEvent(eyeSet) {
-      const delay = 2500 + Math.random() * 4000; // 2.5–6.5 s between events
-      setTimeout(() => {
-        if (Math.random() < 0.25) {
-          // Blink: squish the eye group and restore
-          eyeSet.group.classList.add('eye-blinking');
-          eyeSet.group.addEventListener('animationend', () => {
-            eyeSet.group.classList.remove('eye-blinking');
-            scheduleEyeEvent(eyeSet);
-          }, { once: true });
-        } else {
-          // Glance: move irises in a random direction then return to rest
-          const angle    = Math.random() * Math.PI * 2;
-          const strength = 0.5 + Math.random() * 0.5;
-          eyeSet.irises.forEach(iris => {
-            iris.el.setAttribute('cx', iris.restX + Math.cos(angle) * iris.maxX * strength);
-            iris.el.setAttribute('cy', iris.restY + Math.sin(angle) * iris.maxY * strength);
-          });
-          setTimeout(() => {
-            eyeSet.irises.forEach(iris => {
-              iris.el.setAttribute('cx', iris.restX);
-              iris.el.setAttribute('cy', iris.restY);
-            });
-            scheduleEyeEvent(eyeSet);
-          }, 500 + Math.random() * 600);
-        }
-      }, delay);
+      function singleBlink(onDone) {
+        var holdMs = 60 + Math.random() * 90;
+        eyeL.style.visibility = 'hidden';
+        eyeR.style.visibility = 'hidden';
+        setTimeout(function () {
+          eyeL.style.visibility = '';
+          eyeR.style.visibility = '';
+          setTimeout(onDone || function () {}, 0);
+        }, holdMs);
+      }
+
+      function blink() {
+        singleBlink(function () {
+          if (Math.random() < 0.25) {
+            var gapMs = 100 + Math.random() * 80;
+            setTimeout(function () { singleBlink(scheduleBlink); }, gapMs);
+          } else {
+            scheduleBlink();
+          }
+        });
+      }
+
+      function scheduleBlink() {
+        setTimeout(blink, 4000 + Math.random() * 4000);
+      }
+
+      look();
+      scheduleBlink();
     }
 
-    // Init at rest and kick off autonomous behavior
-    autoEyeSets.forEach(es => {
-      es.irises.forEach(iris => {
-        iris.el.setAttribute('cx', iris.restX);
-        iris.el.setAttribute('cy', iris.restY);
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('brush-iris-l'),
+        irisR:    document.getElementById('brush-iris-r'),
+        eyeL:     document.getElementById('brush-eye-l'),
+        eyeR:     document.getElementById('brush-eye-r'),
+        restL:    { x: 84.2,  y: 110.2 },
+        restR:    { x: 150.6, y: 92.8 },
+        rangeL:   12,  // bumped — iris sits at ~73% from left edge
+        rangeR:   10,  // same reason
       });
-      scheduleEyeEvent(es);
-    });
+    }, Math.random() * 3000);
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('bucket-iris-l'),
+        irisR:    document.getElementById('bucket-iris-r'),
+        eyeL:     document.getElementById('bucket-eye-l'),
+        eyeR:     document.getElementById('bucket-eye-r'),
+        restL:    { x: 57.7,  y: 75.4 },
+        restR:    { x: 127.8, y: 94.1 },
+        rangeL:   9,   // iris sits at ~20% from left — standard formula
+        rangeR:   10,  // iris sits at ~27% from left — standard formula
+      });
+    }, Math.random() * 3000);
 
 
     // ── Draggable objects ──────────────────────────────────────────

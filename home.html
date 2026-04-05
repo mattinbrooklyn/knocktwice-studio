@@ -97,6 +97,15 @@
       height: 50vh;
       margin-top: -2px; /* closes sub-pixel seam at SVG bottom edge */
     }
+
+    /* ── Furniture eye animation ──────────────────────────────────── */
+    #nightstand-iris-l, #nightstand-iris-r,
+    #carpet-iris-l, #carpet-iris-r,
+    #dresser-iris-l, #dresser-iris-r,
+    #vase-iris-l, #vase-iris-r,
+    #couch-iris-l, #couch-iris-r {
+      transition: cx 200ms ease-out, cy 200ms ease-out;
+    }
   </style>
 </head>
 <body>
@@ -269,12 +278,16 @@
                   d="M0 18.9844C18.9686 -4.42069 39.8933 -4.26317 61.9197 9.04652C40.0129 17.4491 19.2335 21.3194 0 18.9844Z"/>
               </clipPath>
             </defs>
-            <path fill="white" transform="translate(173.787 65.689)"
-              d="M0 15.2157C15.5402 -3.05494 31.9928 -3.80667 49.2979 7.30369C31.8573 13.9934 15.3131 17.0761 0 15.2157Z"/>
-            <path fill="white" transform="translate(91.205 76.094)"
-              d="M0 18.9844C18.9686 -4.42069 39.8933 -4.26317 61.9197 9.04652C40.0129 17.4491 19.2335 21.3194 0 18.9844Z"/>
-            <circle clip-path="url(#couch-eye-l-clip)" cx="212.6" cy="77.8"  r="17" fill="#32261F"/>
-            <circle clip-path="url(#couch-eye-r-clip)" cx="139.25" cy="86.85" r="21" fill="#32261F"/>
+            <g id="couch-eye-l">
+              <path id="couch-lid-l" fill="white" transform="translate(173.787 65.689)"
+                d="M0 15.2157C15.5402 -3.05494 31.9928 -3.80667 49.2979 7.30369C31.8573 13.9934 15.3131 17.0761 0 15.2157Z"/>
+              <circle id="couch-iris-l" clip-path="url(#couch-eye-l-clip)" cx="212.6" cy="77.8" r="17" fill="#32261F"/>
+            </g>
+            <g id="couch-eye-r">
+              <path id="couch-lid-r" fill="white" transform="translate(91.205 76.094)"
+                d="M0 18.9844C18.9686 -4.42069 39.8933 -4.26317 61.9197 9.04652C40.0129 17.4491 19.2335 21.3194 0 18.9844Z"/>
+              <circle id="couch-iris-r" clip-path="url(#couch-eye-r-clip)" cx="139.25" cy="86.85" r="21" fill="#32261F"/>
+            </g>
           </svg>
         </div>
       </div>
@@ -296,12 +309,16 @@
               d="M0 2.53974C15.3244 -3.66538 25.3317 1.98121 32.3803 14.2441C19.6266 12.452 8.61882 8.78372 0 2.53974Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(106.775 120.424)"
-          d="M0 2.66543C17.0437 -3.76678 28.2577 1.79388 35.682 15.5626C21.6297 13.5883 9.49887 9.54568 0 2.66543Z"/>
-        <path fill="white" transform="translate(61.404 104.144)"
-          d="M0 2.53974C15.3244 -3.66538 25.3317 1.98121 32.3803 14.2441C19.6266 12.452 8.61882 8.78372 0 2.53974Z"/>
-        <circle clip-path="url(#vase-eye-l-clip)" cx="139.85" cy="123.9"  r="13"   fill="#32261F"/>
-        <circle clip-path="url(#vase-eye-r-clip)" cx="91.05"  cy="107.23" r="11.7" fill="#32261F"/>
+        <g id="vase-eye-l">
+          <path id="vase-lid-l" fill="white" transform="translate(106.775 120.424)"
+            d="M0 2.66543C17.0437 -3.76678 28.2577 1.79388 35.682 15.5626C21.6297 13.5883 9.49887 9.54568 0 2.66543Z"/>
+          <circle id="vase-iris-l" clip-path="url(#vase-eye-l-clip)" cx="139.85" cy="123.9" r="13" fill="#32261F"/>
+        </g>
+        <g id="vase-eye-r">
+          <path id="vase-lid-r" fill="white" transform="translate(61.404 104.144)"
+            d="M0 2.53974C15.3244 -3.66538 25.3317 1.98121 32.3803 14.2441C19.6266 12.452 8.61882 8.78372 0 2.53974Z"/>
+          <circle id="vase-iris-r" clip-path="url(#vase-eye-r-clip)" cx="91.05" cy="107.23" r="11.7" fill="#32261F"/>
+        </g>
       </svg>
     </div>
 
@@ -321,12 +338,16 @@
               d="M0 20.9285C19.5081 -4.29076 41.6676 -4.64163 65.3192 8.88745C42.33 18.3141 20.4243 22.9221 0 20.9285Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(209.929 82.876)"
-          d="M0 16.7831C16.0036 -2.92124 33.4075 -4.12319 52.0048 7.19633C33.7027 14.7013 16.261 18.3701 0 16.7831Z"/>
-        <path fill="white" transform="translate(122.823 95.730)"
-          d="M0 20.9285C19.5081 -4.29076 41.6676 -4.64163 65.3192 8.88745C42.33 18.3141 20.4243 22.9221 0 20.9285Z"/>
-        <circle clip-path="url(#nightstand-eye-l-clip)" cx="236.9" cy="95.6" r="17.9" fill="#32261F"/>
-        <circle clip-path="url(#nightstand-eye-r-clip)" cx="159.4" cy="107.0" r="22.5" fill="#32261F"/>
+        <g id="nightstand-eye-l">
+          <path id="nightstand-lid-l" fill="white" transform="translate(209.929 82.876)"
+            d="M0 16.7831C16.0036 -2.92124 33.4075 -4.12319 52.0048 7.19633C33.7027 14.7013 16.261 18.3701 0 16.7831Z"/>
+          <circle id="nightstand-iris-l" clip-path="url(#nightstand-eye-l-clip)" cx="236.9" cy="95.6" r="17.9" fill="#32261F"/>
+        </g>
+        <g id="nightstand-eye-r">
+          <path id="nightstand-lid-r" fill="white" transform="translate(122.823 95.730)"
+            d="M0 20.9285C19.5081 -4.29076 41.6676 -4.64163 65.3192 8.88745C42.33 18.3141 20.4243 22.9221 0 20.9285Z"/>
+          <circle id="nightstand-iris-r" clip-path="url(#nightstand-eye-r-clip)" cx="159.4" cy="107.0" r="22.5" fill="#32261F"/>
+        </g>
       </svg>
     </div>
 
@@ -346,12 +367,16 @@
               d="M0 27.266C17.5631 -2.08951 41.124 -5.2886 68.045 6.11189C44.7583 19.0859 22.0103 26.7853 0 27.266Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(260.816 123.308)"
-          d="M0 21.9017C14.5351 -1.13098 32.9208 -4.62931 54.1741 5.06062C35.634 15.3896 17.5244 21.5214 0 21.9017Z"/>
-        <path fill="white" transform="translate(170.119 146.962)"
-          d="M0 27.266C17.5631 -2.08951 41.124 -5.2886 68.045 6.11189C44.7583 19.0859 22.0103 26.7853 0 27.266Z"/>
-        <circle clip-path="url(#carpet-eye-l-clip)" cx="283" cy="118" r="19" fill="#32261F"/>
-        <circle clip-path="url(#carpet-eye-r-clip)" cx="202" cy="140" r="24" fill="#32261F"/>
+        <g id="carpet-eye-l">
+          <path id="carpet-lid-l" fill="white" transform="translate(260.816 123.308)"
+            d="M0 21.9017C14.5351 -1.13098 32.9208 -4.62931 54.1741 5.06062C35.634 15.3896 17.5244 21.5214 0 21.9017Z"/>
+          <circle id="carpet-iris-l" clip-path="url(#carpet-eye-l-clip)" cx="283" cy="118" r="19" fill="#32261F"/>
+        </g>
+        <g id="carpet-eye-r">
+          <path id="carpet-lid-r" fill="white" transform="translate(170.119 146.962)"
+            d="M0 27.266C17.5631 -2.08951 41.124 -5.2886 68.045 6.11189C44.7583 19.0859 22.0103 26.7853 0 27.266Z"/>
+          <circle id="carpet-iris-r" clip-path="url(#carpet-eye-r-clip)" cx="202" cy="140" r="24" fill="#32261F"/>
+        </g>
       </svg>
     </div>
 
@@ -371,12 +396,16 @@
               d="M0 10.5895C28.5751 -8.04618 51.0845 -0.607751 70.2191 21.3858C43.6826 22.8314 19.9319 19.7862 0 10.5895Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(242.184 95.254)"
-          d="M0 11.5256C31.9658 -8.25434 56.8852 -1.46618 77.3765 23.423C48.1332 25.0158 21.9613 21.6603 0 11.5256Z"/>
-        <path fill="white" transform="translate(143.879 80.598)"
-          d="M0 10.5895C28.5751 -8.04618 51.0845 -0.607751 70.2191 21.3858C43.6826 22.8314 19.9319 19.7862 0 10.5895Z"/>
-        <circle clip-path="url(#dresser-eye-l-clip)" cx="273.2" cy="86.75" r="26.5" fill="#32261F"/>
-        <circle clip-path="url(#dresser-eye-r-clip)" cx="167.9" cy="72"    r="24"   fill="#32261F"/>
+        <g id="dresser-eye-l">
+          <path id="dresser-lid-l" fill="white" transform="translate(242.184 95.254)"
+            d="M0 11.5256C31.9658 -8.25434 56.8852 -1.46618 77.3765 23.423C48.1332 25.0158 21.9613 21.6603 0 11.5256Z"/>
+          <circle id="dresser-iris-l" clip-path="url(#dresser-eye-l-clip)" cx="273.2" cy="86.75" r="26.5" fill="#32261F"/>
+        </g>
+        <g id="dresser-eye-r">
+          <path id="dresser-lid-r" fill="white" transform="translate(143.879 80.598)"
+            d="M0 10.5895C28.5751 -8.04618 51.0845 -0.607751 70.2191 21.3858C43.6826 22.8314 19.9319 19.7862 0 10.5895Z"/>
+          <circle id="dresser-iris-r" clip-path="url(#dresser-eye-r-clip)" cx="167.9" cy="72" r="24" fill="#32261F"/>
+        </g>
       </svg>
     </div>
 
@@ -526,6 +555,118 @@
       const svgY = (e.clientY - r.top)  / r.height * 181.154;
       trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  114.45, 20, 5);
       trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 114.46, 20, 5);
+    });
+
+    // ─── Furniture eye animation ──────────────────────────────────
+    function animateFurnitureEyes(cfg) {
+      var irisL  = cfg.irisL,  irisR  = cfg.irisR;
+      var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
+      var restL  = cfg.restL,  restR  = cfg.restR;
+      var rangeL = cfg.rangeL, rangeR = cfg.rangeR;
+
+      function look() {
+        var angle = Math.random() * Math.PI * 2;
+        var mag   = Math.random();
+        var dx    = Math.cos(angle) * mag;
+        var dy    = Math.sin(angle) * mag;
+        irisL.setAttribute('cx', restL.x + dx * rangeL);
+        irisL.setAttribute('cy', restL.y + dy * rangeL);
+        irisR.setAttribute('cx', restR.x + dx * rangeR);
+        irisR.setAttribute('cy', restR.y + dy * rangeR);
+        setTimeout(look, 3000 + Math.random() * 3000);
+      }
+
+      function singleBlink(onDone) {
+        var holdMs = 60 + Math.random() * 90;  // 60–150ms
+        eyeL.style.visibility = 'hidden';
+        eyeR.style.visibility = 'hidden';
+        setTimeout(function () {
+          eyeL.style.visibility = '';
+          eyeR.style.visibility = '';
+          setTimeout(onDone || function () {}, 0);
+        }, holdMs);
+      }
+
+      function blink() {
+        singleBlink(function () {
+          if (Math.random() < 0.25) {
+            var gapMs = 100 + Math.random() * 80;  // 100–180ms
+            setTimeout(function () { singleBlink(scheduleBlink); }, gapMs);
+          } else {
+            scheduleBlink();
+          }
+        });
+      }
+
+      function scheduleBlink() {
+        setTimeout(blink, 4000 + Math.random() * 4000);
+      }
+
+      look();
+      scheduleBlink();
+    }
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('couch-iris-l'),
+        irisR:    document.getElementById('couch-iris-r'),
+        eyeL:     document.getElementById('couch-eye-l'),
+        eyeR:     document.getElementById('couch-eye-r'),
+        restL:    { x: 212.6,  y: 77.8 },
+        restR:    { x: 139.25, y: 86.85 },
+        rangeL:   12,  // bumped — iris sits at ~78% from left edge
+        rangeR:   14,  // same reason
+      });
+    }, Math.random() * 3000);
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('vase-iris-l'),
+        irisR:    document.getElementById('vase-iris-r'),
+        eyeL:     document.getElementById('vase-eye-l'),
+        eyeR:     document.getElementById('vase-eye-r'),
+        restL:    { x: 139.85, y: 123.9 },
+        restR:    { x: 91.05,  y: 107.23 },
+        rangeL:   6.0,  // increased — iris sits near right edge, needs room to travel left
+        rangeR:   3.0,  // same reason
+      });
+    }, Math.random() * 3000);
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('dresser-iris-l'),
+        irisR:    document.getElementById('dresser-iris-r'),
+        eyeL:     document.getElementById('dresser-eye-l'),
+        eyeR:     document.getElementById('dresser-eye-r'),
+        restL:    { x: 273.2, y: 86.75 },
+        restR:    { x: 167.9, y: 72 },
+        rangeL:   12.19,  // socket half-width (38.69) minus iris radius (26.5)
+        rangeR:   11.11,  // socket half-width (35.11) minus iris radius (24)
+      });
+    }, Math.random() * 3000);
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('carpet-iris-l'),
+        irisR:    document.getElementById('carpet-iris-r'),
+        eyeL:     document.getElementById('carpet-eye-l'),
+        eyeR:     document.getElementById('carpet-eye-r'),
+        restL:    { x: 283, y: 118 },
+        restR:    { x: 202, y: 140 },
+        rangeL:   8.09,   // socket half-width (27.09) minus iris radius (19)
+        rangeR:   10.02,  // socket half-width (34.02) minus iris radius (24)
+      });
+    }, Math.random() * 3000);
+
+    animateFurnitureEyes({
+      irisL:    document.getElementById('nightstand-iris-l'),
+      irisR:    document.getElementById('nightstand-iris-r'),
+      eyeL:     document.getElementById('nightstand-eye-l'),
+      eyeR:     document.getElementById('nightstand-eye-r'),
+      restL:    { x: 236.9, y: 95.6 },
+      restR:    { x: 159.4, y: 107.0 },
+      rangeL:   8.1,
+      rangeR:   10.16,
     });
 
     // Wordmark keyhole iris tracking
