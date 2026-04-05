@@ -796,20 +796,20 @@
     }
 
     function closeModal() {
-      // Hide the form window immediately — it shouldn't slide down with the wave
-      newsletterWindow.style.display = 'none';
-      // Start the wave sliding back down
+      // Snap back instantly — no animation on close
+      monsterGroup.style.transition = 'none';
       monsterGroup.classList.remove('wave-risen');
-      // Keep backdrop up during the slide so the ticker stays hidden,
-      // then clean everything up once the wave is fully back in place
-      setTimeout(function() {
-        modalBackdrop.style.display = 'none';
-        modalBlueBody.style.display = 'none';
-        // Reset form state for next open
-        newsletterWindow.classList.remove('state-error', 'state-success');
-        nwHeading.textContent = 'JOIN OUR MAILING LIST 📒';
-        nwInput.value = '';
-      }, 620);
+      modalBackdrop.style.display = 'none';
+      modalBlueBody.style.display = 'none';
+      newsletterWindow.style.display = 'none';
+      // Reset form state
+      newsletterWindow.classList.remove('state-error', 'state-success');
+      nwHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+      nwInput.value = '';
+      // Re-enable transition so the next open still animates
+      requestAnimationFrame(function() {
+        monsterGroup.style.transition = '';
+      });
     }
 
     document.querySelector('.monster-ticker').addEventListener('click', openModal);
