@@ -292,10 +292,18 @@
       document.getElementById('monster-section').classList.add('risen');
     }, 500);
 
-    // ── Eye tracking ───────────────────────────────────────────────
-    var eyesSvg = document.getElementById('eyes-svg');
-    var irisR   = document.getElementById('iris-r');
-    var irisL   = document.getElementById('iris-l');
+    // ── Wave sway + eye tracking ───────────────────────────────────
+    var eyesSvg      = document.getElementById('eyes-svg');
+    var irisR        = document.getElementById('iris-r');
+    var irisL        = document.getElementById('iris-l');
+    var wavePath     = document.querySelector('.wave-wrap svg path');
+    var eyeRWhite    = document.querySelectorAll('#eyes-svg > path')[0];
+    var eyeLWhite    = document.querySelectorAll('#eyes-svg > path')[1];
+    var eyeRClipPath = document.querySelector('#eye-r-clip path');
+    var eyeLClipPath = document.querySelector('#eye-l-clip path');
+
+    var waveOffset = 0; // current sway offset in SVG units (shared with iris tracking)
+    var mouseX = -999, mouseY = -999; // last known mouse position
 
     function trackIris(el, svgX, svgY, restX, restY, maxX, maxY) {
       var dx = svgX - restX, dy = svgY - restY;
@@ -307,12 +315,43 @@
     }
 
     document.addEventListener('mousemove', function(e) {
-      var r = eyesSvg.getBoundingClientRect();
-      var svgX = (e.clientX - r.left) / r.width  * 1440;
-      var svgY = (e.clientY - r.top)  / r.height * 116;
-      trackIris(irisR, svgX, svgY, 652.9,  49.45, 20, 5);
-      trackIris(irisL, svgX, svgY, 495.41, 49.46, 20, 5);
+      mouseX = e.clientX; mouseY = e.clientY;
     });
+
+    // ── Wave sway loop ─────────────────────────────────────────────
+    // Shifts the arch's peak ±90px (in 1440-unit SVG space) on a ~7s sine cycle.
+    // Eye whites and clip paths move with it; iris rest positions do too.
+    function swayLoop() {
+      waveOffset = Math.sin(Date.now() / 1100) * 90;
+      var o = waveOffset;
+
+      // Shift the arch control points; bottom anchors (0 and 1440) stay fixed
+      wavePath.setAttribute('d',
+        'M0 116.154C0 116.154 ' + (263+o) + ' 0 ' + (574.834+o) + ' 0C' +
+        (862.5+o) + ' 0 1440 116.154 1440 116.154');
+
+      // Move eye whites and their clip regions with the arch
+      eyeRWhite.setAttribute('transform',    'translate(' + (593.13+o) + ' 32.7)');
+      eyeLWhite.setAttribute('transform',    'translate(' + (431.49+o) + ' 31.57)');
+      eyeRClipPath.setAttribute('transform', 'translate(' + (593.13+o) + ' 32.7)');
+      eyeLClipPath.setAttribute('transform', 'translate(' + (431.49+o) + ' 31.57)');
+
+      // Update iris positions relative to the swayed eye rest positions
+      if (mouseX > -999) {
+        var r = eyesSvg.getBoundingClientRect();
+        var svgX = (mouseX - r.left) / r.width  * 1440;
+        var svgY = (mouseY - r.top)  / r.height * 116;
+        trackIris(irisR, svgX, svgY, 652.9  + o, 49.45, 20, 5);
+        trackIris(irisL, svgX, svgY, 495.41 + o, 49.46, 20, 5);
+      } else {
+        // No mouse yet — rest positions sway with the wave
+        irisR.setAttribute('cx', 652.9  + o);
+        irisL.setAttribute('cx', 495.41 + o);
+      }
+
+      requestAnimationFrame(swayLoop);
+    }
+    swayLoop();
 
     // ── Form ───────────────────────────────────────────────────────
     var emailInput  = document.getElementById('cs-email');
