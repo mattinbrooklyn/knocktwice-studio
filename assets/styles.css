@@ -90,7 +90,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 .footer {
   position: absolute;
   left: 0;
-  width: 1440px; height: 90px;
+  width: 1440px; height: 92px;
   margin-top: -2px;
   background: var(--color-blue);
   display: flex;
