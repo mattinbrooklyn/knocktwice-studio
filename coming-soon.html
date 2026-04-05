@@ -93,7 +93,7 @@
     }
     #eyes-svg { overflow: visible; }
     #eyes-svg-mobile { overflow: visible; }
-    .eyes-svg-mobile { display: none; }
+    .eyes-svg-mobile { display: none !important; }
 
     /* ── Form card — white box floating over the blue body ────────── */
     .form-card {
@@ -216,7 +216,7 @@
         flex-direction: column;
         gap: 20px;
       }
-      .input-wrap { width: 100%; }
+      .input-wrap { flex: none; width: 100%; }
       .cs-input {
         flex: none;
         width: 100%;
