@@ -121,3 +121,11 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
   white-space: nowrap;
 }
+
+/* ── Image load placeholder ─────────────────────────────────────────── */
+/* Checkerboard tiles behind every content image while it's still       */
+/* loading (img is transparent until src resolves). Once loaded the     */
+/* image covers it naturally — no JS needed.                            */
+.page img {
+  background: url('interior-placeholder.png') repeat;
+}
