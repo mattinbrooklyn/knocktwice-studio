@@ -26,18 +26,9 @@
     body {
       position: relative;
       height: 100vh;
-      background: var(--blue);
+      background: var(--bg); /* cream fills the top portion naturally */
       font-family: 'Instrument Sans', sans-serif;
       color: var(--ink);
-    }
-
-    /* ── Top content wrapper — cream panel above monster ─────────── */
-    .top-content {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 35vh;
-      background-color: var(--bg);
-      z-index: 0;
     }
 
     /* ── Logo ─────────────────────────────────────────────────────── */
@@ -202,9 +193,7 @@
       /* Use 100% not 100vh — on iOS, 100vh includes browser chrome,
          making body taller than the visible screen and breaking bottom: 0 */
       html, body { height: 100%; }
-      html { background: var(--blue); }
       body { height: 100%; }
-      .top-content { height: 20vh; }
       .monster-section { height: 80%; }
       /* Blue patch covers the safe-area gap below the footer on notch phones */
       body::after {
@@ -212,7 +201,7 @@
         position: fixed;
         bottom: 0; left: 0;
         width: 100%;
-        height: 10vh;
+        height: env(safe-area-inset-bottom, 0px);
         background: var(--blue);
         z-index: 0;
       }
@@ -325,12 +314,9 @@
 </head>
 <body>
 
-  <!-- Top content — cream background above the monster -->
-  <div class="top-content">
-    <!-- Logo — full wordmark (position: fixed, so not affected by this wrapper) -->
-    <div class="logo">
-      <img src="assets/logo-full.svg" alt="Knock Twice">
-    </div>
+  <!-- Logo — full wordmark -->
+  <div class="logo">
+    <img src="assets/logo-full.svg" alt="Knock Twice">
   </div>
 
   <!-- Monster section — blue zone, rises on load -->
