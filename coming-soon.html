@@ -126,6 +126,8 @@
       margin-bottom: clamp(0.75rem, 2vw, 1.25rem);
     }
 
+    .mobile-break { display: none; }
+
     .form-row {
       display: flex;
       gap: 20px;
@@ -228,6 +230,7 @@
         line-height: 17px;
         margin-bottom: 18px;
       }
+      .mobile-break { display: inline; }
       .form-row { flex-direction: column; gap: 20px; }
       .cs-input {
         flex: none;
@@ -387,7 +390,7 @@
     <div class="form-card">
       <div id="form-default">
         <h2>You're early. We like that. 📬</h2>
-        <p class="form-subtext">Slip your email under the door. We won't keep you waiting.</p>
+        <p class="form-subtext">Slip your email under the door.<span class="mobile-break"><br></span> We won't keep you waiting for long.</p>
         <div class="form-row">
           <input class="cs-input" id="cs-email" type="email" placeholder="Email*" autocomplete="email">
           <button class="cs-submit" id="cs-submit">Sign Up</button>
