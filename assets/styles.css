@@ -1,24 +1,97 @@
 /* Knock Twice — Global Styles */
 
-/* ── Variables ──────────────────────────────────────────────────────── */
+/* ── Variables ──────────────────────────────────── */
 :root {
-  --color-bg:    #f7f2ec;
-  --color-ink:   #32261F;
-  --color-blue:  #378CDA;
-  --color-green: #51B18C;
+
+  /* Colors */
+  --color-bg:              #F7F2EC;
+  --color-ink:             #32261F;
+  --color-blue:            #378CDA;
+  --color-green:           #51B18C;
+  --color-khaki:           #D1C3B6;
+  --color-white:           #FFFFFF;
+  --color-yellow:          #FADB4B;
+  --color-pink:            #EC8EDF;
+  --color-red:             #FF0004;
+
+  /* Fonts */
+  --font-display:          'Erica One', serif;
+  --font-body:             'Instrument Sans', sans-serif;
+  --font-ui:               'Handjet', sans-serif;
+
+  /* Type scale — clamp(mobile, fluid, desktop) */
+  --type-h1:               clamp(2.625rem, 5vw, 4.0625rem);
+  --type-h2:               clamp(1.25rem, 2.5vw, 1.5rem);
+  --type-b1:               clamp(0.75rem, 1.2vw, 0.875rem);
+  --type-b2:               0.75rem;
+  --type-b3:               0.875rem;
+  --type-nav:              clamp(1.125rem, 1.8vw, 1.375rem);
+  --type-field:            1rem;
+  --type-button:           1rem;
+  --type-error:            0.75rem;
+  --type-anim:             clamp(1.125rem, 1.8vw, 1.375rem);
+
+  /* Line heights */
+  --leading-h1:            clamp(2.875rem, 5.2vw, 4.25rem);
+  --leading-h2:            clamp(1.5625rem, 2.6vw, 1.6875rem);
+  --leading-b1:            clamp(1.0625rem, 1.8vw, 1.375rem);
+  --leading-nav:           clamp(1.5rem, 2vw, 1.6875rem);
+
+  /* Letter spacing */
+  --tracking-nav:          -0.01375rem;
+
+  /* Spacing scale */
+  --space-xs:              clamp(0.5rem,  1vw,  1rem);
+  --space-sm:              clamp(1rem,    2vw,  2rem);
+  --space-md:              clamp(1.5rem,  3vw,  3rem);
+  --space-lg:              clamp(2.5rem,  5vw,  6rem);
+  --space-xl:              clamp(4rem,    7vw,  9rem);
+
+  /* Layout — desktop */
+  --content-width:         50.5rem;
+  --content-left:          19.75rem;
+  --page-max:              90rem;
+  --nav-left:              2.5rem;
+  --nav-top:               12.5rem;
+  --logo-top:              4.375rem;
+
+  /* Layout — mobile */
+  --content-left-mobile:   1.25rem;
+  --content-width-mobile:  25rem;
+
+  /* Components */
+  --radius-pill:           2rem;
+  --radius-button:         6.25rem;
+  --radius-input:          0.25rem;
+  --footer-height:         5.75rem;
+  --wave-height-mobile:    7.5rem;
+  --wave-height-desktop:   7.625rem;
+  --input-height:          3.4375rem;
+  --button-height:         3.4375rem;
+
+  /* Effects */
+  --shadow-stack:          0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* ── Reset ──────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
+/* ── Reset ──────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  cursor: none !important;
+}
 
-/* ── Base ───────────────────────────────────────────────────────────── */
+/* ── Base ───────────────────────────────────────── */
 html, body {
   width: 100%;
   background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 16px;
   cursor: none;
 }
 
-/* ── Custom cursor ──────────────────────────────────────────────────── */
+/* ── Custom cursor ──────────────────────────────── */
 #custom-cursor {
   position: fixed;
   left: 0; top: 0;
@@ -27,7 +100,6 @@ html, body {
   will-change: transform;
   transform: translate(-200px, -200px);
 }
-/* Three states: default (pointer), hover (open hand), drag (closed hand) */
 #cursor-default { display: block; width: 45px; height: 49px; }
 #cursor-hover   { display: none;  width: 48px; height: 51px; }
 #cursor-drag    { display: none;  width: 48px; height: 40px; }
@@ -36,61 +108,162 @@ body[data-cursor="hover"] #cursor-hover   { display: block; }
 body[data-cursor="drag"]  #cursor-default { display: none; }
 body[data-cursor="drag"]  #cursor-drag    { display: block; }
 
-/* ── Logo ───────────────────────────────────────────────────────────── */
-/* Keyhole mark: 52×100 at (40, 61) — used on all pages except Home    */
+/* ── Logo ───────────────────────────────────────── */
 .logo {
   position: fixed;
-  left: 40px; top: 61px;
-  width: 52px; height: 100px;
+  left: var(--nav-left);
+  top: var(--logo-top);
+  width: 3.25rem;
+  height: 6.25rem;
   z-index: 1000;
 }
 .logo img {
-  width: 100%; height: 100%;
+  width: 100%;
+  height: 100%;
   display: block;
   object-fit: contain;
   object-position: left top;
 }
 
-/* ── Navigation ─────────────────────────────────────────────────────── */
+/* ── Navigation — desktop ───────────────────────── */
 .nav {
   position: fixed;
-  left: 40px; top: 200px;
+  left: var(--nav-left);
+  top: var(--nav-top);
   width: fit-content;
   z-index: 1000;
 }
 .nav a {
   display: block;
-  font-family: 'Handjet', sans-serif;
-  font-size: 22px;
+  font-family: var(--font-ui);
+  font-size: var(--type-nav);
   font-weight: 400;
-  line-height: 27px;
-  letter-spacing: -0.22px;
+  line-height: var(--leading-nav);
+  letter-spacing: var(--tracking-nav);
   color: var(--color-ink);
   text-decoration: none;
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
 }
-.nav a.active { font-weight: 700; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
-.nav a:hover  { color: var(--color-blue); font-weight: 700; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
-
-/* ── Tag pills ──────────────────────────────────────────────────────── */
-.card-tag {
-  font-family: 'Handjet', sans-serif;
-  font-size: 16px;
-  line-height: 22px;
+.nav a.active {
   font-weight: 700;
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
-  border-radius: 32px;
-  padding: 5px 10px;
-  display: inline-block;
+}
+.nav a:hover {
+  color: var(--color-blue);
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
 }
 
-/* ── Footer ─────────────────────────────────────────────────────────── */
-/* .footer top value is set per-page since it varies with page height   */
+/* ── Navigation — mobile overlay ───────────────── */
+.nav-mobile-trigger {
+  display: none;
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 1001;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.nav-mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--color-pink);
+  z-index: 1000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.nav-mobile-overlay.is-open {
+  display: flex;
+}
+.nav-mobile-overlay a {
+  font-family: var(--font-ui);
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  color: var(--color-ink);
+  text-decoration: none;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  background: var(--color-pink);
+}
+.nav-mobile-overlay a.active,
+.nav-mobile-overlay a:hover {
+  background: var(--color-yellow);
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+}
+
+/* ── Tag pills ──────────────────────────────────── */
+.card-tag {
+  font-family: var(--font-ui);
+  font-size: var(--type-b2);
+  line-height: 1.375rem;
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-bg);
+  padding: 0.13rem 2rem;
+  display: inline-block;
+  height: 2rem;
+}
+
+/* ── Buttons ────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+  height: var(--button-height);
+  border-radius: var(--radius-button);
+  background: var(--color-green);
+  color: var(--color-bg);
+  border: none;
+  padding: 0 2rem;
+  text-decoration: none;
+  cursor: none;
+}
+.btn:hover {
+  opacity: 0.9;
+}
+
+/* ── Form fields ────────────────────────────────── */
+.field {
+  font-family: var(--font-ui);
+  font-size: var(--type-field);
+  font-weight: 400;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  height: var(--input-height);
+  border-radius: var(--radius-input);
+  border: 2px solid var(--color-ink);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  padding: 0 1.375rem;
+  width: 100%;
+}
+.field::placeholder {
+  color: var(--color-khaki);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--color-blue);
+}
+
+/* ── Footer ─────────────────────────────────────── */
 .footer {
   position: absolute;
   left: 0;
-  width: 1440px; height: 92px;
+  width: 100%;
+  height: var(--footer-height);
   margin-top: -2px;
   background: var(--color-blue);
   display: flex;
@@ -98,26 +271,53 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 }
 .footer-icons {
   position: absolute;
-  left: 40px; top: 50%;
+  left: var(--nav-left);
+  top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem;
 }
 .footer-icons a {
   display: flex;
   align-items: center;
-  width: 20px; height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
-.footer-icons img { width: 100%; height: 100%; display: block; }
+.footer-icons img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 .footer-copyright {
   position: absolute;
-  right: 40px; top: 50%;
+  right: var(--nav-left);
+  top: 50%;
   transform: translateY(-50%);
-  font-family: 'Handjet', sans-serif;
-  font-size: 16px;
+  font-family: var(--font-ui);
+  font-size: var(--type-b2);
   font-weight: 400;
   color: var(--color-bg);
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
   white-space: nowrap;
+}
+
+/* ── Image stack (draggable photos) ─────────────── */
+.photo,
+.photo-rotated {
+  box-shadow: var(--shadow-stack);
+}
+
+/* ── Error text ─────────────────────────────────── */
+.error-text {
+  font-family: var(--font-body);
+  font-size: var(--type-error);
+  color: var(--color-red);
+  line-height: 1rem;
+}
+
+/* ── Mobile breakpoint ──────────────────────────── */
+@media (max-width: 768px) {
+  .nav { display: none; }
+  .nav-mobile-trigger { display: block; }
 }

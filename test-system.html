@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Design System — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:ELGR,ELSH,wght@0,1;0,2;100..900&family=Instrument+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+    /* ── Test page shell ────────────────────────────────────────────── */
+    html, body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    body::-webkit-scrollbar { display: none; }
+
+    .test-page {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 4rem 2rem 6rem;
+    }
+
+    .test-title {
+      font-family: var(--font-display);
+      font-size: var(--type-h1);
+      line-height: var(--leading-h1);
+      color: var(--color-ink);
+      margin-bottom: 0.25rem;
+    }
+
+    .test-subtitle {
+      font-family: var(--font-body);
+      font-size: var(--type-b3);
+      color: var(--color-khaki);
+      margin-bottom: 4rem;
+    }
+
+    /* ── Section ────────────────────────────────────────────────────── */
+    .test-section {
+      margin-bottom: 4rem;
+    }
+
+    .test-section-label {
+      font-family: var(--font-ui);
+      font-size: var(--type-b2);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      color: var(--color-khaki);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-khaki);
+    }
+
+    /* ── Color swatches ─────────────────────────────────────────────── */
+    .swatch-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+    }
+
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .swatch-color {
+      width: 5rem;
+      height: 5rem;
+      border-radius: 0.25rem;
+      border: 1px solid var(--color-khaki);
+    }
+
+    .swatch-name {
+      font-family: var(--font-ui);
+      font-size: var(--type-b2);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      color: var(--color-ink);
+      text-align: center;
+    }
+
+    .swatch--bg     .swatch-color { background: var(--color-bg); }
+    .swatch--ink    .swatch-color { background: var(--color-ink); }
+    .swatch--blue   .swatch-color { background: var(--color-blue); }
+    .swatch--green  .swatch-color { background: var(--color-green); }
+    .swatch--khaki  .swatch-color { background: var(--color-khaki); }
+    .swatch--white  .swatch-color { background: var(--color-white); }
+    .swatch--yellow .swatch-color { background: var(--color-yellow); }
+    .swatch--pink   .swatch-color { background: var(--color-pink); }
+    .swatch--red    .swatch-color { background: var(--color-red); }
+
+    /* ── Type scale ─────────────────────────────────────────────────── */
+    .type-row {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .type-sample {
+      display: flex;
+      align-items: baseline;
+      gap: 2rem;
+    }
+
+    .type-var-name {
+      font-family: var(--font-ui);
+      font-size: var(--type-b2);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      color: var(--color-khaki);
+      min-width: 9rem;
+      flex-shrink: 0;
+    }
+
+    .type-demo--h1     { font-family: var(--font-display); font-size: var(--type-h1);     line-height: var(--leading-h1); color: var(--color-ink); }
+    .type-demo--h2     { font-family: var(--font-display); font-size: var(--type-h2);     line-height: var(--leading-h2); color: var(--color-ink); }
+    .type-demo--b1     { font-family: var(--font-body);    font-size: var(--type-b1);     line-height: var(--leading-b1); color: var(--color-ink); }
+    .type-demo--b2     { font-family: var(--font-body);    font-size: var(--type-b2);     color: var(--color-ink); }
+    .type-demo--b3     { font-family: var(--font-body);    font-size: var(--type-b3);     color: var(--color-ink); }
+    .type-demo--nav    { font-family: var(--font-ui);      font-size: var(--type-nav);    line-height: var(--leading-nav); color: var(--color-ink); font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; }
+    .type-demo--field  { font-family: var(--font-ui);      font-size: var(--type-field);  color: var(--color-ink); font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; }
+    .type-demo--button { font-family: var(--font-ui);      font-size: var(--type-button); color: var(--color-ink); font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
+    .type-demo--error  { font-family: var(--font-body);    font-size: var(--type-error);  color: var(--color-red); }
+    .type-demo--anim   { font-family: var(--font-ui);      font-size: var(--type-anim);   color: var(--color-ink); font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; }
+
+    /* ── Nav override for test context ──────────────────────────────── */
+    .nav-demo {
+      position: static;
+      width: fit-content;
+    }
+
+    /* ── Component rows ─────────────────────────────────────────────── */
+    .component-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    /* ── Field constrain width ──────────────────────────────────────── */
+    .field-demo-wrap {
+      max-width: 20rem;
+    }
+
+    /* ── Footer override for test context ───────────────────────────── */
+    .footer-demo {
+      position: relative;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="test-page">
+
+    <p class="test-title">Design System</p>
+    <p class="test-subtitle">Knock Twice Studio — styles.css component reference</p>
+
+    <!-- ── 1. Color palette ─────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Colors</p>
+      <div class="swatch-row">
+        <div class="swatch swatch--bg">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-bg</span>
+        </div>
+        <div class="swatch swatch--ink">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-ink</span>
+        </div>
+        <div class="swatch swatch--blue">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-blue</span>
+        </div>
+        <div class="swatch swatch--green">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-green</span>
+        </div>
+        <div class="swatch swatch--khaki">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-khaki</span>
+        </div>
+        <div class="swatch swatch--white">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-white</span>
+        </div>
+        <div class="swatch swatch--yellow">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-yellow</span>
+        </div>
+        <div class="swatch swatch--pink">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-pink</span>
+        </div>
+        <div class="swatch swatch--red">
+          <div class="swatch-color"></div>
+          <span class="swatch-name">--color-red</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 2. Type scale ─────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Type Scale</p>
+      <div class="type-row">
+        <div class="type-sample">
+          <span class="type-var-name">--type-h1</span>
+          <span class="type-demo--h1">Knock Twice Studio</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-h2</span>
+          <span class="type-demo--h2">Creative Direction &amp; Production</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-b1</span>
+          <span class="type-demo--b1">Body copy at the b1 scale — the main reading size</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-b2</span>
+          <span class="type-demo--b2">Small utility text — labels, captions, tags</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-b3</span>
+          <span class="type-demo--b3">Secondary body text at b3 scale</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-nav</span>
+          <span class="type-demo--nav">Navigation link size</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-field</span>
+          <span class="type-demo--field">Form field input size</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-button</span>
+          <span class="type-demo--button">Button label size</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-error</span>
+          <span class="type-demo--error">Error message text</span>
+        </div>
+        <div class="type-sample">
+          <span class="type-var-name">--type-anim</span>
+          <span class="type-demo--anim">Animated text size</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 3. Navigation ─────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Navigation</p>
+      <nav class="nav nav-demo">
+        <a href="#">About</a>
+        <a href="#" class="active">Interiors</a>
+        <a href="#">Experiences</a>
+        <a href="#">Shop</a>
+        <a href="#">Contact</a>
+      </nav>
+    </section>
+
+    <!-- ── 4. Tag pill ───────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Tag Pill</p>
+      <div class="component-row">
+        <span class="card-tag">Creative Direction</span>
+      </div>
+    </section>
+
+    <!-- ── 5. Button ────────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Button</p>
+      <div class="component-row">
+        <a href="#" class="btn">Get in Touch</a>
+      </div>
+    </section>
+
+    <!-- ── 6. Form field ─────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Form Field</p>
+      <div class="field-demo-wrap">
+        <input class="field" type="email" placeholder="Your email">
+      </div>
+    </section>
+
+    <!-- ── 7. Footer ─────────────────────────────────────────────────── -->
+    <section class="test-section">
+      <p class="test-section-label">Footer</p>
+    </section>
+
+  </div><!-- /.test-page -->
+
+  <footer class="footer footer-demo">
+    <div class="footer-icons">
+      <a href="#" aria-label="Instagram">
+        <img src="assets/icon-instagram.svg" alt="Instagram">
+      </a>
+      <a href="#" aria-label="TikTok">
+        <img src="assets/icon-tiktok.svg" alt="TikTok">
+      </a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+</body>
+</html>
