@@ -63,9 +63,9 @@
   --radius-pill:           2rem;
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
-  --footer-height:         5.75rem;
+  --footer-height:         6.25vw;
   --wave-height-mobile:    7.5rem;
-  --wave-height-desktop:   7.625rem;
+  --wave-height-desktop:   6.875rem;
   --input-height:          3.4375rem;
   --button-height:         3.4375rem;
 
@@ -295,7 +295,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   top: 50%;
   transform: translateY(-50%);
   font-family: var(--font-ui);
-  font-size: var(--type-b2);
+  font-size: var(--type-field);
   font-weight: 400;
   color: var(--color-bg);
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
