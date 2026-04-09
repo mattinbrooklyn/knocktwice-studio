@@ -10,286 +10,249 @@
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/styles.css">
   <style>
-    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
-    body::-webkit-scrollbar { display: none; }
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
 
-    #page-scaler { position: relative; width: 100%; }
+  #page-scaler {
+    position: relative;
+    width: 100%;
+  }
 
-    /* ── Page canvas ────────────────────────────────────────────────
-       Fixed 1440×1024 (exact Figma frame), centered and uniformly
-       scaled by JS to fit the viewport. */
-    .page {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 1024px;
-      transform-origin: top left;
-      background: var(--color-bg);
-      overflow: hidden;
-    }
+  .page {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-md);
+    padding-left: var(--content-left);
+    padding-right: var(--content-left);
+    padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 2rem);
+  }
 
+  .h1 {
+    font-family: var(--font-display);
+    font-size: var(--type-h1);
+    line-height: var(--leading-h1);
+    font-weight: 400;
+    color: var(--color-ink);
+    margin-bottom: var(--space-sm);
+    position: relative;
+    z-index: 3;
+  }
 
-    /* ── Heading ───────────────────────────────────────────────────*/
-    .h1 {
-      position: absolute;
-      left: 316px; top: 70px;
-      font-family: 'Erica One', sans-serif;
-      font-size: 65px;
-      line-height: 68px;
-      font-weight: 400;
-      color: var(--color-ink);
-      z-index: 1;
-    }
+  .whos-there-marquee {
+    position: absolute;
+    left: var(--content-left);
+    top: 6rem;
+    width: 37.1875rem;
+    height: 8.0625rem;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2;
+  }
+  .whos-there-marquee svg {
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
 
-    /* ── "WHO'S THERE?" marquee ───────────────────────────────────*/
-    .whos-there-marquee {
-      position: absolute;
-      left: 568px; top: 96px;
-      width: 595px; height: 129px;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: 2;
-    }
-    .whos-there-marquee svg {
-      width: 100%; height: 100%;
-      overflow: visible;
-    }
+  .intro {
+    font-family: var(--font-body);
+    font-size: var(--type-b1);
+    line-height: var(--leading-b1);
+    font-weight: 400;
+    color: var(--color-ink);
+    width: var(--content-width);
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-xl);
+  }
 
-    /* ── Body text ─────────────────────────────────────────────────*/
-    .intro {
-      position: absolute;
-      left: 316px; top: 244px;
-      width: 808px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      color: var(--color-ink);
-    }
+  .input-row {
+    width: var(--content-width);
+    height: var(--input-height);
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: var(--space-xs);
+  }
+  .input-row input {
+    flex: 1;
+    height: var(--input-height);
+    background: var(--color-white);
+    border: 2px solid var(--color-ink);
+    border-radius: var(--radius-button);
+    padding: 0 1.25rem;
+    font-family: var(--font-ui);
+    font-size: var(--type-field);
+    font-weight: 400;
+    color: var(--color-ink);
+    letter-spacing: -0.01rem;
+    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+    outline: none;
+    cursor: none;
+  }
+  .input-row input::placeholder { color: var(--color-khaki); }
+  .input-row input:focus { border-color: var(--color-blue); }
 
-    /* ── Contact form ──────────────────────────────────────────────
-       Email + Name sit side by side; textarea below; Send button
-       at the bottom. All within a 808px-wide column at left:316. */
+  .textarea-wrap {
+    width: var(--content-width);
+    height: 12rem;
+    margin-bottom: var(--space-xs);
+  }
+  .textarea-wrap textarea {
+    width: 100%; height: 100%;
+    background: var(--color-white);
+    border: 2px solid var(--color-ink);
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    font-family: var(--font-ui);
+    font-size: var(--type-field);
+    font-weight: 400;
+    color: var(--color-ink);
+    letter-spacing: -0.01rem;
+    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+    resize: none;
+    outline: none;
+    cursor: none;
+  }
+  .textarea-wrap textarea::placeholder { color: var(--color-khaki); }
+  .textarea-wrap textarea:focus { border-color: var(--color-blue); }
 
-    /* Pill inputs (Email, Name) */
-    .input-row {
-      position: absolute;
-      left: 316px; top: 296px;
-      width: 808px; height: 55px;
-      display: flex;
-      gap: 9.52px;
-    }
-    .input-row input {
-      flex: 1;
-      height: 55px;
-      background: white;
-      border: 2px solid #32261F;
-      border-radius: 100px;
-      padding: 0 20px;
-      font-family: 'Handjet', sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--color-ink);
-      letter-spacing: -0.16px;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-      outline: none;
-      cursor: none;
-    }
-    .input-row input::placeholder { color: #9A7555; }
-    .input-row input:focus { border-color: #008BE0; }
+  #btn-send {
+    width: var(--content-width);
+    height: var(--button-height);
+    background: var(--color-green);
+    border: none;
+    border-radius: var(--radius-button);
+    font-family: var(--font-ui);
+    font-size: var(--type-button);
+    font-weight: 700;
+    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+    color: var(--color-bg);
+    cursor: none;
+  }
+  #btn-send:hover { opacity: 0.85; }
 
-    /* Message textarea */
-    .textarea-wrap {
-      position: absolute;
-      left: 316px; top: 361px;
-      width: 808px; height: 194px;
-    }
-    .textarea-wrap textarea {
-      width: 100%; height: 100%;
-      background: white;
-      border: 2px solid #32261F;
-      border-radius: 14px;
-      padding: 20px;
-      font-family: 'Handjet', sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--color-ink);
-      letter-spacing: -0.16px;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-      resize: none;
-      outline: none;
-      cursor: none;
-    }
-    .textarea-wrap textarea::placeholder { color: #9A7555; }
-    .textarea-wrap textarea:focus { border-color: #008BE0; }
+  /* ── Error states ──────────────────────────────── */
+  #error-email, #error-name, #error-body {
+    display: none;
+    font-family: var(--font-body);
+    font-size: var(--type-error);
+    color: var(--color-red);
+    line-height: 1rem;
+  }
+  .has-email-error #error-email { display: block; }
+  .has-name-error #error-name { display: block; }
+  .has-body-warning #error-body { display: block; }
 
-    /* Send button */
-    .btn-send {
-      position: absolute;
-      left: 316px; top: 565px;
-      width: 808px; height: 55px;
-      background: var(--color-green);
-      border: none;
-      border-radius: 100px;
-      font-family: 'Handjet', sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      color: #f7f2ec;
-      letter-spacing: -0.16px;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-      cursor: none;
-    }
-    .btn-send:hover { opacity: 0.85; }
+  /* ── Monster wave ──────────────────────────────── */
+  #monster-group {
+    position: absolute;
+    left: 0;
+    bottom: var(--footer-height);
+    width: 100%;
+    z-index: 5;
+    transform: translateY(200px);
+    will-change: transform;
+  }
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  }
+  #modal-blue-body {
+    display: none;
+    position: absolute;
+    left: 0; top: 106px;
+    width: 100%; height: 2000px;
+    background: var(--color-blue);
+  }
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
 
-    /* ── Monster footer wave ───────────────────────────────────────
-       #monster-group handles both entrance pop-up (popped-up class)
-       and success wave-rise (inline transform via JS). */
-    #monster-group {
-      position: absolute;
-      left: 0; top: 824px;
-      width: 1440px;
-      z-index: 5;
-      transform: translateY(200px); /* starts just off the page bottom */
-      will-change: transform;
-    }
-    #monster-group.popped-up {
-      transform: translateY(0);
-      transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
-    }
-    /* Blue body inside group — moves with the wave on success */
-    #modal-blue-body {
-      display: none;
-      position: absolute;
-      left: 0; top: 106px; /* 10px overlap behind wave bottom */
-      width: 1440px; height: 2000px;
-      background: var(--color-blue);
-    }
-    .monster-area {
-      position: absolute;
-      left: 0; top: 0;
-      width: 1440px; height: 116px;
-    }
-    .monster-area img.wave {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 116px;
-      display: block;
-      pointer-events: none;
-    }
-    .monster-eyes-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 116px;
-      pointer-events: none;
-      overflow: visible;
-    }
+  /* ── Footer ────────────────────────────────────── */
+  .footer {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    z-index: 100;
+  }
 
-    .footer { top: 934px; }
-
-    /* ── Backdrop ────────────────────────────────────────────────── */
-    #modal-backdrop {
-      display: none;
-      position: absolute;
-      left: 0; top: 0;
-      width: 1440px; height: 2000px;
-      background: rgba(247, 242, 236, 0.88);
-      z-index: 14;
-    }
-
-    /* ── Success confirmation modal ─────────────────────────────── */
-    #success-modal {
-      display: none;
-      position: absolute;
-      left: 256px; top: 390px;
-      width: 929px; height: 199px;
-      background: white;
-      border: 2px solid var(--color-ink);
-      border-radius: 14px;
-      z-index: 17;
-    }
-    #success-modal .sm-close {
-      position: absolute;
-      top: 18px; right: 18px;
-      background: none;
-      border: none;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 18px;
-      color: var(--color-ink);
-      cursor: pointer;
-      line-height: 1;
-      padding: 12px;
-    }
-    #success-modal .sm-heading {
-      position: absolute;
-      left: 60px; top: 60px;
-      font-family: 'Erica One', sans-serif;
-      font-size: 24px;
-      line-height: 27px;
-      font-weight: 400;
-      color: var(--color-ink);
-      margin: 0;
-    }
-    #success-modal .sm-body {
-      position: absolute;
-      left: 60px; top: 117px;
-      width: 809px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      color: var(--color-ink);
-      font-variation-settings: 'wdth' 100;
-      margin: 0;
-    }
-
-    /* ── Inline validation errors ────────────────────────────────── */
-    .field-error {
-      display: none;
-      position: absolute;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 16px;
-      font-weight: 400;
-      color: #C0392B;
-      margin: 0;
-    }
-    #error-email { left: 316px; top: 361px; }
-    #error-name  { left: 725px; top: 361px; }
-    #error-body  { left: 316px; top: 565px; } /* adjusts via state classes below */
-
-    /* Layout shifts & error visibility per state */
-    .page.has-email-error #error-email,
-    .page.has-name-error  #error-name,
-    .page.has-body-warning #error-body { display: block; }
-
-    /* Input error (email or name): textarea + button shift down 31px */
-    .page.has-input-error .textarea-wrap { top: 392px; }
-    .page.has-input-error .btn-send      { top: 596px; }
-    .page.has-input-error #error-body    { top: 596px; }
-
-    /* Body warning alone: button shifts down 31px, error below unshifted textarea */
-    .page.has-body-warning .btn-send     { top: 596px; }
-
-    /* Both: button shifts 62px total */
-    .page.has-input-error.has-body-warning .btn-send { top: 627px; }
-
-    /* Faded button and red input borders when errors present */
-    .page.has-input-error .btn-send      { opacity: 0.6; }
-    .page.has-email-error .input-row input[name="email"] { border-color: #C0392B; }
-    .page.has-name-error  .input-row input[name="name"]  { border-color: #C0392B; }
-
-    /* Smooth layout transitions */
-    .textarea-wrap { transition: top 150ms ease; }
-    .btn-send      { transition: top 150ms ease, opacity 0.15s; }
-  </style>
+  /* ── Backdrop & modals ─────────────────────────── */
+  #modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(247, 242, 236, 0.88);
+    z-index: 14;
+  }
+  #success-modal {
+    display: none;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: min(58.0625rem, 90vw);
+    height: auto;
+    min-height: 12.4375rem;
+    background: var(--color-white);
+    border: 2px solid var(--color-ink);
+    border-radius: 0.875rem;
+    z-index: 17;
+    padding: 2rem;
+  }
+  #success-modal .sm-close {
+    position: absolute;
+    top: 1.125rem; right: 1.125rem;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    color: var(--color-ink);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.75rem;
+  }
+  #success-modal .sm-heading {
+    font-family: var(--font-display);
+    font-size: var(--type-h2);
+    color: var(--color-ink);
+    margin-bottom: var(--space-xs);
+    margin-top: var(--space-sm);
+  }
+  #success-modal .sm-body {
+    font-family: var(--font-body);
+    font-size: var(--type-b1);
+    line-height: var(--leading-b1);
+    color: var(--color-ink);
+  }
+</style>
 </head>
 <body>
 
-  <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
-  <a href="home.html" class="logo">
-    <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
-      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
-    </svg>
+  <a href="index.html" class="logo">
+    <img src="assets/logo-keyhole.svg" alt="Knock Twice">
   </a>
 
   <nav class="nav">
@@ -301,17 +264,11 @@
   </nav>
 
   <div id="page-scaler">
-  <!-- ── Page canvas ─────────────────────────────────────────────── -->
   <div class="page">
 
-    <!-- Heading -->
-    <h1 class="h1">KNOCK KNOCK</h1>
+    <h1 class="h1">KNOCK KNOCK.</h1>
 
     <div class="whos-there-marquee">
-      <!-- Wave path: starts at x=0, period=300px, midline y=64, peak y=34, valley y=94.
-           Path extends to x=3000 so the full animation range is always covered.
-           startOffset=0 puts the first character at x=0 (left edge of the visible area).
-           JS decrements startOffset each frame; wraps by one measured text-unit for seamless loop. -->
       <svg viewBox="0 0 595 129" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <path id="whos-path" d="M0 64 C75 34,125 34,150 64 C175 94,225 94,300 64 C375 34,425 34,450 64 C475 94,525 94,600 64 C675 34,725 34,750 64 C775 94,825 94,900 64 C975 34,1025 34,1050 64 C1075 94,1125 94,1200 64 C1275 34,1325 34,1350 64 C1375 94,1425 94,1500 64 C1575 34,1625 34,1650 64 C1675 94,1725 94,1800 64 C1875 34,1925 34,1950 64 C1975 94,2025 94,2100 64 C2175 34,2225 34,2250 64 C2275 94,2325 94,2400 64 C2475 34,2525 34,2550 64 C2575 94,2625 94,2700 64 C2775 34,2825 34,2850 64 C2875 94,2925 94,3000 64"/>
@@ -322,13 +279,8 @@
       </svg>
     </div>
 
-    <!-- Body copy -->
     <p class="intro">We're so glad you came by. Have something in mind? Just say hello and we'll figure out the rest.</p>
 
-    <!-- ── Contact form ────────────────────────────────────────────
-         No backend wired up yet — connect to your form handler here.
-         Inputs are real form fields so tab order and browser
-         autofill work as expected. -->
     <div class="input-row">
       <input type="email" name="email" placeholder="Email*" autocomplete="off">
       <input type="text"  name="name"  placeholder="Name*"  autocomplete="off">
@@ -343,11 +295,9 @@
 
     <p class="field-error" id="error-body">Left this blank. That works, but more info helps.</p>
 
-    <button class="btn-send" id="btn-send" type="button">Send</button>
+    <button class="btn-send" id="btn-send" type="button">SEND IT →</button>
 
-    <!-- ── Monster footer wave + success state ──────────────────── -->
-    <div id="modal-backdrop"></div>
-
+    <!-- ── Monster footer wave + success state ──────────────────────── -->
     <div id="monster-group">
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
@@ -377,13 +327,14 @@
       </div>
     </div><!-- /#monster-group -->
 
+    <div id="modal-backdrop"></div>
+
     <div id="success-modal">
       <button class="sm-close" aria-label="Close">×</button>
       <h2 class="sm-heading">SECOND KNOCK RECEIVED! 💌</h2>
       <p class="sm-body">Your note made it through. We're taking a look and will be in touch soon. In the meantime, feel free to keep poking around.</p>
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="footer-icons">
         <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
@@ -408,8 +359,8 @@
 
     function scalePage() {
       scale = window.innerWidth / 1440;
-      page.style.transform  = `scale(${scale})`;
-      scaler.style.height   = PAGE_H * scale + 'px';
+      page.style.transform  = '';
+      scaler.style.height   = '';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
