@@ -54,7 +54,7 @@
   .whos-there-marquee {
     position: absolute;
     left: var(--content-left);
-    top: 5.8125rem;
+    top: 7.5rem;
     width: 50.5rem;
     height: 7.0625rem;
     pointer-events: none;
@@ -275,10 +275,10 @@
     <div class="whos-there-marquee">
       <svg viewBox="0 0 808 113" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <path id="whos-path" d="M0 64 C75 34,125 34,150 64 C175 94,225 94,300 64 C375 34,425 34,450 64 C475 94,525 94,600 64 C675 34,725 34,750 64 C775 94,825 94,900 64 C975 34,1025 34,1050 64 C1075 94,1125 94,1200 64 C1275 34,1325 34,1350 64 C1375 94,1425 94,1500 64 C1575 34,1625 34,1650 64 C1675 94,1725 94,1800 64 C1875 34,1925 34,1950 64 C1975 94,2025 94,2100 64 C2175 34,2225 34,2250 64 C2275 94,2325 94,2400 64 C2475 34,2525 34,2550 64 C2575 94,2625 94,2700 64 C2775 34,2825 34,2850 64 C2875 94,2925 94,3000 64"/>
+          <path id="whos-path" d="M0 56 C102 36,205 36,307 56 C409 76,512 76,614 56 C716 36,819 36,921 56 C1023 76,1126 76,1228 56 C1330 36,1433 36,1535 56 C1637 76,1740 76,1842 56 C1944 36,2047 36,2149 56 C2251 76,2354 76,2456 56 C2558 36,2661 36,2763 56 C2865 76,2968 76,3070 56"/>
         </defs>
-        <text font-family="'Handjet', sans-serif" font-size="22" font-weight="600" fill="#D4A0C8" letter-spacing="-0.22">
-          <textPath id="whos-textpath" href="#whos-path" startOffset="0">WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  </textPath>
+        <text xml:space="preserve" style="font-family: var(--font-ui); font-size: 22px; font-weight: 400; letter-spacing: -0.22px; font-variation-settings: 'ELGR' 1, 'ELSH' 2; fill: #EC8EDF;">
+          <textPath id="whos-textpath" href="#whos-path" startOffset="0">WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        </textPath>
         </text>
       </svg>
     </div>
@@ -436,11 +436,13 @@
       const svg = document.createElementNS(ns, 'svg');
       svg.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
       const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('xml:space', 'preserve');
       txt.setAttribute('font-family', "'Handjet', sans-serif");
       txt.setAttribute('font-size', '22');
       txt.setAttribute('font-weight', '600');
       txt.setAttribute('letter-spacing', '-0.22');
-      txt.textContent = "WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  WHO'S THERE? 👀  ";
+      txt.style.fontVariationSettings = "'ELGR' 1, 'ELSH' 2";
+      txt.textContent = "WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        ";
       svg.appendChild(txt);
       document.body.appendChild(svg);
       const total = txt.getComputedTextLength();
@@ -461,7 +463,13 @@
 
     // Wait for Handjet to load before measuring, then kick off the loop.
     document.fonts.ready.then(() => {
-      whosUnit = measureWhosUnit();
+      // measureWhosUnit() returns straight-line pixels. startOffset is in
+      // arc-length pixels, which are longer on a curved path. Scale by the
+      // ratio of the path's arc length to its horizontal extent so the wrap
+      // fires at exactly the right position with no visible jump.
+      const pathEl  = document.getElementById('whos-path');
+      const arcScale = pathEl.getTotalLength() / 3070;
+      whosUnit = measureWhosUnit() * arcScale;
       requestAnimationFrame(animateWhos);
     });
 
