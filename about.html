@@ -13,41 +13,50 @@
     html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
 
-    #page-scaler { position: relative; width: 100%; }
+    #page-scaler {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh + var(--footer-height));
+      background: var(--color-bg);
+    }
 
     /* ── Page canvas ────────────────────────────────────────────────
        Fixed 1440×1206 (exact Figma frame), centered and uniformly
        scaled by JS to fit the viewport. */
     .page {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 1227px;
-      transform-origin: top left;
+      position: relative;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
       background: var(--color-bg);
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding-top: 4.375rem;
+      padding-left: var(--content-left);
+      flex: 1;
     }
 
 
     /* ── Headings ──────────────────────────────────────────────────*/
     .h1 {
-      position: absolute;
-      left: 316px; top: 70px;
-      width: 808px;
       font-family: 'Erica One', sans-serif;
       font-size: 65px;
       line-height: 68px;
       font-weight: 400;
       color: var(--color-ink);
+      width: var(--content-width);
+      margin-bottom: 1.875rem;
     }
     .h2 {
-      position: absolute;
-      left: 316px; top: 316px;
-      width: 808px;
       font-family: 'Erica One', sans-serif;
       font-size: 24px;
       line-height: 27px;
       font-weight: 400;
       color: var(--color-ink);
+      width: var(--content-width);
+      margin-bottom: 1.1875rem;
     }
 
     /* ── Body text ─────────────────────────────────────────────────*/
@@ -59,18 +68,29 @@
       color: var(--color-ink);
     }
     .intro {
-      position: absolute;
-      left: 316px; top: 168px;
-      width: 808px;
+      width: var(--content-width);
+      margin-bottom: 3.75rem;
     }
     .intro p + p { margin-top: 22px; }
 
+    /* ── People row ────────────────────────────────────────────────*/
+    .people-row {
+      display: flex;
+      gap: 1.25rem;
+      width: var(--content-width);
+      margin-bottom: 10rem;
+    }
+    .person-col {
+      flex: 1;
+    }
+
     /* ── Headshots ─────────────────────────────────────────────────*/
     .headshot {
-      position: absolute;
-      top: 362px;
-      width: 394px; height: 394px;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
       overflow: hidden;
+      position: relative;
     }
     .headshot img {
       position: absolute;
@@ -84,14 +104,9 @@
     .headshot img.hover   { opacity: 0; }
     .headshot:hover img.default { opacity: 0; }
     .headshot:hover img.hover   { opacity: 1; }
-    .headshot-rodrigo { left: 316px; }
-    .headshot-matt    { left: 730px; }
 
     /* ── Team bios ─────────────────────────────────────────────────*/
     .person-name {
-      position: absolute;
-      top: 776px;
-      width: 394px;
       font-family: 'Handjet', sans-serif;
       font-size: 22px;
       font-weight: 400;
@@ -99,14 +114,12 @@
       letter-spacing: -0.22px;
       color: var(--color-ink);
       font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      margin-top: 1.25rem;
+      margin-bottom: 0.9375rem;
     }
     .person-bio {
-      position: absolute;
-      top: 813px;
-      width: 394px;
+      width: 100%;
     }
-    .person-rodrigo { left: 316px; }
-    .person-matt    { left: 730px; }
 
     /* ── Floating objects (draggable, with character eyes) ─────────*/
     .obj {
@@ -160,7 +173,7 @@
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
     #monster-group {
       position: absolute;
-      left: 0; top: 1021px;
+      left: 0; bottom: var(--footer-height);
       width: 1440px;
       z-index: 5;
       transition: transform 600ms ease-out;
@@ -205,7 +218,7 @@
       overflow: visible;
     }
 
-    .footer { top: 1137px; }
+    .footer { position: relative; }
 
     /* ── Object eye animation ──────────────────────────────────────── */
     #brush-iris-l, #brush-iris-r,
@@ -418,28 +431,30 @@
     <!-- Team subheadline -->
     <h2 class="h2">SINCE YOU ASKED</h2>
 
-    <!-- Headshots -->
-    <div class="headshot headshot-rodrigo">
-      <img class="default" src="assets/headshot-rodrigo.png" alt="Rodrigo Miguel">
-      <img class="hover"   src="assets/headshot-rodrigo-hover.png" alt="Rodrigo Miguel">
-    </div>
-    <div class="headshot headshot-matt">
-      <img class="default" src="assets/headshot-matt.png" alt="Matt Little">
-      <img class="hover"   src="assets/headshot-matt-hover.png" alt="Matt Little">
-    </div>
-
-    <!-- Rodrigo -->
-    <p class="person-name person-rodrigo">Rodrigo Miguel</p>
-    <div class="body-text person-bio person-rodrigo">
-      <p>Maker of things. Over a decade across toy design, industrial design, fashion accessories, and interiors.</p>
-      <p>He thinks in materials and proportions and knows when something is exactly right</p>
-    </div>
-
-    <!-- Matt -->
-    <p class="person-name person-matt">Matt Little</p>
-    <div class="body-text person-bio person-matt">
-      <p>Builder of things. Years leading media companies, consultancies, and creative operations.</p>
-      <p>He thinks in systems and relationships and knows how to make a project move.</p>
+    <!-- Headshots + bios -->
+    <div class="people-row">
+      <div class="person-col">
+        <div class="headshot headshot-rodrigo">
+          <img class="default" src="assets/headshot-rodrigo.png" alt="Rodrigo Miguel">
+          <img class="hover"   src="assets/headshot-rodrigo-hover.png" alt="Rodrigo Miguel">
+        </div>
+        <p class="person-name person-rodrigo">Rodrigo Miguel</p>
+        <div class="body-text person-bio person-rodrigo">
+          <p>Maker of things. Over a decade across toy design, industrial design, fashion accessories, and interiors.</p>
+          <p>He thinks in materials and proportions and knows when something is exactly right</p>
+        </div>
+      </div>
+      <div class="person-col">
+        <div class="headshot headshot-matt">
+          <img class="default" src="assets/headshot-matt.png" alt="Matt Little">
+          <img class="hover"   src="assets/headshot-matt-hover.png" alt="Matt Little">
+        </div>
+        <p class="person-name person-matt">Matt Little</p>
+        <div class="body-text person-bio person-matt">
+          <p>Builder of things. Years leading media companies, consultancies, and creative operations.</p>
+          <p>He thinks in systems and relationships and knows how to make a project move.</p>
+        </div>
+      </div>
     </div>
 
     <!-- ── Paintbrush (draggable) ──────────────────────────────────
@@ -538,9 +553,11 @@
       </svg>
     </div>
 
-    <!-- ── Newsletter risen state ──────────────────────────────────── -->
-    <div id="modal-backdrop"></div>
-    <div id="monster-group">
+  </div><!-- /page -->
+
+  <!-- ── Newsletter risen state ──────────────────────────────────── -->
+  <div id="modal-backdrop"></div>
+  <div id="monster-group">
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
       <div class="monster-area" id="monster-area">
@@ -569,9 +586,9 @@
             cx="495.41" cy="49.46" r="30" fill="#32261F"/>
         </svg>
       </div>
-    </div><!-- /#monster-group -->
+  </div><!-- /#monster-group -->
 
-    <div id="newsletter-window">
+  <div id="newsletter-window">
       <button class="nw-close" aria-label="Close">×</button>
       <!-- Heading swaps text via JS on success -->
       <h2 class="nw-heading">JOIN OUR MAILING LIST 📒</h2>
@@ -583,9 +600,9 @@
       <p class="nw-fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
       <!-- Success content -->
       <p class="nw-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
-    </div>
+  </div>
 
-    <footer class="footer">
+  <footer class="footer">
       <div class="footer-icons">
         <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
         <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
@@ -593,7 +610,6 @@
       <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
     </footer>
 
-  </div><!-- /page -->
   </div><!-- /#page-scaler -->
 
   <script src="assets/scripts.js"></script>
@@ -608,8 +624,8 @@
 
     function scalePage() {
       scale = window.innerWidth / 1440;
-      page.style.transform = `scale(${scale})`;
-      scaler.style.height = (PAGE_H * scale) + 'px';
+      page.style.transform = '';
+      scaler.style.height = '';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
