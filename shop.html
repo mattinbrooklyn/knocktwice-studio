@@ -13,42 +13,51 @@
     html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
 
-    #page-scaler { position: relative; width: 100%; }
+    #page-scaler {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh + var(--footer-height));
+      background: var(--color-bg);
+    }
 
     /* ── Page canvas ────────────────────────────────────────────────
        Fixed 1440×1024 (exact Figma frame), centered and uniformly
        scaled by JS to fit the viewport. */
     .page {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 1110px;
-      transform-origin: top left;
+      position: relative;
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
       background: var(--color-bg);
-      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding-top: 4.375rem;
+      padding-left: var(--content-left);
+      flex: 1;
     }
 
 
     /* ── Page heading ──────────────────────────────────────────────*/
     .h1 {
-      position: absolute;
-      left: 316px; top: 70px;
       font-family: 'Erica One', sans-serif;
       font-size: 65px;
       line-height: 68px;
       font-weight: 400;
       color: var(--color-ink);
+      width: var(--content-width);
+      margin-bottom: 1.875rem;
     }
 
     /* ── Subhead / body copy ───────────────────────────────────────*/
     .intro {
-      position: absolute;
-      left: 316px; top: 168px;
-      width: 808px;
       font-family: 'Instrument Sans', sans-serif;
       font-size: 14px;
       line-height: 22px;
       font-weight: 400;
       color: var(--color-ink);
+      width: var(--content-width);
     }
 
     /* ── Shop grid placeholder ─────────────────────────────────────
@@ -64,32 +73,148 @@
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
     .monster-area {
       position: absolute;
-      left: 0; top: 910px;
-      width: 1440px; height: 116px;
-      z-index: 5;
-      transform: translateY(200px);
+      bottom: var(--footer-height);
+      left: 0;
+      width: 100%;
+      height: var(--wave-height-desktop);
+      z-index: 20;
+      transform: translateY(250px);
       will-change: transform;
     }
     .monster-area.popped-up {
-      transform: translateY(0);
-      transition: transform 750ms cubic-bezier(0.34, 1.4, 0.64, 1);
+      transform: translateY(-390px);
+      transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
     }
     .monster-area img.wave {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 116px;
+      width: 100%; height: 100%;
       display: block;
       pointer-events: none;
     }
     .monster-eyes-overlay {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 116px;
+      width: 100%; height: 100%;
       pointer-events: none;
       overflow: visible;
     }
+    #modal-blue-body {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      width: 100%;
+      height: 2000px;
+      background: var(--color-blue);
+    }
 
-    .footer { top: 1026px; }
+    .footer { position: relative; z-index: 21; }
+
+    /* ── Backdrop & modal ─────────────────────────────────────────*/
+    #modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(247, 242, 236, 0.88);
+      z-index: 14;
+    }
+    #success-modal {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 61%;
+      transform: translate(-50%, -50%);
+      width: min(58rem, 90vw);
+      height: auto;
+      min-height: auto;
+      background: var(--color-white);
+      border: 2px solid var(--color-ink);
+      border-radius: 0.875rem;
+      z-index: 25;
+      padding: 1.25rem;
+    }
+    #success-modal .sm-close {
+      position: absolute;
+      top: 1.125rem; right: 1.125rem;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+      font-size: 1.125rem;
+      color: var(--color-ink);
+      cursor: pointer;
+      line-height: 1;
+      padding: 0.75rem;
+    }
+    #success-modal .sm-heading {
+      font-family: var(--font-display);
+      font-size: var(--type-h2);
+      color: var(--color-ink);
+      margin-bottom: var(--space-xs);
+      margin-top: var(--space-sm);
+    }
+    #success-modal .sm-body {
+      font-family: var(--font-body);
+      font-size: var(--type-b1);
+      line-height: var(--leading-b1);
+      color: var(--color-ink);
+    }
+    .ml-form-row {
+      display: flex;
+      gap: 0.625rem;
+      margin-top: 1.25rem;
+    }
+    .ml-form-row input {
+      flex: 1;
+      height: var(--input-height);
+      border: 2px solid var(--color-ink);
+      border-radius: var(--radius-button);
+      padding: 0 1.25rem;
+      font-family: var(--font-ui);
+      font-size: var(--type-field);
+      color: var(--color-ink);
+      background: var(--color-white);
+    }
+    .ml-form-row input::placeholder {
+      color: #9A7555;
+    }
+    .ml-btn {
+      height: var(--input-height);
+      padding: 0 2.5rem;
+      border: none;
+      border-radius: var(--radius-button);
+      background: var(--color-green);
+      color: var(--color-white);
+      font-family: var(--font-ui);
+      font-size: var(--type-button);
+      cursor: pointer;
+    }
+    .ml-btn:hover {
+      background: var(--color-white);
+      color: var(--color-green);
+      border: 2px solid var(--color-ink);
+    }
+    .ml-btn.is-disabled:hover {
+      background: var(--color-green);
+      color: var(--color-white);
+      border: none;
+    }
+    .ml-error {
+      display: none;
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      line-height: 1rem;
+      color: #FF0004;
+      margin: 0.25rem 0 0 0;
+    }
+    .ml-error.is-visible { display: block; }
+    .ml-btn.is-disabled { opacity: 0.5; cursor: default; }
+    .ml-form-row input.has-error { color: #FF0004; font-weight: 700; }
+    .ml-disclaimer {
+      font-family: var(--font-body);
+      font-size: var(--type-b2);
+      color: var(--color-ink);
+      margin-top: 0.75rem;
+    }
   </style>
 </head>
 <body>
@@ -120,52 +245,57 @@
     <!-- Subhead -->
     <p class="intro">Nothing to see here. (There will be soon though.) ⌛️</p>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         SHOP GRID: replace this entire section with your
-         Shopify collection embed (liquid template or JS snippet).
-         The div below is an intentional empty placeholder.
-         ═══════════════════════════════════════════════════════════ -->
-    <div class="shop-placeholder">
-      <!-- SHOPIFY EMBED GOES HERE -->
-    </div>
-
-    <!-- ── Monster footer wave ─────────────────────────────────────
-         Same wave SVG as about page. Eye whites + iris circles match about. -->
-    <div class="monster-area" id="monster-area">
-      <img class="wave" src="assets/monster-wave.svg" alt="">
-      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <clipPath id="mon-eye-r-clip">
-            <path transform="translate(593.13 32.7)"
-              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          </clipPath>
-          <clipPath id="mon-eye-l-clip">
-            <path transform="translate(431.49 31.57)"
-              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          </clipPath>
-        </defs>
-        <path fill="white" transform="translate(593.13 32.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
-      </svg>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer-icons">
-        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
-        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
-      </div>
-      <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
-    </footer>
-
   </div><!-- /page -->
+
+  <div id="modal-backdrop"></div>
+  <div id="success-modal">
+    <button class="sm-close" aria-label="Close">&times;</button>
+    <h2 class="sm-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="sm-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
+    <div class="ml-form-row">
+      <input type="email" id="ml-email" placeholder="Email*" autocomplete="off">
+      <button class="ml-btn" id="ml-submit">Sign Up</button>
+    </div>
+    <p class="ml-error" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+  </div>
+
+  <!-- ── Monster footer wave ─────────────────────────────────────
+       Same wave SVG as about page. Eye whites + iris circles match about. -->
+  <div class="monster-area" id="monster-area">
+    <img class="wave" src="assets/monster-wave.svg" alt="">
+    <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+         viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <clipPath id="mon-eye-r-clip">
+          <path transform="translate(593.13 32.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        </clipPath>
+        <clipPath id="mon-eye-l-clip">
+          <path transform="translate(431.49 31.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        </clipPath>
+      </defs>
+      <path fill="white" transform="translate(593.13 32.7)"
+        d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+      <path fill="white" transform="translate(431.49 31.57)"
+        d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+      <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+        cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+      <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+        cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+    </svg>
+    <div id="modal-blue-body"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
   </div><!-- /#page-scaler -->
 
   <script src="assets/scripts.js"></script>
@@ -182,24 +312,17 @@
 
     function scalePage() {
       scale   = window.innerWidth / 1440;
-      page.style.transform = `scale(${scale})`;
+      page.style.transform = '';
       // Wave bottom sits at the fold; only the 60px footer scrolls into view
       const viewportCanvas  = Math.ceil(window.innerHeight / scale);
       waveTop               = viewportCanvas - 116;
-      monsterArea.style.top = waveTop + 'px';
-      footer.style.top      = viewportCanvas + 'px';
+      monsterArea.style.top = '';
+      footer.style.top      = '';
       page.style.height     = (viewportCanvas + 60) + 'px';
-      scaler.style.height   = (viewportCanvas + 60) * scale + 'px';
+      scaler.style.height   = '';
     }
     scalePage();
     window.addEventListener('resize', scalePage);
-
-    // Pop the monster up on load with a spring bounce
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        monsterArea.classList.add('popped-up');
-      });
-    });
 
     document.addEventListener('mousemove', e => {
       updateMonsterEyes(e.clientX, e.clientY);
@@ -239,6 +362,74 @@
       trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
       trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
     }
+
+    // ── Mailing list modal ─────────────────────────────────────────
+    const modalBackdrop = document.getElementById('modal-backdrop');
+    const successModal  = document.getElementById('success-modal');
+
+    function openModal() {
+      document.querySelector('.logo').style.zIndex = '1';
+      document.querySelector('.nav').style.zIndex  = '1';
+      modalBackdrop.style.display = 'block';
+      successModal.style.display  = 'block';
+      monsterArea.classList.add('popped-up');
+      document.getElementById('modal-blue-body').style.height = '2000px';
+    }
+
+    function closeModal() {
+      document.querySelector('.logo').style.zIndex = '';
+      document.querySelector('.nav').style.zIndex  = '';
+      modalBackdrop.style.display = 'none';
+      successModal.style.display  = 'none';
+      monsterArea.style.transition = 'transform 600ms ease-out';
+      monsterArea.style.transform  = 'translateY(0)';
+      setTimeout(() => {
+        document.getElementById('modal-blue-body').style.height = 'var(--footer-height)';
+      }, 650);
+    }
+
+    document.querySelector('.sm-close').addEventListener('click', closeModal);
+
+    setTimeout(openModal, 900);
+
+    const mlEmail      = document.getElementById('ml-email');
+    const mlError      = document.getElementById('ml-error');
+    const mlSubmit     = document.getElementById('ml-submit');
+    const mlFormRow    = document.querySelector('.ml-form-row');
+    const mlDisclaimer = document.querySelector('.ml-disclaimer');
+    const smBody       = successModal.querySelector('.sm-body');
+    const smHeading    = successModal.querySelector('.sm-heading');
+
+    const defaultBody    = smBody.textContent;
+    const defaultHeading = smHeading.textContent;
+    const errorBody      = "We may be one thing now, but who knows what Knock Twice will become -- we'd love for you to stick around.";
+
+    mlSubmit.addEventListener('click', function() {
+      var email = mlEmail.value.trim();
+      var valid = /\S+@\S+\.\S+/.test(email);
+
+      if (!valid) {
+        mlError.classList.add('is-visible');
+        mlSubmit.classList.add('is-disabled');
+        mlEmail.classList.add('has-error');
+        smBody.textContent = errorBody;
+        return;
+      }
+
+      mlFormRow.style.display    = 'none';
+      mlDisclaimer.style.display = 'none';
+      mlError.classList.remove('is-visible');
+      smHeading.textContent      = "YAY, YOU'RE OFFICIALLY A KNOCKER! \u{1F496}";
+      smHeading.style.cssText    = 'font-size: 24px !important; line-height: 27px !important;';
+      smBody.textContent         = "We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.";
+    });
+
+    mlEmail.addEventListener('input', function() {
+      mlError.classList.remove('is-visible');
+      mlSubmit.classList.remove('is-disabled');
+      mlEmail.classList.remove('has-error');
+      smBody.textContent = defaultBody;
+    });
   </script>
 
 </body>
