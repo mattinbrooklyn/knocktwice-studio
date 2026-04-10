@@ -84,8 +84,13 @@
     gap: 0.6rem;
     margin-bottom: 0.625rem;
   }
-  .input-row input {
+  .input-col {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .input-row input {
+    width: 100%;
     height: var(--input-height);
     background: var(--color-white);
     border: 2px solid var(--color-ink);
@@ -103,10 +108,12 @@
   .input-row input::placeholder { color: #9A7555; }
   .input-row input:focus { border-color: var(--color-blue); }
 
-  .textarea-wrap {
+  .textarea-col {
     width: var(--content-width);
-    height: 12.125rem;
     margin-bottom: 0.625rem;
+  }
+  .textarea-wrap {
+    height: 12.125rem;
   }
   .textarea-wrap textarea {
     width: 100%; height: 100%;
@@ -149,10 +156,17 @@
     font-size: var(--type-error);
     color: var(--color-red);
     line-height: 1rem;
+    margin: 0;
+    margin-top: 0.25rem;
   }
   .has-email-error #error-email { display: block; }
   .has-name-error #error-name { display: block; }
   .has-body-warning #error-body { display: block; }
+  .has-email-error #btn-send,
+  .has-name-error #btn-send {
+    opacity: 0.5;
+    cursor: default;
+  }
 
   /* ── Monster wave ──────────────────────────────── */
   #monster-group {
@@ -286,18 +300,22 @@
     <p class="intro">We're so glad you came by. Have something in mind? Just say hello and we'll figure out the rest.</p>
 
     <div class="input-row">
-      <input type="email" name="email" placeholder="Email*" autocomplete="off">
-      <input type="text"  name="name"  placeholder="Name*"  autocomplete="off">
+      <div class="input-col">
+        <input type="email" name="email" placeholder="Email*" autocomplete="off">
+        <p class="field-error" id="error-email">Hmm. That email doesn't look right. Try again?</p>
+      </div>
+      <div class="input-col">
+        <input type="text" name="name" placeholder="Name*" autocomplete="off">
+        <p class="field-error" id="error-name">What should we call you?</p>
+      </div>
     </div>
 
-    <p class="field-error" id="error-email">Hmm. That email doesn't look right. Try again?</p>
-    <p class="field-error" id="error-name">What should we call you?</p>
-
-    <div class="textarea-wrap">
-      <textarea name="message" placeholder="Knock Twice, we might not hear you the first time..."></textarea>
+    <div class="textarea-col">
+      <div class="textarea-wrap">
+        <textarea name="message" placeholder="Knock Twice, we might not hear you the first time..."></textarea>
+      </div>
+      <p class="field-error" id="error-body">Left this blank. That works, but more info helps.</p>
     </div>
-
-    <p class="field-error" id="error-body">Left this blank. That works, but more info helps.</p>
 
     <button class="btn-send" id="btn-send" type="button">Send</button>
 
