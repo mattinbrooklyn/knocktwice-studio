@@ -35,7 +35,10 @@
       flex-direction: column;
       padding-top: 4.375rem;
       padding-left: var(--content-left);
+      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 2rem);
+      background-clip: content-box;
       flex: 1;
+      min-height: calc(100vh - var(--footer-height));
     }
 
 
@@ -78,7 +81,6 @@
       display: flex;
       gap: 1.25rem;
       width: var(--content-width);
-      margin-bottom: 10rem;
     }
     .person-col {
       flex: 1;
@@ -109,11 +111,11 @@
     .person-name {
       font-family: 'Handjet', sans-serif;
       font-size: 22px;
-      font-weight: 400;
+      font-weight: 600;
       line-height: 27px;
       letter-spacing: -0.22px;
       color: var(--color-ink);
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 600;
       margin-top: 1.25rem;
       margin-bottom: 0.9375rem;
     }
@@ -173,13 +175,14 @@
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
     #monster-group {
       position: absolute;
-      left: 0; bottom: var(--footer-height);
+      left: -1.4%; bottom: 0;
       width: 1440px;
+      height: calc(var(--wave-height-desktop) + var(--footer-height));
       z-index: 5;
       transition: transform 600ms ease-out;
     }
     #monster-group.wave-risen {
-      transform: translateY(-637px);
+      transform: translateY(-55vh);
       z-index: 16;
     }
     .monster-area {
@@ -198,7 +201,7 @@
        room at the peak; connected C curve (no M jumps) for smooth flow */
     .monster-ticker {
       position: absolute;
-      top: 956px;    /* 65px above monster-area (1021px) */
+      bottom: calc(100% - 90px);
       left: 0;
       width: 1440px;
       height: 156px; /* 40px top padding + 116px wave height */
@@ -218,7 +221,7 @@
       overflow: visible;
     }
 
-    .footer { position: relative; }
+    .footer { position: relative; margin-top: -12px; }
 
     /* ── Object eye animation ──────────────────────────────────────── */
     #brush-iris-l, #brush-iris-r,
@@ -248,8 +251,9 @@
     #newsletter-window {
       display: none;
       position: absolute;
-      left: 256px; top: 650px;
+      left: 256px; top: 266px;
       width: 929px; height: 326px;
+      padding: 60px;
       background: white;
       border: 2px solid var(--color-ink);
       border-radius: 14px;
@@ -435,8 +439,8 @@
     <div class="people-row">
       <div class="person-col">
         <div class="headshot headshot-rodrigo">
-          <img class="default" src="assets/headshot-rodrigo.png" alt="Rodrigo Miguel">
-          <img class="hover"   src="assets/headshot-rodrigo-hover.png" alt="Rodrigo Miguel">
+          <img class="default" src="assets/images/headshot-rodrigo.webp" alt="Rodrigo Miguel">
+          <img class="hover"   src="assets/images/headshot-rodrigo-hover.webp" alt="Rodrigo Miguel">
         </div>
         <p class="person-name person-rodrigo">Rodrigo Miguel</p>
         <div class="body-text person-bio person-rodrigo">
@@ -446,8 +450,8 @@
       </div>
       <div class="person-col">
         <div class="headshot headshot-matt">
-          <img class="default" src="assets/headshot-matt.png" alt="Matt Little">
-          <img class="hover"   src="assets/headshot-matt-hover.png" alt="Matt Little">
+          <img class="default" src="assets/images/headshot-matt.webp" alt="Matt Little">
+          <img class="hover"   src="assets/images/headshot-matt-hover.webp" alt="Matt Little">
         </div>
         <p class="person-name person-matt">Matt Little</p>
         <div class="body-text person-bio person-matt">
@@ -533,26 +537,6 @@
            Right (119.75×33.51): translate(593.13, 32.7)
            Left  (127.85×35.77): translate(431.49, 31.57)
          Iris centers: right (652.9, 49.45), left (495.41, 49.46) -->
-    <!-- Wave-following ticker: 4 tiled wave arches, each 1440px wide.
-         textPath baseline rides the same curve as monster-wave.svg.
-         SVG translates -1440px (one arch) per cycle for seamless loop. -->
-    <!-- Wave ticker: arch path is fixed (matches monster's back).
-         Text slides along it via SMIL startOffset — no translateX.
-         3 identical arches in the path; animating 33.333% scrolls exactly
-         one arch, so the loop is seamless. -->
-    <div class="monster-ticker">
-      <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
-          <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-        </defs>
-        <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
-              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-          <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
-        </text>
-      </svg>
-    </div>
-
   </div><!-- /page -->
 
   <!-- ── Newsletter risen state ──────────────────────────────────── -->
@@ -560,6 +544,35 @@
   <div id="monster-group">
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
+      <div id="newsletter-window">
+          <button class="nw-close" aria-label="Close">×</button>
+          <!-- Heading swaps text via JS on success -->
+          <h2 class="nw-heading">JOIN OUR MAILING LIST 📒</h2>
+          <!-- Default form content -->
+          <p class="nw-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
+          <input class="nw-input" type="email" placeholder="Email*" autocomplete="email">
+          <button class="nw-submit">Sign Up</button>
+          <p class="nw-error">Hmm. That email doesn't look right. Try again?</p>
+          <p class="nw-fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+          <!-- Success content -->
+          <p class="nw-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+      </div>
+      <!-- Wave-following ticker: 4 tiled wave arches, each 1440px wide.
+           textPath baseline rides the same curve as monster-wave.svg.
+           3 identical arches in the path; animating 33.333% scrolls exactly
+           one arch, so the loop is seamless. -->
+      <div class="monster-ticker">
+        <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
+            <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
+                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+          </text>
+        </svg>
+      </div>
       <div class="monster-area" id="monster-area">
         <img class="wave" src="assets/monster-wave.svg" alt="">
         <svg class="monster-eyes-overlay" id="monster-eyes-svg"
@@ -587,20 +600,6 @@
         </svg>
       </div>
   </div><!-- /#monster-group -->
-
-  <div id="newsletter-window">
-      <button class="nw-close" aria-label="Close">×</button>
-      <!-- Heading swaps text via JS on success -->
-      <h2 class="nw-heading">JOIN OUR MAILING LIST 📒</h2>
-      <!-- Default form content -->
-      <p class="nw-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
-      <input class="nw-input" type="email" placeholder="Email*" autocomplete="email">
-      <button class="nw-submit">Sign Up</button>
-      <p class="nw-error">Hmm. That email doesn't look right. Try again?</p>
-      <p class="nw-fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
-      <!-- Success content -->
-      <p class="nw-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
-  </div>
 
   <footer class="footer">
       <div class="footer-icons">
