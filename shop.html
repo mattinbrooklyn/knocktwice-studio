@@ -19,7 +19,7 @@
       display: flex;
       flex-direction: column;
       min-height: calc(100vh + var(--footer-height));
-      background: var(--color-bg);
+      overflow: hidden;
     }
 
     /* ── Page canvas ────────────────────────────────────────────────
@@ -71,19 +71,23 @@
 
     /* ── Monster footer wave ───────────────────────────────────────
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
-    .monster-area {
+    #monster-group {
       position: absolute;
       bottom: var(--footer-height);
       left: 0;
       width: 100%;
-      height: var(--wave-height-desktop);
-      z-index: 20;
+      z-index: 16;
       transform: translateY(250px);
       will-change: transform;
     }
-    .monster-area.popped-up {
-      transform: translateY(-390px);
+    #monster-group.popped-up {
+      transform: translateY(-55vh);
       transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .monster-area {
+      position: relative;
+      width: 100%;
+      height: var(--wave-height-desktop);
     }
     .monster-area img.wave {
       position: absolute;
@@ -108,7 +112,7 @@
       background: var(--color-blue);
     }
 
-    .footer { position: relative; z-index: 21; }
+    .footer { position: relative; z-index: 100; }
 
     /* ── Backdrop & modal ─────────────────────────────────────────*/
     #modal-backdrop {
@@ -262,6 +266,7 @@
 
   <!-- ── Monster footer wave ─────────────────────────────────────
        Same wave SVG as about page. Eye whites + iris circles match about. -->
+  <div id="monster-group">
   <div class="monster-area" id="monster-area">
     <img class="wave" src="assets/monster-wave.svg" alt="">
     <svg class="monster-eyes-overlay" id="monster-eyes-svg"
@@ -287,6 +292,7 @@
     </svg>
     <div id="modal-blue-body"></div>
   </div>
+  </div><!-- /#monster-group -->
 
   <footer class="footer">
     <div class="footer-icons">
@@ -305,7 +311,8 @@
     // pixel coordinates correct at any viewport size.
     const page        = document.querySelector('.page');
     const scaler      = document.getElementById('page-scaler');
-    const monsterArea = document.getElementById('monster-area');
+    const monsterArea  = document.getElementById('monster-area');
+    const monsterGroup = document.getElementById('monster-group');
     const footer      = document.querySelector('.footer');
     let scale   = 1;
     let waveTop = 910; // updated each resize
@@ -372,7 +379,7 @@
       document.querySelector('.nav').style.zIndex  = '1';
       modalBackdrop.style.display = 'block';
       successModal.style.display  = 'block';
-      monsterArea.classList.add('popped-up');
+      monsterGroup.classList.add('popped-up');
       document.getElementById('modal-blue-body').style.height = '2000px';
     }
 
@@ -381,8 +388,8 @@
       document.querySelector('.nav').style.zIndex  = '';
       modalBackdrop.style.display = 'none';
       successModal.style.display  = 'none';
-      monsterArea.style.transition = 'transform 600ms ease-out';
-      monsterArea.style.transform  = 'translateY(0)';
+      monsterGroup.style.transition = 'transform 600ms ease-out';
+      monsterGroup.style.transform  = 'translateY(0)';
       setTimeout(() => {
         document.getElementById('modal-blue-body').style.height = 'var(--footer-height)';
       }, 650);
