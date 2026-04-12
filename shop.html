@@ -114,111 +114,6 @@
 
     .footer { position: relative; z-index: 100; }
 
-    /* ── Backdrop & modal ─────────────────────────────────────────*/
-    #modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(247, 242, 236, 0.88);
-      z-index: 14;
-    }
-    #success-modal {
-      display: none;
-      position: fixed;
-      left: 50%;
-      top: 61%;
-      transform: translate(-50%, -50%);
-      width: min(58rem, 90vw);
-      height: auto;
-      min-height: auto;
-      background: var(--color-white);
-      border: 2px solid var(--color-ink);
-      border-radius: 0.875rem;
-      z-index: 25;
-      padding: 1.25rem;
-    }
-    #success-modal .sm-close {
-      position: absolute;
-      top: 1.125rem; right: 1.125rem;
-      background: none;
-      border: none;
-      font-family: var(--font-body);
-      font-size: 1.125rem;
-      color: var(--color-ink);
-      cursor: pointer;
-      line-height: 1;
-      padding: 0.75rem;
-    }
-    #success-modal .sm-heading {
-      font-family: var(--font-display);
-      font-size: var(--type-h2);
-      color: var(--color-ink);
-      margin-bottom: var(--space-xs);
-      margin-top: var(--space-sm);
-    }
-    #success-modal .sm-body {
-      font-family: var(--font-body);
-      font-size: var(--type-b1);
-      line-height: var(--leading-b1);
-      color: var(--color-ink);
-    }
-    .ml-form-row {
-      display: flex;
-      gap: 0.625rem;
-      margin-top: 1.25rem;
-    }
-    .ml-form-row input {
-      flex: 1;
-      height: var(--input-height);
-      border: 2px solid var(--color-ink);
-      border-radius: var(--radius-button);
-      padding: 0 1.25rem;
-      font-family: var(--font-ui);
-      font-size: var(--type-field);
-      color: var(--color-ink);
-      background: var(--color-white);
-    }
-    .ml-form-row input::placeholder {
-      color: #9A7555;
-    }
-    .ml-btn {
-      height: var(--input-height);
-      padding: 0 2.5rem;
-      border: none;
-      border-radius: var(--radius-button);
-      background: var(--color-green);
-      color: var(--color-white);
-      font-family: var(--font-ui);
-      font-size: var(--type-button);
-      cursor: pointer;
-    }
-    .ml-btn:hover {
-      background: var(--color-white);
-      color: var(--color-green);
-      border: 2px solid var(--color-ink);
-    }
-    .ml-btn.is-disabled:hover {
-      background: var(--color-green);
-      color: var(--color-white);
-      border: none;
-    }
-    .ml-error {
-      display: none;
-      font-family: var(--font-body);
-      font-size: 0.75rem;
-      line-height: 1rem;
-      color: #FF0004;
-      margin: 0.25rem 0 0 0;
-    }
-    .ml-error.is-visible { display: block; }
-    .ml-btn.is-disabled { opacity: 0.5; cursor: default; }
-    .ml-form-row input.has-error { color: #FF0004; font-weight: 700; }
-    .ml-disclaimer {
-      font-family: var(--font-body);
-      font-size: var(--type-b2);
-      color: var(--color-ink);
-      margin-top: 0.75rem;
-    }
   </style>
 </head>
 <body>
@@ -251,17 +146,18 @@
 
   </div><!-- /page -->
 
-  <div id="modal-backdrop"></div>
-  <div id="success-modal">
-    <button class="sm-close" aria-label="Close">&times;</button>
-    <h2 class="sm-heading">JOIN OUR MAILING LIST 📒</h2>
-    <p class="sm-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+  <div class="modal-card" id="ml-modal">
+    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="ml-body" id="ml-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
     <div class="ml-form-row">
-      <input type="email" id="ml-email" placeholder="Email*" autocomplete="off">
-      <button class="ml-btn" id="ml-submit">Sign Up</button>
+      <input type="email" id="ml-email" class="field" placeholder="Email*" autocomplete="off">
+      <button class="ml-submit" id="ml-submit">Sign Up</button>
     </div>
-    <p class="ml-error" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
     <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
   </div>
 
   <!-- ── Monster footer wave ─────────────────────────────────────
@@ -371,71 +267,60 @@
     }
 
     // ── Mailing list modal ─────────────────────────────────────────
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const successModal  = document.getElementById('success-modal');
+    var mlModal     = document.getElementById('ml-modal');
+    var mlBackdrop  = document.getElementById('modal-backdrop');
+    var mlClose     = document.getElementById('ml-close');
+    var mlEmail     = document.getElementById('ml-email');
+    var mlError     = document.getElementById('ml-error');
+    var mlSubmit    = document.getElementById('ml-submit');
+    var mlHeading   = document.getElementById('ml-heading');
+    var mlBody      = document.getElementById('ml-body');
 
-    function openModal() {
-      document.querySelector('.logo').style.zIndex = '1';
-      document.querySelector('.nav').style.zIndex  = '1';
-      modalBackdrop.style.display = 'block';
-      successModal.style.display  = 'block';
+    function openMailingList() {
+      mlBackdrop.style.display = 'block';
+      mlModal.style.display    = 'block';
       monsterGroup.classList.add('popped-up');
       document.getElementById('modal-blue-body').style.height = '2000px';
     }
 
-    function closeModal() {
-      document.querySelector('.logo').style.zIndex = '';
-      document.querySelector('.nav').style.zIndex  = '';
-      modalBackdrop.style.display = 'none';
-      successModal.style.display  = 'none';
+    function closeMailingList() {
+      mlBackdrop.style.display = 'none';
+      mlModal.style.display    = 'none';
+      mlModal.classList.remove('ml-error', 'ml-success');
+      mlEmail.value = '';
+      mlEmail.classList.remove('has-error');
+      mlError.classList.remove('is-visible');
       monsterGroup.style.transition = 'transform 600ms ease-out';
       monsterGroup.style.transform  = 'translateY(0)';
-      setTimeout(() => {
+      setTimeout(function() {
         document.getElementById('modal-blue-body').style.height = 'var(--footer-height)';
       }, 650);
     }
 
-    document.querySelector('.sm-close').addEventListener('click', closeModal);
-
-    setTimeout(openModal, 900);
-
-    const mlEmail      = document.getElementById('ml-email');
-    const mlError      = document.getElementById('ml-error');
-    const mlSubmit     = document.getElementById('ml-submit');
-    const mlFormRow    = document.querySelector('.ml-form-row');
-    const mlDisclaimer = document.querySelector('.ml-disclaimer');
-    const smBody       = successModal.querySelector('.sm-body');
-    const smHeading    = successModal.querySelector('.sm-heading');
-
-    const defaultBody    = smBody.textContent;
-    const defaultHeading = smHeading.textContent;
-    const errorBody      = "We may be one thing now, but who knows what Knock Twice will become -- we'd love for you to stick around.";
+    mlClose.addEventListener('click', closeMailingList);
+    setTimeout(openMailingList, 900);
 
     mlSubmit.addEventListener('click', function() {
       var email = mlEmail.value.trim();
-      var valid = /\S+@\S+\.\S+/.test(email);
-
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       if (!valid) {
+        mlModal.classList.add('ml-error');
+        mlModal.classList.remove('ml-success');
         mlError.classList.add('is-visible');
         mlSubmit.classList.add('is-disabled');
         mlEmail.classList.add('has-error');
-        smBody.textContent = errorBody;
         return;
       }
-
-      mlFormRow.style.display    = 'none';
-      mlDisclaimer.style.display = 'none';
-      mlError.classList.remove('is-visible');
-      smHeading.textContent      = "YAY, YOU'RE OFFICIALLY A KNOCKER! \u{1F496}";
-      smHeading.style.cssText    = 'font-size: 24px !important; line-height: 27px !important;';
-      smBody.textContent         = "We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.";
+      mlModal.classList.remove('ml-error');
+      mlModal.classList.add('ml-success');
+      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
     });
 
     mlEmail.addEventListener('input', function() {
+      mlModal.classList.remove('ml-error');
       mlError.classList.remove('is-visible');
       mlSubmit.classList.remove('is-disabled');
       mlEmail.classList.remove('has-error');
-      smBody.textContent = defaultBody;
     });
   </script>
 

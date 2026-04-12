@@ -395,6 +395,10 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   pointer-events: none;
   user-select: none;
 }
+.obj:not(.has-rotation) > img {
+  width: 100%;
+  height: auto;
+}
 .is-dragging {
   cursor: grabbing !important;
 }
@@ -513,7 +517,20 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 /* ── Image stack (draggable photos) ─────────────── */
 .photo,
 .photo-rotated {
+  position: absolute;
+  overflow: hidden;
   box-shadow: var(--shadow-stack);
+  cursor: none;
+  user-select: none;
+}
+.photo img,
+.photo-rotated img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* ── Error text ─────────────────────────────────── */

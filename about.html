@@ -202,7 +202,7 @@
       bottom: calc(100% - 90px);
       left: 0;
       width: 1440px;
-      height: 156px; /* 40px top padding + 116px wave height */
+      height: 156px;
       overflow: hidden;
       z-index: 6;
       pointer-events: auto;
@@ -245,157 +245,23 @@
       width: 1440px; height: 737px;
       background: var(--color-blue);
     }
-    /* Newsletter form window */
-    #newsletter-window {
-      display: none;
+    /* ── Newsletter window — page-specific position overrides ────────
+       .modal-card provides base styles; these override for canvas layout */
+    #newsletter-window.modal-card {
       position: absolute;
       left: 256px; top: 200px;
-      width: 929px; height: 326px;
+      width: 929px;
+      height: auto;
+      min-height: 326px;
+      transform: none;
       padding: 60px;
-      background: white;
-      border: 2px solid var(--color-ink);
-      border-radius: 14px;
       z-index: 17;
     }
-    #newsletter-window .nw-close {
-      position: absolute;
-      top: 18px; right: 18px;
-      background: none;
-      border: none;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 18px;
-      color: var(--color-ink);
-      cursor: pointer;
-      line-height: 1;
-      padding: 12px;
+    #newsletter-window.modal-card.ml-error {
+      top: 180px;
     }
-    #newsletter-window .nw-heading {
-      position: absolute;
-      left: 60px; top: 60px;
-      font-family: 'Erica One', sans-serif;
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 27px;
-      color: var(--color-ink);
-      margin: 0;
-    }
-    #newsletter-window .nw-body {
-      position: absolute;
-      left: 60px; top: 117px;
-      width: 809px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      color: var(--color-ink);
-      font-variation-settings: 'wdth' 100;
-      margin: 0;
-    }
-    #newsletter-window .nw-input {
-      position: absolute;
-      left: 60px; top: 164px;
-      width: 533px; height: 55px;
-      box-sizing: border-box;
-      font-family: 'Handjet', sans-serif;
-      font-size: 16px;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
-      letter-spacing: -0.16px;
-      color: var(--color-ink);
-      background: white;
-      border: 2px solid var(--color-ink);
-      border-radius: 100px;
-      padding: 0 22px;
-      outline: none;
-    }
-    #newsletter-window .nw-input::placeholder {
-      color: #9A7555;
-      opacity: 1;
-    }
-    #newsletter-window .nw-submit {
-      position: absolute;
-      left: 613px; top: 164px;
-      width: 256px; height: 55px;
-      font-family: 'Handjet', sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2;
-      letter-spacing: -0.16px;
-      color: #F7F2EC;
-      background: #51B18C;
-      border: none;
-      border-radius: 100px;
-      cursor: pointer;
-    }
-    #newsletter-window .nw-fine-print {
-      position: absolute;
-      left: 60px; top: 244px;
-      width: 809px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      font-variation-settings: 'wdth' 100;
-      color: var(--color-ink);
-      opacity: 0.55;
-      margin: 0;
-    }
-    /* Error message — hidden until .state-error */
-    #newsletter-window .nw-error {
-      display: none;
-      position: absolute;
-      left: 60px; top: 229px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 16px;
-      font-weight: 400;
-      font-variation-settings: 'wdth' 100;
-      color: #C0392B;
-      margin: 0;
-    }
-    /* Error state: show error message, shift fine-print down, resize window */
-    #newsletter-window.state-error {
-      top: 632px;
-      height: 352px;
-    }
-    #newsletter-window.state-error .nw-error {
-      display: block;
-    }
-    #newsletter-window.state-error .nw-input {
-      border-color: #C0392B;
-    }
-    #newsletter-window.state-error .nw-fine-print {
-      top: 270px;
-    }
-    /* Success state: hide form, show confirmation, resize window */
-    #newsletter-window.state-success {
-      height: 199px;
-    }
-    #newsletter-window.state-success .nw-body,
-    #newsletter-window.state-success .nw-input,
-    #newsletter-window.state-success .nw-submit,
-    #newsletter-window.state-success .nw-fine-print,
-    #newsletter-window.state-success .nw-error {
-      display: none;
-    }
-    #newsletter-window.state-success .nw-heading {
-      top: 60px;
-    }
-    /* Success body — hidden until .state-success */
-    #newsletter-window .nw-success-body {
-      display: none;
-      position: absolute;
-      left: 60px; top: 117px;
-      width: 809px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      font-variation-settings: 'wdth' 100;
-      color: var(--color-ink);
-      margin: 0;
-    }
-    #newsletter-window.state-success .nw-success-body {
-      display: block;
+    #newsletter-window.modal-card.ml-success {
+      min-height: auto;
     }
   </style>
 </head>
@@ -542,18 +408,17 @@
   <div id="monster-group">
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
-      <div id="newsletter-window">
-          <button class="nw-close" aria-label="Close">×</button>
-          <!-- Heading swaps text via JS on success -->
-          <h2 class="nw-heading">JOIN OUR MAILING LIST 📒</h2>
-          <!-- Default form content -->
-          <p class="nw-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
-          <input class="nw-input" type="email" placeholder="Email*" autocomplete="email">
-          <button class="nw-submit">Sign Up</button>
-          <p class="nw-error">Hmm. That email doesn't look right. Try again?</p>
-          <p class="nw-fine-print">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
-          <!-- Success content -->
-          <p class="nw-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+      <div id="newsletter-window" class="modal-card">
+        <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+        <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+        <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
+        <div class="ml-form-row">
+          <input class="field" type="email" id="ml-email" placeholder="Email*" autocomplete="email">
+          <button class="ml-submit" id="ml-submit">Sign Up</button>
+        </div>
+        <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+        <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+        <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
       </div>
       <!-- Wave-following ticker: 4 tiled wave arches, each 1440px wide.
            textPath baseline rides the same curve as monster-wave.svg.
@@ -793,62 +658,67 @@
   </script>
 
   <script>
-    var monsterGroup    = document.getElementById('monster-group');
-    var modalBackdrop   = document.getElementById('modal-backdrop');
-    var modalBlueBody   = document.getElementById('modal-blue-body');
-    var newsletterWindow = document.getElementById('newsletter-window');
-    var nwHeading       = newsletterWindow.querySelector('.nw-heading');
-    var nwInput         = newsletterWindow.querySelector('.nw-input');
-    var nwSubmit        = newsletterWindow.querySelector('.nw-submit');
+    var monsterGroup     = document.getElementById('monster-group');
+    var modalBackdrop    = document.getElementById('modal-backdrop');
+    var modalBlueBody    = document.getElementById('modal-blue-body');
+    var mlModal          = document.getElementById('newsletter-window');
+    var mlClose          = document.getElementById('ml-close');
+    var mlHeading        = document.getElementById('ml-heading');
+    var mlEmail          = document.getElementById('ml-email');
+    var mlSubmit         = document.getElementById('ml-submit');
+    var mlError          = document.getElementById('ml-error');
 
-    function openModal() {
+    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
+
+    function openMailingList() {
       modalBackdrop.style.display = 'block';
       modalBlueBody.style.display = 'block';
-      newsletterWindow.style.display = 'block';
+      mlModal.style.display = 'block';
       monsterGroup.classList.add('wave-risen');
     }
 
-    function closeModal() {
-      // Snap back instantly — no animation on close
+    function closeMailingList() {
       monsterGroup.style.transition = 'none';
       monsterGroup.classList.remove('wave-risen');
       modalBackdrop.style.display = 'none';
       modalBlueBody.style.display = 'none';
-      newsletterWindow.style.display = 'none';
-      // Reset form state
-      newsletterWindow.classList.remove('state-error', 'state-success');
-      nwHeading.textContent = 'JOIN OUR MAILING LIST 📒';
-      nwInput.value = '';
-      // Re-enable transition so the next open still animates
+      mlModal.style.display = 'none';
+      mlModal.classList.remove('ml-error', 'ml-success');
+      mlHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+      mlEmail.value = '';
+      mlEmail.classList.remove('has-error');
+      mlError.classList.remove('is-visible');
       requestAnimationFrame(function() {
         monsterGroup.style.transition = '';
       });
     }
 
-    document.querySelector('.monster-ticker').addEventListener('click', openModal);
-    document.querySelector('.nw-close').addEventListener('click', closeModal);
+    document.querySelector('.monster-ticker').addEventListener('click', openMailingList);
+    mlClose.addEventListener('click', closeMailingList);
 
-    // Clear error as soon as user starts correcting their email
-    nwInput.addEventListener('input', function() {
-      newsletterWindow.classList.remove('state-error');
+    mlEmail.addEventListener('input', function() {
+      mlModal.classList.remove('ml-error');
+      mlError.classList.remove('is-visible');
+      mlSubmit.classList.remove('is-disabled');
+      mlEmail.classList.remove('has-error');
     });
 
-    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
-
-    nwSubmit.addEventListener('click', function() {
-      var email = nwInput.value.trim();
+    mlSubmit.addEventListener('click', function() {
+      var email = mlEmail.value.trim();
       var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
       if (!valid) {
-        newsletterWindow.classList.add('state-error');
-        newsletterWindow.classList.remove('state-success');
-      } else {
-        newsletterWindow.classList.remove('state-error');
-        newsletterWindow.classList.add('state-success');
-        nwHeading.textContent = 'YAY, YOU\'RE OFFICIALLY A KNOCKER! 💖';
-        // Send to Google Sheet via GET — no-cors requires a simple request
-        fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
-          .catch(function() { /* silent fail — submission already confirmed to user */ });
+        mlModal.classList.add('ml-error');
+        mlModal.classList.remove('ml-success');
+        mlError.classList.add('is-visible');
+        mlSubmit.classList.add('is-disabled');
+        mlEmail.classList.add('has-error');
+        return;
       }
+      mlModal.classList.remove('ml-error');
+      mlModal.classList.add('ml-success');
+      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
+      fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
+        .catch(function() {});
     });
   </script>
 
