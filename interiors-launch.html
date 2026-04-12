@@ -264,16 +264,6 @@
       <!-- 8  left:4.17%  top:71.0%  w:24.65% h:29.0% -->
       <div class="placeholder" style="left:4.17%;  top:71.0%;  width:24.65%; height:29.0%;"></div>
 
-      <div class="section-card" style="left:12.5%; top:3%; width:28%; padding:3%;">
-        <h3 class="card-title">THE LIVING ROOM</h3>
-        <p class="card-body">A maximalist living room built to feel and look every inch that splits and covers every surface. Electrics, Seventies, and above every one, comfortably colourful.</p>
-        <div class="card-tags">
-          <span class="card-tag">Interior Design</span>
-          <span class="card-tag">Creative Direction</span>
-          <span class="card-tag">Design</span>
-          <span class="card-tag">Installation</span>
-        </div>
-      </div>
 
     </div><!-- /.project-section (The Living Room) -->
 
@@ -304,21 +294,35 @@
       <!-- 8  left:30.90% top:79.22% w:37.01% h:20.72% -->
       <div class="placeholder" style="left:30.90%; top:79.22%; width:37.01%; height:20.72%;"></div>
 
-      <div class="section-card" style="left:12.5%; top:30%; width:28%; padding:3%;">
-        <h3 class="card-title">THE BEDROOM</h3>
-        <p class="card-body">A color-drenched retreat. Lush, vibrant, and deeply relaxing, the kind of bedroom you don't want to leave.</p>
-        <div class="card-tags">
-          <span class="card-tag">Interior Design</span>
-          <span class="card-tag">Creative Direction</span>
-          <span class="card-tag">Design</span>
-          <span class="card-tag">Installation</span>
-        </div>
-      </div>
 
     </div><!-- /.project-section (The Bedroom) -->
 
-    <!-- ── Draggable objects ──────────────────────────────────────── -->
+    <!-- ── Draggable objects + sticker rings ────────────────────────── -->
     <div class="objects-layer">
+
+      <!-- Sticker Ring 1 — between Saya and Living Room -->
+      <div class="sticker" style="left:calc(201 / 1440 * 100%); top:calc(2365 / 1440 * 100vw); width:calc(134 / 1440 * 100%); height:calc(134 / 1440 * 100%);">
+        <svg viewBox="0 0 134 134" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(60deg);">
+          <defs>
+            <path id="sticker-circle-1" d="M67,10 a57,57 0 1,1 0,114 a57,57 0 1,1 0,-114"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
+            <textPath href="#sticker-circle-1">Where the plans turn into something you can walk into 💅🏽 ✦ </textPath>
+          </text>
+        </svg>
+      </div>
+
+      <!-- Sticker Ring 2 — near footer -->
+      <div class="sticker" style="left:calc(180 / 1440 * 100%); top:calc(6281 / 1440 * 100vw); width:calc(134 / 1440 * 100%); height:calc(134 / 1440 * 100%);">
+        <svg viewBox="0 0 134 134" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(60deg);">
+          <defs>
+            <path id="sticker-circle-2" d="M67,10 a57,57 0 1,1 0,114 a57,57 0 1,1 0,-114"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
+            <textPath href="#sticker-circle-2">Where the plans turn into something you can walk into 💅🏽 ✦ </textPath>
+          </text>
+        </svg>
+      </div>
 
       <!-- Strawberry -->
       <div class="obj" style="left:calc(759 / 1440 * 100%); top:calc(730 / 1440 * 100vw); width:calc(246 / 1440 * 100%);">
@@ -472,7 +476,7 @@
     // ── Draggable objects ──────────────────────────────────────────
     let dragging = null, offsetX = 0, offsetY = 0, topZ = 10;
 
-    document.querySelectorAll('.obj, .photo, .photo-rotated').forEach(el => {
+    document.querySelectorAll('.obj, .photo, .photo-rotated, .placeholder, .photo-card').forEach(el => {
       el.addEventListener('mousedown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
