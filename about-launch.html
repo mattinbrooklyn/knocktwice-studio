@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
-  <title>Skeleton — Knock Twice</title>
+  <title>About — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
   }
   body::-webkit-scrollbar { display: none; }
 
-#monster-group {
+  #monster-group {
     position: absolute;
     bottom: var(--footer-height);
     left: 0;
@@ -52,12 +52,6 @@
     pointer-events: none;
     overflow: visible;
   }
-
-  /* Page content */
-  .intro {
-    width: var(--content-width);
-    margin-top: 2rem;
-  }
   </style>
 </head>
 <body>
@@ -67,7 +61,7 @@
   </a>
 
   <nav class="nav">
-    <a href="about-launch.html">About</a>
+    <a href="about-launch.html" class="active">About</a>
     <a href="interiors-launch.html">Interiors</a>
     <a href="experiences-launch.html">Experiences</a>
     <a href="shop-launch.html">Shop</a>
@@ -77,12 +71,11 @@
   <div id="page-scaler">
   <div class="page">
 
-    <h1 class="h1">SKELETON PAGE</h1>
-    <p class="body-text intro">This is a test page for the shared skeleton structure.</p>
+    <h1 class="h1">THERE YOU ARE</h1>
 
   </div><!-- /.page -->
 
-  <!-- ── Monster footer wave ──────────────────────── -->
+  <!-- ── Monster footer wave ──────────────── -->
   <div id="monster-group">
     <div class="monster-area" id="monster-area">
       <img class="wave" src="assets/monster-wave.svg" alt="">
@@ -128,22 +121,18 @@
     const monIrisR     = document.getElementById('mon-iris-r');
     const monIrisL     = document.getElementById('mon-iris-l');
 
-    // Pop the monster up on load — double rAF ensures the initial translateY(250px)
-    // has painted before the transition fires, so it animates from the right position.
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         monsterGroup.classList.add('popped-up');
       });
     });
 
-    // Dynamic waveTop — measured live so it works regardless of page content height.
     function getWaveTop() {
       const pageRect = page.getBoundingClientRect();
       const waveRect = monsterArea.getBoundingClientRect();
       return waveRect.top - pageRect.top;
     }
 
-    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
     function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
       const dx = localX - restX;
       const dy = localY - restY;
@@ -163,7 +152,6 @@
     document.addEventListener('mousemove', e => {
       const waveTop = getWaveTop();
       const pageRect = page.getBoundingClientRect();
-      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
       const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
       const y = e.clientY - pageRect.top;
       trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
