@@ -276,6 +276,114 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   height: 2rem;
 }
 
+/* ── Card flip ──────────────────────────────────── */
+.photo-card {
+  position: absolute;
+  overflow: hidden;
+  perspective: 1000px;
+  box-shadow: var(--shadow-stack);
+  transition: box-shadow 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.photo-card:hover {
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+}
+.photo-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.photo-card:hover .photo-card-inner {
+  transform: rotateY(180deg) scale(1.02);
+}
+.photo-card-front,
+.photo-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 0.25rem;
+}
+.photo-card-front img {
+  width: 100%; height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.photo-card-back {
+  background: var(--color-khaki);
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8% 7%;
+  gap: 1rem;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  line-height: var(--leading-h2);
+  font-weight: 400;
+  color: var(--color-ink);
+}
+.card-body {
+  font-family: var(--font-body);
+  font-size: var(--type-b1);
+  line-height: var(--leading-b1);
+  font-weight: 400;
+  color: var(--color-ink);
+}
+.card-tags {
+  display: flex;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+.photo-card-back .card-tag,
+.section-card .card-tag {
+  color: var(--color-bg);
+  border-color: var(--color-bg);
+}
+
+/* ── Placeholder ────────────────────────────────── */
+.placeholder {
+  position: absolute;
+  background-image: url('interior-placeholder.png');
+  background-size: 87.68px 87.68px;
+  background-repeat: repeat;
+  box-shadow: var(--shadow-stack);
+}
+
+/* ── Section card (static project info) ─────────── */
+.section-card {
+  position: absolute;
+  background: var(--color-khaki);
+  border-radius: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 5;
+  padding: 2rem;
+}
+
+/* ── Draggable objects ──────────────────────────── */
+.obj {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+}
+.obj-inner {
+  width: 100%;
+}
+.obj-inner img {
+  width: 100%;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+.is-dragging {
+  cursor: grabbing !important;
+}
+
 /* ── Buttons ────────────────────────────────────── */
 .btn {
   display: inline-flex;

@@ -69,12 +69,10 @@
   /* Container preserves 1440×2603 canvas proportions (y:384 to y:2987) */
   .project-section {
     position: relative;
-    width: 100%;
+    width: 100vw;
     max-width: 1440px;
-    margin: 0 auto;
+    margin-left: calc(-1 * var(--content-left));
     aspect-ratio: 1440 / 2603;
-    /* Clears the absolute-positioned wave above the footer */
-    margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));
   }
 
   /* Photos are absolutely positioned as % of the container */
@@ -110,6 +108,12 @@
     object-fit: cover;
     pointer-events: none;
     user-select: none;
+  }
+
+  /* Objects layer sits in flow at zero height; objects overflow visually */
+  .objects-layer {
+    height: 0;
+    overflow: visible;
   }
   </style>
 </head>
@@ -152,9 +156,23 @@
         <img src="assets/images/interior-saya-01.webp" alt="">
       </div>
 
-      <!-- saya-02  left:36.25% top:0%     w:37.01%  h:13.64% -->
-      <div class="photo" style="left:36.25%; top:0%; width:37.01%; height:13.64%;">
-        <img src="assets/images/interior-saya-02.webp" alt="">
+      <!-- saya-02  left:36.25% top:0%     w:37.01%  h:13.64% — hover card flip -->
+      <div class="photo-card" style="left:36.25%; top:0%; width:37.01%; height:13.64%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="assets/images/interior-saya-02.webp" alt="Sava's Room">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">SAYA'S ROOM</h3>
+            <p class="card-body">A bedroom built to grow up slowly. Whimsical without being juvenile, colorful without a theme — every piece chosen to feel as right in her next home as it does in this one.</p>
+            <div class="card-tags">
+              <span class="card-tag">Children's Interior</span>
+              <span class="card-tag">Creative Direction</span>
+              <span class="card-tag">Design</span>
+              <span class="card-tag">Installation</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- saya-04  left:75.35% top:2.31%  w:24.65%  h:20.48% -->
@@ -212,16 +230,151 @@
         <img src="assets/images/interior-saya-12.webp" alt="">
       </div>
 
-      <!-- saya-09  left:0%     top:86.36% w:37.01%  h:13.64%
-           Portrait image displayed landscape via -90° rotation.
-           Outer flex container (% size) centres the rotated inner (355×533). -->
-      <div class="photo-rotated" style="left:0%; top:86.36%; width:37.01%; height:13.64%;">
-        <div class="photo-rotated-inner" style="width:355px; height:533px;">
-          <img src="assets/images/interior-saya-09.webp" alt="" style="width:355px; height:533px;">
+      <!-- saya-09  left:0%     top:88.0%  w:37.01%  h:13.64% -->
+      <div class="photo" style="left:0%; top:86.36%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-09.webp" alt="Saya's Room">
+      </div>
+
+    </div><!-- /.project-section (Saya's Room) -->
+
+    <!-- ── The Living Room ───────────────────────────────────────────── -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1838;">
+
+      <!-- 1  left:42.50% top:0%     w:37.01% h:19.31% -->
+      <div class="placeholder" style="left:42.50%; top:0%;    width:37.01%; height:19.31%;"></div>
+
+      <!-- 2  left:5.35%  top:9.79%  w:24.65% h:29.0% -->
+      <div class="placeholder" style="left:5.35%;  top:9.79%; width:24.65%; height:29.0%;"></div>
+
+      <!-- 3  left:75.35% top:13.06% w:24.65% h:29.0% -->
+      <div class="placeholder" style="left:75.35%; top:13.06%; width:24.65%; height:29.0%;"></div>
+
+      <!-- 4  left:36.25% top:24.21% w:37.01% h:19.31% -->
+      <div class="placeholder" style="left:36.25%; top:24.21%; width:37.01%; height:19.31%;"></div>
+
+      <!-- 5  left:20.83% top:45.16% w:37.01% h:19.31% -->
+      <div class="placeholder" style="left:20.83%; top:45.16%; width:37.01%; height:19.31%;"></div>
+
+      <!-- 6  left:66.18% top:48.42% w:24.65% h:29.0% -->
+      <div class="placeholder" style="left:66.18%; top:48.42%; width:24.65%; height:29.0%;"></div>
+
+      <!-- 7  left:27.08% top:67.74% w:37.01% h:19.31% -->
+      <div class="placeholder" style="left:27.08%; top:67.74%; width:37.01%; height:19.31%;"></div>
+
+      <!-- 8  left:4.17%  top:71.0%  w:24.65% h:29.0% -->
+      <div class="placeholder" style="left:4.17%;  top:71.0%;  width:24.65%; height:29.0%;"></div>
+
+      <div class="section-card" style="left:12.5%; top:3%; width:28%; padding:3%;">
+        <h3 class="card-title">THE LIVING ROOM</h3>
+        <p class="card-body">A maximalist living room built to feel and look every inch that splits and covers every surface. Electrics, Seventies, and above every one, comfortably colourful.</p>
+        <div class="card-tags">
+          <span class="card-tag">Interior Design</span>
+          <span class="card-tag">Creative Direction</span>
+          <span class="card-tag">Design</span>
+          <span class="card-tag">Installation</span>
         </div>
       </div>
 
-    </div><!-- /.project-section -->
+    </div><!-- /.project-section (The Living Room) -->
+
+    <!-- ── The Bedroom ───────────────────────────────────────────────── -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1713; margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));">
+
+      <!-- 1  left:36.25% top:0%     w:37.01% h:20.72% -->
+      <div class="placeholder" style="left:36.25%; top:0%;     width:37.01%; height:20.72%;"></div>
+
+      <!-- 2  left:75.35% top:1.75%  w:24.65% h:31.11% -->
+      <div class="placeholder" style="left:75.35%; top:1.75%;  width:24.65%; height:31.11%;"></div>
+
+      <!-- 3  left:0%     top:31.46% w:37.01% h:20.72% -->
+      <div class="placeholder" style="left:0%;     top:31.46%; width:37.01%; height:20.72%;"></div>
+
+      <!-- 4  left:58.82% top:29.48% w:37.01% h:20.72% -->
+      <div class="placeholder" style="left:58.82%; top:29.48%; width:37.01%; height:20.72%;"></div>
+
+      <!-- 5  left:32.08% top:35.43% w:24.65% h:31.11% -->
+      <div class="placeholder" style="left:32.08%; top:35.43%; width:24.65%; height:31.11%;"></div>
+
+      <!-- 6  left:-2.08% top:55.69% w:24.65% h:31.11% (bleeds left) -->
+      <div class="placeholder" style="left:-2.08%; top:55.69%; width:24.65%; height:31.11%;"></div>
+
+      <!-- 7  left:65.07% top:55.46% w:24.65% h:31.11% -->
+      <div class="placeholder" style="left:65.07%; top:55.46%; width:24.65%; height:31.11%;"></div>
+
+      <!-- 8  left:30.90% top:79.22% w:37.01% h:20.72% -->
+      <div class="placeholder" style="left:30.90%; top:79.22%; width:37.01%; height:20.72%;"></div>
+
+      <div class="section-card" style="left:12.5%; top:30%; width:28%; padding:3%;">
+        <h3 class="card-title">THE BEDROOM</h3>
+        <p class="card-body">A color-drenched retreat. Lush, vibrant, and deeply relaxing, the kind of bedroom you don't want to leave.</p>
+        <div class="card-tags">
+          <span class="card-tag">Interior Design</span>
+          <span class="card-tag">Creative Direction</span>
+          <span class="card-tag">Design</span>
+          <span class="card-tag">Installation</span>
+        </div>
+      </div>
+
+    </div><!-- /.project-section (The Bedroom) -->
+
+    <!-- ── Draggable objects ──────────────────────────────────────── -->
+    <div class="objects-layer">
+
+      <!-- Strawberry -->
+      <div class="obj" style="left:calc(759 / 1440 * 100%); top:calc(730 / 1440 * 100vw); width:calc(246 / 1440 * 100%);">
+        <img src="assets/images/obj-strawberry.webp" alt="Strawberry" style="width: 100%; aspect-ratio: 246/257;">
+      </div>
+
+      <!-- Red Tulip -->
+      <div class="obj has-rotation" style="left:81.03%; top:calc(1527.03 / 1440 * 100vw); width:calc(434.249 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(-15.05deg); aspect-ratio:278.046/638.126;">
+          <img src="assets/images/obj-red-tulip.webp" alt="Red Tulip">
+        </div>
+      </div>
+
+      <!-- Purple Candle -->
+      <div class="obj has-rotation" style="left:85.76%; top:calc(2897 / 1440 * 100vw); width:calc(267.76 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(-6.71deg); aspect-ratio:241/243;">
+          <img src="assets/images/obj-blob-candle-purple.webp" alt="Purple candle">
+        </div>
+      </div>
+
+      <!-- Dice -->
+      <div class="obj has-rotation" style="left:3.44%; top:calc(3693.57 / 1440 * 100vw); width:calc(312.242 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(16.05deg); aspect-ratio:247.334/269.605;">
+          <img src="assets/images/obj-dice.webp" alt="Dice">
+        </div>
+      </div>
+
+      <!-- Chain -->
+      <div class="obj has-rotation" style="left:77.11%; top:calc(4243.87 / 1440 * 100vw); width:calc(449.232 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(-18.14deg); aspect-ratio:380/283;">
+          <img src="assets/images/obj-chain.webp" alt="Chain">
+        </div>
+      </div>
+
+      <!-- Yellow Candle -->
+      <div class="obj has-rotation" style="left:47.50%; top:calc(5092 / 1440 * 100vw); width:calc(219.523 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(2.69deg); aspect-ratio:208.967/230.038;">
+          <img src="assets/images/obj-blob-candle-yellow.webp" alt="Yellow candle">
+        </div>
+      </div>
+
+      <!-- Bust -->
+      <div class="obj has-rotation" style="left:16.17%; top:calc(5659.67 / 1440 * 100vw); width:calc(239.691 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(-3.84deg); aspect-ratio:217.533/338.435;">
+          <img src="assets/images/obj-bust.webp" alt="Bust">
+        </div>
+      </div>
+
+      <!-- Cat Clock -->
+      <div class="obj has-rotation" style="left:85.83%; top:calc(5852 / 1440 * 100vw); width:calc(164.349 / 1440 * 100vw);">
+        <div class="obj-inner" style="transform:rotate(3.12deg); aspect-ratio:138/488;">
+          <img src="assets/images/obj-cat-clock.webp" alt="Cat clock">
+        </div>
+      </div>
+
+    </div><!-- /.objects-layer -->
 
   </div><!-- /.page -->
 
@@ -312,6 +465,42 @@
       const y = e.clientY - pageRect.top;
       trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
       trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
+  </script>
+
+  <script>
+    // ── Draggable objects ──────────────────────────────────────────
+    let dragging = null, offsetX = 0, offsetY = 0, topZ = 10;
+
+    document.querySelectorAll('.obj, .photo, .photo-rotated').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const parent = dragging.offsetParent;
+      const parentRect = parent.getBoundingClientRect();
+      dragging.style.left = (e.clientX - parentRect.left - offsetX) + 'px';
+      dragging.style.top  = (e.clientY - parentRect.top  - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+      }
+    });
+
+    document.querySelectorAll('.obj img, .photo img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
     });
   </script>
 
