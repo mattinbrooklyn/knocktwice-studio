@@ -53,7 +53,7 @@
   --page-max:              90rem;
   --nav-left:              2.5rem;
   --nav-top:               12.5rem;
-  --logo-top:              4.375rem;
+  --logo-top:              3.8125rem;
 
   /* Layout — mobile */
   --content-left-mobile:   1.25rem;
@@ -71,6 +71,16 @@
 
   /* Effects */
   --shadow-stack:          0px 4px 4px rgba(0, 0, 0, 0.25);
+
+  /* Grid — desktop (5 col) */
+  --grid-margin:           2.5rem;       /* 40px — outer page margin */
+  --grid-gutter:           1.25rem;      /* 20px — space between columns */
+  --grid-columns:          5;
+
+  /* Grid — mobile (3 col) */
+  --grid-margin-mobile:    1.25rem;      /* 20px */
+  --grid-gutter-mobile:    1.25rem;      /* 20px */
+  --grid-columns-mobile:   3;
 }
 
 /* ── Reset ──────────────────────────────────────── */
@@ -89,6 +99,29 @@ html, body {
   font-family: var(--font-body);
   font-size: 16px;
   cursor: none;
+}
+
+/* ── Typography helpers ─────────────────────────── */
+.h1 {
+  font-family: var(--font-display);
+  font-size: var(--type-h1);
+  line-height: var(--leading-h1);
+  font-weight: 400;
+  color: var(--color-ink);
+}
+.h2 {
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  line-height: var(--leading-h2);
+  font-weight: 400;
+  color: var(--color-ink);
+}
+.body-text {
+  font-family: var(--font-body);
+  font-size: var(--type-b1);
+  line-height: var(--leading-b1);
+  font-weight: 400;
+  color: var(--color-ink);
 }
 
 /* ── Custom cursor ──────────────────────────────── */
@@ -123,6 +156,35 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   display: block;
   object-fit: contain;
   object-position: left top;
+}
+.logo svg path {
+  transition: fill 0.2s ease;
+}
+.logo:hover svg path {
+  fill: var(--color-ink);
+}
+
+/* ── Page skeleton ──────────────────────────────── */
+#page-scaler {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh + var(--footer-height));
+  overflow: hidden;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  padding-top: 4.375rem;
+  padding-left: var(--content-left);
+  padding-right: var(--grid-margin);
+  padding-bottom: 0;
 }
 
 /* ── Navigation — desktop ───────────────────────── */
@@ -236,6 +298,28 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   opacity: 0.9;
 }
 
+/* Full-width primary button — pages will migrate to this over time */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--button-height);
+  border-radius: var(--radius-button);
+  background: var(--color-green);
+  color: var(--color-bg);
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  font-weight: 400;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  border: none;
+  cursor: none;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  opacity: 0.85;
+}
+
 /* ── Form fields ────────────────────────────────── */
 .field {
   font-family: var(--font-ui);
@@ -243,7 +327,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   font-weight: 400;
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
   height: var(--input-height);
-  border-radius: var(--radius-input);
+  border-radius: var(--radius-button);
   border: 2px solid var(--color-ink);
   background: var(--color-bg);
   color: var(--color-ink);
@@ -260,7 +344,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 
 /* ── Footer ─────────────────────────────────────── */
 .footer {
-  position: absolute;
+  position: relative;
   left: 0;
   width: 100%;
   height: var(--footer-height);
@@ -268,6 +352,7 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   background: var(--color-blue);
   display: flex;
   align-items: center;
+  z-index: 100;
 }
 .footer-icons {
   position: absolute;
@@ -316,8 +401,171 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   line-height: 1rem;
 }
 
+/* Replaces .error-text going forward — toggled by JS adding .is-visible */
+.error-msg {
+  font-family: var(--font-body);
+  font-size: var(--type-error);
+  color: var(--color-red);
+  line-height: 1rem;
+  display: none;
+  margin-top: 0.25rem;
+}
+.error-msg.is-visible {
+  display: block;
+}
+
+/* ── Modals ─────────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(247, 242, 236, 0.88);
+  z-index: 14;
+  display: none;
+}
+.modal-card {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(58rem, 90vw);
+  background: var(--color-white);
+  border: 2px solid var(--color-ink);
+  border-radius: 0.875rem;
+  z-index: 25;
+  padding: 1.25rem;
+}
+
+/* ── Mailing list modal ─────────────────────────── */
+.ml-close {
+  position: absolute;
+  top: 1.125rem;
+  right: 1.125rem;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  color: var(--color-ink);
+  line-height: 1;
+  padding: 0.75rem;
+}
+.ml-heading {
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  line-height: var(--leading-h2);
+  font-weight: 400;
+  color: var(--color-ink);
+  margin-bottom: var(--space-xs);
+}
+.ml-body {
+  font-family: var(--font-body);
+  font-size: var(--type-b1);
+  line-height: var(--leading-b1);
+  font-weight: 400;
+  color: var(--color-ink);
+}
+.ml-form-row {
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 1.25rem;
+}
+/* Inherits .field styles; overrides specific to this context */
+.ml-form-row input {
+  font-family: var(--font-ui);
+  font-size: var(--type-field);
+  font-weight: 400;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  height: var(--input-height);
+  border: 2px solid var(--color-ink);
+  color: var(--color-ink);
+  padding: 0 1.375rem;
+  flex: 1;
+  background: var(--color-white);
+  border-radius: var(--radius-button);
+}
+.ml-form-row input::placeholder {
+  color: var(--color-khaki);
+}
+.ml-form-row input:focus {
+  outline: none;
+  border-color: var(--color-blue);
+}
+.ml-form-row input.has-error {
+  color: var(--color-red);
+  font-weight: 700;
+}
+.ml-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: auto;
+  padding: 0 2.5rem;
+  height: var(--button-height);
+  border-radius: var(--radius-button);
+  background: var(--color-green);
+  color: var(--color-bg);
+  font-family: var(--font-ui);
+  font-size: var(--type-button);
+  font-weight: 400;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  border: 2px solid transparent;
+  cursor: none;
+  text-decoration: none;
+}
+.ml-submit:hover {
+  background: var(--color-white);
+  color: var(--color-green);
+  border-color: var(--color-ink);
+}
+.ml-submit.is-disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ml-submit.is-disabled:hover {
+  background: var(--color-green);
+  color: var(--color-bg);
+  border-color: transparent;
+}
+.ml-disclaimer {
+  font-family: var(--font-body);
+  font-size: var(--type-b1);
+  line-height: var(--leading-b1);
+  color: var(--color-ink);
+  opacity: 0.55;
+  margin-top: 1rem;
+}
+
+/* Error state — JS adds .ml-error to .modal-card */
+.modal-card.ml-error .error-msg {
+  display: block;
+}
+.modal-card.ml-error .ml-form-row input {
+  border-color: var(--color-red);
+}
+
+/* Success state — JS adds .ml-success to .modal-card */
+.ml-success-body {
+  font-family: var(--font-body);
+  font-size: var(--type-b1);
+  line-height: var(--leading-b1);
+  font-weight: 400;
+  color: var(--color-ink);
+  display: none;
+}
+.modal-card.ml-success .ml-body,
+.modal-card.ml-success .ml-form-row,
+.modal-card.ml-success .ml-disclaimer,
+.modal-card.ml-success .error-msg {
+  display: none;
+}
+.modal-card.ml-success .ml-success-body {
+  display: block;
+}
+
 /* ── Mobile breakpoint ──────────────────────────── */
 @media (max-width: 768px) {
   .nav { display: none; }
   .nav-mobile-trigger { display: block; }
+  --grid-margin: var(--grid-margin-mobile);
 }

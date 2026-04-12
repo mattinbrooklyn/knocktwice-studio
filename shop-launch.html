@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Shop — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  /* ── Monster wave — shop-specific timing and rise behavior ───────── */
+  /* z-index 16: above modal-backdrop (14) so the wave is visible over it */
+  #monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 16;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  /* 900ms, no delay — monster lands at rest before modal opens at 1500ms */
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Wave-risen state: triggered when mailing list modal opens */
+  #monster-group.wave-risen {
+    transform: translateY(-55vh);
+    transition: transform 600ms ease-out;
+  }
+
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* Blue fill below the wave — always present, comes up with the monster on rise */
+  #modal-blue-body {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: 2000px;
+    background: var(--color-blue);
+  }
+
+  /* ── Modal position ─────────────────────────────────────────────── */
+  #ml-modal.modal-card {
+    top: 61%;
+  }
+
+  /* ── Page content ────────────────────────────────────────────────── */
+  .h1 {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-sm);
+  }
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-top: var(--space-sm);
+  }
+  </style>
+</head>
+<body>
+
+  <a href="home.html" class="logo">
+    <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+    </svg>
+  </a>
+
+  <nav class="nav">
+    <a href="about.html">About</a>
+    <a href="interiors.html">Interiors</a>
+    <a href="experiences.html">Experiences</a>
+    <a href="shop.html" class="active">Shop</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div id="page-scaler">
+  <div class="page">
+
+    <h1 class="h1">NOT QUITE READY</h1>
+    <p class="body-text intro">Nothing to see here. (There will be soon though.) ⌛️</p>
+
+  </div><!-- /.page -->
+
+  <!-- Backdrop and modal use shared styles from styles.css -->
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+
+  <div class="modal-card" id="ml-modal">
+    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="ml-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
+    <div class="ml-form-row">
+      <input type="email" id="ml-email" class="field" placeholder="Email*" autocomplete="off">
+      <button class="ml-submit" id="ml-submit">Sign Up</button>
+    </div>
+    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+  </div>
+
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group">
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+      <div id="modal-blue-body"></div>
+    </div>
+  </div><!-- /#monster-group -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+  </div><!-- /#page-scaler -->
+
+  <script src="assets/scripts.js"></script>
+  <script>
+    // ── Skeleton constants ─────────────────────────────────────────
+    const page         = document.querySelector('.page');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
+
+    // Pop the monster up on load — 900ms, no delay, lands before modal opens.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
+      });
+    });
+
+    // Dynamic waveTop — measured live so it works regardless of page content height.
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return waveRect.top - pageRect.top;
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + nx * maxX * strength);
+      el.setAttribute('cy', restY + ny * maxY * strength);
+    }
+
+    document.addEventListener('mousemove', e => {
+      const waveTop  = getWaveTop();
+      const pageRect = page.getBoundingClientRect();
+      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
+      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = e.clientY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
+
+
+    // ── Mailing list modal ─────────────────────────────────────────
+    var mlModal    = document.getElementById('ml-modal');
+    var mlBackdrop = document.getElementById('modal-backdrop');
+    var mlClose    = document.getElementById('ml-close');
+    var mlEmail    = document.getElementById('ml-email');
+    var mlError    = document.getElementById('ml-error');
+    var mlSubmit   = document.getElementById('ml-submit');
+    var mlHeading  = document.getElementById('ml-heading');
+
+    function openMailingList() {
+      mlBackdrop.style.display = 'block';
+      mlModal.style.display    = 'block';
+      monsterGroup.classList.add('wave-risen');
+    }
+
+    function closeMailingList() {
+      mlBackdrop.style.display = 'none';
+      mlModal.style.display    = 'none';
+      mlModal.classList.remove('ml-error', 'ml-success');
+      mlEmail.value = '';
+      mlEmail.classList.remove('has-error');
+      mlError.classList.remove('is-visible');
+      mlHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+      // Set inline transition before removing wave-risen so the return animates smoothly.
+      monsterGroup.style.transition = 'transform 600ms ease-out';
+      monsterGroup.classList.remove('wave-risen');
+      // Clear inline transition once the animation settles.
+      setTimeout(function() { monsterGroup.style.transition = ''; }, 650);
+    }
+
+    mlClose.addEventListener('click', closeMailingList);
+
+    // Auto-open after monster has landed (900ms pop-up + buffer).
+    setTimeout(openMailingList, 1500);
+
+    mlSubmit.addEventListener('click', function() {
+      var email = mlEmail.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!valid) {
+        mlModal.classList.add('ml-error');
+        mlModal.classList.remove('ml-success');
+        mlError.classList.add('is-visible');
+        mlSubmit.classList.add('is-disabled');
+        mlEmail.classList.add('has-error');
+        return;
+      }
+      mlModal.classList.remove('ml-error');
+      mlModal.classList.add('ml-success');
+      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
+    });
+
+    mlEmail.addEventListener('input', function() {
+      mlModal.classList.remove('ml-error');
+      mlError.classList.remove('is-visible');
+      mlSubmit.classList.remove('is-disabled');
+      mlEmail.classList.remove('has-error');
+    });
+  </script>
+
+</body>
+</html>

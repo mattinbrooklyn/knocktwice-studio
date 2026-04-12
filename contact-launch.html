@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Contact — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
+
+#monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 1.1s;
+  }
+
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── H1 ─────────────────────────────────────────────────────────── */
+  /* z-index 3 keeps the heading above the absolutely-positioned marquee */
+  .h1 {
+    margin-bottom: var(--space-sm);
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ── WHO'S THERE marquee ─────────────────────────────────────────── */
+  .whos-there-marquee {
+    position: absolute;
+    left: var(--content-left);
+    top: 7.5rem;
+    width: 50.5rem;
+    height: 7.0625rem;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2;
+  }
+  .whos-there-marquee svg {
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  /* ── Intro ───────────────────────────────────────────────────────── */
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-top: 4.8125rem;
+    margin-bottom: var(--space-sm);
+  }
+
+  /* ── Form layout ─────────────────────────────────────────────────── */
+  .input-row {
+    width: min(var(--content-width), 100%);
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.625rem;
+  }
+  .input-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Design uses white backgrounds on all form fields */
+  .input-row input.field,
+  .textarea-wrap textarea.field {
+    background: var(--color-white);
+  }
+
+  .textarea-col {
+    width: min(var(--content-width), 100%);
+    margin-bottom: 0.625rem;
+  }
+  .textarea-wrap {
+    height: 12.125rem;
+  }
+  /* Textarea shares .field base styles; overrides for larger dimensions */
+  .textarea-wrap textarea.field {
+    height: 100%;
+    padding: 1.25rem;
+    resize: none;
+    border-radius: 0.875rem;
+  }
+
+  /* Constrain btn-primary to content width */
+  .form-actions {
+    width: min(var(--content-width), 100%);
+  }
+  /* Disabled state while required field errors are active */
+  .btn-primary.is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* ── Success state ───────────────────────────────────────────────── */
+  /* Blue fill that appears behind the rising wave */
+  #modal-blue-body {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 106px; /* just below the wave crest */
+    width: 100%;
+    height: 2000px;
+    background: var(--color-blue);
+  }
+  /* Padding override and heading spacing for the success card */
+  #success-modal {
+    padding: 2rem;
+  }
+  #success-modal .ml-heading {
+    margin-top: var(--space-sm);
+  }
+  </style>
+</head>
+<body>
+
+  <a href="home.html" class="logo">
+    <img src="assets/logo-keyhole.svg" alt="Knock Twice">
+  </a>
+
+  <nav class="nav">
+    <a href="about.html">About</a>
+    <a href="interiors.html">Interiors</a>
+    <a href="experiences.html">Experiences</a>
+    <a href="shop.html">Shop</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+
+  <div id="page-scaler">
+  <div class="page">
+
+    <h1 class="h1">KNOCK KNOCK</h1>
+
+    <div class="whos-there-marquee">
+      <svg viewBox="0 0 808 113" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <path id="whos-path" d="M0 56 C102 36,205 36,307 56 C409 76,512 76,614 56 C716 36,819 36,921 56 C1023 76,1126 76,1228 56 C1330 36,1433 36,1535 56 C1637 76,1740 76,1842 56 C1944 36,2047 36,2149 56 C2251 76,2354 76,2456 56 C2558 36,2661 36,2763 56 C2865 76,2968 76,3070 56"/>
+        </defs>
+        <text xml:space="preserve" style="font-family: var(--font-ui); font-size: 22px; font-weight: 400; letter-spacing: -0.22px; font-variation-settings: 'ELGR' 1, 'ELSH' 2; fill: var(--color-pink);">
+          <textPath id="whos-textpath" href="#whos-path" startOffset="0">WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        </textPath>
+        </text>
+      </svg>
+    </div>
+
+    <p class="body-text intro">We're so glad you came by. Have something in mind? Just say hello and we'll figure out the rest.</p>
+
+    <div class="input-row">
+      <div class="input-col">
+        <input class="field" type="email" name="email" id="input-email" placeholder="Email*" autocomplete="off">
+        <p class="error-msg" id="error-email">Hmm. That email doesn't look right. Try again?</p>
+      </div>
+      <div class="input-col">
+        <input class="field" type="text" name="name" id="input-name" placeholder="Name*" autocomplete="off">
+        <p class="error-msg" id="error-name">What should we call you?</p>
+      </div>
+    </div>
+
+    <div class="textarea-col">
+      <div class="textarea-wrap">
+        <textarea class="field" name="message" id="input-message" placeholder="Knock Twice, we might not hear you the first time..."></textarea>
+      </div>
+      <p class="error-msg" id="error-body">Left this blank. That works, but more info helps.</p>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-primary" id="btn-send" type="button">Send</button>
+    </div>
+
+    <!-- Backdrop and success modal use shared styles from styles.css -->
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+
+    <div class="modal-card" id="success-modal">
+      <button class="ml-close" aria-label="Close">×</button>
+      <h2 class="ml-heading">SECOND KNOCK RECEIVED! 💌</h2>
+      <p class="ml-body">Your note made it through. We're taking a look and will be in touch soon. In the meantime, feel free to keep poking around.</p>
+    </div>
+
+  </div><!-- /.page -->
+
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group">
+    <!-- Blue body fills the area below the wave crest during the success rise -->
+    <div id="modal-blue-body"></div>
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+    </div>
+  </div><!-- /#monster-group -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+  </div><!-- /#page-scaler -->
+
+  <script src="assets/scripts.js"></script>
+  <script>
+    // ── Skeleton constants ─────────────────────────────────────────
+    const page         = document.querySelector('.page');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
+
+    // Pop the monster up on load — double rAF ensures the initial translateY(250px)
+    // has painted before the transition fires, so it animates from the right position.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
+      });
+    });
+
+    // Dynamic waveTop — measured live so it works regardless of page content height.
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return waveRect.top - pageRect.top;
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + nx * maxX * strength);
+      el.setAttribute('cy', restY + ny * maxY * strength);
+    }
+
+    document.addEventListener('mousemove', e => {
+      const waveTop  = getWaveTop();
+      const pageRect = page.getBoundingClientRect();
+      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
+      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = e.clientY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
+
+
+    // ── WHO'S THERE marquee ────────────────────────────────────────
+    // Scrolls the wavy text path continuously leftward. Arc-length
+    // wrapping is measured after fonts load so the seam is invisible.
+    const whosTextpath = document.getElementById('whos-textpath');
+    let whosOffset = 0;
+    let whosUnit   = 0; // one repeat-unit in arc-length pixels, set after font load
+    let whosPrev   = null;
+
+    function measureWhosUnit() {
+      // Measure on a straight line (close enough to arc length for this gentle wave).
+      // The text string is 20 identical repeats, so one unit = total / 20.
+      const ns  = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
+      const txt = document.createElementNS(ns, 'text');
+      txt.setAttribute('xml:space', 'preserve');
+      txt.setAttribute('font-family', "'Handjet', sans-serif");
+      txt.setAttribute('font-size', '22');
+      txt.setAttribute('font-weight', '600');
+      txt.setAttribute('letter-spacing', '-0.22');
+      txt.style.fontVariationSettings = "'ELGR' 1, 'ELSH' 2";
+      txt.textContent = "WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        ";
+      svg.appendChild(txt);
+      document.body.appendChild(svg);
+      const total = txt.getComputedTextLength();
+      document.body.removeChild(svg);
+      return total / 20;
+    }
+
+    function animateWhos(ts) {
+      if (whosPrev !== null) {
+        const dt = Math.min(ts - whosPrev, 50);
+        whosOffset -= 51 * (dt / 1000);
+        if (whosUnit > 0 && whosOffset <= -whosUnit) whosOffset += whosUnit;
+        whosTextpath.setAttribute('startOffset', whosOffset.toFixed(2));
+      }
+      whosPrev = ts;
+      requestAnimationFrame(animateWhos);
+    }
+
+    // Wait for Handjet to load before measuring, then start the loop.
+    document.fonts.ready.then(() => {
+      // Scale straight-line measurement to arc length so the wrap fires exactly.
+      const pathEl   = document.getElementById('whos-path');
+      const arcScale = pathEl.getTotalLength() / 3070;
+      whosUnit = measureWhosUnit() * arcScale;
+      requestAnimationFrame(animateWhos);
+    });
+
+
+    // ── Contact form ───────────────────────────────────────────────
+    var emailInput    = document.getElementById('input-email');
+    var nameInput     = document.getElementById('input-name');
+    var messageInput  = document.getElementById('input-message');
+    var btnSend       = document.getElementById('btn-send');
+    var errorEmail    = document.getElementById('error-email');
+    var errorName     = document.getElementById('error-name');
+    var errorBody     = document.getElementById('error-body');
+    var modalBackdrop = document.getElementById('modal-backdrop');
+    var modalBlueBody = document.getElementById('modal-blue-body');
+    var successModal  = document.getElementById('success-modal');
+
+    // Canvas y where the wave crest should settle in the success state (px from page top).
+    var RISE_TARGET = 208;
+    var SHEET_URL   = 'https://script.google.com/macros/s/AKfycbyJarDDs9UsG_pflQFBYWCuVkaDYBY_XdSWdi7Trv70NC-KRzj8_8Hf1UHQT7F9oxkd/exec';
+
+    function openSuccess() {
+      // getWaveTop() is called here (not cached) so the rise amount is correct
+      // even if the page was resized between load and form submit.
+      var riseAmount = getWaveTop() - RISE_TARGET;
+      modalBackdrop.style.display   = 'block';
+      modalBlueBody.style.display   = 'block';
+      successModal.style.display    = 'block';
+      monsterGroup.style.zIndex     = '16'; // above backdrop (z-index 14)
+      monsterGroup.style.transition = 'transform 600ms ease-out';
+      monsterGroup.style.transform  = 'translateY(-' + riseAmount + 'px)';
+
+      if (SHEET_URL) {
+        var email   = emailInput.value.trim();
+        var name    = nameInput.value.trim();
+        var message = messageInput.value.trim();
+        fetch(SHEET_URL + '?email='   + encodeURIComponent(email) +
+                          '&name='    + encodeURIComponent(name) +
+                          '&message=' + encodeURIComponent(message), { mode: 'no-cors' })
+          .catch(function() {});
+      }
+    }
+
+    function closeSuccess() {
+      // Snap back instantly so the pop-up transition doesn't replay on close.
+      monsterGroup.style.transition = 'none';
+      monsterGroup.style.transform  = '';
+      successModal.style.display    = 'none';
+      modalBackdrop.style.display   = 'none';
+      modalBlueBody.style.display   = 'none';
+      emailInput.value   = '';
+      nameInput.value    = '';
+      messageInput.value = '';
+      errorEmail.classList.remove('is-visible');
+      errorName.classList.remove('is-visible');
+      errorBody.classList.remove('is-visible');
+      btnSend.classList.remove('is-disabled');
+      monsterGroup.style.zIndex = '';
+      // Re-enable the CSS transition for the next pop-up entrance.
+      requestAnimationFrame(function() { monsterGroup.style.transition = ''; });
+    }
+
+    btnSend.addEventListener('click', function() {
+      var email     = emailInput.value.trim();
+      var name      = nameInput.value.trim();
+      var emailOk   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      var nameOk    = name.length > 0;
+      var bodyEmpty = messageInput.value.trim().length === 0;
+
+      errorEmail.classList.toggle('is-visible', !emailOk);
+      errorName.classList.toggle('is-visible',  !nameOk);
+      errorBody.classList.toggle('is-visible',   bodyEmpty);
+      btnSend.classList.toggle('is-disabled',   !emailOk || !nameOk);
+
+      if (emailOk && nameOk) {
+        openSuccess();
+      }
+    });
+
+    // Clear each error as the user corrects it; re-enable button only when
+    // both required fields are error-free.
+    emailInput.addEventListener('input', function() {
+      errorEmail.classList.remove('is-visible');
+      if (!errorName.classList.contains('is-visible')) {
+        btnSend.classList.remove('is-disabled');
+      }
+    });
+    nameInput.addEventListener('input', function() {
+      errorName.classList.remove('is-visible');
+      if (!errorEmail.classList.contains('is-visible')) {
+        btnSend.classList.remove('is-disabled');
+      }
+    });
+    messageInput.addEventListener('input', function() {
+      errorBody.classList.remove('is-visible');
+    });
+
+    document.querySelector('.ml-close').addEventListener('click', closeSuccess);
+  </script>
+
+</body>
+</html>
