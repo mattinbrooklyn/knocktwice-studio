@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Interiors — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <style>
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  /* ── Monster wave ────────────────────────────────────────────────── */
+  #monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 1.1s;
+  }
+
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── Top section content ─────────────────────────────────────────── */
+  .h1 {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-sm);
+  }
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-xl);
+  }
+  .intro p { margin-bottom: 0; }
+
+  /* ── Sava's Room photo collage ───────────────────────────────────── */
+  /* Container preserves 1440×2603 canvas proportions (y:384 to y:2987) */
+  .project-section {
+    position: relative;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    aspect-ratio: 1440 / 2603;
+    /* Clears the absolute-positioned wave above the footer */
+    margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));
+  }
+
+  /* Photos are absolutely positioned as % of the container */
+  .photo {
+    position: absolute;
+    overflow: hidden;
+    user-select: none;
+  }
+  .photo img {
+    width: 100%; height: 100%;
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* saya-09: portrait image displayed landscape via -90° rotation.
+     Outer flex container centres the rotated inner div. */
+  .photo-rotated {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+  }
+  .photo-rotated-inner {
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+  }
+  .photo-rotated-inner img {
+    display: block;
+    object-fit: cover;
+    pointer-events: none;
+    user-select: none;
+  }
+  </style>
+</head>
+<body>
+
+  <a href="home.html" class="logo">
+    <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+    </svg>
+  </a>
+
+  <nav class="nav">
+    <a href="about.html">About</a>
+    <a href="interiors.html" class="active">Interiors</a>
+    <a href="experiences.html">Experiences</a>
+    <a href="shop.html">Shop</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <div id="page-scaler">
+  <div class="page">
+
+    <h1 class="h1">OH. I GUESS YOU LIVE HERE NOW</h1>
+
+    <div class="body-text intro">
+      <p>We design interiors for people who take play seriously and notice the details.</p>
+      <p>We approach the work as industrial designers, which means something is rarely just decorative.</p>
+      <p>&nbsp;</p>
+      <p>Whether you want a full service or creative direction, just reach out and we'll take it from there.</p>
+    </div>
+
+    <!-- ── Sava's Room photo collage ──────────────────────────────── -->
+    <!-- Container aspect-ratio 1440:2603 preserves canvas proportions.
+         All positions/sizes are % of this container (origin: canvas y=384). -->
+    <div class="project-section">
+
+      <!-- saya-01  left:2.08%  top:6.91%  w:37.01%  h:13.64% -->
+      <div class="photo" style="left:2.08%; top:6.91%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-01.webp" alt="">
+      </div>
+
+      <!-- saya-02  left:36.25% top:0%     w:37.01%  h:13.64% -->
+      <div class="photo" style="left:36.25%; top:0%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-02.webp" alt="">
+      </div>
+
+      <!-- saya-04  left:75.35% top:2.31%  w:24.65%  h:20.48% -->
+      <div class="photo" style="left:75.35%; top:2.31%; width:24.65%; height:20.48%;">
+        <img src="assets/images/interior-saya-04.webp" alt="">
+      </div>
+
+      <!-- saya-05  left:38.26% top:18.25% w:24.65%  h:20.48% -->
+      <div class="photo" style="left:38.26%; top:18.25%; width:24.65%; height:20.48%;">
+        <img src="assets/images/interior-saya-05.webp" alt="">
+      </div>
+
+      <!-- saya-07  left:-2.92% top:21.71% w:37.01%  h:13.64% (bleeds left) -->
+      <div class="photo" style="left:-2.92%; top:21.71%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-07.webp" alt="">
+      </div>
+
+      <!-- saya-03  left:65.0%  top:23.89% w:37.01%  h:13.64% -->
+      <div class="photo" style="left:65.0%; top:23.89%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-03.webp" alt="">
+      </div>
+
+      <!-- saya-08  left:10.42% top:36.50% w:37.01%  h:13.64% -->
+      <div class="photo" style="left:10.42%; top:36.50%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-08.webp" alt="">
+      </div>
+
+      <!-- saya-06  left:54.72% top:41.0%  w:37.01%  h:13.64% -->
+      <div class="photo" style="left:54.72%; top:41.0%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-06.webp" alt="">
+      </div>
+
+      <!-- saya-14  left:6.04%  top:52.44% w:24.72%  h:20.48% -->
+      <div class="photo" style="left:6.04%; top:52.44%; width:24.72%; height:20.48%;">
+        <img src="assets/images/interior-saya-14.webp" alt="">
+      </div>
+
+      <!-- saya-11  left:34.93% top:56.93% w:37.01%  h:13.64% -->
+      <div class="photo" style="left:34.93%; top:56.93%; width:37.01%; height:13.64%;">
+        <img src="assets/images/interior-saya-11.webp" alt="">
+      </div>
+
+      <!-- saya-13  left:76.11% top:61.54% w:24.65%  h:20.48% -->
+      <div class="photo" style="left:76.11%; top:61.54%; width:24.65%; height:20.48%;">
+        <img src="assets/images/interior-saya-13.webp" alt="">
+      </div>
+
+      <!-- saya-10  left:24.51% top:71.73% w:24.65%  h:20.48% -->
+      <div class="photo" style="left:24.51%; top:71.73%; width:24.65%; height:20.48%;">
+        <img src="assets/images/interior-saya-10.webp" alt="">
+      </div>
+
+      <!-- saya-12  left:53.54% top:74.03% w:24.65%  h:20.48% -->
+      <div class="photo" style="left:53.54%; top:74.03%; width:24.65%; height:20.48%;">
+        <img src="assets/images/interior-saya-12.webp" alt="">
+      </div>
+
+      <!-- saya-09  left:0%     top:86.36% w:37.01%  h:13.64%
+           Portrait image displayed landscape via -90° rotation.
+           Outer flex container (% size) centres the rotated inner (355×533). -->
+      <div class="photo-rotated" style="left:0%; top:86.36%; width:37.01%; height:13.64%;">
+        <div class="photo-rotated-inner" style="width:355px; height:533px;">
+          <img src="assets/images/interior-saya-09.webp" alt="" style="width:355px; height:533px;">
+        </div>
+      </div>
+
+    </div><!-- /.project-section -->
+
+  </div><!-- /.page -->
+
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group">
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+    </div>
+  </div><!-- /#monster-group -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+  </div><!-- /#page-scaler -->
+
+  <script src="assets/scripts.js"></script>
+  <script>
+    // ── Skeleton constants ─────────────────────────────────────────
+    const page         = document.querySelector('.page');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
+
+    // Pop the monster up on load — double rAF ensures the initial
+    // translateY(250px) has painted before the transition fires.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
+      });
+    });
+
+    // Dynamic waveTop — measured live so it works regardless of page height.
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return waveRect.top - pageRect.top;
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + nx * maxX * strength);
+      el.setAttribute('cy', restY + ny * maxY * strength);
+    }
+
+    document.addEventListener('mousemove', e => {
+      const waveTop  = getWaveTop();
+      const pageRect = page.getBoundingClientRect();
+      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
+      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = e.clientY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
+  </script>
+
+</body>
+</html>
