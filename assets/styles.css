@@ -48,8 +48,8 @@
   --space-xl:              clamp(4rem,    7vw,  9rem);
 
   /* Layout — desktop */
-  --content-width:         50.5rem;
-  --content-left:          19.75rem;
+  --content-width:         clamp(25rem, 56vw, 50.5rem);
+  --content-left:          clamp(1.25rem, 22vw, 19.75rem);
   --page-max:              90rem;
   --nav-left:              2.5rem;
   --nav-top:               12.5rem;
@@ -702,6 +702,24 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 }
 .modal-card.ml-success .ml-success-body {
   display: block;
+}
+
+/* ── Object eye overlay ─────────────────────────── */
+/* Base image inside an .obj — block display, no pointer events */
+.obj img.base {
+  display: block;
+  pointer-events: none;
+}
+/* Eyes SVG sits on top of the base image */
+.obj .eyes {
+  position: absolute;
+  top: 0; left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+/* Smooth iris glances driven by KT.animateObjectEyes */
+.obj .eyes circle {
+  transition: cx 200ms ease-out, cy 200ms ease-out;
 }
 
 /* ── Mobile breakpoint ──────────────────────────── */
