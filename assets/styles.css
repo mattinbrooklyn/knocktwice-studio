@@ -704,9 +704,13 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   display: block;
 }
 
-/* ── Mobile breakpoint ──────────────────────────── */
+/* ── Mobile breakpoint (canonical: 768px) ─────────── */
 @media (max-width: 768px) {
+  :root {
+    --grid-margin:    var(--grid-margin-mobile);
+    --content-left: var(--content-left-mobile);
+    --content-width: var(--content-width-mobile);
+  }
   .nav { display: none; }
   .nav-mobile-trigger { display: block; }
-  --grid-margin: var(--grid-margin-mobile);
 }

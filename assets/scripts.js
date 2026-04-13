@@ -17,9 +17,9 @@
   var div = document.createElement('div');
   div.id  = 'custom-cursor';
   div.innerHTML =
-    '<img id="cursor-default" src="assets/cursor-pointer.svg" alt="">' +
-    '<img id="cursor-hover"   src="assets/cursor-open.svg"   alt="">' +
-    '<img id="cursor-drag"    src="assets/cursor-closed.svg" alt="">';
+    '<img id="cursor-default" src="/assets/cursor-pointer.svg" alt="">' +
+    '<img id="cursor-hover"   src="/assets/cursor-open.svg"   alt="">' +
+    '<img id="cursor-drag"    src="/assets/cursor-closed.svg" alt="">';
   document.body.appendChild(div);
 
   // ── Hotspot offsets ───────────────────────────────────────────────

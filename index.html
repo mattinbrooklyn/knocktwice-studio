@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
   <title>Knock Twice</title>
   <style>
     *, *::before, *::after {
@@ -110,7 +110,7 @@
     </svg>
   </div>
 
-  <script src="assets/scripts.js"></script>
+  <script src="/assets/scripts.js"></script>
   <script>
     // ─── Elements ────────────────────────────────────────────────
     const svg           = document.getElementById('keyhole-svg');
@@ -173,7 +173,7 @@
     // 100 –  500ms  Drop     — creature slides off bottom, ease-in (gravity)
     //               Flash    — two-eye state shows for one frame as it drops
     // 500 –  800ms  Fade     — screen fades to black (300ms)
-    // 800ms         Navigate — home.html crossfades in (500ms on that side)
+    // 800ms         Navigate — /home/ crossfades in (500ms on that side)
 
     const overlay  = document.getElementById('fade-overlay');
     let animating  = false;
@@ -203,10 +203,10 @@
           overlay.style.transition = 'opacity 300ms ease';
           overlay.style.opacity    = '1';
 
-          // ── Navigate: home.html fades in from black ────────────
+          // ── Navigate: /home/ fades in from black ────────────
           setTimeout(() => {
             sessionStorage.setItem('from-splash', '1');
-            window.location.href = 'home.html';
+            window.location.href = '/home/';
           }, 300);
 
         }, 450); // drop duration

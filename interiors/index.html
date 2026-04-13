@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
   <title>Interiors — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css">
   <style>
     html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
@@ -99,7 +99,7 @@
     /* ── Checkerboard placeholder ────────────────────────────────── */
     .placeholder {
       position: absolute;
-      background-image: url('assets/interior-placeholder.png');
+      background-image: url('/assets/interior-placeholder.png');
       background-size: 87.68px 87.68px;
       background-position: top left;
       background-repeat: repeat;
@@ -207,11 +207,27 @@
       transform-origin: 50% 50%;
     }
 
-    /* ── Monster wave ────────────────────────────────────────────── */
-    .monster-area {
+    /* ── Monster wave + footer — rise from below (same pattern as contact / launch pages) */
+    #monster-group {
       position: absolute;
-      left: 0; top: 6515px;
-      width: 1440px; height: 122px;
+      left: 0;
+      top: 6515px;
+      width: 100%;
+      min-height: 212px;
+      z-index: 50;
+      transform: translateY(250px);
+      will-change: transform;
+    }
+    #monster-group.popped-up {
+      transform: translateY(0);
+      transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .monster-area {
+      position: relative;
+      left: 0;
+      top: 0;
+      width: 1440px;
+      height: 122px;
     }
     .monster-area .wave {
       position: absolute;
@@ -227,14 +243,26 @@
       overflow: visible;
     }
 
-    .footer { top: 6637px; }
+    /* Canvas uses fixed 1440px math; footer slot is 90px (6.25% of 1440). Global --footer-height is vw-based
+       and grows with viewport width, so the bar extended past .page and was clipped by overflow:hidden.
+       margin-top:0 — shared .footer uses margin-top:-2px for wave seam; with position:absolute + exact top,
+       that pulled the bar up and exposed .page’s cream bg (#F7F2EC) as a “white” line under the footer. */
+    #monster-group .footer {
+      position: absolute;
+      left: 0;
+      top: 122px;
+      width: 100%;
+      height: 90px;
+      margin-top: 0;
+      z-index: 100;
+    }
   </style>
 </head>
 <body>
 
   <!-- ── Scrollable page wrapper ─────────────────────────────────── -->
   <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
-  <a href="home.html" class="logo">
+  <a href="/home/" class="logo">
     <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
       <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
@@ -242,11 +270,11 @@
   </a>
 
   <nav class="nav">
-    <a href="about.html">About</a>
-    <a href="interiors.html" class="active">Interiors</a>
-    <a href="experiences.html">Experiences</a>
-    <a href="shop.html">Shop</a>
-    <a href="contact.html">Contact</a>
+    <a href="/about/">About</a>
+    <a href="/interiors/" class="active">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
   </nav>
 
   <div id="page-scaler">
@@ -271,12 +299,12 @@
 
       <!-- saya-01  left:30   top:564  landscape 533×355 -->
       <div class="photo" style="left:30px; top:564px; width:533px; height:355px;">
-        <img src="assets/interior-saya-01.png" alt="">
+        <img src="/assets/interior-saya-01.png" alt="">
       </div>
 
       <!-- saya-02  left:522  top:384  landscape 533×355 -->
       <div class="photo photo-card" style="left:522px; top:384px; width:533px; height:355px;">
-        <img src="assets/interior-saya-02.png" alt="">
+        <img src="/assets/interior-saya-02.png" alt="">
         <div class="card-overlay">
           <h3 class="card-title">SAYA'S ROOM</h3>
           <p class="card-body">A bedroom built to grow up slowly. Whimsical without being juvenile, colorful without a theme — every piece chosen to feel as right in her next home as it does in this one.</p>
@@ -286,70 +314,70 @@
             <span class="card-tag">Design</span>
             <span class="card-tag">Installation</span>
           </div>
-          <img class="card-cursor" src="assets/cursor-open.svg" alt="">
+          <img class="card-cursor" src="/assets/cursor-open.svg" alt="">
         </div>
       </div>
 
       <!-- saya-04  left:1085 top:444  portrait 355×533 -->
       <div class="photo" style="left:1085px; top:444px; width:355px; height:533px;">
-        <img src="assets/interior-saya-04.png" alt="">
+        <img src="/assets/interior-saya-04.png" alt="">
       </div>
 
       <!-- saya-05  left:551  top:859  portrait 355×533 -->
       <div class="photo" style="left:551px; top:859px; width:355px; height:533px;">
-        <img src="assets/interior-saya-05.png" alt="">
+        <img src="/assets/interior-saya-05.png" alt="">
       </div>
 
       <!-- saya-07  left:-42  top:949  landscape 533×355 (bleeds left edge) -->
       <div class="photo" style="left:-42px; top:949px; width:533px; height:355px;">
-        <img src="assets/interior-saya-07.png" alt="">
+        <img src="/assets/interior-saya-07.png" alt="">
       </div>
 
       <!-- saya-03  left:936  top:1006 landscape 533×355 -->
       <div class="photo" style="left:936px; top:1006px; width:533px; height:355px;">
-        <img src="assets/interior-saya-03.png" alt="">
+        <img src="/assets/interior-saya-03.png" alt="">
       </div>
 
       <!-- saya-08  left:150  top:1334 landscape 533×355 -->
       <div class="photo" style="left:150px; top:1334px; width:533px; height:355px;">
-        <img src="assets/interior-saya-08.png" alt="">
+        <img src="/assets/interior-saya-08.png" alt="">
       </div>
 
       <!-- saya-06  left:788  top:1451 landscape 533×355 -->
       <div class="photo" style="left:788px; top:1451px; width:533px; height:355px;">
-        <img src="assets/interior-saya-06.png" alt="">
+        <img src="/assets/interior-saya-06.png" alt="">
       </div>
 
       <!-- saya-14  left:87   top:1749 portrait 356×533 -->
       <div class="photo" style="left:87px; top:1749px; width:356px; height:533px;">
-        <img src="assets/interior-saya-14.png" alt="">
+        <img src="/assets/interior-saya-14.png" alt="">
       </div>
 
       <!-- saya-11  left:503  top:1866 landscape 533×355 -->
       <div class="photo" style="left:503px; top:1866px; width:533px; height:355px;">
-        <img src="assets/interior-saya-11.png" alt="">
+        <img src="/assets/interior-saya-11.png" alt="">
       </div>
 
       <!-- saya-13  left:1096 top:1986 portrait 355×533 -->
       <div class="photo" style="left:1096px; top:1986px; width:355px; height:533px;">
-        <img src="assets/interior-saya-13.png" alt="">
+        <img src="/assets/interior-saya-13.png" alt="">
       </div>
 
       <!-- saya-10  left:353  top:2251 portrait 355×533 -->
       <div class="photo" style="left:353px; top:2251px; width:355px; height:533px;">
-        <img src="assets/interior-saya-10.png" alt="">
+        <img src="/assets/interior-saya-10.png" alt="">
       </div>
 
       <!-- saya-12  left:771  top:2311 portrait 355×533 -->
       <div class="photo" style="left:771px; top:2311px; width:355px; height:533px;">
-        <img src="assets/interior-saya-12.png" alt="">
+        <img src="/assets/interior-saya-12.png" alt="">
       </div>
 
       <!-- saya-09  left:0 top:2632 — portrait image displayed landscape via -90° rotation.
            Outer flex container (533×355) centres the rotated inner div (355×533). -->
       <div class="photo-rotated" style="left:0; top:2632px; width:533px; height:355px;">
         <div class="photo-rotated-inner" style="width:355px; height:533px;">
-          <img src="assets/interior-saya-09.png" alt="" style="width:355px; height:533px;">
+          <img src="/assets/interior-saya-09.png" alt="" style="width:355px; height:533px;">
         </div>
       </div>
 
@@ -432,19 +460,19 @@
 
       <!-- Strawberry — no rotation, left:759 top:730 w:246 h:257 -->
       <div class="obj" id="obj-strawberry" style="left:759px; top:730px; width:246px; height:257px;">
-        <img src="assets/obj-strawberry.png" alt="Strawberry">
+        <img src="/assets/obj-strawberry.png" alt="Strawberry">
       </div>
 
       <!-- Cloud — no rotation, left:-156 top:1567 w:371 h:212 (bleeds left) -->
       <div class="obj" id="obj-cloud" style="left:-156px; top:1567px; width:371px; height:212px;">
-        <img src="assets/obj-cloud.png" alt="Cloud">
+        <img src="/assets/obj-cloud.png" alt="Cloud">
       </div>
 
       <!-- Red Tulip — outer 434.249×688.444, inner rotate(-15.05deg) 278.046×638.126 -->
       <div class="obj has-rotation" id="obj-tulip"
            style="left:1166.87px; top:1454.81px; width:434.249px; height:688.444px;">
         <div class="obj-inner" style="transform:rotate(-15.05deg); width:278.046px; height:638.126px;">
-          <img src="assets/obj-red-tulip.png" alt="Red Tulip">
+          <img src="/assets/obj-red-tulip.png" alt="Red Tulip">
         </div>
       </div>
 
@@ -452,7 +480,7 @@
       <div class="obj has-rotation" id="obj-candle-purple"
            style="left:1235px; top:2897px; width:267.76px; height:269.512px;">
         <div class="obj-inner" style="transform:rotate(-6.71deg); width:241px; height:243px;">
-          <img src="assets/obj-blob-candle-purple.png" alt="Purple candle">
+          <img src="/assets/obj-blob-candle-purple.png" alt="Purple candle">
         </div>
       </div>
 
@@ -460,7 +488,7 @@
       <div class="obj has-rotation" id="obj-dice"
            style="left:49.59px; top:3693.57px; width:312.242px; height:327.487px;">
         <div class="obj-inner" style="transform:rotate(16.05deg); width:247.334px; height:269.605px;">
-          <img src="assets/obj-dice.png" alt="Dice">
+          <img src="/assets/obj-dice.png" alt="Dice">
         </div>
       </div>
 
@@ -468,7 +496,7 @@
       <div class="obj has-rotation" id="obj-chain"
            style="left:1110.38px; top:4243.87px; width:449.232px; height:387.26px;">
         <div class="obj-inner" style="transform:rotate(-18.14deg); width:380px; height:283px;">
-          <img src="assets/obj-chain.png" alt="Chain">
+          <img src="/assets/obj-chain.png" alt="Chain">
         </div>
       </div>
 
@@ -476,7 +504,7 @@
       <div class="obj has-rotation" id="obj-candle-yellow"
            style="left:684px; top:5092px; width:219.523px; height:239.583px;">
         <div class="obj-inner" style="transform:rotate(2.69deg); width:208.967px; height:230.038px;">
-          <img src="assets/obj-blob-candle-yellow.png" alt="Yellow candle">
+          <img src="/assets/obj-blob-candle-yellow.png" alt="Yellow candle">
         </div>
       </div>
 
@@ -484,7 +512,7 @@
       <div class="obj has-rotation" id="obj-bust"
            style="left:232.84px; top:5659.67px; width:239.691px; height:352.232px;">
         <div class="obj-inner" style="transform:rotate(-3.84deg); width:217.533px; height:338.435px;">
-          <img src="assets/obj-bust.png" alt="Bust">
+          <img src="/assets/obj-bust.png" alt="Bust">
         </div>
       </div>
 
@@ -492,7 +520,7 @@
       <div class="obj has-rotation" id="obj-catclock"
            style="left:1236px; top:5852px; width:164.349px; height:494.786px;">
         <div class="obj-inner" style="transform:rotate(3.12deg); width:138px; height:488px;">
-          <img src="assets/obj-cat-clock.png" alt="Cat clock">
+          <img src="/assets/obj-cat-clock.png" alt="Cat clock">
         </div>
       </div>
 
@@ -500,12 +528,14 @@
       <!-- ══════════════════════════════════════════════════════════ -->
       <!--  MONSTER WAVE FOOTER                                       -->
       <!-- ══════════════════════════════════════════════════════════ -->
-      <!-- Wave div at canvas top:6515. Eye whites overlaid in SVG.
+      <!-- #monster-group at canvas y:6515; wave 122px + footer 90px. .popped-up added when scrolled into view. -->
+      <div id="monster-group">
+      <!-- Wave div. Eye whites overlaid in SVG.
            Right eye: translate(564.63, 38.45), w:119.75  h:33.51
            Left  eye: translate(403,    37.32), w:127.849 h:35.774
            Iris centers: right (624.5, 55.2), left (466.9, 55.2), r:30 -->
       <div class="monster-area" id="monster-area">
-        <img class="wave" src="assets/monster-wave-interiors.svg" alt="">
+        <img class="wave" src="/assets/monster-wave-interiors.svg" alt="">
         <svg class="monster-eyes-overlay" id="monster-eyes-svg"
              viewBox="0 0 1440 122" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -531,20 +561,20 @@
         </svg>
       </div>
 
-      <!-- Footer bar -->
       <footer class="footer">
         <div class="footer-icons">
-          <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
-          <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+          <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+          <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
         </div>
         <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
       </footer>
+      </div><!-- /#monster-group -->
 
     </div><!-- /page -->
   </div><!-- /page-scaler -->
 
 
-  <script src="assets/scripts.js"></script>
+  <script src="/assets/scripts.js"></script>
   <script>
     // ── Scale to fit viewport width, scroll vertically ─────────────
     // The canvas is 1440×6727. We scale it so its width matches the
@@ -552,8 +582,10 @@
     // scroll bar represents the full canvas height.
     const PAGE_W = 1440;
     const PAGE_H = 6727;
-    const page   = document.querySelector('.page');
-    const scaler = document.getElementById('page-scaler');
+    const page         = document.querySelector('.page');
+    const scaler       = document.getElementById('page-scaler');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
     let scale = 1;
 
     function scalePage() {
@@ -563,6 +595,41 @@
     }
     scalePage();
     window.addEventListener('resize', scalePage);
+
+    /* Reveal when user reaches (near) the document bottom. IntersectionObserver on #monster-group
+       failed: translateY(250px) + .page overflow:hidden made the target effectively never reach
+       a visible intersection ratio against the viewport. */
+    (function bindMonsterRevealOnScroll() {
+      if (!monsterGroup) return;
+      const BOTTOM_SLACK_PX = 56;
+
+      function getMaxScrollY() {
+        const sh = Math.max(
+          document.documentElement.scrollHeight,
+          document.body.scrollHeight
+        );
+        return Math.max(0, sh - window.innerHeight);
+      }
+
+      function tryReveal() {
+        if (monsterGroup.classList.contains('popped-up')) return;
+        if (window.scrollY >= getMaxScrollY() - BOTTOM_SLACK_PX) {
+          monsterGroup.classList.add('popped-up');
+        }
+      }
+
+      function onScrollOrResize() {
+        tryReveal();
+        if (monsterGroup.classList.contains('popped-up')) {
+          window.removeEventListener('scroll', onScrollOrResize);
+          window.removeEventListener('resize', onScrollOrResize);
+        }
+      }
+
+      window.addEventListener('scroll', onScrollOrResize, { passive: true });
+      window.addEventListener('resize', onScrollOrResize);
+      onScrollOrResize();
+    })();
 
 
     document.addEventListener('mousemove', e => {
@@ -594,13 +661,19 @@
       el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
     }
 
-    // Monster wave sits at canvas y:6515; SVG coords are relative to that.
     const monIrisR = document.getElementById('mon-iris-r');
     const monIrisL = document.getElementById('mon-iris-l');
 
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return (waveRect.top - pageRect.top) / scale;
+    }
+
     function moveMonsterEyes(cx, cy) {
-      trackIris(monIrisR, cx, cy - 6515, 624.5, 55.2, 20, 5);
-      trackIris(monIrisL, cx, cy - 6515, 466.9, 55.2, 20, 5);
+      const wt = getWaveTop();
+      trackIris(monIrisR, cx, cy - wt, 624.5, 55.2, 20, 5);
+      trackIris(monIrisL, cx, cy - wt, 466.9, 55.2, 20, 5);
     }
 
     function updateAllEyes(vx, vy) {

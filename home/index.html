@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
   <title>Home — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css">
   <style>
     html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
@@ -68,7 +68,15 @@
       transform-origin: 50% 50%;
     }
 
-    .footer { top: 934px; }
+    /* Footer pinned to viewport (same layer as .logo / .nav), not inside scaled canvas */
+    body.home .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 600;
+      margin-top: 0;
+    }
     /* ── Monster easter egg ──────────────────────────────────────── */
     /* Rises from the bottom when all furniture is dragged off screen */
     #home-monster {
@@ -108,7 +116,7 @@
     }
   </style>
 </head>
-<body>
+<body class="home">
 
   <!-- Monster easter egg — rises when all furniture is off-screen -->
   <div id="home-monster">
@@ -182,11 +190,11 @@
   </div>
 
   <nav class="nav">
-    <a href="about.html">About</a>
-    <a href="interiors.html">Interiors</a>
-    <a href="experiences.html">Experiences</a>
-    <a href="shop.html">Shop</a>
-    <a href="contact.html">Contact</a>
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
   </nav>
 
   <div id="page-scaler">
@@ -266,7 +274,7 @@
       <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
         <div style="width:370.668px; height:345.37px; position:relative;
                     transform:rotate(-11.01deg); flex-shrink:0; overflow:hidden;">
-          <img class="base" src="assets/furniture-couch.png" alt="Couch">
+          <img class="base" src="/assets/furniture-couch.png" alt="Couch">
           <svg class="eyes" viewBox="0 0 370.668 345.37" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <clipPath id="couch-eye-l-clip">
@@ -297,7 +305,7 @@
     <!-- Figma: x:871 y:110 w:194 h:353 -->
     <div class="furniture vase"
          style="left:871px; top:110px; width:194px; height:353px;">
-      <img class="base" src="assets/furniture-vase.png" alt="Vase">
+      <img class="base" src="/assets/furniture-vase.png" alt="Vase">
       <svg class="eyes" viewBox="0 0 194 353" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="vase-eye-l-clip">
@@ -326,7 +334,7 @@
     <!-- Figma: x:163 y:331 w:314 h:286 -->
     <div class="furniture nightstand"
          style="left:163px; top:331px; width:314px; height:286px;">
-      <img class="base" src="assets/furniture-nightstand.png" alt="Nightstand">
+      <img class="base" src="/assets/furniture-nightstand.png" alt="Nightstand">
       <svg class="eyes" viewBox="0 0 314 286" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="nightstand-eye-l-clip">
@@ -355,7 +363,7 @@
     <!-- Figma: x:350 y:513 w:448 h:275 -->
     <div class="furniture carpet"
          style="left:350px; top:513px; width:448px; height:275px;">
-      <img class="base" src="assets/furniture-carpet.png" alt="Carpet">
+      <img class="base" src="/assets/furniture-carpet.png" alt="Carpet">
       <svg class="eyes" viewBox="0 0 449 275" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="carpet-eye-l-clip">
@@ -384,7 +392,7 @@
     <!-- Figma: x:780 y:485 w:569 h:303 -->
     <div class="furniture dresser"
          style="left:780px; top:485px; width:569px; height:303px;">
-      <img class="base" src="assets/furniture-dresser.png" alt="Dresser">
+      <img class="base" src="/assets/furniture-dresser.png" alt="Dresser">
       <svg class="eyes" viewBox="0 0 568 303" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="dresser-eye-l-clip">
@@ -409,21 +417,20 @@
       </svg>
     </div>
 
-    <!-- ── Footer — just below the fold ──────────────────────── -->
-    <footer class="footer">
-      <div class="footer-icons">
-        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
-          <img src="assets/icon-instagram.svg" alt="Instagram">
-        </a>
-        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
-          <img src="assets/icon-tiktok.svg" alt="TikTok">
-        </a>
-      </div>
-      <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
-    </footer>
-
   </div><!-- /.page -->
   </div><!-- /#page-scaler -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+        <img src="/assets/icon-instagram.svg" alt="Instagram">
+      </a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer">
+        <img src="/assets/icon-tiktok.svg" alt="TikTok">
+      </a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
 
   <!-- Crossfade from splash: starts black, fades in over 500ms -->
   <div id="splash-fade" style="position:fixed;inset:0;background:#000;z-index:9999;pointer-events:none;"></div>
@@ -443,7 +450,7 @@
     }());
   </script>
 
-  <script src="assets/scripts.js"></script>
+  <script src="/assets/scripts.js"></script>
   <script>
     // ─── Uniform scale to fit viewport ───────────────────────────
     // The page is a fixed 1440×1024 canvas. JS scales it uniformly
@@ -451,17 +458,14 @@
     // while preserving exact Figma pixel ratios.
     const page   = document.querySelector('.page');
     const scaler = document.getElementById('page-scaler');
-    const footer = document.querySelector('.footer');
     let scale = 1;
 
     function scalePage() {
       scale = window.innerWidth / 1440;
       page.style.transform = `scale(${scale})`;
-      // Place footer top at exactly the fold (first pixel below viewport)
       const foldPx = Math.ceil(window.innerHeight / scale);
-      footer.style.top    = foldPx + 'px';
-      page.style.height   = (foldPx + 90) + 'px';
-      scaler.style.height = (foldPx + 90) * scale + 'px';
+      page.style.height   = foldPx + 'px';
+      scaler.style.height = foldPx * scale + 'px';
     }
     scalePage();
     window.addEventListener('resize', scalePage);

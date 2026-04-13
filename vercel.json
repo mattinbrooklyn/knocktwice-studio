@@ -1,5 +1,19 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/coming-soon.html", "permanent": false }
+    { "source": "/", "destination": "/coming-soon/", "permanent": false },
+    { "source": "/about.html", "destination": "/about/", "permanent": true },
+    { "source": "/contact.html", "destination": "/contact/", "permanent": true },
+    { "source": "/experiences.html", "destination": "/experiences/", "permanent": true },
+    { "source": "/interiors.html", "destination": "/interiors/", "permanent": true },
+    { "source": "/shop.html", "destination": "/shop/", "permanent": true },
+    { "source": "/home.html", "destination": "/home/", "permanent": true },
+    { "source": "/coming-soon.html", "destination": "/coming-soon/", "permanent": true },
+    { "source": "/about-launch.html", "destination": "/about-launch/", "permanent": true },
+    { "source": "/contact-launch.html", "destination": "/contact-launch/", "permanent": true },
+    { "source": "/experiences-launch.html", "destination": "/experiences-launch/", "permanent": true },
+    { "source": "/interiors-launch.html", "destination": "/interiors-launch/", "permanent": true },
+    { "source": "/shop-launch.html", "destination": "/shop-launch/", "permanent": true },
+    { "source": "/home-launch.html", "destination": "/home-launch/", "permanent": true },
+    { "source": "/skeleton.html", "destination": "/skeleton/", "permanent": true }
   ]
 }
