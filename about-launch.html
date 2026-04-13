@@ -128,18 +128,18 @@
   /* ── Draggable objects ──────────────────────────────────────── */
   /* Paintbrush: bristle-up, left column. overflow:hidden clips SVG eye whites */
   .paintbrush {
-    left: 4.24%; top: 537px;
-    width: 279px; height: 525px;
+    left: 4.24%; top: 44.5%;
+    width: 19.375%; aspect-ratio: 279/525;
     overflow: hidden;
     z-index: 10;
   }
-  .paintbrush img.base { width: 279px; height: 525px; }
-  .paintbrush .eyes    { width: 279px; height: 525px; }
+  .paintbrush img.base { width: 100%; height: 100%; }
+  .paintbrush .eyes    { width: 100%; height: 100%; }
 
   /* Paint bucket: outer holds rotated inner; outer overflow:visible so handle shows */
   .paint-bucket-outer {
-    left: 77.85%; top: 163px;
-    width: 364px; height: 380px;
+    left: 77.85%; top: 13.5%;
+    width: 25.28%; aspect-ratio: 364/380;
     overflow: visible;
     z-index: 10;
     display: flex;
@@ -150,11 +150,11 @@
     flex-shrink: 0;
     transform: rotate(7.63deg);
     position: relative;
-    width: 322px; height: 340px;
+    width: 88.46%; aspect-ratio: 322/340;
     overflow: hidden;
   }
-  .paint-bucket-inner img.base { width: 322px; height: 340px; }
-  .paint-bucket-inner .eyes    { width: 322px; height: 340px; }
+  .paint-bucket-inner img.base { width: 100%; height: 100%; }
+  .paint-bucket-inner .eyes    { width: 100%; height: 100%; }
 
   /* ── Monster ticker ─────────────────────────────────────────── */
   /* Sits above the wave; bottom positioning relative to #monster-group height */
