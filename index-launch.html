@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Knock Twice</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #32261f;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    #custom-cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; will-change: transform; transform: translate(-200px,-200px); }
+    #cursor-default { display: block; width: 45px; height: 49px; }
+    #cursor-hover   { display: none;  width: 48px; height: 51px; }
+    #cursor-drag    { display: none;  width: 48px; height: 40px; }
+    body[data-cursor="hover"] #cursor-default { display: none; }
+    body[data-cursor="hover"] #cursor-hover   { display: block; }
+    body[data-cursor="drag"]  #cursor-default { display: none; }
+    body[data-cursor="drag"]  #cursor-drag    { display: block; }
+
+    .splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .keyhole {
+      height: min(82vh, 598px);
+      width: auto;
+      /* transform-origin defaults to 50% 50% on HTML elements — correct for centered zoom */
+      will-change: transform;
+    }
+
+    /* transform-box: fill-box makes transform-origin relative to the element's own bounds,
+       so scale(0) collapses to the eye's center rather than the SVG origin. */
+    #eye-group {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Full-screen black overlay for the fade-to-black transition -->
+  <div id="fade-overlay" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:9990;"></div>
+
+  <div class="splash">
+    <svg id="keyhole-svg" class="keyhole" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!--
+          Keyhole window — static clip path, never moves.
+          Defines the visible aperture; only what's inside is ever shown.
+        -->
+        <clipPath id="keyhole-clip">
+          <path d="M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295Z"/>
+        </clipPath>
+      </defs>
+
+      <!--
+        Static keyhole window — carries the clip-path and never transforms.
+        Only what falls within the keyhole aperture is visible at any time.
+      -->
+      <g id="keyhole-window" clip-path="url(#keyhole-clip)">
+
+        <!--
+          Splash_Monster — the creature body + eyes.
+          Only this group translates on click. No JS changes any element.
+
+          Eye layout:
+            • Single eye (cy≈151) — visible at rest through the keyhole head.
+              Mouse-tracked iris lives here.
+            • Two eyes (cy≈−140) — positioned above SVG y=0 so they are
+              completely outside the keyhole clip at rest. As the creature
+              drops, this zone descends into the keyhole opening and both
+              eyes briefly pass through — naturally, with no JS involvement.
+        -->
+        <g id="splash-monster" style="will-change:transform;">
+
+          <!-- ── Single eye (resting state) ───────────────────── -->
+          <g id="eye-group">
+            <circle cx="157.5" cy="151.5" r="80.5" fill="white"/>
+            <g id="iris">
+              <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
+            </g>
+          </g>
+
+          <!-- ── Two eyes (above viewport at rest, flash during drop) ── -->
+          <circle cx="87"  cy="-140" r="60" fill="white"/>
+          <circle cx="226" cy="-140" r="60" fill="white"/>
+          <circle cx="87"  cy="-155" r="36" fill="#32261F"/>
+          <circle cx="226" cy="-155" r="36" fill="#32261F"/>
+
+          <!--
+            Blue creature body — large rect clipped to the keyhole window.
+            Three eye-socket sub-paths (fill-rule evenodd):
+              1. Single socket at y≈142 — aligns with the resting single eye.
+              2. Two sockets at y≈−140 — aligns with the two eyes above;
+                 both sockets are outside the keyhole clip at rest so
+                 the holes are invisible until the creature drops.
+          -->
+          <path fill="#378CDA" fill-rule="evenodd"
+            d="M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z M30 -140C68 -176.226 107 -176.226 145 -140C107 -122.347 68 -122.347 30 -140Z M168 -140C206 -176.226 245 -176.226 283 -140C245 -122.347 206 -122.347 168 -140Z"/>
+
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <script src="assets/scripts.js"></script>
+  <script>
+    // ─── Elements ────────────────────────────────────────────────
+    const svg           = document.getElementById('keyhole-svg');
+    const splashMonster = document.getElementById('splash-monster');
+    const iris          = document.getElementById('iris');
+
+
+    // ─── Mouse tracking ──────────────────────────────────────────
+    const IRIS_X = 165;   // iris resting center, SVG coords
+    const IRIS_Y = 114.5;
+    const MAX_X  = 15;    // max travel, SVG units (elliptical envelope)
+    const MAX_Y  = 10;
+
+    let cx = 0, cy = 0;   // current offset
+    let tx = 0, ty = 0;   // target offset
+    let tracking = true;
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+
+    function tick() {
+      cx = lerp(cx, tx, 0.08);
+      cy = lerp(cy, ty, 0.08);
+      iris.setAttribute('transform', `translate(${cx.toFixed(3)}, ${cy.toFixed(3)})`);
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    document.addEventListener('mousemove', e => {
+      if (!tracking) return;
+
+      const r     = svg.getBoundingClientRect();
+      const scale = r.width / 313;
+
+      const eyeVX = r.left + IRIS_X * scale;
+      const eyeVY = r.top  + IRIS_Y * scale;
+
+      const dx   = (e.clientX - eyeVX) / scale;
+      const dy   = (e.clientY - eyeVY) / scale;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 1) { tx = 0; ty = 0; return; }
+
+      const nx = dx / dist;
+      const ny = dy / dist;
+
+      // Elliptical max: more horizontal room than vertical
+      const maxR    = 1 / Math.sqrt((nx / MAX_X) ** 2 + (ny / MAX_Y) ** 2);
+      // Ease in — iris is sluggish right on top, reaches full travel at ~60 units away
+      const strength = Math.min(dist / 60, 1);
+
+      tx = nx * maxR * strength;
+      ty = ny * maxR * strength;
+    });
+
+
+    // ─── Click animation ─────────────────────────────────────────
+    //
+    // Timing:
+    //   0ms          Kill tracking — iris snaps, mousemove ignored
+    //   0 –  450ms   Slide    — monster translates diagonally off screen, ease-in
+    // 450 –  750ms   Fade     — screen fades to black (300ms)
+    // 750ms          Navigate — home-launch.html crossfades in
+
+    const overlay  = document.getElementById('fade-overlay');
+    let animating  = false;
+
+    document.addEventListener('click', () => {
+      if (animating) return;
+      animating = true;
+      tracking  = false;
+      tx = 0; ty = 0;
+
+      // ── Diagonal slide — down-right at 45°, enough to clear the viewport ─
+      // Using max(width, height) as the distance so it clears on any screen size.
+      const dist = Math.max(window.innerWidth, window.innerHeight) + 200;
+      splashMonster.style.transition = 'transform 450ms cubic-bezier(0.4, 0, 1, 1)';
+      // Force reflow so transition fires from the current (identity) state.
+      splashMonster.getBoundingClientRect();
+      splashMonster.style.transform  = `translate(${dist}px, ${dist}px)`;
+
+      // ── Fade to black ─────────────────────────────────────────
+      setTimeout(() => {
+        overlay.style.transition = 'opacity 300ms ease';
+        overlay.style.opacity    = '1';
+
+        // ── Navigate ─────────────────────────────────────────────
+        setTimeout(() => {
+          sessionStorage.setItem('from-splash', '1');
+          window.location.href = 'home-launch.html';
+        }, 300);
+
+      }, 450); // slide duration
+    });
+  </script>
+
+</body>
+</html>
