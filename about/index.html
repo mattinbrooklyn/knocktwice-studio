@@ -263,6 +263,97 @@
     #newsletter-window.modal-card.ml-success {
       min-height: auto;
     }
+
+    /* ── Mobile (<=768px) ──────────────────────────────────────────
+       Figma mobile master: frame id 7055:2255 (About state A), 440×1485.
+       Headshots stack vertically, paintbrush overlaps Rodrigo from the
+       left (x=-15), paint bucket overlaps Matt from the right (x=310).
+       Coords are relative to .page (which is 100vw wide on mobile). */
+    @media (max-width: 768px) {
+      .page {
+        padding-top: 6.0625rem;
+        padding-right: var(--content-left);
+        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + 1rem);
+        /* Reserve space for absolute-positioned paint bucket below the
+           Matt headshot (Figma: bucket bottom at y=1241, footer wave at
+           y=1365). */
+        min-height: 80rem;
+      }
+      .h1 {
+        font-size: clamp(2.25rem, 10vw, 3rem);
+        line-height: 1.05;
+        width: var(--content-width);
+        margin-bottom: 0.9375rem;
+      }
+      .h2 {
+        font-size: 1.25rem;
+        line-height: 1.4rem;
+        width: var(--content-width);
+      }
+      .intro {
+        width: var(--content-width);
+        margin-bottom: 2.5rem;
+      }
+      .people-row {
+        flex-direction: column;
+        gap: 2rem;
+        width: var(--content-width);
+      }
+      /* Paintbrush per Figma: x=-15, y=340, 144×271.
+         `.page` has padding-left:var(--content-left)=1.25rem (20px), but
+         paintbrush is position:absolute so it sits relative to .page's
+         padding box origin. Subtract 20 from Figma x to align. */
+      .paintbrush {
+        left: -35px !important;
+        top: 340px !important;
+        width: 144px !important;
+        height: 271px !important;
+      }
+      .paintbrush img.base,
+      .paintbrush .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Paint bucket per Figma: x=310, y=1045, 188×196.
+         Inner rotated container scales to fit outer. */
+      .paint-bucket-outer {
+        left: 290px !important;
+        top: 1045px !important;
+        width: 188px !important;
+        height: 196px !important;
+      }
+      .paint-bucket-inner {
+        width: 166px !important;
+        height: 176px !important;
+      }
+      .paint-bucket-inner img.base,
+      .paint-bucket-inner .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Monster ticker (1440px wide, overflows); hide on mobile. */
+      .monster-ticker {
+        display: none;
+      }
+      .monster-area {
+        height: var(--wave-height-mobile);
+      }
+      .monster-eyes-overlay {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      #modal-backdrop,
+      #modal-blue-body {
+        width: 100%;
+      }
+      #newsletter-window.modal-card {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(22.5rem, calc(100vw - 2.5rem));
+        padding: 1.75rem 1.25rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -276,6 +367,21 @@
   </a>
 
   <nav class="nav">
+    <a href="/about/" class="active">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
     <a href="/about/" class="active">About</a>
     <a href="/interiors/">Interiors</a>
     <a href="/experiences/">Experiences</a>

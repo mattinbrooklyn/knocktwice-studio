@@ -57,7 +57,7 @@
 
   /* Layout — mobile */
   --content-left-mobile:   1.25rem;
-  --content-width-mobile:  25rem;
+  --content-width-mobile:  calc(100vw - 2 * var(--content-left-mobile));
 
   /* Components */
   --radius-pill:           2rem;
@@ -224,9 +224,20 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   top: 1.5rem;
   right: 1.5rem;
   z-index: 1001;
+  width: 2.5rem;
+  height: 2.5rem;
   background: none;
   border: none;
   padding: 0;
+  color: var(--color-ink);
+  cursor: none;
+}
+.nav-mobile-trigger svg,
+.nav-mobile-trigger img {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  margin: 0 auto;
 }
 .nav-mobile-overlay {
   display: none;
@@ -238,9 +249,25 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  padding: 4rem 1.5rem;
 }
 .nav-mobile-overlay.is-open {
   display: flex;
+}
+.nav-mobile-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-body);
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-ink);
+  cursor: none;
 }
 .nav-mobile-overlay a {
   font-family: var(--font-ui);
@@ -260,6 +287,9 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
   background: var(--color-yellow);
   font-weight: 700;
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+}
+body.nav-open {
+  overflow: hidden;
 }
 
 /* ── Tag pills ──────────────────────────────────── */
@@ -712,5 +742,36 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
     --content-width: var(--content-width-mobile);
   }
   .nav { display: none; }
-  .nav-mobile-trigger { display: block; }
+
+  /* Mobile header (Figma 440-wide spec):
+     - Keyhole logo 25×47 at x=20, y=30
+     - Hamburger 76×47 at x=366 (i.e. right=20), y=30
+     Home overrides .logo dimensions to use the wordmark (119×47). */
+  .logo {
+    top: 1.875rem;
+    left: var(--content-left);
+    width: 1.5625rem;
+    height: 2.9375rem;
+  }
+  .nav-mobile-trigger {
+    display: block;
+    top: 1.875rem;
+    right: var(--content-left);
+    width: 4.75rem;
+    height: 2.9375rem;
+  }
+  .nav-mobile-trigger svg,
+  .nav-mobile-trigger img {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  /* Mobile page clearance — Figma H1 starts at y=97 (header 30+47+20).
+     Per-page mobile blocks can layer additional padding/adjustments on
+     top; this sets the baseline clearance for absolute-positioned logo
+     + hamburger. Pages that run a fixed canvas (Home) aren't affected
+     since their .page is position:absolute/transform:scale. */
+  .page {
+    padding-top: 6.0625rem;
+  }
 }

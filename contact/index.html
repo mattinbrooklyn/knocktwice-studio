@@ -264,6 +264,48 @@
     line-height: var(--leading-b1);
     color: var(--color-ink);
   }
+
+  /* ── Mobile (<=768px) ──────────────────────────── */
+  @media (max-width: 768px) {
+    .page {
+      padding-top: 6.25rem;
+      padding-right: var(--content-left);
+    }
+    .h1 {
+      font-size: clamp(2.25rem, 11vw, 3rem);
+      line-height: 1.05;
+      margin-bottom: 1.25rem;
+    }
+    .whos-there-marquee {
+      left: var(--content-left);
+      top: 5.5rem;
+      width: var(--content-width);
+      height: 4rem;
+    }
+    .intro {
+      width: var(--content-width);
+      margin-top: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .input-row {
+      width: var(--content-width);
+      height: auto;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    .input-row input {
+      width: 100%;
+    }
+    .textarea-col {
+      width: var(--content-width);
+    }
+    .textarea-wrap {
+      height: 10rem;
+    }
+    #btn-send {
+      width: var(--content-width);
+    }
+  }
 </style>
 </head>
 <body>
@@ -273,6 +315,21 @@
   </a>
 
   <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/" class="active">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
     <a href="/about/">About</a>
     <a href="/interiors/">Interiors</a>
     <a href="/experiences/">Experiences</a>

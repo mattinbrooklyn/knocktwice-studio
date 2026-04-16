@@ -10,224 +10,224 @@
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
-    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
-    body::-webkit-scrollbar { display: none; }
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
 
-    /* Scrollable wrapper — JS sets height = PAGE_H × scale */
-    #page-scaler { position: relative; width: 100%; }
+  /* ── Monster wave ────────────────────────────────────────────────── */
+  #monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 1.1s;
+  }
 
-    /* 1440 × 8126 canvas, scaled to fit viewport width */
-    .page {
-      position: absolute;
-      top: 0; left: 0;
-      width: 1440px; height: 8126px;
-      transform-origin: top left;
-      background: var(--color-bg);
-      overflow: hidden;
-    }
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
 
+  /* ── Top section content ─────────────────────────────────────────── */
+  .h1 {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-sm);
+  }
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-xl);
+  }
+  .intro p { margin-bottom: 0; }
 
-    .h1 {
-      position: absolute;
-      left: 316px; top: 70px;
-      width: 808px;
-      font-family: 'Erica One', sans-serif;
-      font-size: 65px;
-      line-height: 68px;
-      font-weight: 400;
-      color: var(--color-ink);
-    }
+  /* ── Project sections ────────────────────────────────────────────── */
+  .project-section {
+    position: relative;
+    width: 100vw;
+    max-width: 1440px;
+    margin-left: calc(-1 * var(--content-left));
+    aspect-ratio: 1440 / 1256;
+    overflow: visible;
+  }
 
-    .body-text {
-      position: absolute;
-      left: 316px; top: 168px;
-      width: 808px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      color: var(--color-ink);
-    }
-    .body-text p { margin-bottom: 0; }
+  /* Mobile variant blocks hidden by default; revealed under ≤768px. */
+  .project-mobile { display: none; }
 
-    /* ── Photos (all draggable) ──────────────────────────────────── */
-    .photo {
-      position: absolute;
-      overflow: hidden;
-      cursor: none;
-      user-select: none;
-    }
-    .photo img {
-      width: 100%; height: 100%;
-      display: block;
-      object-fit: cover;
-      pointer-events: none;
-      user-select: none;
-    }
+  /* ── Mobile (Figma 7097:2441 — 440-wide frame) ────────────────── */
+  @media (max-width: 768px) {
+    /* Intro → first stack gap (Figma: 30px from body end y=311 to divider y=341) */
+    .intro { margin-bottom: 1.875rem; }
 
-    /* Dinner-101: portrait image displayed landscape via -90° rotation */
-    .photo-rotated {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      cursor: none;
-      user-select: none;
-    }
-    .photo-rotated-inner {
-      flex-shrink: 0;
-      transform: rotate(-90deg);
-    }
-    .photo-rotated-inner img {
-      display: block;
-      object-fit: cover;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    .photo.is-dragging,
-    .photo-rotated.is-dragging { opacity: 0.9; }
-
-    /* ── Draggable 3D objects ────────────────────────────────────── */
-    .obj {
-      position: absolute;
-      z-index: 10;
-      cursor: none;
-      user-select: none;
-    }
-    .obj > img {
-      display: block;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-    }
-    .obj.has-rotation {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .obj-inner { flex-shrink: 0; }
-    .obj-inner img {
-      display: block;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-    }
-    .obj.is-dragging { opacity: 0.9; }
-
-    /* ── Monster wave + footer — rise from below (contact / launch pattern) */
-    #monster-group {
-      position: absolute;
-      left: 0;
-      top: 7914px;
+    /* Collapse desktop collage; project-sections become natural flow. */
+    .project-section {
+      margin-left: 0;
       width: 100%;
-      min-height: 212px;
-      z-index: 50;
-      transform: translateY(250px);
-      will-change: transform;
+      max-width: none;
+      aspect-ratio: auto;
     }
-    #monster-group.popped-up {
-      transform: translateY(0);
-      transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .monster-area {
-      position: relative;
-      left: 0;
-      top: 0;
-      width: 1440px;
-      height: 122px;
-    }
-    .monster-area .wave {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%; display: block;
-    }
-    .monster-eyes-overlay {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none; overflow: visible;
-    }
+    .project-section > .photo,
+    .project-section > .photo-card,
+    .project-section > .photo-rotated,
+    .project-section > .placeholder,
+    .project-section > .obj,
+    .project-section > .sticker { display: none; }
 
-    #monster-group .footer {
-      position: absolute;
-      left: 0;
-      top: 122px;
-      width: 100%;
-      height: 90px;
-      margin-top: 0;
-      z-index: 100;
-    }
-
-    /* ── Spinning sticker rings ──────────────────────────────────── */
-    .sticker {
-      position: absolute;
-      pointer-events: none;
-      z-index: 8;
-    }
-    @keyframes sticker-ring-spin {
-      to { transform: rotate(360deg); }
-    }
-    .sticker-ring-spin {
-      animation: sticker-ring-spin 18s linear infinite;
-      transform-origin: 50% 50%;
-    }
-
-    /* ── Hover card overlay ─────────────────────────────────────── */
-    .card-overlay {
-      position: absolute;
-      inset: 0;
-      background: #D1C3B6;
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      /* flex column so tags always sit below body, however long it runs */
+    /* Mobile variant flows vertically inside each project-section. */
+    .project-mobile {
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      padding: 114px 50px 20px;
-      gap: 16px;
+      gap: 1.25rem;
+      padding-block: 1.25rem 2.5rem;
+      border-top: 1px solid var(--color-ink);
     }
-    .photo-card:hover .card-overlay { transform: translateY(0); }
-
-    .card-overlay .card-title {
-      width: 433px;
-      font-family: 'Erica One', sans-serif;
-      font-size: 24px;
-      line-height: 27px;
-      font-weight: 400;
-      color: #32261F;
-      margin: 0;
-    }
-    .card-overlay .card-body {
-      width: 433px;
-      font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
-      font-weight: 400;
-      color: #32261F;
-      margin: 0;
-    }
-    .card-overlay .card-tags {
+    .project-mobile .stack-description {
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      gap: 0.625rem;
+      padding-inline: var(--content-left);
     }
-    .card-overlay .card-tag {
-      color: #F7F2EC;
-      border: 2px solid #F7F2EC;
+    .project-mobile .card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      line-height: 1.5625rem;
+      font-weight: 400;
+      color: var(--color-ink);
     }
-    .card-overlay .card-cursor {
+    .project-mobile .card-body {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.375rem;
+      color: var(--color-ink);
+    }
+    .project-mobile .card-tags {
+      display: flex;
+      gap: 0.625rem;
+      flex-wrap: wrap;
+    }
+    .project-mobile .card-tag {
+      color: var(--color-ink);
+      border-color: var(--color-ink);
+    }
+
+    /* Swipe stack container — per-stack width + aspect from Figma. */
+    .swipe-stack {
+      position: relative;
+      overflow: visible;
+      touch-action: pan-y;
+    }
+    /* Blank Canvas Bash: canvas x=3.287, w=413.43, h=409.07 on 440-wide frame. */
+    .swipe-stack[data-stack="blank-canvas-bash"] {
+      width: 93.96vw;
+      margin-left: 0.75vw;
+      aspect-ratio: 413.43 / 409.07;
+    }
+    /* Dinner: canvas x=5, w=h=409.074. */
+    .swipe-stack[data-stack="dinner"] {
+      width: 92.97vw;
+      margin-left: 1.14vw;
+      aspect-ratio: 1 / 1;
+    }
+    /* Wedding: canvas x=5.244, w=h=409.074. */
+    .swipe-stack[data-stack="wedding"] {
+      width: 92.97vw;
+      margin-left: 1.19vw;
+      aspect-ratio: 1 / 1;
+    }
+    /* Hotel MR: landscape — canvas x=1, w=417.651, h=294.252. */
+    .swipe-stack[data-stack="hotel-mr"] {
+      width: 94.92vw;
+      margin-left: 0.23vw;
+      aspect-ratio: 417.651 / 294.252;
+    }
+    /* MR Buffet: near-square — canvas x=5.682, w=409.074, h=409.393. */
+    .swipe-stack[data-stack="mr-buffet"] {
+      width: 92.97vw;
+      margin-left: 1.29vw;
+      aspect-ratio: 409.074 / 409.393;
+    }
+    /* Sister Soiree: landscape — canvas x=13, w=413.426, h=287.568. */
+    .swipe-stack[data-stack="sister-soiree"] {
+      width: 93.96vw;
+      margin-left: 2.95vw;
+      aspect-ratio: 413.426 / 287.568;
+    }
+
+    .swipe-card {
       position: absolute;
-      right: 24px; bottom: 20px;
-      width: 75px; height: 80px;
-      pointer-events: none;
+      border-radius: 0.25rem;
+      box-shadow: var(--shadow-stack);
+      overflow: hidden;
+      will-change: transform;
+      background: var(--color-bg);
+      user-select: none;
     }
+    .swipe-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Stickers sit over the stack — % values resolve against .swipe-stack. */
+    .project-stickers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    /* Outer = Figma post-rotation bbox (axis-aligned). Inner (if present)
+       holds the pre-rotation rect + rotation, centered via flex so the
+       rotated content lands exactly inside the bbox. */
+    .mobile-sticker {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mobile-sticker-inner {
+      flex: none;
+      position: relative;
+    }
+    .mobile-sticker img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+  }
   </style>
 </head>
 <body>
 
-  <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
   <a href="/home/" class="logo">
     <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
@@ -243,68 +243,260 @@
     <a href="/contact/">Contact</a>
   </nav>
 
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/" class="active">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
   <div id="page-scaler">
-    <div class="page">
+  <div class="page">
 
-      <!-- Headline -->
-      <h1 class="h1">TAKE A SEAT</h1>
+    <h1 class="h1">TAKE A SEAT</h1>
 
-      <!-- Intro copy -->
-      <div class="body-text">
-        <p>We create the kinds of experiences you feel before you walk in and stay with you well after leaving.</p>
-        <p>&nbsp;</p>
-        <p>From intimate celebrations with loved ones to weekend-long retreats for global communities, we work across scales and priorities to bring ideas to life and vibes to fruition.</p>
-        <p>&nbsp;</p>
-        <p>If you have something in mind, or just a feeling you want to chase, reach out and we will make it happen.</p>
+    <div class="body-text intro">
+      <p>We create the kinds of experiences you feel before you walk in and stay with you well after leaving.</p>
+      <p>&nbsp;</p>
+      <p>From intimate celebrations with loved ones to weekend-long retreats for global communities, we work across scales and priorities to bring ideas to life and vibes to fruition.</p>
+      <p>&nbsp;</p>
+      <p>If you have something in mind, or just a feeling you want to chase, reach out and we will make it happen.</p>
+    </div>
+
+    <!-- ── Mr. Tao ──────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1256 (canvas y:360 to y:1616). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1256;">
+
+      <!-- exp-mr-tao-1  left:13.54% top:0%     w:37.01% h:28.26% — hover card flip -->
+      <div class="photo-card" style="left:13.54%; top:0%; width:37.01%; height:28.26%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-mr-tao-1.webp" alt="Blank Canvas Bash">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">BLANK CANVAS BASH</h3>
+            <p class="card-body">The Animal Observatory's first US activation — an open-house invitation for children and parents to explore, make, and play.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-tao-3  left:52.64% top:6.21%  w:36.94% h:28.26% -->
+      <div class="photo" style="left:52.64%; top:6.21%; width:36.94%; height:28.26%;">
+        <img src="/assets/images/exp-mr-tao-3.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-6  left:-7.01% top:30.65% w:36.94% h:28.26% (bleeds left) -->
+      <div class="photo" style="left:-7.01%; top:30.65%; width:36.94%; height:28.26%;">
+        <img src="/assets/images/exp-mr-tao-6.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-4  left:36.18% top:30.65% w:24.65% h:42.36% portrait -->
+      <div class="photo" style="left:36.18%; top:30.65%; width:24.65%; height:42.36%;">
+        <img src="/assets/images/exp-mr-tao-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-2  left:65.0%  top:36.31% w:36.94% h:28.26% -->
+      <div class="photo" style="left:65.0%; top:36.31%; width:36.94%; height:28.26%;">
+        <img src="/assets/images/exp-mr-tao-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-7  left:10.42% top:63.69% w:36.94% h:28.26% -->
+      <div class="photo" style="left:10.42%; top:63.69%; width:36.94%; height:28.26%;">
+        <img src="/assets/images/exp-mr-tao-7.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-5  left:54.72% top:71.73% w:36.94% h:28.26% -->
+      <div class="photo" style="left:54.72%; top:71.73%; width:36.94%; height:28.26%;">
+        <img src="/assets/images/exp-mr-tao-5.webp" alt="">
       </div>
 
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  MR. TAO — 7 photos                                       -->
-      <!-- ══════════════════════════════════════════════════════════ -->
+      <!-- Box Tape -->
+      <div class="obj has-rotation" style="left:8.13%; top:4.30%; width:6.74%;">
+        <div class="obj-inner" style="transform:rotate(90deg); aspect-ratio:97/284;">
+          <img src="/assets/images/obj-box-tape.webp" alt="Box Tape">
+        </div>
+      </div>
 
-      <div class="photo photo-card" style="left:195px; top:360px; width:533px; height:355px;">
-        <img src="/assets/exp-mr-tao-1.png" alt="">
-        <div class="card-overlay">
+      <!-- Yellow Pencil -->
+      <div class="obj has-rotation" style="left:87.87%; top:12.10%; width:8%;">
+        <div class="obj-inner" style="transform:rotate(-24.05deg); aspect-ratio:224.02/421.508;">
+          <img src="/assets/images/obj-yellow-pencil.webp" alt="Yellow Pencil">
+        </div>
+      </div>
+
+      <!-- Duct Tape -->
+      <div class="obj has-rotation" style="left:61.67%; top:62.34%; width:14%;">
+        <div class="obj-inner" style="transform:rotate(180deg); aspect-ratio:312.128/90;">
+          <img src="/assets/images/obj-duct-tape.webp" alt="Duct Tape">
+        </div>
+      </div>
+
+      <!-- Pink Eraser -->
+      <div class="obj has-rotation" style="left:3.09%; top:63.33%; width:10%;">
+        <div class="obj-inner" style="transform:rotate(-16.85deg); aspect-ratio:228.433/150.788;">
+          <img src="/assets/images/obj-pink-eraser.webp" alt="Pink Eraser">
+        </div>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Blank Canvas Bash) ── -->
+      <div class="project-mobile" data-project="blank-canvas-bash">
+        <div class="stack-description">
           <h3 class="card-title">BLANK CANVAS BASH</h3>
           <p class="card-body">The Animal Observatory's first US activation — an open-house invitation for children and parents to explore, make, and play.</p>
           <div class="card-tags">
             <span class="card-tag">Brand Activation</span>
             <span class="card-tag">Production</span>
           </div>
-          <img class="card-cursor" src="/assets/cursor-open.svg" alt="">
+        </div>
+
+        <div class="swipe-stack" data-stack="blank-canvas-bash">
+          <!-- DOM order: MR_TAO-1 (bottom) → MR_TAO-7 (top) -->
+          <div class="swipe-card" style="left:2.78%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-tao-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:20.09%; width:100%; aspect-ratio:413.426/287.568;">
+            <img src="/assets/images/exp-mr-tao-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.19%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-tao-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.16%; top:2.28%; width:67.92%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-mr-tao-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.07%; top:18.35%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-tao-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.19%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-tao-6.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.78%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-tao-7.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- BoxTape: file is tall (97×284); pre-rotate 90° + Figma -177.15° = -87.15°. -->
+            <div class="mobile-sticker" style="left:43.60%; top:109.57%; width:43.19%; aspect-ratio:178.541/68.665;">
+              <div class="mobile-sticker-inner" style="width:33.62%; aspect-ratio:97/284; transform:rotate(-87.15deg);">
+                <img src="/assets/images/obj-box-tape.webp" alt="">
+              </div>
+            </div>
+            <!-- YellowPencil: tall, slight tilt (Figma -12.09°). -->
+            <div class="mobile-sticker" style="left:91.36%; top:-6.38%; width:21.03%; aspect-ratio:86.948/273.194;">
+              <div class="mobile-sticker-inner" style="width:35.06%; aspect-ratio:30.484/272.86; transform:rotate(-12.09deg);">
+                <img src="/assets/images/obj-yellow-pencil.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Blank Canvas Bash) -->
+
+    </div><!-- /.project-section (Mr. Tao) -->
+
+    <!-- ── Dinner ────────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1414 (canvas y:1605 to y:3019). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1414;">
+
+      <!-- exp-dinner-151  left:6.11%  top:0%     w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:6.11%; top:0%; width:24.65%; height:37.62%;">
+        <img src="/assets/images/exp-dinner-151.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-123  left:34.93% top:5.73%  w:36.94% h:25.11% — hover card flip -->
+      <div class="photo-card" style="left:34.93%; top:5.73%; width:36.94%; height:25.11%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-dinner-123.webp" alt="Yumi Matsuo Industry Dinner">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">YUMI MATSUO INDUSTRY DINNER</h3>
+            <p class="card-body">An intimate dinner party for NYC based-photographers — candlelit, citrus-laden, and good to the last drop.</p>
+            <div class="card-tags">
+              <span class="card-tag">Private Event</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="photo" style="left:758px; top:438px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-tao-3.png" alt="">
+
+      <!-- exp-dinner-145  left:77.43% top:21.85% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:77.43%; top:21.85%; width:24.65%; height:37.62%;">
+        <img src="/assets/images/exp-dinner-145.webp" alt="">
       </div>
-      <div class="photo" style="left:-101px; top:745px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-tao-6.png" alt="">
+
+      <!-- exp-dinner-112  left:28.13% top:28.71% w:24.65% h:37.69% portrait -->
+      <div class="photo" style="left:28.13%; top:28.71%; width:24.65%; height:37.69%;">
+        <img src="/assets/images/exp-dinner-112.webp" alt="">
       </div>
-      <div class="photo" style="left:521px; top:745px; width:355px; height:532px;">
-        <img src="/assets/exp-mr-tao-4.png" alt="">
+
+      <!-- exp-dinner-138  left:54.86% top:35.08% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:54.86%; top:35.08%; width:24.65%; height:37.62%;">
+        <img src="/assets/images/exp-dinner-138.webp" alt="">
       </div>
-      <div class="photo" style="left:936px; top:816px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-tao-2.png" alt="">
+
+      <!-- exp-dinner-108  left:-2.08% top:46.11% w:24.65% h:37.62% portrait, bleeds left -->
+      <div class="photo" style="left:-2.08%; top:46.11%; width:24.65%; height:37.62%;">
+        <img src="/assets/images/exp-dinner-108.webp" alt="">
       </div>
-      <div class="photo" style="left:150px; top:1160px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-tao-7.png" alt="">
+
+      <!-- exp-dinner-102  left:72.92% top:63.72% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:72.92%; top:63.72%; width:24.65%; height:37.62%;">
+        <img src="/assets/images/exp-dinner-102.webp" alt="">
       </div>
-      <div class="photo" style="left:788px; top:1261px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-tao-5.png" alt="">
+
+      <!-- exp-dinner-101  left:13.54% top:74.89% w:36.77% h:25.11% landscape -->
+      <div class="photo" style="left:13.54%; top:74.89%; width:36.77%; height:25.11%;">
+        <img src="/assets/images/exp-dinner-101.webp" alt="">
       </div>
 
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  DINNER — 8 photos                                        -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <div class="photo" style="left:88px; top:1605px; width:355px; height:532px;">
-        <img src="/assets/exp-dinner-151.png" alt="">
+      <!-- Grapefruit -->
+      <div class="obj" style="left:72.92%; top:8.70%; width:14.58%;">
+        <img src="/assets/images/obj-grapefruit.webp" alt="Grapefruit" style="aspect-ratio:210/221;">
       </div>
-      <div class="photo photo-card" style="left:503px; top:1686px; width:532px; height:355px;">
-        <img src="/assets/exp-dinner-123.png" alt="">
-        <div class="card-overlay">
+
+      <!-- Halved Plum -->
+      <div class="obj" style="left:24.31%; top:61.81%; width:15.28%;">
+        <img src="/assets/images/obj-halved-plum.webp" alt="Halved Plum" style="aspect-ratio:220/219;">
+      </div>
+
+      <!-- Orange 3 -->
+      <div class="obj" style="left:61.11%; top:67.75%; width:14.72%;">
+        <img src="/assets/images/obj-orange-3.webp" alt="Orange" style="aspect-ratio:212/202;">
+      </div>
+
+      <!-- Old Fashioned -->
+      <div class="obj has-rotation" style="left:72.97%; top:102.60%; width:12%; mix-blend-mode:multiply;">
+        <div class="obj-inner" style="transform:rotate(9.06deg); aspect-ratio:222.791/285.281;">
+          <img src="/assets/images/obj-old-fashioned.webp" alt="Old Fashioned">
+        </div>
+      </div>
+
+      <!-- Sticker Ring 1 -->
+      <div class="sticker" style="left:calc(829 / 1440 * 100%); top:83.38%; width:calc(176 / 1440 * 100%); aspect-ratio:1;">
+        <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="exp-sticker-1" d="M88,10 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/></defs>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
+            <textPath href="#exp-sticker-1">Where the plans turn into something you can walk into 💅🏽</textPath>
+          </text>
+        </svg>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Dinner) ───────────── -->
+      <div class="project-mobile" data-project="dinner">
+        <div class="stack-description">
           <h3 class="card-title">YUMI MATSUO INDUSTRY DINNER</h3>
           <p class="card-body">An intimate dinner party for NYC based-photographers — candlelit, citrus-laden, and good to the last drop.</p>
           <div class="card-tags">
@@ -312,63 +504,109 @@
             <span class="card-tag">Experience Design + Production</span>
           </div>
         </div>
-      </div>
-      <div class="photo" style="left:1115px; top:1914px; width:355px; height:532px;">
-        <img src="/assets/exp-dinner-145.png" alt="">
-      </div>
-      <div class="photo" style="left:405px; top:2011px; width:355px; height:533px;">
-        <img src="/assets/exp-dinner-112.png" alt="">
-      </div>
-      <div class="photo" style="left:790px; top:2101px; width:355px; height:532px;">
-        <img src="/assets/exp-dinner-138.png" alt="">
-      </div>
-      <div class="photo" style="left:-30px; top:2257px; width:355px; height:532px;">
-        <img src="/assets/exp-dinner-108.png" alt="">
-      </div>
-      <div class="photo" style="left:1050px; top:2506px; width:355px; height:532px;">
-        <img src="/assets/exp-dinner-102.png" alt="">
+
+        <div class="swipe-stack" data-stack="dinner">
+          <!-- DOM order: Dinner_1 (bottom) → Dinner_8 (top); available photos 101/102/108/112/123/138/145/151 used in ascending order -->
+          <div class="swipe-card" style="left:19.31%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-dinner-101.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.73%; top:18.33%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-dinner-102.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:19.31%; width:100%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-dinner-108.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:18.33%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-dinner-112.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:19.31%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-dinner-123.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.62%; top:1.96%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-dinner-138.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:18.33%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-dinner-145.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.62%; top:1.96%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-dinner-151.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <div class="mobile-sticker" style="left:86.05%; top:-13.20%; width:34.22%; aspect-ratio:140/146;">
+              <img src="/assets/images/obj-grapefruit.webp" alt="">
+            </div>
+            <div class="mobile-sticker" style="left:-12.22%; top:85.56%; width:38.14%; aspect-ratio:156/155;">
+              <img src="/assets/images/obj-halved-plum.webp" alt="">
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Dinner) -->
+
+    </div><!-- /.project-section (Dinner) -->
+
+    <!-- ── Wedding ─────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1212 (canvas y:3079 to y:4291). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1212;">
+
+      <!-- exp-wedding-228  left:80%    top:0%     w:24.65% h:43.98% portrait -->
+      <div class="photo" style="left:80%; top:0%; width:24.65%; height:43.98%;">
+        <img src="/assets/images/exp-wedding-228.webp" alt="">
       </div>
 
-      <!-- Dinner-101: portrait displayed landscape via -90° rotation -->
-      <div class="photo-rotated" style="left:195px; top:2664px; width:529.517px; height:355px;">
-        <div class="photo-rotated-inner" style="width:355px; height:529.517px;">
-          <img src="/assets/exp-dinner-101.png" alt="" style="width:355px; height:529.517px;">
+      <!-- exp-wedding-311  left:26.67% top:4.70%  w:37.01% h:29.29% — hover card flip -->
+      <div class="photo-card" style="left:26.67%; top:4.70%; width:37.01%; height:29.29%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-wedding-311.webp" alt="Not a Regular Wedding">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">NOT A REGULAR WEDDING</h3>
+            <p class="card-body">An intimate restaurant wedding for 60 — a quick garden ceremony followed by dinner and a lounge that didn't want to end. Warm, considered, and entirely them.</p>
+            <div class="card-tags">
+              <span class="card-tag">Wedding</span>
+              <span class="card-tag">Event Design + Production</span>
+            </div>
+          </div>
         </div>
       </div>
 
+      <!-- exp-wedding-229  left:59.44% top:24.26% w:37.01% h:29.29% -->
+      <div class="photo" style="left:59.44%; top:24.26%; width:37.01%; height:29.29%;">
+        <img src="/assets/images/exp-wedding-229.webp" alt="">
+      </div>
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  STICKER RING 1 — between Dinner and Wedding sections     -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!-- Figma: x:825 y:2780 183×183; center (916.5, 2871.5) → div 176×176 at (829, 2784) -->
-      <div class="sticker" style="left:829px; top:2784px; width:176px; height:176px;">
-        <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <path id="exp-ring1-path" d="M88 24 a64 64 0 1 1 -0.001 0"/>
-          </defs>
-          <g>
-            <animateTransform attributeName="transform" type="rotate"
-              from="0 88 88" to="360 88 88" dur="18s" repeatCount="indefinite"/>
-            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="14" font-weight="400"
-                  style="font-variation-settings: 'wght' 400"
-                  fill="#32261F" letter-spacing="0">
-              <textPath href="#exp-ring1-path" textLength="402" lengthAdjust="spacing">Where the plans turn into something you can walk into 💅🏽&#xa0;</textPath>
-            </text>
-          </g>
-        </svg>
+      <!-- exp-wedding-222  left:20.42% top:38.94% w:37.01% h:29.29% -->
+      <div class="photo" style="left:20.42%; top:38.94%; width:37.01%; height:29.29%;">
+        <img src="/assets/images/exp-wedding-222.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-309  left:-0.83% top:53.88% w:24.65% h:43.98% portrait, bleeds left -->
+      <div class="photo" style="left:-0.83%; top:53.88%; width:24.65%; height:43.98%;">
+        <img src="/assets/images/exp-wedding-309.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-233  left:67.08% top:57.67% w:24.65% h:43.98% portrait -->
+      <div class="photo" style="left:67.08%; top:57.67%; width:24.65%; height:43.98%;">
+        <img src="/assets/images/exp-wedding-233.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-398  left:27.99% top:70.71% w:37.01% h:29.29% -->
+      <div class="photo" style="left:27.99%; top:70.71%; width:37.01%; height:29.29%;">
+        <img src="/assets/images/exp-wedding-398.webp" alt="">
       </div>
 
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  WEDDING — 7 photos (displayed normally, no mirror)       -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <div class="photo" style="left:0; top:3079px; width:355px; height:533px;">
-        <img src="/assets/exp-wedding-228.png" alt="">
+      <!-- Napkin -->
+      <div class="obj has-rotation" style="left:83.82%; top:41.83%; width:14%;">
+        <div class="obj-inner" style="transform:rotate(-12.02deg); aspect-ratio:275/299;">
+          <img src="/assets/images/obj-napkin.webp" alt="Napkin">
+        </div>
       </div>
-      <div class="photo photo-card" style="left:384px; top:3136px; width:533px; height:355px;">
-        <img src="/assets/exp-wedding-311.png" alt="">
-        <div class="card-overlay">
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Wedding) ──────────── -->
+      <div class="project-mobile" data-project="wedding">
+        <div class="stack-description">
           <h3 class="card-title">NOT A REGULAR WEDDING</h3>
           <p class="card-body">An intimate restaurant wedding for 60 — a quick garden ceremony followed by dinner and a lounge that didn't want to end. Warm, considered, and entirely them.</p>
           <div class="card-tags">
@@ -376,405 +614,496 @@
             <span class="card-tag">Event Design + Production</span>
           </div>
         </div>
+
+        <div class="swipe-stack" data-stack="wedding">
+          <!-- DOM order: Wedding-1 (bottom) → Wedding-7 (top); available photos 222/228/229/233/309/311/398 in ascending order -->
+          <div class="swipe-card" style="left:98.21%; top:16.70%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-wedding-222.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:84.28%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-wedding-228.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:97.72%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-wedding-229.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:99.43%; top:18.41%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-wedding-233.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.58%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-wedding-309.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:83.55%; top:2.03%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-wedding-311.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:97.72%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-wedding-398.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- OldFashioned: tall, Figma -12.48°. -->
+            <div class="mobile-sticker" style="left:84.28%; top:-7.33%; width:35.02%; aspect-ratio:143.266/167.645;">
+              <div class="mobile-sticker-inner" style="width:79.80%; aspect-ratio:114.328/146.395; transform:rotate(-12.48deg);">
+                <img src="/assets/images/obj-old-fashioned.webp" alt="">
+              </div>
+            </div>
+            <!-- Napkin: Figma -166.19° + scaleY(-1). -->
+            <div class="mobile-sticker" style="left:27.23%; top:77.46%; width:47.34%; aspect-ratio:193.650/203.944;">
+              <div class="mobile-sticker-inner" style="width:81.23%; aspect-ratio:157.3/171.355; transform:rotate(-166.19deg) scaleY(-1);">
+                <img src="/assets/images/obj-napkin.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Wedding) -->
+
+    </div><!-- /.project-section (Wedding) -->
+
+    <!-- ── Mr. Hotel ───────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1225 (canvas y:4341 to y:5566). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1225;">
+
+      <!-- exp-mr-hotel-3   left:52.57% top:0%     w:37.01% h:28.98% -->
+      <div class="photo" style="left:52.57%; top:0%; width:37.01%; height:28.98%;">
+        <img src="/assets/images/exp-mr-hotel-3.webp" alt="">
       </div>
-      <div class="photo" style="left:856px; top:3373px; width:533px; height:355px;">
-        <img src="/assets/exp-wedding-229.png" alt="">
+
+      <!-- exp-mr-hotel-1   left:13.54% top:5.71%  w:37.01% h:29.06% — hover card flip -->
+      <div class="photo-card" style="left:13.54%; top:5.71%; width:37.01%; height:29.06%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-mr-hotel-1.webp" alt="Hotel Man Repeller">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">HOTEL MAN REPELLER</h3>
+            <p class="card-body">A weekend-long immersive activation that turned a digital media brand's platform into something guests could experience IRL. 14 events, 200 guests, 40+ brand partners.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="photo" style="left:294px; top:3551px; width:533px; height:355px;">
-        <img src="/assets/exp-wedding-222.png" alt="">
+
+      <!-- exp-mr-hotel-4   left:-4.17% top:32.24% w:37.08% h:28.98% bleeds left -->
+      <div class="photo" style="left:-4.17%; top:32.24%; width:37.08%; height:28.98%;">
+        <img src="/assets/images/exp-mr-hotel-4.webp" alt="">
       </div>
-      <div class="photo" style="left:-12px; top:3732px; width:355px; height:533px;">
-        <img src="/assets/exp-wedding-309.png" alt="">
+
+      <!-- exp-mr-hotel-2   left:44.93% top:37.14% w:37.01% h:28.98% -->
+      <div class="photo" style="left:44.93%; top:37.14%; width:37.01%; height:28.98%;">
+        <img src="/assets/images/exp-mr-hotel-2.webp" alt="">
       </div>
-      <div class="photo" style="left:966px; top:3778px; width:355px; height:533px;">
-        <img src="/assets/exp-wedding-233.png" alt="">
+
+      <!-- exp-mr-hotel-5   left:17.64% top:58.45% w:36.94% h:28.98% -->
+      <div class="photo" style="left:17.64%; top:58.45%; width:36.94%; height:28.98%;">
+        <img src="/assets/images/exp-mr-hotel-5.webp" alt="">
       </div>
-      <div class="photo" style="left:403px; top:3936px; width:533px; height:355px;">
-        <img src="/assets/exp-wedding-398.png" alt="">
+
+      <!-- exp-mr-hotel-6   left:58.75% top:70.98% w:36.94% h:28.98% -->
+      <div class="photo" style="left:58.75%; top:70.98%; width:36.94%; height:28.98%;">
+        <img src="/assets/images/exp-mr-hotel-6.webp" alt="">
       </div>
 
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  MR. HOTEL — 6 photos                                     -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <div class="photo" style="left:757px; top:4341px; width:533px; height:355px;">
-        <img src="/assets/exp-mr-hotel-3.png" alt="">
+      <!-- Lemon Wedge -->
+      <div class="obj has-rotation" style="left:75.63%; top:26.61%; width:10%;">
+        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); aspect-ratio:188/217;">
+          <img src="/assets/images/obj-lemon-wedge.webp" alt="Lemon Wedge">
+        </div>
       </div>
-      <div class="photo photo-card" style="left:195px; top:4411px; width:533px; height:356px;">
-        <img src="/assets/exp-mr-hotel-1.png" alt="">
-        <div class="card-overlay">
+
+      <!-- Cookie -->
+      <div class="obj" style="left:27.78%; top:92.98%; width:16.67%;">
+        <img src="/assets/images/obj-cookie.webp" alt="Cookie" style="aspect-ratio:240/231;">
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Hotel MR) ─────────── -->
+      <div class="project-mobile" data-project="hotel-mr">
+        <div class="stack-description">
           <h3 class="card-title">HOTEL MAN REPELLER</h3>
           <p class="card-body">A weekend-long immersive activation that turned a digital media brand's platform into something guests could experience IRL. 14 events, 200 guests, 40+ brand partners.</p>
           <div class="card-tags">
             <span class="card-tag">Brand Activation</span>
-            <span class="card-tag">Experience Design + Production</span>
-          </div>
-        </div>
-      </div>
-      <div class="photo" style="left:-60px; top:4736px; width:534px; height:355px;">
-        <img src="/assets/exp-mr-hotel-4.png" alt="">
-      </div>
-      <div class="photo" style="left:647px; top:4796px; width:533px; height:355px;">
-        <img src="/assets/exp-mr-hotel-2.png" alt="">
-      </div>
-      <div class="photo" style="left:254px; top:5057px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-hotel-5.png" alt="">
-      </div>
-      <div class="photo" style="left:846px; top:5211px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-hotel-6.png" alt="">
-      </div>
-
-
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  STICKER RING 2 — before Mr. Buffet section              -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!-- Figma: x:1068.69 y:5707.81 151.63×151.63; center (1144.5, 5783.6) → div 166×166 at (1062, 5701) -->
-      <div class="sticker" style="left:1062px; top:5701px; width:166px; height:166px;">
-        <svg viewBox="0 0 166 166" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <path id="exp-ring2-path" d="M83 30 a53 53 0 1 1 -0.001 0"/>
-          </defs>
-          <g>
-            <animateTransform attributeName="transform" type="rotate"
-              from="0 83 83" to="360 83 83" dur="18s" repeatCount="indefinite"/>
-            <text font-family="Handjet, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', monospace" font-size="12" font-weight="400"
-                  style="font-variation-settings: 'wght' 400"
-                  fill="#32261F" letter-spacing="0">
-              <textPath href="#exp-ring2-path" textLength="333" lengthAdjust="spacing">Because &#x201C;just an event&#x201D; was never the plan 🪩&#xa0;</textPath>
-            </text>
-          </g>
-        </svg>
-      </div>
-
-
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  MR. BUFFET — 6 photos                                    -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <div class="photo" style="left:675px; top:5596px; width:355px; height:533px;">
-        <img src="/assets/exp-mr-buffet-6.png" alt="">
-      </div>
-      <div class="photo photo-card" style="left:82px; top:5671px; width:533px; height:355px;">
-        <img src="/assets/exp-mr-buffet-3.png" alt="">
-        <div class="card-overlay">
-          <h3 class="card-title">MR BUFFET HOLIDAY ACTIVATION</h3>
-          <p class="card-body">A bakery takeover celebrating a seasonal accessories collection -- custom desserts, new product, three days open to the public.</p>
-          <div class="card-tags">
-            <span class="card-tag">Brand Activation</span>
+            <span class="card-tag">Experience Design</span>
             <span class="card-tag">Production</span>
           </div>
         </div>
-      </div>
-      <div class="photo" style="left:1120px; top:5687px; width:355px; height:533px;">
-        <img src="/assets/exp-mr-buffet-2.png" alt="">
-      </div>
-      <div class="photo" style="left:460px; top:6085.88px; width:355px; height:533px;">
-        <img src="/assets/exp-mr-buffet-5.png" alt="">
-      </div>
-      <div class="photo" style="left:915px; top:6146px; width:355px; height:533px;">
-        <img src="/assets/exp-mr-buffet-4.png" alt="">
-      </div>
-      <div class="photo" style="left:-42px; top:6176.88px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-buffet-1.png" alt="">
+
+        <div class="swipe-stack" data-stack="hotel-mr">
+          <!-- DOM order: MR_Hotel-1 (bottom) → MR_Hotel-6 (top) -->
+          <div class="swipe-card" style="left:3.11%; top:2.35%; width:97.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-hotel-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.48%; top:8.46%; width:98.99%; aspect-ratio:413.426/287.568;">
+            <img src="/assets/images/exp-mr-hotel-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.87%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-hotel-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:9.48%; width:100%; aspect-ratio:417.651/294.252;">
+            <img src="/assets/images/exp-mr-hotel-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.87%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-hotel-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.96%; top:7.10%; width:97.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-hotel-6.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- LemonWedge: Figma 98.31° + scaleY(-1). -->
+            <div class="mobile-sticker" style="left:82.98%; top:-20.69%; width:32.93%; aspect-ratio:137.520/123.244;">
+              <div class="mobile-sticker-inner" style="width:77.53%; aspect-ratio:106.623/123.391; transform:rotate(98.31deg) scaleY(-1);">
+                <img src="/assets/images/obj-lemon-wedge.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Hotel MR) -->
+
+    </div><!-- /.project-section (Mr. Hotel) -->
+
+    <!-- ── Mr. Buffet ──────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 936 (canvas y:5596 to y:6532). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 936;">
+
+      <!-- exp-mr-buffet-6  left:46.88% top:0%     w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:46.88%; top:0%; width:24.65%; height:56.94%;">
+        <img src="/assets/images/exp-mr-buffet-6.webp" alt="">
       </div>
 
-
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  MR. NINE WEST — 6 photos                                 -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <div class="photo photo-card" style="left:457px; top:6709.01px; width:533px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-1.png" alt="">
-        <div class="card-overlay">
-          <h3 class="card-title">SOLE SISTER SOIRÉE</h3>
-          <p class="card-body">A sister-themed cocktail party in partnership with Nine West. Sixty guests, one rule: bring someone like a sister.</p>
-          <div class="card-tags">
-            <span class="card-tag">Private Event</span>
-            <span class="card-tag">Experience Design + Production</span>
+      <!-- exp-mr-buffet-3  left:5.69%  top:8.01%  w:37.01% h:37.93% — hover card flip -->
+      <div class="photo-card" style="left:5.69%; top:8.01%; width:37.01%; height:37.93%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-mr-buffet-3.webp" alt="Mr Buffet Holiday Activation">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">MR BUFFET HOLIDAY ACTIVATION</h3>
+            <p class="card-body">A bakery takeover celebrating a seasonal accessories collection — custom desserts, new product, three days open to the public.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Production</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="photo" style="left:-105px; top:6833.01px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-3.png" alt="">
+
+      <!-- exp-mr-buffet-2  left:77.78% top:9.72%  w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:77.78%; top:9.72%; width:24.65%; height:56.94%;">
+        <img src="/assets/images/exp-mr-buffet-2.webp" alt="">
       </div>
-      <div class="photo" style="left:827px; top:6964.01px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-4.png" alt="">
+
+      <!-- exp-mr-buffet-5  left:31.94% top:52.35% w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:31.94%; top:52.35%; width:24.65%; height:56.94%;">
+        <img src="/assets/images/exp-mr-buffet-5.webp" alt="">
       </div>
-      <div class="photo" style="left:235px; top:7114.01px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-2.png" alt="">
+
+      <!-- exp-mr-buffet-4  left:63.54% top:58.76% w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:63.54%; top:58.76%; width:24.65%; height:56.94%;">
+        <img src="/assets/images/exp-mr-buffet-4.webp" alt="">
       </div>
-      <div class="photo" style="left:682px; top:7439.01px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-6.png" alt="">
-      </div>
-      <div class="photo" style="left:30px; top:7499.01px; width:532px; height:355px;">
-        <img src="/assets/exp-mr-nine-west-5.png" alt="">
+
+      <!-- exp-mr-buffet-1  left:-2.92% top:62.07% w:36.94% h:37.93% bleeds left -->
+      <div class="photo" style="left:-2.92%; top:62.07%; width:36.94%; height:37.93%;">
+        <img src="/assets/images/exp-mr-buffet-1.webp" alt="">
       </div>
 
 
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  DRAGGABLE 3D OBJECTS                                      -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-
-      <!-- Box Tape — outer 97×284, inner rotate(90deg) 284×97 -->
-      <div class="obj has-rotation" id="obj-box-tape"
-           style="left:117px; top:414px; width:97px; height:284px;">
-        <div class="obj-inner" style="transform:rotate(90deg); width:284px; height:97px;">
-          <img src="/assets/obj-box-tape.png" alt="Box tape">
+      <!-- Dark Cherry -->
+      <div class="obj has-rotation" style="left:1.18%; top:34.29%; width:11%;">
+        <div class="obj-inner" style="transform:rotate(12.54deg); aspect-ratio:211.925/234.206;">
+          <img src="/assets/images/obj-dark-cherry.webp" alt="Dark Cherry">
         </div>
       </div>
 
-      <!-- Yellow Pencil — outer 224.02×421.508, inner rotate(-24.05deg) 49.119×439.653 -->
-      <div class="obj has-rotation" id="obj-yellow-pencil"
-           style="left:1267.36px; top:512.02px; width:224.02px; height:421.508px;">
-        <div class="obj-inner" style="transform:rotate(-24.05deg); width:49.119px; height:439.653px;">
-          <img src="/assets/obj-yellow-pencil.png" alt="Yellow pencil">
+      <!-- Orange 1 -->
+      <div class="obj has-rotation" style="left:13.61%; top:115.71%; width:13.89%;">
+        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); aspect-ratio:200/183;">
+          <img src="/assets/images/obj-orange-1.webp" alt="Orange">
         </div>
       </div>
 
-      <!-- Duct Tape — outer 312.128×90, inner rotate(180deg) same size -->
-      <div class="obj has-rotation" id="obj-duct-tape"
-           style="left:888px; top:1143px; width:312.128px; height:90px;">
-        <div class="obj-inner" style="transform:rotate(180deg); width:312.128px; height:90px;">
-          <img src="/assets/obj-duct-tape.png" alt="Duct tape">
-        </div>
-      </div>
-
-      <!-- Pink Eraser — outer 228.433×150.788, inner rotate(-16.85deg) skewX(0.16deg) 209.941×94.039 -->
-      <div class="obj has-rotation" id="obj-pink-eraser"
-           style="left:44.47px; top:1155.73px; width:228.433px; height:150.788px;">
-        <div class="obj-inner" style="transform:rotate(-16.85deg) skewX(0.16deg); width:209.941px; height:94.039px;">
-          <img src="/assets/obj-pink-eraser.png" alt="Pink eraser">
-        </div>
-      </div>
-
-      <!-- Grapefruit — no rotation -->
-      <div class="obj" id="obj-grapefruit"
-           style="left:1050px; top:1728px; width:210px; height:221px;">
-        <img src="/assets/obj-grapefruit.png" alt="Grapefruit">
-      </div>
-
-      <!-- Halved Plum — no rotation -->
-      <div class="obj" id="obj-halved-plum"
-           style="left:350px; top:2479px; width:220px; height:219px;">
-        <img src="/assets/obj-halved-plum.png" alt="Halved plum">
-      </div>
-
-      <!-- Orange 3 — no rotation -->
-      <div class="obj" id="obj-orange-3"
-           style="left:880px; top:2563px; width:212px; height:202px;">
-        <img src="/assets/obj-orange-3.png" alt="Orange">
-      </div>
-
-      <!-- Old Fashioned — outer 264.948×316.814, inner rotate(9.06deg) 222.791×285.281 -->
-      <div class="obj has-rotation" id="obj-old-fashioned"
-           style="left:1050.76px; top:3055.82px; width:264.948px; height:316.814px; mix-blend-mode:multiply;">
-        <div class="obj-inner" style="transform:rotate(9.06deg); width:222.791px; height:285.281px;">
-          <img src="/assets/obj-old-fashioned.png" alt="Old fashioned">
-        </div>
-      </div>
-
-      <!-- Napkin — outer 331.232×349.709, inner rotate(-12.02deg) 275×299 -->
-      <div class="obj has-rotation" id="obj-napkin"
-           style="left:1207px; top:3586px; width:331.232px; height:349.709px;">
-        <div class="obj-inner" style="transform:rotate(-12.02deg); width:275px; height:299px;">
-          <img src="/assets/obj-napkin.png" alt="Napkin">
-        </div>
-      </div>
-
-      <!-- Lemon Wedge — outer 280.75×286.449, inner rotate(142.99deg) scaleY(-1) 188×217 -->
-      <div class="obj has-rotation" id="obj-lemon-wedge"
-           style="left:1089px; top:4667px; width:280.75px; height:286.449px;">
-        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); width:188px; height:217px;">
-          <img src="/assets/obj-lemon-wedge.png" alt="Lemon wedge">
-        </div>
-      </div>
-
-      <!-- Chocolate Chip Cookie — no rotation -->
-      <div class="obj" id="obj-cookie"
-           style="left:400px; top:5480px; width:240px; height:231px;">
-        <img src="/assets/obj-cookie.png" alt="Chocolate chip cookie">
-      </div>
-
-      <!-- Dark Cherry — outer 257.712×274.626, inner rotate(12.54deg) 211.925×234.206 -->
-      <div class="obj has-rotation" id="obj-dark-cherry"
-           style="left:17px; top:5917px; width:257.712px; height:274.626px;">
-        <div class="obj-inner" style="transform:rotate(12.54deg); width:211.925px; height:234.206px;">
-          <img src="/assets/obj-dark-cherry.png" alt="Dark cherry">
-        </div>
-      </div>
-
-      <!-- Orange 1 — outer 200×183, inner rotate(180deg) scaleY(-1) = horizontal flip -->
-      <div class="obj has-rotation" id="obj-orange-1"
-           style="left:196px; top:6679px; width:200px; height:183px;">
-        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); width:200px; height:183px;">
-          <img src="/assets/obj-orange-1.png" alt="Orange">
-        </div>
-      </div>
-
-      <!-- White Orchid — outer 260.133×223.552, inner rotate(3.45deg) 248×209 -->
-      <div class="obj has-rotation" id="obj-white-orchid"
-           style="left:1113.93px; top:6724.72px; width:260.133px; height:223.552px;">
-        <div class="obj-inner" style="transform:rotate(3.45deg); width:248px; height:209px;">
-          <img src="/assets/obj-white-orchid.png" alt="White orchid">
-        </div>
-      </div>
-
-      <!-- Orange 2 — outer 261.371×256.071, inner rotate(17.93deg) 209.565×201.328 -->
-      <div class="obj has-rotation" id="obj-orange-2"
-           style="left:-71.58px; top:7147.72px; width:261.371px; height:256.071px;">
-        <div class="obj-inner" style="transform:rotate(17.93deg); width:209.565px; height:201.328px;">
-          <img src="/assets/obj-orange-2.png" alt="Orange">
-        </div>
-      </div>
-
-      <!-- Paloma — no rotation, mix-blend-multiply -->
-      <div class="obj" id="obj-paloma"
-           style="left:1244px; top:7349px; width:237px; height:326px; mix-blend-mode:multiply;">
-        <img src="/assets/obj-paloma.png" alt="Paloma">
-      </div>
-
-
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <!--  MONSTER WAVE FOOTER                                       -->
-      <!-- ══════════════════════════════════════════════════════════ -->
-      <div id="monster-group">
-      <div class="monster-area" id="monster-area">
-        <img class="wave" src="/assets/monster-wave-interiors.svg" alt="">
-        <svg class="monster-eyes-overlay" viewBox="0 0 1440 122" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <clipPath id="mon-eye-r-clip">
-              <path transform="translate(564.63 38.45)"
-                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-            </clipPath>
-            <clipPath id="mon-eye-l-clip">
-              <path transform="translate(403 37.32)"
-                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-            </clipPath>
-          </defs>
-          <path fill="white" transform="translate(564.63 38.45)"
-            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          <path fill="white" transform="translate(403 37.32)"
-            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-            cx="624.5" cy="55.2" r="30" fill="#32261F"/>
-          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-            cx="466.9" cy="55.2" r="30" fill="#32261F"/>
+      <!-- Sticker Ring 2 -->
+      <div class="sticker" style="left:calc(1062 / 1440 * 100%); top:11.22%; width:calc(166 / 1440 * 100%); aspect-ratio:1;">
+        <svg viewBox="0 0 166 166" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="exp-sticker-2" d="M83,10 a73,73 0 1,1 0,146 a73,73 0 1,1 0,-146"/></defs>
+          <text font-family="Handjet, sans-serif" font-size="16" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
+            <textPath href="#exp-sticker-2">Because "just an event" was never the plan 🪩</textPath>
+          </text>
         </svg>
       </div>
 
-      <footer class="footer">
-        <div class="footer-icons">
-          <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
-          <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+      <!-- ── Mobile variant (Figma 7097:2441 → MR Buffet) ────────── -->
+      <div class="project-mobile" data-project="mr-buffet">
+        <div class="stack-description">
+          <h3 class="card-title">MR BUFFET HOLIDAY ACTIVATION</h3>
+          <p class="card-body">A bakery takeover celebrating a seasonal accessories collection — custom desserts, new product, three days open to the public.</p>
+          <div class="card-tags">
+            <span class="card-tag">Retail Pop-up</span>
+            <span class="card-tag">Production</span>
+          </div>
         </div>
-        <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
-      </footer>
-      </div><!-- /#monster-group -->
 
-    </div><!-- /page -->
-  </div><!-- /page-scaler -->
+        <div class="swipe-stack" data-stack="mr-buffet">
+          <!-- DOM order: MR_Buffet-1 (bottom) → MR_Buffet-6 (top) -->
+          <div class="swipe-card" style="left:2.28%; top:15.95%; width:100%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-buffet-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.70%; top:2.03%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img src="/assets/images/exp-mr-buffet-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.97%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-mr-buffet-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.03%; top:16.69%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-buffet-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.97%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-mr-buffet-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:19.39%; top:0.08%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img src="/assets/images/exp-mr-buffet-6.webp" alt="">
+          </div>
 
+          <div class="project-stickers">
+            <!-- Cookie: no rotation. -->
+            <div class="mobile-sticker" style="left:87.10%; top:-8.23%; width:35.20%; aspect-ratio:144/138;">
+              <img src="/assets/images/obj-cookie.webp" alt="">
+            </div>
+            <!-- DarkCherry: Figma 0.79° (subtle). -->
+            <div class="mobile-sticker" style="left:-3.62%; top:70.63%; width:36.03%; aspect-ratio:147.374/162.425;">
+              <div class="mobile-sticker-inner" style="width:98.51%; aspect-ratio:145.173/160.437; transform:rotate(0.79deg);">
+                <img src="/assets/images/obj-dark-cherry.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (MR Buffet) -->
+
+    </div><!-- /.project-section (Mr. Buffet) -->
+
+    <!-- ── Mr. Nine West ───────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1145 (canvas y:6709 to y:7854). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1145; margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));">
+
+      <!-- exp-mr-nine-west-1  left:31.74% top:0%     w:37.01% h:31.0% — hover card flip -->
+      <div class="photo-card" style="left:31.74%; top:0%; width:37.01%; height:31.0%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img src="/assets/images/exp-mr-nine-west-1.webp" alt="Sole Sister Soirée">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">SOLE SISTER SOIRÉE</h3>
+            <p class="card-body">A sister-themed cocktail party in partnership with Nine West. Sixty guests, one rule: bring someone like a sister.</p>
+            <div class="card-tags">
+              <span class="card-tag">Private Event</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-nine-west-3  left:-7.29% top:10.83% w:36.94% h:31.0% bleeds left -->
+      <div class="photo" style="left:-7.29%; top:10.83%; width:36.94%; height:31.0%;">
+        <img src="/assets/images/exp-mr-nine-west-3.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-4  left:57.43% top:22.27% w:36.94% h:31.0% -->
+      <div class="photo" style="left:57.43%; top:22.27%; width:36.94%; height:31.0%;">
+        <img src="/assets/images/exp-mr-nine-west-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-2  left:16.32% top:35.37% w:36.94% h:31.0% -->
+      <div class="photo" style="left:16.32%; top:35.37%; width:36.94%; height:31.0%;">
+        <img src="/assets/images/exp-mr-nine-west-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-6  left:47.36% top:63.76% w:36.94% h:31.0% -->
+      <div class="photo" style="left:47.36%; top:63.76%; width:36.94%; height:31.0%;">
+        <img src="/assets/images/exp-mr-nine-west-6.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-5  left:2.08%  top:69.0%  w:36.94% h:31.0% -->
+      <div class="photo" style="left:2.08%; top:69.0%; width:36.94%; height:31.0%;">
+        <img src="/assets/images/exp-mr-nine-west-5.webp" alt="">
+      </div>
+
+
+      <!-- White Orchid -->
+      <div class="obj has-rotation" style="left:77.36%; top:1.37%; width:12%;">
+        <div class="obj-inner" style="transform:rotate(3.45deg); aspect-ratio:248/209;">
+          <img src="/assets/images/obj-white-orchid.webp" alt="White Orchid">
+        </div>
+      </div>
+
+      <!-- Orange 2 -->
+      <div class="obj has-rotation" style="left:-4.97%; top:38.32%; width:12%;">
+        <div class="obj-inner" style="transform:rotate(17.93deg); aspect-ratio:209.565/201.328;">
+          <img src="/assets/images/obj-orange-2.webp" alt="Orange">
+        </div>
+      </div>
+
+      <!-- Paloma -->
+      <div class="obj" style="left:86.39%; top:55.90%; width:16.46%; mix-blend-mode:multiply;">
+        <img src="/assets/images/obj-paloma.webp" alt="Paloma" style="aspect-ratio:237/326;">
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Sister Soiree) ────── -->
+      <div class="project-mobile" data-project="sister-soiree">
+        <div class="stack-description">
+          <h3 class="card-title">SOLE SISTER SOIRÉE</h3>
+          <p class="card-body">A sister-themed cocktail party in partnership with Nine West. Sixty guests, one rule: bring someone like a sister.</p>
+          <div class="card-tags">
+            <span class="card-tag">Brand Event</span>
+            <span class="card-tag">Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="sister-soiree">
+          <!-- DOM order: MR_NineWest-1 (bottom) → MR_NineWest-6 (top) -->
+          <div class="swipe-card" style="left:2.66%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-nine-west-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.48%; top:5.89%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-nine-west-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.66%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img src="/assets/images/exp-mr-nine-west-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:7.28%; width:100%; aspect-ratio:413.426/287.568;">
+            <img src="/assets/images/exp-mr-nine-west-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.18%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-nine-west-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:2.18%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img src="/assets/images/exp-mr-nine-west-6.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- Orange-2: Figma 17.93°. -->
+            <div class="mobile-sticker" style="left:-1.74%; top:75.81%; width:40.58%; aspect-ratio:167.766/164.364;">
+              <div class="mobile-sticker-inner" style="width:80.18%; aspect-ratio:134.513/129.226; transform:rotate(17.93deg);">
+                <img src="/assets/images/obj-orange-2.webp" alt="">
+              </div>
+            </div>
+            <!-- WhiteOrchid: Figma 11.43°. -->
+            <div class="mobile-sticker" style="left:80.56%; top:-28.63%; width:45.33%; aspect-ratio:187.384/167.512;">
+              <div class="mobile-sticker-inner" style="width:87.14%; aspect-ratio:163.295/137.881; transform:rotate(11.43deg);">
+                <img src="/assets/images/obj-white-orchid.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Sister Soiree) -->
+
+    </div><!-- /.project-section (Mr. Nine West) -->
+
+  </div><!-- /.page -->
+
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group">
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="/assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="white" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="white" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+    </div>
+  </div><!-- /#monster-group -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+  </div><!-- /#page-scaler -->
 
   <script src="/assets/scripts.js"></script>
   <script>
-    const PAGE_W = 1440;
-    const PAGE_H = 8126;
+    // ── Skeleton constants ─────────────────────────────────────────
     const page         = document.querySelector('.page');
-    const scaler       = document.getElementById('page-scaler');
     const monsterGroup = document.getElementById('monster-group');
     const monsterArea  = document.getElementById('monster-area');
-    let scale = 1;
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
 
-    function scalePage() {
-      scale = window.innerWidth / PAGE_W;
-      page.style.transform = `scale(${scale})`;
-      scaler.style.height  = (PAGE_H * scale) + 'px';
-    }
-    scalePage();
-    window.addEventListener('resize', scalePage);
-
-    (function bindMonsterRevealOnScroll() {
-      if (!monsterGroup) return;
-      const BOTTOM_SLACK_PX = 56;
-
-      function getMaxScrollY() {
-        const sh = Math.max(
-          document.documentElement.scrollHeight,
-          document.body.scrollHeight
-        );
-        return Math.max(0, sh - window.innerHeight);
-      }
-
-      function tryReveal() {
-        if (monsterGroup.classList.contains('popped-up')) return;
-        if (window.scrollY >= getMaxScrollY() - BOTTOM_SLACK_PX) {
-          monsterGroup.classList.add('popped-up');
-        }
-      }
-
-      function onScrollOrResize() {
-        tryReveal();
-        if (monsterGroup.classList.contains('popped-up')) {
-          window.removeEventListener('scroll', onScrollOrResize);
-          window.removeEventListener('resize', onScrollOrResize);
-        }
-      }
-
-      window.addEventListener('scroll', onScrollOrResize, { passive: true });
-      window.addEventListener('resize', onScrollOrResize);
-      onScrollOrResize();
-    })();
-
-
-    document.addEventListener('mousemove', e => {
-      updateAllEyes(e.clientX, e.clientY);
+    // Pop the monster up on load — double rAF ensures the initial
+    // translateY(250px) has painted before the transition fires.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
+      });
     });
 
-
-    // ── Eye tracking ─────────────────────────────────────────────────
-    function toCanvas(vx, vy) {
-      const r = page.getBoundingClientRect();
-      return { x: (vx - r.left) / scale, y: (vy - r.top) / scale };
-    }
-
-    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
-      const dx = localX - restX, dy = localY - restY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
-      const strength = Math.min(dist / 200, 1);
-      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
-      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
-    }
-
-    const monIrisR = document.getElementById('mon-iris-r');
-    const monIrisL = document.getElementById('mon-iris-l');
-
+    // Dynamic waveTop — measured live so it works regardless of page height.
     function getWaveTop() {
       const pageRect = page.getBoundingClientRect();
       const waveRect = monsterArea.getBoundingClientRect();
-      return (waveRect.top - pageRect.top) / scale;
+      return waveRect.top - pageRect.top;
     }
 
-    function updateAllEyes(vx, vy) {
-      const { x, y } = toCanvas(vx, vy);
-      const wt = getWaveTop();
-      trackIris(monIrisR, x, y - wt, 624.5, 55.2, 20, 5);
-      trackIris(monIrisL, x, y - wt, 466.9, 55.2, 20, 5);
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      el.setAttribute('cx', restX + nx * maxX * strength);
+      el.setAttribute('cy', restY + ny * maxY * strength);
     }
 
+    document.addEventListener('mousemove', e => {
+      const waveTop  = getWaveTop();
+      const pageRect = page.getBoundingClientRect();
+      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
+      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = e.clientY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
 
-    // ── Drag (photos + objects) ──────────────────────────────────────
+    // ── Draggable objects ──────────────────────────────────────────
     let dragging = null, offsetX = 0, offsetY = 0, topZ = 10;
 
-    document.querySelectorAll('.obj, .photo, .photo-rotated').forEach(el => {
+    const draggableSelector = '.obj, .photo, .photo-rotated, .placeholder, .photo-card';
+
+    document.querySelectorAll(draggableSelector).forEach(el => {
       el.addEventListener('mouseenter', () => KT.setCursor('hover'));
       el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
       el.addEventListener('mousedown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
-        offsetX = (e.clientX - rect.left) / scale;
-        offsetY = (e.clientY - rect.top)  / scale;
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
         KT.setCursor('drag');
@@ -784,9 +1113,10 @@
 
     document.addEventListener('mousemove', e => {
       if (!dragging) return;
-      const pr = page.getBoundingClientRect();
-      dragging.style.left = ((e.clientX - pr.left) / scale - offsetX) + 'px';
-      dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
+      const parent = dragging.offsetParent;
+      const parentRect = parent.getBoundingClientRect();
+      dragging.style.left = (e.clientX - parentRect.left - offsetX) + 'px';
+      dragging.style.top  = (e.clientY - parentRect.top  - offsetY) + 'px';
     });
 
     document.addEventListener('mouseup', e => {
@@ -794,13 +1124,21 @@
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
-        KT.setCursor(under && under.closest('.obj, .photo, .photo-rotated') ? 'hover' : 'default');
+        KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
       }
     });
 
-    document.querySelectorAll('img').forEach(img => {
+    document.querySelectorAll('.obj img, .photo img').forEach(img => {
       img.addEventListener('dragstart', e => e.preventDefault());
     });
+
+    // ── Mobile swipe stacks (C4 → D4) ─────────────────────────────
+    // KT.swipeStack internally gates on touch context; safe to call on desktop.
+    if (window.KT && window.KT.swipeStack) {
+      document.querySelectorAll('.swipe-stack').forEach(function (el) {
+        window.KT.swipeStack(el);
+      });
+    }
   </script>
 
 </body>

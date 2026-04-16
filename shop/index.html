@@ -114,6 +114,26 @@
 
     .footer { position: relative; z-index: 100; }
 
+    /* ── Mobile (<=768px) ──────────────────────────── */
+    @media (max-width: 768px) {
+      .page {
+        padding-top: 6.25rem;
+        padding-right: var(--content-left);
+      }
+      .h1 {
+        font-size: clamp(2.25rem, 11vw, 3rem);
+        line-height: 1.05;
+        width: var(--content-width);
+        margin-bottom: 1.25rem;
+      }
+      .intro {
+        width: var(--content-width);
+      }
+      .shop-placeholder {
+        left: var(--content-left);
+        width: var(--content-width);
+      }
+    }
   </style>
 </head>
 <body>
@@ -127,6 +147,21 @@
   </a>
 
   <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/" class="active">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
     <a href="/about/">About</a>
     <a href="/interiors/">Interiors</a>
     <a href="/experiences/">Experiences</a>

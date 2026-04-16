@@ -10,6 +10,10 @@ Static site: HTML, CSS, JS → GitHub → Vercel.
 Staging branch: `rebuild` (deployed automatically). Main branch = live site, never touch it.
 Figma MCP connected via figma-desktop at localhost:3845.
 
+## Development scope
+
+Do **not** modify [`archive/`](archive/) (preserved legacy / stubs). Active work stays in repo root [`index.html`](index.html), [`about/`](about/), [`contact/`](contact/), [`experiences/`](experiences/), [`home/`](home/), [`interiors/`](interiors/), [`shop/`](shop/), [`skeleton/`](skeleton/), and [`assets/`](assets/) when global CSS/JS or shared assets are required. See [`docs/todo/00-README.md`](docs/todo/00-README.md).
+
 ## The person you're working with
 
 Matt is not a developer. He directs Claude Code. He has strong design instincts and learns fast, but don't assume hard dev knowledge. Give him one clear recommendation with reasoning, not a menu of options. Be direct. Push back when something is wrong. Flag issues before they compound.

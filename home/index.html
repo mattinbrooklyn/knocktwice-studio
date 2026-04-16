@@ -114,6 +114,73 @@
     #couch-iris-l, #couch-iris-r {
       transition: cx 200ms ease-out, cy 200ms ease-out;
     }
+
+    /* Home mobile header uses the wordmark (Logo_Full_Mobile-Web,
+       119×47 at x=20, y=30) — overrides the global keyhole mobile
+       rule. Has to be outside the @media too; declared inline for
+       specificity since Home's desktop .logo also lives in this file. */
+
+    /* ── Mobile (<=768px) ──────────────────────────────────────────
+       Figma mobile master: frame id 7048:1185, 440×956.
+       Canvas width switches to 440; JS scales by innerWidth/440 instead
+       of innerWidth/1440. Furniture pieces re-laid per mobile coords.
+       !important wins over the inline style="left:..." attrs used for
+       desktop positions (JS drag sets inline styles without !important,
+       so dragging is intentionally parked on mobile — user isn't going
+       to drag 300×250 couches around on a 390px phone). */
+    @media (max-width: 768px) {
+      .page {
+        width: 440px;
+        height: 956px;
+      }
+      .logo {
+        top: 30px;
+        left: 20px;
+        width: 119px;
+        height: 47px;
+      }
+      .sticker-outer {
+        left: 227px !important;
+        top: 656px !important;
+        width: 176px !important;
+        height: 176px !important;
+      }
+      /* Figma: RenderWithEyes_Couch x=35.9 y=122.4 w=269 h=257 */
+      .furniture.couch {
+        left: 36px !important;
+        top: 122px !important;
+        width: 269px !important;
+        height: 257px !important;
+      }
+      /* Figma: RenderWithEyes_Vase x=266 y=240 w=122 h=221 */
+      .furniture.vase {
+        left: 266px !important;
+        top: 240px !important;
+        width: 122px !important;
+        height: 221px !important;
+      }
+      /* Figma: RenderWithEyes_Nightstand x=-4 y=305 w=196 h=179 */
+      .furniture.nightstand {
+        left: -4px !important;
+        top: 305px !important;
+        width: 196px !important;
+        height: 179px !important;
+      }
+      /* Figma: RenderWithEyes_Carpet x=0 y=573 w=281 h=172 */
+      .furniture.carpet {
+        left: 0 !important;
+        top: 573px !important;
+        width: 281px !important;
+        height: 172px !important;
+      }
+      /* Figma: RenderWithEyes_Dresser x=102 y=460 w=357 h=190 */
+      .furniture.dresser {
+        left: 102px !important;
+        top: 460px !important;
+        width: 357px !important;
+        height: 190px !important;
+      }
+    }
   </style>
 </head>
 <body class="home">
@@ -190,6 +257,21 @@
   </div>
 
   <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
     <a href="/about/">About</a>
     <a href="/interiors/">Interiors</a>
     <a href="/experiences/">Experiences</a>
@@ -461,11 +543,23 @@
     let scale = 1;
 
     function scalePage() {
-      scale = window.innerWidth / 1440;
+      // Desktop: canvas is 1440 wide and stretches to match viewport
+      // height (single-screen playground). Mobile (<=768): canvas is
+      // fixed to the Figma mobile frame (440×956, id 7048:1185); scroll
+      // reveals anything below fold on short phones.
+      const isMobile = window.innerWidth <= 768;
+      const ref      = isMobile ? 440 : 1440;
+      scale = window.innerWidth / ref;
       page.style.transform = `scale(${scale})`;
-      const foldPx = Math.ceil(window.innerHeight / scale);
-      page.style.height   = foldPx + 'px';
-      scaler.style.height = foldPx * scale + 'px';
+
+      if (isMobile) {
+        page.style.height   = '956px';
+        scaler.style.height = (956 * scale) + 'px';
+      } else {
+        const foldPx = Math.ceil(window.innerHeight / scale);
+        page.style.height   = foldPx + 'px';
+        scaler.style.height = foldPx * scale + 'px';
+      }
     }
     scalePage();
     window.addEventListener('resize', scalePage);

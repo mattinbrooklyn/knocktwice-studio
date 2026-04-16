@@ -62,16 +62,31 @@
 </head>
 <body>
 
-  <a href="/home-launch/" class="logo">
+  <a href="/home/" class="logo">
     <img src="/assets/logo-keyhole.svg" alt="Knock Twice">
   </a>
 
   <nav class="nav">
-    <a href="/about-launch/">About</a>
-    <a href="/interiors-launch/">Interiors</a>
-    <a href="/experiences-launch/">Experiences</a>
-    <a href="/shop-launch/">Shop</a>
-    <a href="/contact-launch/">Contact</a>
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
   </nav>
 
   <div id="page-scaler">
