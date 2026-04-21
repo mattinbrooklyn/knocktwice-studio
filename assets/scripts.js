@@ -39,7 +39,7 @@
   };
 
   // ── Position tracking ─────────────────────────────────────────────
-  document.addEventListener('mousemove', function (e) {
+  document.addEventListener('pointermove', function (e) {
     var state = document.body.dataset.cursor || 'default';
     var off   = hotspot[state] || hotspot.default;
     div.style.transform = 'translate(' + (e.clientX - off[0]) + 'px,' + (e.clientY - off[1]) + 'px)';
@@ -52,7 +52,7 @@
   var restX = 27.325, restY = 19.055;
   var maxX  = 2.5,    maxY  = 1.5;
 
-  document.addEventListener('mousemove', function (e) {
+  document.addEventListener('pointermove', function (e) {
     if (!iris) iris = document.getElementById('logo-iris');
     if (!iris) return;
 
@@ -201,6 +201,10 @@
           return;
         }
         locked = true;
+        
+        // Hide swipe hint if present
+        var hint = container.querySelector('.swipe-hint-overlay');
+        if (hint) hint.classList.add('is-hidden');
       }
 
       e.preventDefault();

@@ -247,12 +247,18 @@
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
-    <a href="/about/">About</a>
-    <a href="/interiors/" class="active">Interiors</a>
-    <a href="/experiences/">Experiences</a>
-    <a href="/shop/">Shop</a>
-    <a href="/contact/">Contact</a>
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" aria-label="Close menu">
+        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/" class="active">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
   </nav>
 
   <div id="page-scaler">
@@ -370,6 +376,9 @@
         </div>
 
         <div class="swipe-stack" data-stack="saya">
+          <!-- Swipe hint (dismissed on first interactions) -->
+          <img src="/assets/images/swipe-hint.png" alt="Swipe through the stack" class="swipe-hint-overlay" />
+
           <!-- DOM order: Saya-1 (bottom of pile) → Saya-14 (top) -->
           <div class="swipe-card" style="left:2.58%; top:18.16%; width:94.85%; aspect-ratio:400/267;">
             <img src="/assets/images/interior-saya-01.webp" alt="">
@@ -739,7 +748,11 @@
     document.querySelectorAll(draggableSelector).forEach(el => {
       el.addEventListener('mouseenter', () => KT.setCursor('hover'));
       el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      el.addEventListener('mousedown', e => {
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+
+      el.addEventListener('pointerdown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
@@ -747,24 +760,32 @@
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
         KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('mousemove', e => {
+    document.addEventListener('pointermove', e => {
       if (!dragging) return;
       const parent = dragging.offsetParent;
       const parentRect = parent.getBoundingClientRect();
-      dragging.style.left = (e.clientX - parentRect.left - offsetX) + 'px';
-      dragging.style.top  = (e.clientY - parentRect.top  - offsetY) + 'px';
+      dragging.style.setProperty('left', (e.clientX - parentRect.left - offsetX) + 'px', 'important');
+      dragging.style.setProperty('top', (e.clientY - parentRect.top  - offsetY) + 'px', 'important');
     });
 
-    document.addEventListener('mouseup', e => {
+    document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
         KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
       }
     });
 

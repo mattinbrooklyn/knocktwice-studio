@@ -112,26 +112,50 @@
       background: var(--color-blue);
     }
 
+    #ml-modal.modal-card {
+      top: 62%;
+    }
+
     .footer { position: relative; z-index: 100; }
 
     /* ── Mobile (<=768px) ──────────────────────────── */
     @media (max-width: 768px) {
       .page {
-        padding-top: 6.25rem;
+        padding-top: 6.0625rem; /* ~97px matches Figma */
         padding-right: var(--content-left);
       }
       .h1 {
-        font-size: clamp(2.25rem, 11vw, 3rem);
-        line-height: 1.05;
+        font-size: clamp(2.25rem, 11vw, 2.625rem); /* exactly 42px on 375px mobile */
+        line-height: 1.095; /* 46px line-height for 42px font */
         width: var(--content-width);
-        margin-bottom: 1.25rem;
+        margin-bottom: 0.9375rem; /* 15px gap to body */
       }
       .intro {
+        font-size: 0.75rem; /* 12px matches Figma */
+        line-height: 17px;
         width: var(--content-width);
       }
       .shop-placeholder {
         left: var(--content-left);
         width: var(--content-width);
+      }
+      /* Match modal padding exactly and fix flex height collapse */
+      .modal-card {
+        padding: 1.875rem; /* 30px padding matches Figma */
+      }
+      #ml-modal.modal-card {
+        top: 68%;
+      }
+      .ml-form-row {
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      .ml-form-row input {
+        flex: none;
+        width: 100%;
+      }
+      .ml-form-row .ml-submit {
+        width: 100%;
       }
     }
   </style>
@@ -161,12 +185,18 @@
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
-    <a href="/about/">About</a>
-    <a href="/interiors/">Interiors</a>
-    <a href="/experiences/">Experiences</a>
-    <a href="/shop/" class="active">Shop</a>
-    <a href="/contact/">Contact</a>
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" aria-label="Close menu">
+        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/" class="active">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
   </nav>
 
   <div id="page-scaler">
@@ -185,7 +215,7 @@
   <div class="modal-card" id="ml-modal">
     <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
     <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
-    <p class="ml-body" id="ml-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
+    <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become -- we'd love for you to stick around.</p>
     <div class="ml-form-row">
       <input type="email" id="ml-email" class="field" placeholder="Email*" autocomplete="off">
       <button class="ml-submit" id="ml-submit">Sign Up</button>

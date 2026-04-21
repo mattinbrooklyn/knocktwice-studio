@@ -55,7 +55,7 @@
     /* ── Circular sticker ─────────────────────────────────────── */
     .sticker-outer {
       position: absolute;
-      left: 1186px; top: 114px;
+      left: 1186px; top: 74px;
       width: 176px; height: 176px;
     }
     @keyframes coinflip {
@@ -271,12 +271,18 @@
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
-    <a href="/about/">About</a>
-    <a href="/interiors/">Interiors</a>
-    <a href="/experiences/">Experiences</a>
-    <a href="/shop/">Shop</a>
-    <a href="/contact/">Contact</a>
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" aria-label="Close menu">
+        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
   </nav>
 
   <div id="page-scaler">
@@ -350,9 +356,9 @@
     </div>
 
     <!-- ── Furniture: Couch ────────────────────────────────────── -->
-    <!-- Figma: x:397 y:96 w:430 h:410, inner rotated 371×345 -->
+    <!-- Figma: outer wrapper x:397 y:25 w:430 h:410, inner rotated 371×345 -->
     <div class="furniture couch"
-         style="left:397px; top:96px; width:430px; height:410px;">
+         style="left:397px; top:25px; width:430px; height:410px;">
       <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
         <div style="width:370.668px; height:345.37px; position:relative;
                     transform:rotate(-11.01deg); flex-shrink:0; overflow:hidden;">
@@ -442,9 +448,9 @@
     </div>
 
     <!-- ── Furniture: Carpet ───────────────────────────────────── -->
-    <!-- Figma: x:350 y:513 w:448 h:275 -->
+    <!-- Figma: x:349 y:513 w:449 h:275 (calc(20%+61px)=349px) -->
     <div class="furniture carpet"
-         style="left:350px; top:513px; width:448px; height:275px;">
+         style="left:349px; top:513px; width:449px; height:275px;">
       <img class="base" src="/assets/furniture-carpet.png" alt="Carpet">
       <svg class="eyes" viewBox="0 0 449 275" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -575,7 +581,11 @@
     document.querySelectorAll('.furniture').forEach(el => {
       el.addEventListener('mouseenter', () => KT.setCursor('hover'));
       el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      el.addEventListener('mousedown', e => {
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+      
+      el.addEventListener('pointerdown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
         // Convert click offset into page (unscaled) coordinates
@@ -584,26 +594,34 @@
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
         KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('mousemove', e => {
+    document.addEventListener('pointermove', e => {
       if (!dragging) return;
       const pageRect = page.getBoundingClientRect();
       // Convert viewport coords to page coords, then subtract the grab offset
       const x = (e.clientX - pageRect.left) / scale - offsetX;
       const y = (e.clientY - pageRect.top)  / scale - offsetY;
-      dragging.style.left = x + 'px';
-      dragging.style.top  = y + 'px';
+      dragging.style.setProperty('left', x + 'px', 'important');
+      dragging.style.setProperty('top', y + 'px', 'important');
     });
 
-    document.addEventListener('mouseup', e => {
+    document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
         KT.setCursor(under && under.closest('.furniture') ? 'hover' : 'default');
+      }
+    });
+    
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
       }
     });
 

@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
-    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-bg); }
+    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
 
     #page-scaler {
@@ -28,6 +28,8 @@
     .page {
       position: relative;
       width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
       background: var(--color-bg);
       display: flex;
       flex-direction: column;
@@ -197,9 +199,9 @@
        room at the peak; connected C curve (no M jumps) for smooth flow */
     .monster-ticker {
       position: absolute;
-      bottom: calc(100% - 96px);
+      bottom: calc(100% - 90px);
       left: 0;
-      width: 100%;
+      width: 1440px;
       height: 156px;
       overflow: hidden;
       z-index: 6;
@@ -212,7 +214,7 @@
     .monster-eyes-overlay {
       position: absolute;
       top: 0; left: 0;
-      width: 100%; height: 100%;
+      width: 1440px; height: 116px;
       pointer-events: none;
       overflow: visible;
     }
@@ -230,7 +232,7 @@
       display: none;
       position: absolute;
       left: 0; top: 0;
-      width: 100%; height: 100%;
+      width: 1440px; height: 1116px;
       background: rgba(247, 242, 236, 0.88);
       z-index: 14;
     }
@@ -240,7 +242,7 @@
       display: none;
       position: absolute;
       left: 0; top: 106px;
-      width: 100%; height: 737px;
+      width: 1440px; height: 737px;
       background: var(--color-blue);
     }
     /* ── Newsletter window — page-specific position overrides ────────
@@ -261,97 +263,6 @@
     #newsletter-window.modal-card.ml-success {
       min-height: auto;
     }
-
-    /* ── Mobile (<=768px) ──────────────────────────────────────────
-       Figma mobile master: frame id 7055:2255 (About state A), 440×1485.
-       Headshots stack vertically, paintbrush overlaps Rodrigo from the
-       left (x=-15), paint bucket overlaps Matt from the right (x=310).
-       Coords are relative to .page (which is 100vw wide on mobile). */
-    @media (max-width: 768px) {
-      .page {
-        padding-top: 6.0625rem;
-        padding-right: var(--content-left);
-        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + 1rem);
-        /* Reserve space for absolute-positioned paint bucket below the
-           Matt headshot (Figma: bucket bottom at y=1241, footer wave at
-           y=1365). */
-        min-height: 80rem;
-      }
-      .h1 {
-        font-size: clamp(2.25rem, 10vw, 3rem);
-        line-height: 1.05;
-        width: var(--content-width);
-        margin-bottom: 0.9375rem;
-      }
-      .h2 {
-        font-size: 1.25rem;
-        line-height: 1.4rem;
-        width: var(--content-width);
-      }
-      .intro {
-        width: var(--content-width);
-        margin-bottom: 2.5rem;
-      }
-      .people-row {
-        flex-direction: column;
-        gap: 2rem;
-        width: var(--content-width);
-      }
-      /* Paintbrush per Figma: x=-15, y=340, 144×271.
-         `.page` has padding-left:var(--content-left)=1.25rem (20px), but
-         paintbrush is position:absolute so it sits relative to .page's
-         padding box origin. Subtract 20 from Figma x to align. */
-      .paintbrush {
-        left: -35px !important;
-        top: 340px !important;
-        width: 144px !important;
-        height: 271px !important;
-      }
-      .paintbrush img.base,
-      .paintbrush .eyes {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      /* Paint bucket per Figma: x=310, y=1045, 188×196.
-         Inner rotated container scales to fit outer. */
-      .paint-bucket-outer {
-        left: 290px !important;
-        top: 1045px !important;
-        width: 188px !important;
-        height: 196px !important;
-      }
-      .paint-bucket-inner {
-        width: 166px !important;
-        height: 176px !important;
-      }
-      .paint-bucket-inner img.base,
-      .paint-bucket-inner .eyes {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      /* Monster ticker (1440px wide, overflows); hide on mobile. */
-      .monster-ticker {
-        display: none;
-      }
-      .monster-area {
-        height: var(--wave-height-mobile);
-      }
-      .monster-eyes-overlay {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      #modal-backdrop,
-      #modal-blue-body {
-        width: 100%;
-      }
-      #newsletter-window.modal-card {
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: min(22.5rem, calc(100vw - 2.5rem));
-        padding: 1.75rem 1.25rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -370,27 +281,6 @@
     <a href="/experiences/">Experiences</a>
     <a href="/shop/">Shop</a>
     <a href="/contact/">Contact</a>
-  </nav>
-
-  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-  </button>
-
-  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-    <div class="nav-mobile-menu">
-      <button class="nav-mobile-close" aria-label="Close menu">
-        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <a href="/about/" class="active">About</a>
-      <a href="/interiors/">Interiors</a>
-      <a href="/experiences/">Experiences</a>
-      <a href="/shop/">Shop</a>
-      <a href="/contact/">Contact</a>
-    </div>
   </nav>
 
   <div id="page-scaler">
@@ -535,7 +425,7 @@
            3 identical arches in the path; animating 33.333% scrolls exactly
            one arch, so the loop is seamless. -->
       <div class="monster-ticker">
-        <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
             <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
@@ -734,43 +624,31 @@
     document.querySelectorAll('.obj').forEach(el => {
       el.addEventListener('mouseenter', () => KT.setCursor('hover'));
       el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      
-      // Ensure element doesn't scroll the page on touch
-      el.style.touchAction = 'none';
-
-      el.addEventListener('pointerdown', e => {
+      el.addEventListener('mousedown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
+        offsetX = (e.clientX - rect.left) / scale;
+        offsetY = (e.clientY - rect.top)  / scale;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
         KT.setCursor('drag');
-        el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('pointermove', e => {
+    document.addEventListener('mousemove', e => {
       if (!dragging) return;
       const pr = page.getBoundingClientRect();
-      dragging.style.setProperty('left', (e.clientX - pr.left - offsetX) + 'px', 'important');
-      dragging.style.setProperty('top',  (e.clientY - pr.top  - offsetY) + 'px', 'important');
+      dragging.style.left = ((e.clientX - pr.left) / scale - offsetX) + 'px';
+      dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
     });
 
-    document.addEventListener('pointerup', e => {
+    document.addEventListener('mouseup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
         KT.setCursor(under && under.closest('.obj') ? 'hover' : 'default');
-      }
-    });
-
-    document.addEventListener('pointercancel', e => {
-      if (dragging) {
-        dragging.classList.remove('is-dragging');
-        dragging = null;
       }
     });
 

@@ -103,7 +103,7 @@
       flex-direction: column;
       gap: 1.25rem;
       padding-block: 1.25rem 2.5rem;
-      border-top: 1px solid var(--color-ink);
+      border-top: 2px solid var(--color-ink);
     }
     .project-mobile .stack-description {
       display: flex;
@@ -113,15 +113,15 @@
     }
     .project-mobile .card-title {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       line-height: 1.5625rem;
       font-weight: 400;
       color: var(--color-ink);
     }
     .project-mobile .card-body {
       font-family: var(--font-body);
-      font-size: 1rem;
-      line-height: 1.375rem;
+      font-size: 0.75rem;
+      line-height: 1.0625rem;
       color: var(--color-ink);
     }
     .project-mobile .card-tags {
@@ -130,8 +130,12 @@
       flex-wrap: wrap;
     }
     .project-mobile .card-tag {
-      color: var(--color-ink);
-      border-color: var(--color-ink);
+      font-family: var(--font-ui);
+      font-size: 0.875rem;
+      font-weight: 700;
+      line-height: 1.375rem;
+      color: #9a7555;
+      border-color: #9a7555;
     }
 
     /* Swipe stack container — per-stack width + aspect from Figma. */
@@ -145,36 +149,47 @@
       width: 93.96vw;
       margin-left: 0.75vw;
       aspect-ratio: 413.43 / 409.07;
+      margin-top: 7.37vw;
+      margin-bottom: 8.87vw;
     }
     /* Dinner: canvas x=5, w=h=409.074. */
     .swipe-stack[data-stack="dinner"] {
       width: 92.97vw;
       margin-left: 1.14vw;
       aspect-ratio: 1 / 1;
+      margin-top: 12.27vw;
+      margin-bottom: 21.81vw;
     }
     /* Wedding: canvas x=5.244, w=h=409.074. */
     .swipe-stack[data-stack="wedding"] {
       width: 92.97vw;
       margin-left: 1.19vw;
       aspect-ratio: 1 / 1;
+      margin-top: 12.43vw;
+      margin-bottom: 16.88vw;
     }
     /* Hotel MR: landscape — canvas x=1, w=417.651, h=294.252. */
     .swipe-stack[data-stack="hotel-mr"] {
       width: 94.92vw;
       margin-left: 0.23vw;
       aspect-ratio: 417.651 / 294.252;
+      margin-top: 13.82vw;
     }
     /* MR Buffet: near-square — canvas x=5.682, w=409.074, h=409.393. */
     .swipe-stack[data-stack="mr-buffet"] {
       width: 92.97vw;
       margin-left: 1.29vw;
       aspect-ratio: 409.074 / 409.393;
+      margin-top: 7.65vw;
+      margin-bottom: 9.62vw;
     }
     /* Sister Soiree: landscape — canvas x=13, w=413.426, h=287.568. */
     .swipe-stack[data-stack="sister-soiree"] {
       width: 93.96vw;
       margin-left: 2.95vw;
       aspect-ratio: 413.426 / 287.568;
+      margin-top: 18.69vw;
+      margin-bottom: 10.17vw;
     }
 
     .swipe-card {
@@ -250,12 +265,18 @@
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-    <button class="nav-mobile-close" aria-label="Close menu">&times;</button>
-    <a href="/about/">About</a>
-    <a href="/interiors/">Interiors</a>
-    <a href="/experiences/" class="active">Experiences</a>
-    <a href="/shop/">Shop</a>
-    <a href="/contact/">Contact</a>
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" aria-label="Close menu">
+        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/" class="active">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
   </nav>
 
   <div id="page-scaler">
@@ -324,29 +345,29 @@
 
 
       <!-- Box Tape -->
-      <div class="obj has-rotation" style="left:8.13%; top:4.30%; width:6.74%;">
-        <div class="obj-inner" style="transform:rotate(90deg); aspect-ratio:97/284;">
+      <div class="obj has-rotation" style="left:3.37%; top:11.74%; width:19.72%;">
+        <div class="obj-inner" style="transform:rotate(90deg); aspect-ratio:2332/796;">
           <img src="/assets/images/obj-box-tape.webp" alt="Box Tape">
         </div>
       </div>
 
       <!-- Yellow Pencil -->
-      <div class="obj has-rotation" style="left:87.87%; top:12.10%; width:8%;">
-        <div class="obj-inner" style="transform:rotate(-24.05deg); aspect-ratio:224.02/421.508;">
+      <div class="obj has-rotation" style="left:94.08%; top:12.97%; width:3.41%;">
+        <div class="obj-inner" style="transform:rotate(-24.05deg); aspect-ratio:61/546;">
           <img src="/assets/images/obj-yellow-pencil.webp" alt="Yellow Pencil">
         </div>
       </div>
 
       <!-- Duct Tape -->
-      <div class="obj has-rotation" style="left:61.67%; top:62.34%; width:14%;">
-        <div class="obj-inner" style="transform:rotate(180deg); aspect-ratio:312.128/90;">
+      <div class="obj has-rotation" style="left:62%; top:63%; width:21.68%;">
+        <div class="obj-inner" style="transform:rotate(180deg); aspect-ratio:326/94;">
           <img src="/assets/images/obj-duct-tape.webp" alt="Duct Tape">
         </div>
       </div>
 
       <!-- Pink Eraser -->
-      <div class="obj has-rotation" style="left:3.09%; top:63.33%; width:10%;">
-        <div class="obj-inner" style="transform:rotate(-16.85deg); aspect-ratio:228.433/150.788;">
+      <div class="obj has-rotation" style="left:3.72%; top:70.47%; width:14.60%;">
+        <div class="obj-inner" style="transform:rotate(-16.85deg); aspect-ratio:319/142;">
           <img src="/assets/images/obj-pink-eraser.webp" alt="Pink Eraser">
         </div>
       </div>
@@ -363,38 +384,41 @@
         </div>
 
         <div class="swipe-stack" data-stack="blank-canvas-bash">
-          <!-- DOM order: MR_TAO-1 (bottom) → MR_TAO-7 (top) -->
-          <div class="swipe-card" style="left:2.78%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+          <!-- Swipe hint (dismissed on first interactions) -->
+          <img src="/assets/images/swipe-hint.png" alt="Swipe through the stack" class="swipe-hint-overlay" />
+
+          <!-- DOM order: MR_TAO-1 (bottom) → MR_TAO-7 (top). Positions = visual outer-container coords from Figma 7097:2485 (ImageStack x=3.287, y=493.46, w=413.43, h=409.07). -->
+          <div class="swipe-card" style="left:0.53%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-tao-1.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0%; top:20.09%; width:100%; aspect-ratio:413.426/287.568;">
+          <div class="swipe-card" style="left:0%; top:14.97%; width:100%; aspect-ratio:413.426/287.568;">
             <img src="/assets/images/exp-mr-tao-2.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.19%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-tao-3.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:16.16%; top:2.28%; width:67.92%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:16.16%; top:0%; width:67.92%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-mr-tao-4.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:1.07%; top:18.35%; width:97.87%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-tao-5.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.19%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-tao-6.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.78%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0.53%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-tao-7.webp" alt="">
           </div>
 
           <div class="project-stickers">
             <!-- BoxTape: file is tall (97×284); pre-rotate 90° + Figma -177.15° = -87.15°. -->
-            <div class="mobile-sticker" style="left:43.60%; top:109.57%; width:43.19%; aspect-ratio:178.541/68.665;">
+            <div class="mobile-sticker" style="left:1.14%; top:80%; width:43.19%; aspect-ratio:178.541/68.665;">
               <div class="mobile-sticker-inner" style="width:33.62%; aspect-ratio:97/284; transform:rotate(-87.15deg);">
                 <img src="/assets/images/obj-box-tape.webp" alt="">
               </div>
             </div>
             <!-- YellowPencil: tall, slight tilt (Figma -12.09°). -->
-            <div class="mobile-sticker" style="left:91.36%; top:-6.38%; width:21.03%; aspect-ratio:86.948/273.194;">
+            <div class="mobile-sticker" style="left:91.36%; top:-7.94%; width:21.03%; aspect-ratio:86.948/273.194;">
               <div class="mobile-sticker-inner" style="width:35.06%; aspect-ratio:30.484/272.86; transform:rotate(-12.09deg);">
                 <img src="/assets/images/obj-yellow-pencil.webp" alt="">
               </div>
@@ -464,28 +488,28 @@
 
       <!-- Grapefruit -->
       <div class="obj" style="left:72.92%; top:8.70%; width:14.58%;">
-        <img src="/assets/images/obj-grapefruit.webp" alt="Grapefruit" style="aspect-ratio:210/221;">
+        <img src="/assets/images/obj-grapefruit.webp" alt="Grapefruit" style="aspect-ratio:660/692;">
       </div>
 
       <!-- Halved Plum -->
       <div class="obj" style="left:24.31%; top:61.81%; width:15.28%;">
-        <img src="/assets/images/obj-halved-plum.webp" alt="Halved Plum" style="aspect-ratio:220/219;">
+        <img src="/assets/images/obj-halved-plum.webp" alt="Halved Plum" style="aspect-ratio:272/271;">
       </div>
 
       <!-- Orange 3 -->
       <div class="obj" style="left:61.11%; top:67.75%; width:14.72%;">
-        <img src="/assets/images/obj-orange-3.webp" alt="Orange" style="aspect-ratio:212/202;">
+        <img src="/assets/images/obj-orange-3.webp" alt="Orange" style="aspect-ratio:231/220;">
       </div>
 
       <!-- Old Fashioned -->
-      <div class="obj has-rotation" style="left:72.97%; top:102.60%; width:12%; mix-blend-mode:multiply;">
-        <div class="obj-inner" style="transform:rotate(9.06deg); aspect-ratio:222.791/285.281;">
+      <div class="obj has-rotation" style="left:77.55%; top:103.72%; width:15.47%; mix-blend-mode:multiply;">
+        <div class="obj-inner" style="transform:rotate(9.06deg); aspect-ratio:492/630;">
           <img src="/assets/images/obj-old-fashioned.webp" alt="Old Fashioned">
         </div>
       </div>
 
       <!-- Sticker Ring 1 -->
-      <div class="sticker" style="left:calc(829 / 1440 * 100%); top:83.38%; width:calc(176 / 1440 * 100%); aspect-ratio:1;">
+      <div class="sticker" style="left:57.29%; top:83.10%; width:12.71%; aspect-ratio:1;">
         <svg viewBox="0 0 176 176" xmlns="http://www.w3.org/2000/svg">
           <defs><path id="exp-sticker-1" d="M88,10 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/></defs>
           <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
@@ -506,29 +530,30 @@
         </div>
 
         <div class="swipe-stack" data-stack="dinner">
-          <!-- DOM order: Dinner_1 (bottom) → Dinner_8 (top); available photos 101/102/108/112/123/138/145/151 used in ascending order -->
-          <div class="swipe-card" style="left:19.31%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <!-- DOM order: Dinner_1 (bottom) → Dinner_8 (top); photos 101/102/108/112/123/138/145/151 → Dinner_1..8.
+               Positions = visual outer-container coords from Figma 7104:1539 (ImageStack x=5, y=1121, w=409.07, h=409.07). -->
+          <div class="swipe-card" style="left:15.90%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-dinner-101.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0.73%; top:18.33%; width:98.91%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:0.73%; top:16.63%; width:98.91%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-dinner-102.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0%; top:19.31%; width:100%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0%; top:15.90%; width:100%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-dinner-108.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:18.33%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.63%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-dinner-112.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:19.31%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.90%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-dinner-123.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:16.62%; top:1.96%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.62%; top:0.82%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-dinner-138.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:18.33%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.63%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-dinner-145.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:16.62%; top:1.96%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.62%; top:0.82%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-dinner-151.webp" alt="">
           </div>
 
@@ -598,8 +623,8 @@
 
 
       <!-- Napkin -->
-      <div class="obj has-rotation" style="left:83.82%; top:41.83%; width:14%;">
-        <div class="obj-inner" style="transform:rotate(-12.02deg); aspect-ratio:275/299;">
+      <div class="obj has-rotation" style="left:85.77%; top:48.65%; width:19.10%;">
+        <div class="obj-inner" style="transform:rotate(-12.02deg); aspect-ratio:291/317;">
           <img src="/assets/images/obj-napkin.webp" alt="Napkin">
         </div>
       </div>
@@ -616,38 +641,40 @@
         </div>
 
         <div class="swipe-stack" data-stack="wedding">
-          <!-- DOM order: Wedding-1 (bottom) → Wedding-7 (top); available photos 222/228/229/233/309/311/398 in ascending order -->
-          <div class="swipe-card" style="left:98.21%; top:16.70%; width:98.91%; aspect-ratio:404.599/273.940;">
+          <!-- DOM order: Wedding-1 (bottom) → Wedding-7 (top); photos 222/228/229/233/309/311/398 → Wedding_1..7.
+               Positions = visual outer-container coords from Figma 7104:1493 (ImageStack x=5.244, y=1821.68, w=409.07, h=409.07).
+               NOTE: get_metadata returned post-rotation bbox X values (~405) that put cards off-screen — design context gave the true visual coords used here. -->
+          <div class="swipe-card" style="left:0.44%; top:16.70%; width:98.91%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-wedding-222.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:84.28%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.63%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-wedding-228.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:97.72%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-wedding-229.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:99.43%; top:18.41%; width:98.91%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:0.53%; top:16.71%; width:98.91%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-wedding-233.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:15.58%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.59%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-wedding-309.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:83.55%; top:2.03%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.58%; top:0.89%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-wedding-311.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:97.72%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-wedding-398.webp" alt="">
           </div>
 
           <div class="project-stickers">
             <!-- OldFashioned: tall, Figma -12.48°. -->
-            <div class="mobile-sticker" style="left:84.28%; top:-7.33%; width:35.02%; aspect-ratio:143.266/167.645;">
+            <div class="mobile-sticker" style="left:84.28%; top:-13.37%; width:35.02%; aspect-ratio:143.266/167.645;">
               <div class="mobile-sticker-inner" style="width:79.80%; aspect-ratio:114.328/146.395; transform:rotate(-12.48deg);">
                 <img src="/assets/images/obj-old-fashioned.webp" alt="">
               </div>
             </div>
             <!-- Napkin: Figma -166.19° + scaleY(-1). -->
-            <div class="mobile-sticker" style="left:27.23%; top:77.46%; width:47.34%; aspect-ratio:193.650/203.944;">
+            <div class="mobile-sticker" style="left:-20.10%; top:68.28%; width:47.34%; aspect-ratio:193.650/203.944;">
               <div class="mobile-sticker-inner" style="width:81.23%; aspect-ratio:157.3/171.355; transform:rotate(-166.19deg) scaleY(-1);">
                 <img src="/assets/images/obj-napkin.webp" alt="">
               </div>
@@ -706,15 +733,15 @@
 
 
       <!-- Lemon Wedge -->
-      <div class="obj has-rotation" style="left:75.63%; top:26.61%; width:10%;">
-        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); aspect-ratio:188/217;">
+      <div class="obj has-rotation" style="left:89.27%; top:29.45%; width:13.06%;">
+        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); aspect-ratio:292/338;">
           <img src="/assets/images/obj-lemon-wedge.webp" alt="Lemon Wedge">
         </div>
       </div>
 
       <!-- Cookie -->
       <div class="obj" style="left:27.78%; top:92.98%; width:16.67%;">
-        <img src="/assets/images/obj-cookie.webp" alt="Cookie" style="aspect-ratio:240/231;">
+        <img src="/assets/images/obj-cookie.webp" alt="Cookie" style="aspect-ratio:713/685;">
       </div>
 
       <!-- ── Mobile variant (Figma 7097:2441 → Hotel MR) ─────────── -->
@@ -730,29 +757,30 @@
         </div>
 
         <div class="swipe-stack" data-stack="hotel-mr">
-          <!-- DOM order: MR_Hotel-1 (bottom) → MR_Hotel-6 (top) -->
-          <div class="swipe-card" style="left:3.11%; top:2.35%; width:97.95%; aspect-ratio:409.075/280.797;">
+          <!-- DOM order: MR_Hotel-1 (bottom) → MR_Hotel-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1518 (ImageStack x=1, y=2508, w=417.65, h=294.25). -->
+          <div class="swipe-card" style="left:0.88%; top:2.34%; width:97.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-hotel-1.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0.48%; top:8.46%; width:98.99%; aspect-ratio:413.426/287.568;">
+          <div class="swipe-card" style="left:0.48%; top:1.35%; width:98.99%; aspect-ratio:413.426/287.568;">
             <img src="/assets/images/exp-mr-hotel-2.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.87%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.76%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-hotel-3.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0%; top:9.48%; width:100%; aspect-ratio:417.651/294.252;">
+          <div class="swipe-card" style="left:0%; top:0%; width:100%; aspect-ratio:417.651/294.252;">
             <img src="/assets/images/exp-mr-hotel-4.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.87%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.76%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-hotel-5.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0.96%; top:7.10%; width:97.95%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0.96%; top:2.36%; width:97.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-hotel-6.webp" alt="">
           </div>
 
           <div class="project-stickers">
             <!-- LemonWedge: Figma 98.31° + scaleY(-1). -->
-            <div class="mobile-sticker" style="left:82.98%; top:-20.69%; width:32.93%; aspect-ratio:137.520/123.244;">
+            <div class="mobile-sticker" style="left:79.29%; top:-20.69%; width:32.93%; aspect-ratio:137.520/123.244;">
               <div class="mobile-sticker-inner" style="width:77.53%; aspect-ratio:106.623/123.391; transform:rotate(98.31deg) scaleY(-1);">
                 <img src="/assets/images/obj-lemon-wedge.webp" alt="">
               </div>
@@ -811,21 +839,21 @@
 
 
       <!-- Dark Cherry -->
-      <div class="obj has-rotation" style="left:1.18%; top:34.29%; width:11%;">
-        <div class="obj-inner" style="transform:rotate(12.54deg); aspect-ratio:211.925/234.206;">
+      <div class="obj has-rotation" style="left:6.30%; top:36.45%; width:14.72%;">
+        <div class="obj-inner" style="transform:rotate(12.54deg); aspect-ratio:428/473;">
           <img src="/assets/images/obj-dark-cherry.webp" alt="Dark Cherry">
         </div>
       </div>
 
       <!-- Orange 1 -->
-      <div class="obj has-rotation" style="left:13.61%; top:115.71%; width:13.89%;">
-        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); aspect-ratio:200/183;">
+      <div class="obj has-rotation" style="left:27.50%; top:115.71%; width:13.89%;">
+        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); aspect-ratio:229/209;">
           <img src="/assets/images/obj-orange-1.webp" alt="Orange">
         </div>
       </div>
 
       <!-- Sticker Ring 2 -->
-      <div class="sticker" style="left:calc(1062 / 1440 * 100%); top:11.22%; width:calc(166 / 1440 * 100%); aspect-ratio:1;">
+      <div class="sticker" style="left:74.21%; top:11.95%; width:10.53%; aspect-ratio:1;">
         <svg viewBox="0 0 166 166" xmlns="http://www.w3.org/2000/svg">
           <defs><path id="exp-sticker-2" d="M83,10 a73,73 0 1,1 0,146 a73,73 0 1,1 0,-146"/></defs>
           <text font-family="Handjet, sans-serif" font-size="16" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
@@ -846,33 +874,34 @@
         </div>
 
         <div class="swipe-stack" data-stack="mr-buffet">
-          <!-- DOM order: MR_Buffet-1 (bottom) → MR_Buffet-6 (top) -->
-          <div class="swipe-card" style="left:2.28%; top:15.95%; width:100%; aspect-ratio:409.075/280.797;">
+          <!-- DOM order: MR_Buffet-1 (bottom) → MR_Buffet-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1598 (ImageStack x=5.682, y=2980.68, w=409.07, h=409.39). -->
+          <div class="swipe-card" style="left:0%; top:15.96%; width:100%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-buffet-1.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:16.70%; top:2.03%; width:66.97%; aspect-ratio:273.940/404.599;">
+          <div class="swipe-card" style="left:16.70%; top:0.89%; width:66.97%; aspect-ratio:273.940/404.599;">
             <img src="/assets/images/exp-mr-buffet-2.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:15.97%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.97%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-mr-buffet-3.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.03%; top:16.69%; width:98.91%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:0.89%; top:16.69%; width:98.91%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-buffet-4.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:15.97%; top:2.28%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.97%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-mr-buffet-5.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:19.39%; top:0.08%; width:68.64%; aspect-ratio:280.797/409.075;">
+          <div class="swipe-card" style="left:15.98%; top:0.08%; width:68.64%; aspect-ratio:280.797/409.075;">
             <img src="/assets/images/exp-mr-buffet-6.webp" alt="">
           </div>
 
           <div class="project-stickers">
             <!-- Cookie: no rotation. -->
-            <div class="mobile-sticker" style="left:87.10%; top:-8.23%; width:35.20%; aspect-ratio:144/138;">
+            <div class="mobile-sticker" style="left:87.11%; top:-8.23%; width:35.20%; aspect-ratio:144/138;">
               <img src="/assets/images/obj-cookie.webp" alt="">
             </div>
             <!-- DarkCherry: Figma 0.79° (subtle). -->
-            <div class="mobile-sticker" style="left:-3.62%; top:70.63%; width:36.03%; aspect-ratio:147.374/162.425;">
+            <div class="mobile-sticker" style="left:-4.16%; top:70.64%; width:36.02%; aspect-ratio:147.374/162.425;">
               <div class="mobile-sticker-inner" style="width:98.51%; aspect-ratio:145.173/160.437; transform:rotate(0.79deg);">
                 <img src="/assets/images/obj-dark-cherry.webp" alt="">
               </div>
@@ -931,22 +960,22 @@
 
 
       <!-- White Orchid -->
-      <div class="obj has-rotation" style="left:77.36%; top:1.37%; width:12%;">
-        <div class="obj-inner" style="transform:rotate(3.45deg); aspect-ratio:248/209;">
+      <div class="obj has-rotation" style="left:78.65%; top:2.01%; width:17.22%;">
+        <div class="obj-inner" style="transform:rotate(3.45deg); aspect-ratio:302/255;">
           <img src="/assets/images/obj-white-orchid.webp" alt="White Orchid">
         </div>
       </div>
 
       <!-- Orange 2 -->
-      <div class="obj has-rotation" style="left:-4.97%; top:38.32%; width:12%;">
-        <div class="obj-inner" style="transform:rotate(17.93deg); aspect-ratio:209.565/201.328;">
+      <div class="obj has-rotation" style="left:1.13%; top:40.71%; width:14.55%;">
+        <div class="obj-inner" style="transform:rotate(17.93deg); aspect-ratio:229/220;">
           <img src="/assets/images/obj-orange-2.webp" alt="Orange">
         </div>
       </div>
 
       <!-- Paloma -->
       <div class="obj" style="left:86.39%; top:55.90%; width:16.46%; mix-blend-mode:multiply;">
-        <img src="/assets/images/obj-paloma.webp" alt="Paloma" style="aspect-ratio:237/326;">
+        <img src="/assets/images/obj-paloma.webp" alt="Paloma" style="aspect-ratio:662/909;">
       </div>
 
       <!-- ── Mobile variant (Figma 7097:2441 → Sister Soiree) ────── -->
@@ -961,35 +990,36 @@
         </div>
 
         <div class="swipe-stack" data-stack="sister-soiree">
-          <!-- DOM order: MR_NineWest-1 (bottom) → MR_NineWest-6 (top) -->
-          <div class="swipe-card" style="left:2.66%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+          <!-- DOM order: MR_NineWest-1 (bottom) → MR_NineWest-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1670 (ImageStack x=13, y=3608, w=413.43, h=287.57). -->
+          <div class="swipe-card" style="left:0.41%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-nine-west-1.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0.48%; top:5.89%; width:98.95%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0.48%; top:1.03%; width:98.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-nine-west-2.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.66%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+          <div class="swipe-card" style="left:0.41%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
             <img src="/assets/images/exp-mr-nine-west-3.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:0%; top:7.28%; width:100%; aspect-ratio:413.426/287.568;">
+          <div class="swipe-card" style="left:0%; top:0%; width:100%; aspect-ratio:413.426/287.568;">
             <img src="/assets/images/exp-mr-nine-west-4.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.18%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.05%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-nine-west-5.webp" alt="">
           </div>
-          <div class="swipe-card" style="left:2.18%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+          <div class="swipe-card" style="left:1.05%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
             <img src="/assets/images/exp-mr-nine-west-6.webp" alt="">
           </div>
 
           <div class="project-stickers">
             <!-- Orange-2: Figma 17.93°. -->
-            <div class="mobile-sticker" style="left:-1.74%; top:75.81%; width:40.58%; aspect-ratio:167.766/164.364;">
+            <div class="mobile-sticker" style="left:-11.37%; top:75.81%; width:40.58%; aspect-ratio:167.766/164.364;">
               <div class="mobile-sticker-inner" style="width:80.18%; aspect-ratio:134.513/129.226; transform:rotate(17.93deg);">
                 <img src="/assets/images/obj-orange-2.webp" alt="">
               </div>
             </div>
             <!-- WhiteOrchid: Figma 11.43°. -->
-            <div class="mobile-sticker" style="left:80.56%; top:-28.63%; width:45.33%; aspect-ratio:187.384/167.512;">
+            <div class="mobile-sticker" style="left:73.95%; top:-28.63%; width:45.32%; aspect-ratio:187.384/167.512;">
               <div class="mobile-sticker-inner" style="width:87.14%; aspect-ratio:163.295/137.881; transform:rotate(11.43deg);">
                 <img src="/assets/images/obj-white-orchid.webp" alt="">
               </div>
@@ -1099,7 +1129,11 @@
     document.querySelectorAll(draggableSelector).forEach(el => {
       el.addEventListener('mouseenter', () => KT.setCursor('hover'));
       el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      el.addEventListener('mousedown', e => {
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+
+      el.addEventListener('pointerdown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
         offsetX = e.clientX - rect.left;
@@ -1107,24 +1141,32 @@
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
         KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('mousemove', e => {
+    document.addEventListener('pointermove', e => {
       if (!dragging) return;
       const parent = dragging.offsetParent;
       const parentRect = parent.getBoundingClientRect();
-      dragging.style.left = (e.clientX - parentRect.left - offsetX) + 'px';
-      dragging.style.top  = (e.clientY - parentRect.top  - offsetY) + 'px';
+      dragging.style.setProperty('left', (e.clientX - parentRect.left - offsetX) + 'px', 'important');
+      dragging.style.setProperty('top', (e.clientY - parentRect.top  - offsetY) + 'px', 'important');
     });
 
-    document.addEventListener('mouseup', e => {
+    document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
         KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
       }
     });
 
