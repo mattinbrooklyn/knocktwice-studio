@@ -64,7 +64,7 @@
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
   --footer-height:         6.25vw;
-  --wave-height-mobile:    7.5rem;
+  --wave-height-mobile:    4rem;
   --wave-height-desktop:   6.875rem;
   --input-height:          3.4375rem;
   --button-height:         3.4375rem;
@@ -807,6 +807,10 @@ body.nav-open {
   .nav-mobile-trigger img {
     width: 2rem;
     height: 2rem;
+  }
+
+  .monster-area {
+    height: var(--wave-height-mobile) !important;
   }
 
   /* Mobile page clearance — Figma H1 starts at y=97 (header 30+47+20).
