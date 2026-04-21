@@ -40,8 +40,24 @@
     .keyhole {
       height: min(82vh, 598px);
       width: auto;
-      /* transform-origin defaults to 50% 50% on HTML elements — correct for centered zoom */
       will-change: transform;
+      transition: transform 600ms cubic-bezier(0.25, 0, 0.35, 1);
+    }
+
+    /* ── Knock shake ─────────────────────────────────────────────
+       Quick physical jitter when the user clicks (knocks).
+       The site is called "Knock Twice" — the click should FEEL
+       like knocking on a door. 3 rapid oscillations, done. */
+    @keyframes knock-shake {
+      0%, 100% { transform: translate(0, 0); }
+      12%  { transform: translate(-4px, 0); }
+      25%  { transform: translate(4px, 1px); }
+      42%  { transform: translate(-3px, 0); }
+      58%  { transform: translate(2px, -1px); }
+      75%  { transform: translate(-1px, 0); }
+    }
+    .splash.is-knocked {
+      animation: knock-shake 120ms ease-out;
     }
   </style>
 </head>
@@ -50,13 +66,9 @@
   <!-- Full-screen black overlay for the fade-to-black transition -->
   <div id="fade-overlay" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:9990;"></div>
 
-  <div class="splash">
+  <div class="splash" id="splash">
     <svg id="keyhole-svg" class="keyhole" viewBox="0 0 313 598" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <!--
-          Keyhole window — static clip path, never moves.
-          Defines the visible aperture; only what's inside is ever shown.
-        -->
         <clipPath id="keyhole-clip">
           <path d="M313 142.295C313 93.2516 301.915 57.2557 279.745 34.3841C257.575 11.4742 222.164 0 173.513 0H139.872C91.2211 0 55.7334 11.4742 33.4477 34.3458C11.1621 57.2557 0 93.2516 0 142.295C0 191.339 11.2006 227.795 33.6402 251.626C45.4566 264.213 60.9295 273.423 79.9436 279.371L44.5713 598H267.736L232.402 279.678C251.84 273.73 267.582 264.405 279.552 251.626C301.838 227.795 313 191.339 313 142.295Z"/>
         </clipPath>
@@ -64,46 +76,54 @@
 
       <!--
         Static keyhole window — carries the clip-path and never transforms.
-        Only what falls within the keyhole aperture is visible at any time.
+        Only what falls within the keyhole aperture is visible.
       -->
       <g id="keyhole-window" clip-path="url(#keyhole-clip)">
 
+        <!-- Dark room behind the door.
+             At rest this is hidden under the monster's blue body.
+             When the monster flees, this is revealed — the viewer
+             sees a dark room through the now-empty keyhole. -->
+        <rect x="-50" y="-50" width="413" height="698" fill="#18120d"/>
+
         <!--
           Splash_Monster — the creature body + eyes.
-          Only this group translates on click. No JS changes any element.
 
-          Eye layout:
-            • Single eye (cy≈151) — visible at rest through the keyhole head.
-              Mouse-tracked iris lives here.
-            • Two eyes (cy≈−140) — positioned above SVG y=0 so they are
-              completely outside the keyhole clip at rest. As the creature
-              drops, this zone descends into the keyhole opening and both
-              eyes briefly pass through — naturally, with no JS involvement.
+          Design:
+            The monster peeks through the keyhole with ONE eye.
+            When the user clicks (knocks), the monster startles and
+            bolts away diagonally — the finite circular body sweeps
+            out of the keyhole, revealing the dark room behind.
+
+            Scared eyes are positioned to the lower-right of the
+            keyhole (invisible at rest). As the body translates
+            upper-left during the flee, the scared-eye zone sweeps
+            INTO the keyhole aperture for a brief flash.
+
+          The body is a FINITE circle (r=420) — not a rectangle —
+          so the viewer actually sees it depart.
         -->
-        <g id="splash-monster" style="will-change:transform;">
+        <g id="splash-monster">
 
-          <!-- ── Single eye (resting state) ───────────────────── -->
+          <!-- ── Single peek eye (resting state) ──────────────── -->
           <circle cx="157.5" cy="151.5" r="80.5" fill="white"/>
           <g id="iris">
             <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
           </g>
 
-          <!-- ── Two eyes (above viewport at rest, flash during drop) ── -->
-          <circle cx="87"  cy="-140" r="60" fill="white"/>
-          <circle cx="226" cy="-140" r="60" fill="white"/>
-          <circle cx="87"  cy="-155" r="36" fill="#32261F"/>
-          <circle cx="226" cy="-155" r="36" fill="#32261F"/>
+          <!-- ── Two scared eyes (lower-right, clipped at rest) ── -->
+          <circle cx="360" cy="350" r="40" fill="white"/>
+          <circle cx="460" cy="350" r="40" fill="white"/>
+          <!-- Pupils — looking back over shoulder -->
+          <circle cx="348" cy="336" r="22" fill="#32261F"/>
+          <circle cx="448" cy="336" r="22" fill="#32261F"/>
 
-          <!--
-            Blue creature body — large rect clipped to the keyhole window.
-            Three eye-socket sub-paths (fill-rule evenodd):
-              1. Single socket at y≈142 — aligns with the resting single eye.
-              2. Two sockets at y≈−140 — aligns with the two eyes above;
-                 both sockets are outside the keyhole clip at rest so
-                 the holes are invisible until the creature drops.
-          -->
+          <!-- ── Body: finite circle with eye-socket cutouts ──── -->
           <path fill="#378CDA" fill-rule="evenodd"
-            d="M-100 -600L413 -600L413 1200L-100 1200Z M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z M30 -140C68 -176.226 107 -176.226 145 -140C107 -122.347 68 -122.347 30 -140Z M168 -140C206 -176.226 245 -176.226 283 -140C245 -122.347 206 -122.347 168 -140Z"/>
+            d="M157 -170 A420 420 0 0 1 157 670 A420 420 0 0 1 157 -170 Z
+               M89.9509 141.796C134.33 105.57 178.67 105.57 223.049 141.796C178.67 159.449 134.33 159.449 89.9509 141.796Z
+               M320 350C347 334 373 334 400 350C373 366 347 366 320 350Z
+               M420 350C447 334 473 334 500 350C473 366 447 366 420 350Z"/>
 
         </g>
       </g>
@@ -112,28 +132,59 @@
 
   <script src="/assets/scripts.js"></script>
   <script>
-    // ─── Elements ────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  SPLASH SCREEN — "Peek, Knock, Scare, Enter"
+    //
+    //  Designed as a 5-beat cinematic micro-interaction:
+    //
+    //  ┌─────────────────────────────────────────────────────────┐
+    //  │  BEAT 1 — KNOCK        0 – 120ms                       │
+    //  │  Quick physical shake. The click IS a knock.            │
+    //  │                                                         │
+    //  │  BEAT 2 — STARTLE      120 – 280ms                     │
+    //  │  Iris snaps upward. The monster realizes it's spotted.  │
+    //  │  Hold this beat — let the emotion read.                 │
+    //  │                                                         │
+    //  │  BEAT 3 — FLEE         280 – 680ms                     │
+    //  │  Monster bolts upper-left. Ease-out (explosive start).  │
+    //  │  The circular body sweeps out, revealing the dark room. │
+    //  │  Scared eyes briefly flash through the aperture.        │
+    //  │                                                         │
+    //  │  BEAT 4 — SILENCE      680 – 900ms                     │
+    //  │  Empty dark keyhole. Suspense. "Who's behind the door?" │
+    //  │  Subtle 5% scale-up — subliminal pull toward the door.  │
+    //  │                                                         │
+    //  │  BEAT 5 — ENTER        900 – 1300ms                    │
+    //  │  Fade to black. You're walking through the door.        │
+    //  │  Navigate to /home/ with crossfade.                     │
+    //  └─────────────────────────────────────────────────────────┘
+    //
+    //  Total: ~1.3s — long enough to read, short enough to feel snappy.
+    // ═══════════════════════════════════════════════════════════════
+
     const svg           = document.getElementById('keyhole-svg');
+    const splash        = document.getElementById('splash');
     const splashMonster = document.getElementById('splash-monster');
     const iris          = document.getElementById('iris');
+    const overlay       = document.getElementById('fade-overlay');
 
 
-    // ─── Mouse tracking ──────────────────────────────────────────
-    const IRIS_X = 165;   // iris resting center, SVG coords
-    const IRIS_Y = 114.5;
-    const MAX_X  = 15;    // max travel, SVG units (elliptical envelope)
-    const MAX_Y  = 10;
+    // ─── Mouse tracking (resting state) ──────────────────────────
+    const IRIS_X = 165, IRIS_Y = 114.5;
+    const MAX_X  = 15,  MAX_Y  = 10;
 
-    let cx = 0, cy = 0;   // current offset
-    let tx = 0, ty = 0;   // target offset
+    let cx = 0, cy = 0;
+    let tx = 0, ty = 0;
     let tracking = true;
 
     function lerp(a, b, t) { return a + (b - a) * t; }
 
     function tick() {
-      cx = lerp(cx, tx, 0.08);
-      cy = lerp(cy, ty, 0.08);
-      iris.setAttribute('transform', `translate(${cx.toFixed(3)}, ${cy.toFixed(3)})`);
+      if (tracking) {
+        cx = lerp(cx, tx, 0.08);
+        cy = lerp(cy, ty, 0.08);
+        iris.setAttribute('transform', `translate(${cx.toFixed(3)}, ${cy.toFixed(3)})`);
+      }
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
@@ -143,22 +194,17 @@
 
       const r     = svg.getBoundingClientRect();
       const scale = r.width / 313;
-
       const eyeVX = r.left + IRIS_X * scale;
       const eyeVY = r.top  + IRIS_Y * scale;
-
-      const dx   = (e.clientX - eyeVX) / scale;
-      const dy   = (e.clientY - eyeVY) / scale;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const dx    = (e.clientX - eyeVX) / scale;
+      const dy    = (e.clientY - eyeVY) / scale;
+      const dist  = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < 1) { tx = 0; ty = 0; return; }
 
       const nx = dx / dist;
       const ny = dy / dist;
-
-      // Elliptical max: more horizontal room than vertical
-      const maxR    = 1 / Math.sqrt((nx / MAX_X) ** 2 + (ny / MAX_Y) ** 2);
-      // Ease in — iris is sluggish right on top, reaches full travel at ~60 units away
+      const maxR     = 1 / Math.sqrt((nx / MAX_X) ** 2 + (ny / MAX_Y) ** 2);
       const strength = Math.min(dist / 60, 1);
 
       tx = nx * maxR * strength;
@@ -166,52 +212,94 @@
     });
 
 
-    // ─── Click animation ─────────────────────────────────────────
-    //
-    // Timing:
-    //   0 –  100ms  Pause    — nothing moves
-    // 100 –  500ms  Drop     — creature slides off bottom, ease-in (gravity)
-    //               Flash    — two-eye state shows for one frame as it drops
-    // 500 –  800ms  Fade     — screen fades to black (300ms)
-    // 800ms         Navigate — /home/ crossfades in (500ms on that side)
+    // ─── Click → 5-beat animation ────────────────────────────────
 
-    const overlay  = document.getElementById('fade-overlay');
-    let animating  = false;
+    let animating = false;
 
     document.addEventListener('click', () => {
       if (animating) return;
       animating = true;
       tracking  = false;
-      tx = 0; ty = 0; // snap iris, stop tracking
 
-      // ── 100ms pause — nothing moves ───────────────────────────
+
+      // ── BEAT 1: KNOCK (0–120ms) ────────────────────────────────
+      // Physical shake. The site is called Knock Twice — make it feel
+      // like you're actually knocking on a door.
+      splash.classList.add('is-knocked');
+
+
+      // ── BEAT 2: STARTLE (120–280ms) ────────────────────────────
+      // At 120ms the shake is done. Snap the iris upward — the
+      // monster's "oh no" moment. Hold for 160ms so the emotion reads.
       setTimeout(() => {
+        // Lock the iris in the startled position
+        iris.setAttribute('transform', 'translate(0, -10)');
 
-        // ── Drop: Splash_Monster slides behind the static keyhole window ─
-        // The clip path on #keyhole-window never moves, so the aperture
-        // stays frozen while the creature falls through it.
-        // Drop distance = viewport height so the eye-flash zone (translateY
-        // ~140–430px) occupies a visible fraction of the total travel.
-        const dropDist = window.innerHeight + 100;
-        splashMonster.style.transition = 'transform 450ms cubic-bezier(0.4, 0, 1, 1)';
-        // Force reflow so transition fires from current state, not skipped.
-        splashMonster.getBoundingClientRect();
-        splashMonster.style.transform  = `translateY(${dropDist}px)`;
-
-        // ── Fade to black: begins when drop lands ──────────────
+        // ── BEAT 3: FLEE (280–680ms) ─────────────────────────────
+        // After the startle hold, the monster BOLTS.
         setTimeout(() => {
-          overlay.style.transition = 'opacity 300ms ease';
+          const FLEE_DUR = 400;  // ms
+          // These distances (in SVG viewBox units) fully clear the
+          // r=420 circle from the 313×598 keyhole. Math:
+          //   circle center (157,250) + r=420 → rightmost=577, bottom=670
+          //   Need right edge < 0 and bottom edge < 0:
+          //     moveX < -(157 + 420) = -577  →  use -700
+          //     moveY < -(250 + 420) = -670  →  use -720
+          const FLEE_X = -700;
+          const FLEE_Y = -720;
+          const t0 = performance.now();
+
+          function fleeFrame(now) {
+            const t = Math.min((now - t0) / FLEE_DUR, 1);
+
+            // Ease-out cubic: explosive start (panicked burst),
+            // smooth deceleration. This reads as the monster
+            // tensing during the startle, then releasing all energy.
+            const e = 1 - Math.pow(1 - t, 3);
+
+            splashMonster.setAttribute('transform',
+              `translate(${(FLEE_X * e).toFixed(1)}, ${(FLEE_Y * e).toFixed(1)})`
+            );
+
+            if (t < 1) {
+              requestAnimationFrame(fleeFrame);
+            } else {
+              onFleeComplete();
+            }
+          }
+
+          requestAnimationFrame(fleeFrame);
+        }, 160); // startle hold duration
+
+      }, 120); // knock shake duration
+
+
+      // ── BEAT 4 & 5: SILENCE + ENTER ────────────────────────────
+      function onFleeComplete() {
+        // The monster is gone. The keyhole shows a dark, empty room.
+        // This moment of silence is critical — it's the punchline.
+        // "You knocked, and whatever was behind the door ran away."
+        //
+        // Subtle touch: scale the keyhole up 5% over 600ms.
+        // This creates a subliminal "pulling in" sensation, as if
+        // the viewer is leaning closer to peer through the keyhole.
+        svg.style.transform = 'scale(1.06)';
+
+        // Start the fade to black after a brief silence (220ms).
+        // The fade is slow and elegant (450ms ease-in-out), not rushed.
+        // It overlaps with the scale drift so everything dissolves
+        // together smoothly.
+        setTimeout(() => {
+          overlay.style.transition = 'opacity 450ms ease-in-out';
           overlay.style.opacity    = '1';
 
-          // ── Navigate: /home/ fades in from black ────────────
+          // Navigate after the fade is nearly complete.
           setTimeout(() => {
             sessionStorage.setItem('from-splash', '1');
             window.location.href = '/home/';
-          }, 300);
-
-        }, 450); // drop duration
-
-      }, 100); // initial pause
+          }, 400);
+        }, 220); // silence duration before fade
+      }
     });
   </script>
 
