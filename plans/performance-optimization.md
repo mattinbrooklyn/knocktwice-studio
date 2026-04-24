@@ -315,3 +315,4 @@ Follow-up items address: (1) **load / jank** on About Us after the initial pass,
 | About: visibility pause for eye rAF | **Not done** | No `visibilitychange` / `document.hidden` in [about/index.html](about/index.html) |
 
 **Conclusion:** The follow-up items **do require code changes**; they are not yet implemented. After implementation, update the table above to “Done” and brief notes.
+
