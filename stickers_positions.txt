@@ -1,0 +1,153 @@
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[361px]" data-node-id="7104:1741" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[361px] w-[400px]" data-node-id="7104:1742">
+            BLANK CANVAS BASH
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[3.29px] top-[493.46px]" data-node-id="7104:1750" data-name="ImageStack">
+          <div className="absolute flex h-[280.797px] items-center justify-center left-[5.46px] top-[558.1px] w-[409.075px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-2">
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[8px] top-[461px]" data-node-id="7104:1758" data-name="Stickers">
+          <div className="absolute flex h-[68.665px] items-center justify-center left-[8px] top-[873px] w-[178.541px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[-177.15deg] skew-x-[0.01deg]">
+              <div className="h-[60px] relative w-[175.783px]" data-node-id="7104:1759" data-name="BoxTape 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgBoxTape1} />
+              </div>
+--
+          <div className="absolute flex h-[273.194px] items-center justify-center left-[calc(66.67%+87.67px)] top-[461px] w-[86.948px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[-12.09deg]">
+              <div className="h-[272.86px] relative w-[30.484px]" data-node-id="7104:1760" data-name="YellowPencil 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgYellowPencil1} />
+              </div>
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[987px]" data-node-id="7104:1763" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[987px] w-[400px]" data-node-id="7104:1764">
+            YUMI MATSUO INDUSTRY DINNER
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[5px] top-[1121px]" data-node-id="7104:1772" data-name="ImageStack">
+          <div className="absolute flex h-[404.599px] items-center justify-center left-[73px] top-[1124.34px] w-[273.94px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="-rotate-1 flex-none">
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[-45px] top-[1067px]" data-node-id="7104:1781" data-name="Stickers">
+          <div className="absolute h-[146px] left-[calc(66.67%+63.67px)] top-[1067px] w-[140px]" data-node-id="7104:1782" data-name="Grapefruit 1">
+            <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgGrapefruit1} />
+          </div>
+          <div className="absolute h-[155px] left-[-45px] top-[1471px] w-[156px]" data-node-id="7104:1783" data-name="HalvedPlum 1">
+            <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgHalvedPlum1} />
+          </div>
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[1671px]" data-node-id="7104:1786" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[1671px] w-[400px]" data-node-id="7104:1787">
+            NOT A REGULAR WEDDING
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[5.24px] top-[1821.68px]" data-node-id="7104:1795" data-name="ImageStack">
+          <div className="absolute flex h-[280.797px] items-center justify-center left-[5.24px] top-[1887px] w-[409.075px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="-scale-y-100 flex-none rotate-178">
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[-77px] top-[1767px]" data-node-id="7104:1803" data-name="Stickers">
+          <div className="absolute flex h-[167.645px] items-center justify-center left-[calc(66.67%+56.67px)] top-[1767px] w-[143.266px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[-12.48deg]">
+              <div className="h-[146.395px] relative w-[114.328px]" data-node-id="7104:1804" data-name="OldFashioned 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgOldFashioned1} />
+              </div>
+--
+          <div className="absolute flex h-[203.944px] items-center justify-center left-[-77px] top-[2101px] w-[193.65px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="-scale-y-100 flex-none rotate-[-166.19deg]">
+              <div className="h-[171.355px] relative w-[157.3px]" data-node-id="7104:1805" data-name="Napkin 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgNapkin1} />
+              </div>
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[2350px]" data-node-id="7104:1808" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[2350px] w-[400px]" data-node-id="7104:1809">
+            HOTEL MAN REPELLER
+--
+          </div>
+        </div>
+        <div className="absolute contents left-px top-[2508px]" data-node-id="7104:1820" data-name="ImageStack">
+          <div className="absolute flex h-[280.797px] items-center justify-center left-[5px] top-[2514.94px] w-[409.075px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="-rotate-2 flex-none">
+--
+          </div>
+        </div>
+        <div className="absolute contents h-[227.793px] left-[calc(66.67%-6.31px)] top-[2394.84px] w-[227.769px]" data-node-id="7104:1827" data-name="Stickers">
+          <div className="absolute flex h-[123.244px] items-center justify-center left-[calc(66.67%+38.81px)] top-[2447.11px] w-[137.52px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="-scale-y-100 flex-none rotate-[98.31deg] skew-x-[0.04deg]">
+              <div className="h-[123.391px] relative w-[106.623px]" data-node-id="7104:1828" data-name="lemonWedge 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgLemonWedge1} />
+              </div>
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[2847px]" data-node-id="7104:1831" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[2847px] w-[400px]" data-node-id="7104:1832">
+            MR BUFFET HOLIDAY ACTIVATION
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[5.68px] top-[2980.68px]" data-node-id="7104:1840" data-name="ImageStack">
+          <div className="absolute flex h-[409.075px] items-center justify-center left-[71.04px] top-[2981px] w-[280.797px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-2">
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[-11.33px] top-[2947px]" data-node-id="7104:1847" data-name="Stickers">
+          <div className="absolute h-[138px] left-[calc(66.67%+68.67px)] top-[2947px] w-[144px]" data-node-id="7104:1848" data-name="ChocolateChipCookie 1">
+            <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgChocolateChipCookie1} />
+          </div>
+          <div className="absolute flex h-[162.425px] items-center justify-center left-[-11.33px] top-[3269.83px] w-[147.374px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[0.79deg]">
+              <div className="h-[160.437px] relative w-[145.173px]" data-node-id="7104:1849" data-name="DarkCherry 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgDarkCherry1} />
+              </div>
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[20px] top-[3477px]" data-node-id="7104:1852" data-name="StackDescription">
+          <p className="absolute font-['Erica_One:Regular',sans-serif] leading-[25px] left-[20px] not-italic text-[#32261f] text-[20px] top-[3477px] w-[400px]" data-node-id="7104:1853">
+            SOLE SISTER SOIRÉE
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[13px] top-[3608px]" data-node-id="7104:1861" data-name="ImageStack">
+          <div className="absolute flex h-[273.94px] items-center justify-center left-[17.34px] top-[3614.93px] w-[404.599px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-1">
+--
+          </div>
+        </div>
+        <div className="absolute contents left-[-34px] top-[3525.66px]" data-node-id="7104:1868" data-name="Stickers">
+          <div className="absolute flex h-[164.364px] items-center justify-center left-[-34px] top-[3826px] w-[167.766px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[17.93deg]">
+              <div className="h-[129.226px] relative w-[134.513px]" data-node-id="7104:1869" data-name="Orange-2 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgOrange21} />
+              </div>
+--
+          <div className="absolute flex h-[167.512px] items-center justify-center left-[calc(66.67%+25.39px)] top-[3525.66px] w-[187.384px]" style={{ "--transform-inner-width": "285", "--transform-inner-height": "19" } as React.CSSProperties}>
+            <div className="flex-none rotate-[11.43deg]">
+              <div className="h-[137.881px] relative w-[163.295px]" data-node-id="7104:1870" data-name="WhiteOrchid 1">
+                <img alt="" className="absolute inset-0 max-w-none object-cover pointer-events-none size-full" src={imgWhiteOrchid1} />
+              </div>
+--
+
+Node ids have been added to the code as data attributes, e.g. `data-node-id="1:2"`.
+These styles are contained in the design: H1/Mobile: Font(family: "Erica One", style: Regular, size: 42, weight: 400, lineHeight: 46, letterSpacing: 0), B1/Mobile: Font(family: "Instrument Sans", style: Regular, size: 12, weight: 400, lineHeight: 17, letterSpacing: 0), Field/Inactive_Mobile: Font(family: "Handjet", style: Regular, size: 14, weight: 400, lineHeight: 18, letterSpacing: -1), H2/Mobile: Font(family: "Erica One", style: Regular, size: 20, weight: 400, lineHeight: 25, letterSpacing: 0), Field/Active_Mobile: Font(family: "Handjet", style: Bold, size: 14, weight: 700, lineHeight: 22, letterSpacing: 0), ImageStack_DropShadow: Effect(type: DROP_SHADOW, color: #32261F66, offset: (2, 2), radius: 7, spread: -2); Effect(type: DROP_SHADOW, color: #00000040, offset: (0, 4), radius: 4, spread: 0), Off-white: #F7F2EC.
+Image assets are stored on a localhost server. Clients can use these images directly in code as a way to view the image assets the same way they would other remote servers. Images and SVGs will be stored as constants, e.g. const image = 'http://localhost:3845/assets/10c13ac1a228a365cb98a0064b1d5afbc84887b2.png' These constants will be used in the code as the source for the image, e.g. <img src={image} /> This is true for both images and SVGs, so you can use the same approach for both types of assets.
+IMPORTANT: After you call this tool, you MUST call get_screenshot to get a screenshot of the node for context.

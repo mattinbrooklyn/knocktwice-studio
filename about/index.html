@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
   <title>About — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans&display=optional" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
   <style>
-    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
+    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-bg); }
     body::-webkit-scrollbar { display: none; }
 
     #page-scaler {
@@ -28,8 +29,6 @@
     .page {
       position: relative;
       width: 100%;
-      max-width: 1440px;
-      margin: 0 auto;
       background: var(--color-bg);
       display: flex;
       flex-direction: column;
@@ -44,8 +43,8 @@
     /* ── Headings ──────────────────────────────────────────────────*/
     .h1 {
       font-family: 'Erica One', sans-serif;
-      font-size: 65px;
-      line-height: 68px;
+      font-size: clamp(2.25rem, 4.514vw, 4.0625rem);
+      line-height: clamp(2.375rem, 4.722vw, 4.25rem);
       font-weight: 400;
       color: var(--color-ink);
       width: var(--content-width);
@@ -53,8 +52,8 @@
     }
     .h2 {
       font-family: 'Erica One', sans-serif;
-      font-size: 24px;
-      line-height: 27px;
+      font-size: clamp(1.25rem, 1.667vw, 1.5rem);
+      line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
       font-weight: 400;
       color: var(--color-ink);
       width: var(--content-width);
@@ -64,8 +63,8 @@
     /* ── Body text ─────────────────────────────────────────────────*/
     .body-text {
       font-family: 'Instrument Sans', sans-serif;
-      font-size: 14px;
-      line-height: 22px;
+      font-size: clamp(0.8125rem, 0.972vw, 0.875rem);
+      line-height: clamp(1.25rem, 1.528vw, 1.375rem);
       font-weight: 400;
       color: var(--color-ink);
     }
@@ -109,9 +108,9 @@
     /* ── Team bios ─────────────────────────────────────────────────*/
     .person-name {
       font-family: 'Handjet', sans-serif;
-      font-size: 22px;
+      font-size: clamp(1.125rem, 1.528vw, 1.375rem);
       font-weight: 600;
-      line-height: 27px;
+      line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
       letter-spacing: -0.22px;
       color: var(--color-ink);
       font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 600;
@@ -140,20 +139,22 @@
       overflow: visible;
     }
 
-    /* Paintbrush: bristle-up, overlapping the left nav column */
+    /* Paintbrush: bristle-up, overlapping the left nav column.
+       Fluid vw units (based on 1440px design) so it scales smoothly. */
     .paintbrush {
-      left: 61px; top: 537px;
-      width: 279px; height: 525px;
+      left: 4.236vw; top: 37.292vw;
+      width: 19.375vw; height: 36.458vw;
       overflow: hidden;
       z-index: 10;
     }
-    .paintbrush img.base { width: 279px; height: 525px; }
-    .paintbrush .eyes   { width: 279px; height: 525px; }
+    .paintbrush img.base { width: 100%; height: 100%; }
+    .paintbrush .eyes   { width: 100%; height: 100%; }
 
-    /* Paint bucket: outer container holds the rotated inner */
+    /* Paint bucket: outer container holds the rotated inner.
+       Fluid vw units so bucket tracks the right edge smoothly. */
     .paint-bucket-outer {
-      left: 1121px; top: 163px;
-      width: 364px; height: 380px;
+      left: 70vw; top: 11.319vw;
+      width: 25.278vw; height: 26.389vw;
       overflow: visible;
       z-index: 10;
       display: flex;
@@ -164,11 +165,11 @@
       flex-shrink: 0;
       transform: rotate(7.63deg);
       position: relative;
-      width: 322px; height: 340px;
+      width: 88.46%; height: 89.47%;
       overflow: hidden;
     }
-    .paint-bucket-inner img.base { width: 322px; height: 340px; }
-    .paint-bucket-inner .eyes   { width: 322px; height: 340px; }
+    .paint-bucket-inner img.base { width: 100%; height: 100%; }
+    .paint-bucket-inner .eyes   { width: 100%; height: 100%; }
 
     /* ── Monster footer wave ───────────────────────────────────────
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
@@ -179,9 +180,11 @@
       z-index: 5;
       transition: transform 600ms ease-out;
     }
+    /* Wave-risen: translateY pulls wave up. z-index above the backdrop (1010)
+       so eyes and wave render on top of the cream overlay. */
     #monster-group.wave-risen {
       transform: translateY(-55vh);
-      z-index: 16;
+      z-index: 1020;
     }
     .monster-area {
       position: relative;
@@ -195,28 +198,55 @@
       display: block;
       pointer-events: none;
     }
-    /* SVG textPath ticker — sits 40px above monster-area so text has
-       room at the peak; connected C curve (no M jumps) for smooth flow */
+    /* SVG textPath ticker */
     .monster-ticker {
       position: absolute;
-      bottom: calc(100% - 90px);
+      bottom: calc(100% - 96px);
       left: 0;
-      width: 1440px;
+      width: 100%;
       height: 156px;
       overflow: hidden;
       z-index: 6;
       pointer-events: auto;
     }
-    .monster-ticker svg {
-      display: block;
-      /* no CSS animation — SMIL startOffset handles the scroll */
-    }
+    .monster-ticker svg { display: block; }
+    /* Eyes overlay: MUST use preserveAspectRatio=none so it stretches
+       to fill the wave area at every viewport width */
     .monster-eyes-overlay {
       position: absolute;
       top: 0; left: 0;
-      width: 1440px; height: 116px;
+      width: 100%; height: 100%;
       pointer-events: none;
       overflow: visible;
+    }
+    /* Mobile ticker — hidden by default; mobile breakpoint shows it.
+       Sits directly over the wave area (same dimensions, 440×64 viewBox).
+       Text is drawn along a path that follows the wave curve, offset up by
+       ~8px so the text baseline rides along the wave top edge. Container
+       extends 20px above the wave so the text at the peak isn't clipped. */
+    .monster-ticker-mobile {
+      display: none;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      /* Wave (64px) + 20px headroom above for text at peaks */
+      height: calc(var(--wave-height-mobile) + 20px);
+      overflow: hidden;
+      z-index: 7; /* above eyes overlay so ticker sits on top */
+      pointer-events: auto;
+    }
+    .monster-ticker-mobile svg { display: block; }
+    /* Blue body below the wave crest — follows monster-group transform.
+       height:300vh guarantees it fills below the wave on all screens. */
+    #modal-blue-body {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(var(--wave-height-desktop) - 0px);
+      width: 100%;
+      height: 300vh;
+      background: var(--color-blue);
     }
 
     .footer { position: relative; z-index: 100; }
@@ -226,61 +256,232 @@
     #bucket-iris-l, #bucket-iris-r {
       transition: cx 200ms ease-out, cy 200ms ease-out;
     }
-    /* ── Newsletter risen state ─────────────────────────────────────── */
-    /* Cream overlay that dims the page content behind the wave */
+
+    /* ── Newsletter modal ───────────────────────────────────────────
+       #newsletter-window is a sibling of #monster-group (NOT inside it).
+       CSS transforms on a parent break position:fixed for children. */
     #modal-backdrop {
       display: none;
-      position: absolute;
-      left: 0; top: 0;
-      width: 1440px; height: 1116px;
+      position: fixed;
+      inset: 0;
       background: rgba(247, 242, 236, 0.88);
-      z-index: 14;
+      z-index: 1010;
+      pointer-events: all;
     }
-    /* Blue monster body — inside #monster-group, so it moves with the wave.
-       Positioned at top:106px (wave is 116px tall, 10px overlap to prevent seam). */
-    #modal-blue-body {
-      display: none;
-      position: absolute;
-      left: 0; top: 106px;
-      width: 1440px; height: 737px;
-      background: var(--color-blue);
-    }
-    /* ── Newsletter window — page-specific position overrides ────────
-       .modal-card provides base styles; these override for canvas layout */
+    /* Card sits above the monster-group (1020) — z-index 1025.
+       Wave crest + eyes are at top of viewport; card is in the middle.
+       No vertical overlap between them so card doesn’t hide eyes. */
     #newsletter-window.modal-card {
-      position: absolute;
-      left: 256px; top: 200px;
-      width: 929px;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(929px, calc(100vw - 4rem));
       height: auto;
       min-height: 326px;
-      transform: none;
-      padding: 60px;
-      z-index: 17;
-    }
-    #newsletter-window.modal-card.ml-error {
-      top: 180px;
+      padding: clamp(1.75rem, 4.167vw, 3.75rem);
+      z-index: 1025;
     }
     #newsletter-window.modal-card.ml-success {
       min-height: auto;
+    }
+
+    /* ── Tablet transition (1140→769) ─────────────────────────────
+       Smooths scaling of text, people row, and objects between the
+       desktop layout and the fully-stacked mobile layout.           */
+    @media (max-width: 1140px) {
+      .page {
+        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 1rem);
+      }
+      .person-name {
+        font-size: clamp(1.125rem, 1.528vw, 1.375rem);
+        line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
+      }
+    }
+
+    /* ── Narrow tablet (<=960px): stack people vertically early ───
+       Prevents cramped headshots. Paintbrush and paint bucket
+       reposition to flow with the stacked layout.                   */
+    @media (max-width: 960px) {
+      .people-row {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .person-col {
+        max-width: 28rem;
+      }
+      /* Paintbrush: nudge into nav gutter, scale down */
+      .paintbrush {
+        left: 1vw !important;
+        top: 32vw !important;
+        width: 15vw !important;
+        height: 28.25vw !important;
+      }
+      /* Paint bucket: pull inside viewport, scale down */
+      .paint-bucket-outer {
+        left: auto !important;
+        right: 1vw !important;
+        top: auto !important;
+        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 3rem) !important;
+        width: 20vw !important;
+        height: 21vw !important;
+      }
+    }
+
+    /* ── Mobile (<=768px) ──────────────────────────────────────────
+       Figma mobile master: frame id 7055:2255 (About state A), 440×1485.
+       Headshots stack vertically, paintbrush overlaps Rodrigo from the
+       left (x=-15), paint bucket overlaps Matt from the right (x=310).
+       Coords are relative to .page (which is 100vw wide on mobile). */
+    @media (max-width: 768px) {
+      .page {
+        padding-top: 6.0625rem;
+        padding-right: var(--content-left);
+        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + 1rem);
+        /* Reserve space for absolute-positioned paint bucket below the
+           Matt headshot (Figma: bucket bottom at y=1241, footer wave at
+           y=1365). */
+        min-height: 80rem;
+      }
+      .h1 {
+        font-size: clamp(2.25rem, 10vw, 3rem);
+        line-height: 1.05;
+        width: var(--content-width);
+        margin-bottom: 0.9375rem;
+      }
+      .h2 {
+        font-size: 1.25rem;
+        line-height: 1.4rem;
+        width: var(--content-width);
+      }
+      .intro {
+        width: var(--content-width);
+        margin-bottom: 2.5rem;
+      }
+      .people-row {
+        flex-direction: column;
+        gap: 2rem;
+        width: var(--content-width);
+      }
+      .person-col {
+        max-width: none;
+      }
+      /* Paintbrush per Figma: x=-15, y=340, 144×271.
+         `.page` has padding-left:var(--content-left)=1.25rem (20px), but
+         paintbrush is position:absolute so it sits relative to .page's
+         padding box origin. Subtract 20 from Figma x to align. */
+      .paintbrush {
+        left: -35px !important;
+        top: 340px !important;
+        width: 144px !important;
+        height: 271px !important;
+      }
+      .paintbrush img.base,
+      .paintbrush .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Paint bucket per Figma: x=310, y=1045, 188×196.
+         Inner rotated container scales to fit outer.
+         Reset right/bottom (set by 960px breakpoint) back to auto. */
+      .paint-bucket-outer {
+        left: 290px !important;
+        right: auto !important;
+        top: 1045px !important;
+        bottom: auto !important;
+        width: 188px !important;
+        height: 196px !important;
+      }
+      .paint-bucket-inner {
+        width: 166px !important;
+        height: 176px !important;
+      }
+      .paint-bucket-inner img.base,
+      .paint-bucket-inner .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Monster ticker: show on mobile with mobile-specific wave path */
+      .monster-ticker { display: none; }
+      .monster-ticker-mobile { display: block; }
+
+      /* Mobile wave height and tap target */
+      .monster-area {
+        height: var(--wave-height-mobile);
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      /* Mobile: wave rises so it sits near the top of the viewport with the
+         ticker visible above the crest and the eyes peeking down. The blue
+         body (#modal-blue-body) fills everything below. Figma shows wave
+         top at ~15% from screen top — we use -70vh which approximates that
+         on typical phone screens (640px..900px tall). */
+      #monster-group.wave-risen {
+        transform: translateY(-60vh);
+      }
+
+      /* Blue body top aligns with mobile wave bottom */
+      #modal-blue-body {
+        top: calc(var(--wave-height-mobile) - 4px);
+      }
+
+      /* Card position: Figma shows card center at ~66% of 956px frame.
+         Input stacks above button per Figma. */
+      #newsletter-window.modal-card {
+        top: 66%;
+        width: min(24rem, calc(100vw - 2rem));
+        padding: 1.5rem 1.25rem;
+      }
+
+      /* Vertical form layout on mobile */
+      .ml-form-row {
+        flex-direction: column;
+        gap: 0.625rem;
+      }
+      .ml-submit { width: 100%; }
     }
   </style>
 </head>
 <body>
 
   <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
-  <a href="home.html" class="logo">
+  <a href="/home/" class="logo">
       <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
         <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
         <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
       </svg>
   </a>
 
   <nav class="nav">
-    <a href="about.html" class="active">About</a>
-    <a href="interiors.html">Interiors</a>
-    <a href="experiences.html">Experiences</a>
-    <a href="shop.html">Shop</a>
-    <a href="contact.html">Contact</a>
+    <a href="/about/" class="active">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <a href="/about/" class="active">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
   </nav>
 
   <div id="page-scaler">
@@ -303,8 +504,8 @@
     <div class="people-row">
       <div class="person-col">
         <div class="headshot headshot-rodrigo">
-          <img class="default" src="assets/images/headshot-rodrigo.webp" alt="Rodrigo Miguel">
-          <img class="hover"   src="assets/images/headshot-rodrigo-hover.webp" alt="Rodrigo Miguel">
+          <img class="default" src="/assets/images/headshot-rodrigo.webp" alt="Rodrigo Miguel">
+          <img class="hover"   src="/assets/images/headshot-rodrigo-hover.webp" alt="Rodrigo Miguel">
         </div>
         <p class="person-name person-rodrigo">Rodrigo Miguel</p>
         <div class="body-text person-bio person-rodrigo">
@@ -314,8 +515,8 @@
       </div>
       <div class="person-col">
         <div class="headshot headshot-matt">
-          <img class="default" src="assets/images/headshot-matt.webp" alt="Matt Little">
-          <img class="hover"   src="assets/images/headshot-matt-hover.webp" alt="Matt Little">
+          <img class="default" src="/assets/images/headshot-matt.webp" alt="Matt Little">
+          <img class="hover"   src="/assets/images/headshot-matt-hover.webp" alt="Matt Little">
         </div>
         <p class="person-name person-matt">Matt Little</p>
         <div class="body-text person-bio person-matt">
@@ -331,7 +532,7 @@
            Right white almond: translate(117.7, 98.4), iris center ≈ (140, 107)
            Left  white almond: translate(43.6, 117.3),  iris center ≈ (71, 128) -->
     <div class="obj paintbrush" id="obj-brush">
-      <img class="base" src="assets/render-paintbrush.png" alt="Paintbrush">
+      <img class="base" src="/assets/images/render-paintbrush.webp" alt="Paintbrush" loading="lazy">
       <svg class="eyes" viewBox="0 0 279 525" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="brush-eye-r-clip">
@@ -344,13 +545,13 @@
           </clipPath>
         </defs>
         <g id="brush-eye-r">
-          <path id="brush-lid-r" fill="white" transform="translate(117.7 98.4)"
+          <path id="brush-lid-r" fill="#F7F2EC" transform="translate(117.7 98.4)"
             d="M0 17.6931C11.9644 -1.0084 26.9782 -3.77549 44.2694 4.22012C29.0986 12.5511 14.2961 17.4632 0 17.6931Z"/>
           <circle id="brush-iris-r" clip-path="url(#brush-eye-r-clip)"
             cx="150.6" cy="92.8" r="15.65" fill="#32261F"/>
         </g>
         <g id="brush-eye-l">
-          <path id="brush-lid-l" fill="white" transform="translate(43.6 117.3)"
+          <path id="brush-lid-l" fill="#F7F2EC" transform="translate(43.6 117.3)"
             d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
           <circle id="brush-iris-l" clip-path="url(#brush-eye-l-clip)"
             cx="84.2" cy="110.2" r="19.65" fill="#32261F"/>
@@ -366,7 +567,7 @@
            Left  white crest: translate(47.0, 61.6)  scale(1.132, 1.114), iris ≈ (73, 69) -->
     <div class="obj paint-bucket-outer" id="obj-bucket">
       <div class="paint-bucket-inner" id="bucket-inner">
-        <img class="base" src="assets/render-paint-bucket.png" alt="Paint bucket">
+        <img class="base" src="/assets/images/render-paint-bucket.webp" alt="Paint bucket" loading="lazy">
         <svg class="eyes" viewBox="0 0 322 340" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <clipPath id="bucket-eye-r-clip">
@@ -379,13 +580,13 @@
             </clipPath>
           </defs>
           <g id="bucket-eye-r">
-            <path id="bucket-lid-r" fill="white" transform="translate(112.2 80.1) scale(1.133 1.12)"
+            <path id="bucket-lid-r" fill="#F7F2EC" transform="translate(112.2 80.1) scale(1.133 1.12)"
               d="M0 5.06111C23.3024 -5.57823 39.5691 1.143 51.2976 19.7283C31.3899 18.3021 13.9841 13.7951 0 5.06111Z"/>
             <circle id="bucket-iris-r" clip-path="url(#bucket-eye-r-clip)"
               cx="127.8" cy="94.1" r="18.05" fill="#32261F"/>
           </g>
           <g id="bucket-eye-l">
-            <path id="bucket-lid-l" fill="white" transform="translate(47.0 61.6) scale(1.132 1.114)"
+            <path id="bucket-lid-l" fill="#F7F2EC" transform="translate(47.0 61.6) scale(1.132 1.114)"
               d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
             <circle id="bucket-iris-l" clip-path="url(#bucket-eye-l-clip)"
               cx="57.7" cy="75.4" r="16.37" fill="#32261F"/>
@@ -404,28 +605,32 @@
   </div><!-- /page -->
 
   <!-- ── Newsletter risen state ──────────────────────────────────── -->
+  <!-- Backdrop: fixed overlay that dims everything behind the modal -->
   <div id="modal-backdrop"></div>
-  <div id="monster-group">
+
+  <!-- Newsletter card: sibling of monster-group (NOT inside it).
+       position:fixed is broken by CSS transforms on ancestor elements.
+       Keeping it outside ensures it stays truly fixed while the wave animates. -->
+  <div id="newsletter-window" class="modal-card">
+    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
+    <div class="ml-form-row">
+      <input class="field" type="email" id="ml-email" placeholder="Email*" autocomplete="email">
+      <button class="ml-submit" id="ml-submit">Sign Up</button>
+    </div>
+    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+  </div>
+
+  <div id="monster-group" class="has-mobile-monster-eyes">
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
-      <div id="newsletter-window" class="modal-card">
-        <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
-        <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
-        <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
-        <div class="ml-form-row">
-          <input class="field" type="email" id="ml-email" placeholder="Email*" autocomplete="email">
-          <button class="ml-submit" id="ml-submit">Sign Up</button>
-        </div>
-        <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
-        <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
-        <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
-      </div>
-      <!-- Wave-following ticker: 4 tiled wave arches, each 1440px wide.
-           textPath baseline rides the same curve as monster-wave.svg.
-           3 identical arches in the path; animating 33.333% scrolls exactly
-           one arch, so the loop is seamless. -->
+
+      <!-- ── Desktop ticker (hidden on mobile) ────────────────────── -->
       <div class="monster-ticker">
-        <svg width="1440" height="156" viewBox="0 0 1440 156.154" xmlns="http://www.w3.org/2000/svg">
+        <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
             <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
@@ -436,10 +641,37 @@
           </text>
         </svg>
       </div>
+
+      <!-- ── Mobile ticker (visible on mobile, hidden on desktop) ─── -->
+      <!-- viewBox 440×84 = 64px wave area + 20px headroom above.
+           Wave top edge in this viewBox: y=20 at edges, y=20-20=0 at peak.
+           Actually wave at edges y=84, at peak x=170 y=20 (above wave area).
+           Text path follows the wave curve offset up ~6px so the text
+           baseline sits ON the wave top edge. 3 arches for seamless scroll. -->
+      <div class="monster-ticker-mobile" style="display:none;">
+        <svg width="100%" height="100%" viewBox="0 0 440 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Wave curve (scaled into 440×84): trough y=84 at x=0 and x=440,
+                 peak y=20 at x=170. Text path offset up by 6px so text sits
+                 on top of the wave edge. Troughs extended slightly off-screen
+                 so the three-arch sequence wraps seamlessly. -->
+            <path id="wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
+                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+            <textPath href="#wave-text-path-mobile">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
+          </text>
+        </svg>
+      </div>
+
       <div class="monster-area" id="monster-area">
-        <img class="wave" src="assets/monster-wave.svg" alt="">
+        <img class="wave" src="/assets/monster-wave.svg" alt="">
+
+        <!-- Desktop eyes overlay: viewBox 1440×116 -->
         <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-             viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+             viewBox="0 0 1440 116.154"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
           <defs>
             <clipPath id="mon-eye-r-clip">
               <path transform="translate(593.13 32.7)"
@@ -450,31 +682,64 @@
                 d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
             </clipPath>
           </defs>
-          <!-- Eye whites -->
-          <path fill="white" transform="translate(593.13 32.7)"
-            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          <path fill="white" transform="translate(431.49 31.57)"
-            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          <!-- Iris circles (JS moves cx/cy, clip path constrains to eye whites) -->
-          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-            cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-            cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+              cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+          </g>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+              cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+          </g>
         </svg>
+
+        <!-- Mobile eyes: same geometry as coming-soon (circle irises + clip, 440×64) -->
+        <svg class="monster-eyes-overlay-mobile" id="monster-eyes-svg-mobile"
+             viewBox="0 0 440 64"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip-m">
+              <path transform="translate(197.14 30.76)"
+                d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip-m">
+              <path transform="translate(88 30)"
+                d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+            </clipPath>
+          </defs>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(197.14 30.76)"
+              d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+            <circle id="mon-iris-r-m" clip-path="url(#mon-eye-r-clip-m)"
+              cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+          </g>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(88 30)"
+              d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+            <circle id="mon-iris-l-m" clip-path="url(#mon-eye-l-clip-m)"
+              cx="142" cy="64" r="29" fill="#32261F"/>
+          </g>
+        </svg>
+
       </div>
   </div><!-- /#monster-group -->
 
+
   <footer class="footer">
       <div class="footer-icons">
-        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="assets/icon-instagram.svg" alt="Instagram"></a>
-        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="assets/icon-tiktok.svg" alt="TikTok"></a>
+        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
       </div>
       <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
     </footer>
 
   </div><!-- /#page-scaler -->
 
-  <script src="assets/scripts.js"></script>
+  <script src="/assets/scripts.js" defer></script>
   <script>
     // ── Scale page ─────────────────────────────────────────────────
     // 1440×1206 canvas (exact Figma frame). Uniform scale keeps all
@@ -490,12 +755,47 @@
       scaler.style.height = '';
     }
     scalePage();
-    window.addEventListener('resize', scalePage);
 
+    // ── Mobile / desktop component swap ───────────────────────────
+    // Shows the correct ticker for the current viewport (eyes: global CSS + has-mobile-monster-eyes).
+    var tickerDesktop = document.querySelector('.monster-ticker');
+    var tickerMobile  = document.querySelector('.monster-ticker-mobile');
+    function applyMonsterLayout() {
+      var isMobile = window.innerWidth <= 768;
+      tickerDesktop.style.display = isMobile ? 'none'  : '';
+      tickerMobile.style.display  = isMobile ? 'block' : 'none';
+    }
+    applyMonsterLayout();
 
-    document.addEventListener('mousemove', e => {
-      updateAllEyes(e.clientX, e.clientY);
+    // Debounced resize
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() { scalePage(); applyMonsterLayout(); }, 100);
     });
+
+
+    // rAF-throttled eye tracking
+    var eyeRaf = 0, eyeMX = 0, eyeMY = 0;
+    function updateEyesFrame() {
+      eyeRaf = 0;
+      if (document.hidden) return;
+      updateAllEyes(eyeMX, eyeMY);
+    }
+    document.addEventListener('mousemove', function (e) {
+      if (document.hidden) return;
+      eyeMX = e.clientX;
+      eyeMY = e.clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateEyesFrame);
+    }, { passive: true });
+    // Touch: track finger for mobile eye animation
+    document.addEventListener('touchmove', function (e) {
+      if (document.hidden) return;
+      if (!e.touches.length) return;
+      eyeMX = e.touches[0].clientX;
+      eyeMY = e.touches[0].clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateEyesFrame);
+    }, { passive: true });
 
 
     // ── Eye tracking ───────────────────────────────────────────────
@@ -533,9 +833,46 @@
       trackIris(monIrisL, cx, cy - 1021, 495.41, 49.46, 20, 5);
     }
 
+    // Mobile footer eyes: same circle + clip setup as coming-soon (440×64).
+    var monIrisLMob = document.getElementById('mon-iris-l-m');
+    var monIrisRMob = document.getElementById('mon-iris-r-m');
+    function moveMobileMonsterEyes(vx, vy) {
+      if (!monIrisLMob || !monIrisRMob) return;
+      var waveEl = document.getElementById('monster-area');
+      if (!waveEl) return;
+      var wr = waveEl.getBoundingClientRect();
+      var svgX = ((vx - wr.left) / wr.width)  * 440;
+      var svgY = ((vy - wr.top)  / wr.height) * 64;
+      trackIris(monIrisRMob, svgX, svgY, 248.5, 62.5, 10, 3);
+      trackIris(monIrisLMob, svgX, svgY, 142, 64, 10, 3);
+    }
+
+    // Footer monster blink (desktop scaleY, mobile opacity — see CSS)
+    var monsterBlinkGroups = document.querySelectorAll('#monster-area .eye-blink-group');
+    function footerMonsterBlink() {
+      monsterBlinkGroups.forEach(function (g) { g.classList.add('closing'); });
+      setTimeout(function () {
+        monsterBlinkGroups.forEach(function (g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function () {
+          monsterBlinkGroups.forEach(function (g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    function scheduleFooterMonsterBlink() {
+      setTimeout(function () {
+        footerMonsterBlink();
+        scheduleFooterMonsterBlink();
+      }, 2000 + Math.random() * 5000);
+    }
+    scheduleFooterMonsterBlink();
+
     function updateAllEyes(vx, vy) {
       const { x, y } = toCanvas(vx, vy);
       moveMonsterEyes(x, y);
+      if (window.innerWidth <= 768) moveMobileMonsterEyes(vx, vy);
     }
 
     // ── Object eye animation ───────────────────────────────────────
@@ -622,33 +959,56 @@
     let topZ = 10;
 
     document.querySelectorAll('.obj').forEach(el => {
-      el.addEventListener('mouseenter', () => KT.setCursor('hover'));
-      el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      el.addEventListener('mousedown', e => {
+      if (window.KT && window.KT.isDesktop) {
+        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
+        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      }
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+
+      el.addEventListener('pointerdown', e => {
         dragging = el;
         const rect = el.getBoundingClientRect();
-        offsetX = (e.clientX - rect.left) / scale;
-        offsetY = (e.clientY - rect.top)  / scale;
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
-        KT.setCursor('drag');
+        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('mousemove', e => {
+    // rAF-throttled drag
+    var dragRaf = 0, dragMX = 0, dragMY = 0;
+    function updateDragPos() {
+      dragRaf = 0;
       if (!dragging) return;
       const pr = page.getBoundingClientRect();
-      dragging.style.left = ((e.clientX - pr.left) / scale - offsetX) + 'px';
-      dragging.style.top  = ((e.clientY - pr.top)  / scale - offsetY) + 'px';
-    });
+      dragging.style.setProperty('left', (dragMX - pr.left - offsetX) + 'px', 'important');
+      dragging.style.setProperty('top',  (dragMY - pr.top  - offsetY) + 'px', 'important');
+    }
+    document.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dragMX = e.clientX;
+      dragMY = e.clientY;
+      if (!dragRaf) dragRaf = requestAnimationFrame(updateDragPos);
+    }, { passive: true });
 
-    document.addEventListener('mouseup', e => {
+    document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
-        KT.setCursor(under && under.closest('.obj') ? 'hover' : 'default');
+        if (window.KT && window.KT.isDesktop) KT.setCursor(under && under.closest('.obj') ? 'hover' : 'default');
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
       }
     });
 
@@ -693,7 +1053,12 @@
       });
     }
 
+    // Desktop ticker click opens the modal
     document.querySelector('.monster-ticker').addEventListener('click', openMailingList);
+    // Mobile ticker click also opens the modal (Figma 7057:2880 \u2014 ticker visible on mobile)
+    document.querySelector('.monster-ticker-mobile').addEventListener('click', openMailingList);
+    // Mobile fallback: tapping the wave area (outside ticker) also opens the modal
+    document.getElementById('monster-area').addEventListener('click', openMailingList);
     mlClose.addEventListener('click', closeMailingList);
 
     mlEmail.addEventListener('input', function() {

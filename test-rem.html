@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html style="font-size: calc(16px * (900 / 1140));">
+<head>
+  <style>
+    .box { width: 50.5rem; height: 10px; background: red; }
+  </style>
+</head>
+<body>
+  <div class="box" id="box"></div>
+  <script>
+    console.log(getComputedStyle(document.getElementById('box')).width);
+  </script>
+</body>
+</html>
