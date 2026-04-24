@@ -13,6 +13,21 @@
 */
 
 (function () {
+  // ── Device detection ─────────────────────────────────────────────
+  // True only on devices with a fine pointer (mouse/trackpad) AND hover
+  // capability. Touch-only devices (phones, tablets) get native cursor.
+  window.KT = window.KT || {};
+  var mq = window.matchMedia('(hover: hover) and (pointer: fine)');
+  window.KT.isDesktop = mq.matches;
+
+  // ── Cursor — desktop only ──────────────────────────────────────
+  if (!window.KT.isDesktop) {
+    // Touch device: expose a no-op setCursor and add body class
+    document.documentElement.classList.add('is-touch');
+    window.KT.setCursor = function () {};
+    return;
+  }
+
   // ── Inject cursor element ─────────────────────────────────────────
   var div = document.createElement('div');
   div.id  = 'custom-cursor';
@@ -33,26 +48,40 @@
   };
 
   // ── Public API ────────────────────────────────────────────────────
-  window.KT = window.KT || {};
   window.KT.setCursor = function (state) {
     document.body.dataset.cursor = (state === 'default') ? '' : state;
   };
 
-  // ── Position tracking ─────────────────────────────────────────────
-  document.addEventListener('pointermove', function (e) {
+  // ── Position tracking (rAF-throttled) ─────────────────────────────
+  var cursorX = -200, cursorY = -200;
+  var cursorRaf = 0;
+
+  function updateCursor() {
+    cursorRaf = 0;
     var state = document.body.dataset.cursor || 'default';
     var off   = hotspot[state] || hotspot.default;
-    div.style.transform = 'translate(' + (e.clientX - off[0]) + 'px,' + (e.clientY - off[1]) + 'px)';
-  });
+    div.style.transform = 'translate(' + (cursorX - off[0]) + 'px,' + (cursorY - off[1]) + 'px)';
+  }
+
+  document.addEventListener('pointermove', function (e) {
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+    if (!cursorRaf) cursorRaf = requestAnimationFrame(updateCursor);
+  }, { passive: true });
 }());
 
-// ── Logo iris tracking ────────────────────────────────────────────
+// ── Logo iris tracking (rAF-throttled) ──────────────────────────
 (function () {
+  if (!window.KT.isDesktop) return;
+
   var iris  = null;
   var restX = 27.325, restY = 19.055;
   var maxX  = 2.5,    maxY  = 1.5;
+  var raf   = 0;
+  var mx    = 0, my = 0;
 
-  document.addEventListener('pointermove', function (e) {
+  function updateIris() {
+    raf = 0;
     if (!iris) iris = document.getElementById('logo-iris');
     if (!iris) return;
 
@@ -60,15 +89,21 @@
     var eyeX = rect.left + rect.width  * 0.53;
     var eyeY = rect.top  + rect.height * 0.19;
 
-    var dx   = e.clientX - eyeX;
-    var dy   = e.clientY - eyeY;
+    var dx   = mx - eyeX;
+    var dy   = my - eyeY;
     var dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 1) { iris.setAttribute('cx', restX); iris.setAttribute('cy', restY); return; }
 
     var strength = Math.min(dist / 400, 1);
     iris.setAttribute('cx', restX + (dx / dist) * maxX * strength);
     iris.setAttribute('cy', restY + (dy / dist) * maxY * strength);
-  });
+  }
+
+  document.addEventListener('pointermove', function (e) {
+    mx = e.clientX;
+    my = e.clientY;
+    if (!raf) raf = requestAnimationFrame(updateIris);
+  }, { passive: true });
 }());
 
 // ── Mobile navigation (hamburger + overlay) ───────────────────────
@@ -280,8 +315,8 @@
 
     container.addEventListener('touchstart', onStart, { passive: true });
     container.addEventListener('touchmove',  onMove,  { passive: false });
-    container.addEventListener('touchend',   onEnd);
-    container.addEventListener('touchcancel', onCancel);
+    container.addEventListener('touchend',   onEnd,   { passive: true });
+    container.addEventListener('touchcancel', onCancel, { passive: true });
 
     return {
       destroy: function () {

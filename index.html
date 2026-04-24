@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
   <title>Knock Twice</title>
   <style>
     *, *::before, *::after {
@@ -19,6 +19,10 @@
       overflow: hidden;
       cursor: none;
     }
+    /* Restore native cursor on touch devices */
+    html.is-touch, html.is-touch body { cursor: auto; }
+    html.is-touch *, html.is-touch *::before, html.is-touch *::after { cursor: auto !important; }
+    html.is-touch #custom-cursor { display: none !important; }
 
     #custom-cursor { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; will-change: transform; transform: translate(-200px,-200px); }
     #cursor-default { display: block; width: 45px; height: 49px; }
@@ -106,14 +110,14 @@
         <g id="splash-monster">
 
           <!-- ── Single peek eye (resting state) ──────────────── -->
-          <circle cx="157.5" cy="151.5" r="80.5" fill="white"/>
+          <circle cx="157.5" cy="151.5" r="80.5" fill="#F7F2EC"/>
           <g id="iris">
             <path d="M165 151C185.435 151 202 134.658 202 114.5C202 94.3416 185.435 78 165 78C144.565 78 128 94.3416 128 114.5C128 134.658 144.565 151 165 151Z" fill="#32261F"/>
           </g>
 
           <!-- ── Two scared eyes (lower-right, clipped at rest) ── -->
-          <circle cx="360" cy="350" r="40" fill="white"/>
-          <circle cx="460" cy="350" r="40" fill="white"/>
+          <circle cx="360" cy="350" r="40" fill="#F7F2EC"/>
+          <circle cx="460" cy="350" r="40" fill="#F7F2EC"/>
           <!-- Pupils — looking back over shoulder -->
           <circle cx="348" cy="336" r="22" fill="#32261F"/>
           <circle cx="448" cy="336" r="22" fill="#32261F"/>
@@ -130,8 +134,13 @@
     </svg>
   </div>
 
-  <script src="/assets/scripts.js"></script>
+  <script src="/assets/scripts.js" defer></script>
   <script>
+    // ── Touch detection — applied before scripts.js loads on inner pages,
+    //    but splash has its own inline cursor so we need it here too.
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.documentElement.classList.add('is-touch');
+    }
     // ═══════════════════════════════════════════════════════════════
     //  SPLASH SCREEN — "Peek, Knock, Scare, Enter"
     //
@@ -189,15 +198,20 @@
     }
     requestAnimationFrame(tick);
 
-    document.addEventListener('mousemove', e => {
+    // rAF-throttled mousemove for iris tracking
+    let irisRaf = 0;
+    let rawMX = 0, rawMY = 0;
+
+    function updateIrisFromMouse() {
+      irisRaf = 0;
       if (!tracking) return;
 
       const r     = svg.getBoundingClientRect();
       const scale = r.width / 313;
       const eyeVX = r.left + IRIS_X * scale;
       const eyeVY = r.top  + IRIS_Y * scale;
-      const dx    = (e.clientX - eyeVX) / scale;
-      const dy    = (e.clientY - eyeVY) / scale;
+      const dx    = (rawMX - eyeVX) / scale;
+      const dy    = (rawMY - eyeVY) / scale;
       const dist  = Math.sqrt(dx * dx + dy * dy);
 
       if (dist < 1) { tx = 0; ty = 0; return; }
@@ -209,7 +223,13 @@
 
       tx = nx * maxR * strength;
       ty = ny * maxR * strength;
-    });
+    }
+
+    document.addEventListener('mousemove', e => {
+      rawMX = e.clientX;
+      rawMY = e.clientY;
+      if (!irisRaf) irisRaf = requestAnimationFrame(updateIrisFromMouse);
+    }, { passive: true });
 
 
     // ─── Click → 5-beat animation ────────────────────────────────

@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
   <title>Home — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap" rel="stylesheet">
@@ -57,6 +57,7 @@
       position: absolute;
       left: 1186px; top: 74px;
       width: 176px; height: 176px;
+      z-index: 150; /* above furniture (overlaps couch on mobile top-right) */
     }
     @keyframes coinflip {
       from { transform: rotateY(0deg); }
@@ -67,18 +68,26 @@
       transform-box: fill-box;
       transform-origin: 50% 50%;
     }
+    .sticker-outer .sticker-svg {
+      display: block;
+      width: 176px;
+      height: 176px;
+    }
 
-    /* Footer pinned to viewport (same layer as .logo / .nav), not inside scaled canvas */
+    /* Desktop: footer sits just below the fold, revealed on scroll.
+       #page-scaler is sized to exactly 100vh by the scaling JS, so a
+       relative-positioned footer lands immediately below the fold.
+       Mobile override below keeps it pinned to the viewport. */
     body.home .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      position: relative;
       z-index: 600;
       margin-top: 0;
     }
     /* ── Monster easter egg ──────────────────────────────────────── */
-    /* Rises from the bottom when all furniture is dragged off screen */
+    /* Rises from the bottom when all furniture is dragged off screen.
+       Slow rise (3s) feels dramatic. Fast hide (.is-hiding, 600ms) feels
+       snappy when the user clicks to dismiss — nobody wants to wait 3s
+       for the monster to sink back after clicking it. */
     #home-monster {
       position: fixed;
       bottom: 0; left: 0;
@@ -87,23 +96,42 @@
       pointer-events: none;
       transform: translateY(100%);
       transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      /* Flex column: removes any block-level gap between the SVG and the
+         fill div. On mobile, height:auto on SVG has cross-browser sizing
+         quirks; flex + aspect-ratio is the reliable fix. */
+      display: flex;
+      flex-direction: column;
     }
-    #home-monster.is-visible { transform: translateY(15%); }
+    /* Above home footer (600), below .logo / .nav (1000) so clicks hit the monster */
+    #home-monster.is-visible {
+      z-index: 650;
+      transform: translateY(15%);
+      pointer-events: auto;
+      cursor: pointer;
+    }
+    #home-monster.is-hiding   { transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* Wave, eyes, and ticker are one combined SVG — everything scales together */
+    /* Ticker: startOffset via chained setTimeout at ~60/24 Hz (not 60Hz rAF).
+       font-variation-settings omitted on ticker text — ELGR/ELSH axes
+       force per-glyph OpenType reshaping on every update. */
     #home-monster .monster-area {
       width: 100%;
       line-height: 0;
+      flex-shrink: 0;
     }
     #home-monster .monster-area svg {
-      display: block; width: 100%; height: auto;
+      display: block;
+      width: 100%;
+      /* aspect-ratio replaces height:auto — explicit intrinsic ratio avoids
+         the mobile cross-browser SVG sizing ambiguity that caused the gap. */
+      aspect-ratio: 1440 / 181.154;
     }
-    /* Blue fill below the wave to the bottom of the viewport */
     #home-monster .monster-fill {
       width: 100%;
       background: #378CDA;
-      height: 50vh;
-      margin-top: -2px; /* closes sub-pixel seam at SVG bottom edge */
+      flex: 1;          /* fills remaining height of the fixed container */
+      min-height: 50vh; /* desktop: tall viewports */
+      margin-top: -1px; /* sub-pixel seam insurance */
     }
 
     /* ── Furniture eye animation ──────────────────────────────────── */
@@ -139,46 +167,101 @@
         width: 119px;
         height: 47px;
       }
+      /* Figma 7048:1185 / 7056:2437 Sticker_SpiralText — ~119×120, not desktop 176 */
       .sticker-outer {
-        left: 227px !important;
-        top: 656px !important;
-        width: 176px !important;
-        height: 176px !important;
+        left: calc(100% / 3 + 98.33px) !important;
+        top: 82px !important;
+        width: 118.819px !important;
+        height: 120.239px !important;
       }
-      /* Figma: RenderWithEyes_Couch x=35.9 y=122.4 w=269 h=257 */
+      .sticker-outer .sticker-svg {
+        width: 100%;
+        height: 100%;
+      }
+      /* Figma 7052:58 couch wrapper: left 21, top 78, 269.404×256.867 */
       .furniture.couch {
-        left: 36px !important;
-        top: 122px !important;
-        width: 269px !important;
-        height: 257px !important;
+        left: 21px !important;
+        top: 78px !important;
+        width: 269.404px !important;
+        height: 256.867px !important;
       }
-      /* Figma: RenderWithEyes_Vase x=266 y=240 w=122 h=221 */
+      /* Figma 7052:72 vase */
       .furniture.vase {
-        left: 266px !important;
-        top: 240px !important;
+        left: calc(100% / 3 + 119.33px) !important;
+        top: 262px !important;
         width: 122px !important;
         height: 221px !important;
       }
-      /* Figma: RenderWithEyes_Nightstand x=-4 y=305 w=196 h=179 */
+      /* Figma 7052:100 nightstand */
       .furniture.nightstand {
         left: -4px !important;
-        top: 305px !important;
+        top: 322px !important;
         width: 196px !important;
         height: 179px !important;
       }
-      /* Figma: RenderWithEyes_Carpet x=0 y=573 w=281 h=172 */
+      /* Figma 7052:44 carpet top 596 */
       .furniture.carpet {
         left: 0 !important;
-        top: 573px !important;
+        top: 596px !important;
         width: 281px !important;
         height: 172px !important;
       }
-      /* Figma: RenderWithEyes_Dresser x=102 y=460 w=357 h=190 */
+      /* Mobile: keep footer pinned to the viewport (desktop reveals
+         it on scroll, but mobile has no hover-reveal affordance). */
+      body.home .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      /* Figma 7052:86 dresser top 483 */
       .furniture.dresser {
         left: 102px !important;
-        top: 460px !important;
+        top: 483px !important;
         width: 357px !important;
         height: 190px !important;
+      }
+
+      /* ── Monster empty state (Figma 7053:1258) ───────────────────
+         No solid background on #home-monster / .monster-area: the wave SVG
+         has transparent “sky” above the path — if the parent is blue, that
+         area reads as flat blue; cream must show through for the curve. */
+      body.home .footer {
+        height: 56px;
+        min-height: 56px;
+        z-index: 800;
+      }
+      #home-monster {
+        bottom: 56px;
+        background: transparent;
+      }
+      #home-monster.is-visible {
+        height: calc(100vh - 56px);
+        max-height: calc(100vh - 56px);
+        height: calc(100dvh - 56px);
+        max-height: calc(100dvh - 56px);
+      }
+      /* Wave strip stays at the *top* of the overlay (curve meets the page). flex-end
+         pinned it to the bottom of this row — only the straight SVG baseline showed at
+         the top → looked like a flat cut. */
+      #home-monster .monster-area {
+        display: block;
+        overflow: hidden;
+        line-height: 0;
+        background: transparent;
+        flex: 0 0 auto;
+      }
+      #home-monster .monster-area svg {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1440 / 181.154;
+        /* ~55px for 440px design width — do not cap height or the wave flattens/clips */
+        max-height: none;
+      }
+      #home-monster .monster-fill {
+        flex: 1 1 auto;
+        min-height: 0;
       }
     }
   </style>
@@ -188,18 +271,24 @@
   <!-- Monster easter egg — rises when all furniture is off-screen -->
   <div id="home-monster">
     <!-- Single combined SVG: wave fill + eyes + ticker text all in one coordinate space.
-         viewBox is 1440×156.154 — the wave arch spans from y=156.154 at the sides up to
-         y=40 at the peak, leaving 40px above for the ticker text to ride the crest. -->
+         viewBox is 1440×181.154 — wave arch spans y=156.154 at the sides up to y=40
+         at the peak, leaving 40px for the ticker text to ride the crest.
+         Ticker uses startOffset animation (the correct tool for arch-following text).
+         Font-variation-settings removed from the ticker only — ELGR/ELSH custom axes
+         trigger per-glyph OpenType reshaping every frame; dropping them is the largest
+         single perf win without changing the visual approach. Handjet at default axes
+         still reads correctly. 12 reps (was 18) reduces total glyph count by 33%. -->
     <div class="monster-area">
       <svg id="home-monster-eyes-svg"
            viewBox="0 0 1440 181.154"
            xmlns="http://www.w3.org/2000/svg"
            preserveAspectRatio="xMidYMin meet">
         <defs>
-          <!-- Text path: peaks at y=40, troughs at y=181.154 (off-screen in blue).
-               Wave arch peaks at y=65 — matching about.html's 25px gap between text and crest. -->
+          <!-- 3-tile path required for startOffset animation headroom.
+               Text starts at 33.333% (= tile 2, the viewport arch) and
+               scrolls to 0% over 30s. Both tiles are identical arch shapes
+               so the loop restart is visually seamless. -->
           <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-          <!-- Eye whites, y-shifted +65 to sit on the wave surface -->
           <clipPath id="home-mon-eye-r-clip">
             <path transform="translate(593.13 97.7)"
               d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
@@ -210,26 +299,27 @@
           </clipPath>
         </defs>
 
-        <!-- Wave fill: arch peaks at y=65, matching about.html proportions -->
+        <!-- Wave fill -->
         <path fill="#378CDA"
           d="M0 181.154 C0 181.154 263 65 574.834 65 C862.5 65 1440 181.154 1440 181.154 Z"/>
 
-        <!-- Eye whites (y +65 from original 116-unit viewBox) -->
-        <path fill="white" transform="translate(593.13 97.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 96.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(593.13 97.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <circle id="home-mon-iris-r" clip-path="url(#home-mon-eye-r-clip)"
+            cx="652.9" cy="114.45" r="30" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(431.49 96.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="home-mon-iris-l" clip-path="url(#home-mon-eye-l-clip)"
+            cx="495.41" cy="114.46" r="30" fill="#32261F"/>
+        </g>
 
-        <!-- Iris circles (cy +65) -->
-        <circle id="home-mon-iris-r" clip-path="url(#home-mon-eye-r-clip)"
-          cx="652.9" cy="114.45" r="30" fill="#32261F"/>
-        <circle id="home-mon-iris-l" clip-path="url(#home-mon-eye-l-clip)"
-          cx="495.41" cy="114.46" r="30" fill="#32261F"/>
-
-        <!-- Ticker text rides the arch crest at y=40, 25px above the wave peak -->
-        <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
-              style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-          <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+        <!-- Ticker: setTimeout-driven startOffset; font-variation-settings omitted. -->
+        <text font-family="Handjet, sans-serif" font-size="22" font-weight="400"
+              fill="#51B18C" letter-spacing="-0.22">
+          <textPath id="home-ticker-textpath" href="#home-wave-text-path" startOffset="33.333%">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   </textPath>
         </text>
       </svg>
     </div>
@@ -245,6 +335,7 @@
       <!-- K --><g transform="translate(169.68, 0.56) scale(1.039, 1.038)"><path d="M40.7256 0H21.9496L19.642 16.7619H18.4602V0H0V37.1188H18.4602V26.9148H19.642L21.8426 37.1188H40.7256L34.18 18.5314L40.7256 0Z" fill="#32261F"/></g>
       <!-- Same path + iris as logo-nav-keyhole.svg, scaled to fit the wordmark slot -->
       <g transform="translate(85.10, 0.008) scale(0.831, 0.830)">
+        <path d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
         <circle id="wordmark-iris" fill="#32261F" cx="27.325" cy="19.055" r="6.127"/>
         <path class="wordmark-keyhole" fill="#32261F"
           d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z"/>
@@ -265,16 +356,17 @@
   </nav>
 
   <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
     </svg>
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
     <div class="nav-mobile-menu">
-      <button class="nav-mobile-close" aria-label="Close menu">
-        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
         </svg>
       </button>
       <a href="/about/">About</a>
@@ -289,9 +381,10 @@
   <div class="page">
 
     <!-- ── Circular sticker ────────────────────────────────────── -->
-    <!-- Figma: text ring 176×176 (r=88), hand 118.4×119.8 (67.3% of circle — from mobile component) -->
+    <!-- Figma desktop: ring 176×176 (r=88). Mobile 7048:1185: ~119×120 via .sticker-outer + 100% SVG. -->
     <div class="sticker-outer">
-      <svg viewBox="0 0 176 176" width="176" height="176" overflow="visible"
+      <svg class="sticker-svg" viewBox="0 0 176 176" overflow="visible"
+           preserveAspectRatio="xMidYMid meet"
            fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <path id="sticker-circle"
@@ -356,13 +449,13 @@
     </div>
 
     <!-- ── Furniture: Couch ────────────────────────────────────── -->
-    <!-- Figma: outer wrapper x:397 y:25 w:430 h:410, inner rotated 371×345 -->
+    <!-- Figma: outer x:397 y:25 w:430 h:410; inner 370.668×345.37 — use calc so mobile wrapper scales (7052:58). -->
     <div class="furniture couch"
          style="left:397px; top:25px; width:430px; height:410px;">
       <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
-        <div style="width:370.668px; height:345.37px; position:relative;
+        <div style="width:calc(100% * 370.668 / 430); height:calc(100% * 345.37 / 410); position:relative;
                     transform:rotate(-11.01deg); flex-shrink:0; overflow:hidden;">
-          <img class="base" src="/assets/furniture-couch.png" alt="Couch">
+          <img class="base" src="/assets/images/furniture-couch.webp" alt="Couch">
           <svg class="eyes" viewBox="0 0 370.668 345.37" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <clipPath id="couch-eye-l-clip">
@@ -375,12 +468,12 @@
               </clipPath>
             </defs>
             <g id="couch-eye-l">
-              <path id="couch-lid-l" fill="white" transform="translate(173.787 65.689)"
+              <path id="couch-lid-l" fill="#F7F2EC" transform="translate(173.787 65.689)"
                 d="M0 15.2157C15.5402 -3.05494 31.9928 -3.80667 49.2979 7.30369C31.8573 13.9934 15.3131 17.0761 0 15.2157Z"/>
               <circle id="couch-iris-l" clip-path="url(#couch-eye-l-clip)" cx="212.6" cy="77.8" r="17" fill="#32261F"/>
             </g>
             <g id="couch-eye-r">
-              <path id="couch-lid-r" fill="white" transform="translate(91.205 76.094)"
+              <path id="couch-lid-r" fill="#F7F2EC" transform="translate(91.205 76.094)"
                 d="M0 18.9844C18.9686 -4.42069 39.8933 -4.26317 61.9197 9.04652C40.0129 17.4491 19.2335 21.3194 0 18.9844Z"/>
               <circle id="couch-iris-r" clip-path="url(#couch-eye-r-clip)" cx="139.25" cy="86.85" r="21" fill="#32261F"/>
             </g>
@@ -393,7 +486,7 @@
     <!-- Figma: x:871 y:110 w:194 h:353 -->
     <div class="furniture vase"
          style="left:871px; top:110px; width:194px; height:353px;">
-      <img class="base" src="/assets/furniture-vase.png" alt="Vase">
+      <img class="base" src="/assets/images/furniture-vase.webp" alt="Vase">
       <svg class="eyes" viewBox="0 0 194 353" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="vase-eye-l-clip">
@@ -406,12 +499,12 @@
           </clipPath>
         </defs>
         <g id="vase-eye-l">
-          <path id="vase-lid-l" fill="white" transform="translate(106.775 120.424)"
+          <path id="vase-lid-l" fill="#F7F2EC" transform="translate(106.775 120.424)"
             d="M0 2.66543C17.0437 -3.76678 28.2577 1.79388 35.682 15.5626C21.6297 13.5883 9.49887 9.54568 0 2.66543Z"/>
           <circle id="vase-iris-l" clip-path="url(#vase-eye-l-clip)" cx="139.85" cy="123.9" r="13" fill="#32261F"/>
         </g>
         <g id="vase-eye-r">
-          <path id="vase-lid-r" fill="white" transform="translate(61.404 104.144)"
+          <path id="vase-lid-r" fill="#F7F2EC" transform="translate(61.404 104.144)"
             d="M0 2.53974C15.3244 -3.66538 25.3317 1.98121 32.3803 14.2441C19.6266 12.452 8.61882 8.78372 0 2.53974Z"/>
           <circle id="vase-iris-r" clip-path="url(#vase-eye-r-clip)" cx="91.05" cy="107.23" r="11.7" fill="#32261F"/>
         </g>
@@ -422,7 +515,7 @@
     <!-- Figma: x:163 y:331 w:314 h:286 -->
     <div class="furniture nightstand"
          style="left:163px; top:331px; width:314px; height:286px;">
-      <img class="base" src="/assets/furniture-nightstand.png" alt="Nightstand">
+      <img class="base" src="/assets/images/furniture-nightstand.webp" alt="Nightstand">
       <svg class="eyes" viewBox="0 0 314 286" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="nightstand-eye-l-clip">
@@ -435,12 +528,12 @@
           </clipPath>
         </defs>
         <g id="nightstand-eye-l">
-          <path id="nightstand-lid-l" fill="white" transform="translate(209.929 82.876)"
+          <path id="nightstand-lid-l" fill="#F7F2EC" transform="translate(209.929 82.876)"
             d="M0 16.7831C16.0036 -2.92124 33.4075 -4.12319 52.0048 7.19633C33.7027 14.7013 16.261 18.3701 0 16.7831Z"/>
           <circle id="nightstand-iris-l" clip-path="url(#nightstand-eye-l-clip)" cx="236.9" cy="95.6" r="17.9" fill="#32261F"/>
         </g>
         <g id="nightstand-eye-r">
-          <path id="nightstand-lid-r" fill="white" transform="translate(122.823 95.730)"
+          <path id="nightstand-lid-r" fill="#F7F2EC" transform="translate(122.823 95.730)"
             d="M0 20.9285C19.5081 -4.29076 41.6676 -4.64163 65.3192 8.88745C42.33 18.3141 20.4243 22.9221 0 20.9285Z"/>
           <circle id="nightstand-iris-r" clip-path="url(#nightstand-eye-r-clip)" cx="159.4" cy="107.0" r="22.5" fill="#32261F"/>
         </g>
@@ -451,7 +544,7 @@
     <!-- Figma: x:349 y:513 w:449 h:275 (calc(20%+61px)=349px) -->
     <div class="furniture carpet"
          style="left:349px; top:513px; width:449px; height:275px;">
-      <img class="base" src="/assets/furniture-carpet.png" alt="Carpet">
+      <img class="base" src="/assets/images/furniture-carpet.webp" alt="Carpet">
       <svg class="eyes" viewBox="0 0 449 275" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="carpet-eye-l-clip">
@@ -464,12 +557,12 @@
           </clipPath>
         </defs>
         <g id="carpet-eye-l">
-          <path id="carpet-lid-l" fill="white" transform="translate(260.816 123.308)"
+          <path id="carpet-lid-l" fill="#F7F2EC" transform="translate(260.816 123.308)"
             d="M0 21.9017C14.5351 -1.13098 32.9208 -4.62931 54.1741 5.06062C35.634 15.3896 17.5244 21.5214 0 21.9017Z"/>
           <circle id="carpet-iris-l" clip-path="url(#carpet-eye-l-clip)" cx="283" cy="118" r="19" fill="#32261F"/>
         </g>
         <g id="carpet-eye-r">
-          <path id="carpet-lid-r" fill="white" transform="translate(170.119 146.962)"
+          <path id="carpet-lid-r" fill="#F7F2EC" transform="translate(170.119 146.962)"
             d="M0 27.266C17.5631 -2.08951 41.124 -5.2886 68.045 6.11189C44.7583 19.0859 22.0103 26.7853 0 27.266Z"/>
           <circle id="carpet-iris-r" clip-path="url(#carpet-eye-r-clip)" cx="202" cy="140" r="24" fill="#32261F"/>
         </g>
@@ -480,7 +573,7 @@
     <!-- Figma: x:780 y:485 w:569 h:303 -->
     <div class="furniture dresser"
          style="left:780px; top:485px; width:569px; height:303px;">
-      <img class="base" src="/assets/furniture-dresser.png" alt="Dresser">
+      <img class="base" src="/assets/images/furniture-dresser.webp" alt="Dresser">
       <svg class="eyes" viewBox="0 0 568 303" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="dresser-eye-l-clip">
@@ -493,12 +586,12 @@
           </clipPath>
         </defs>
         <g id="dresser-eye-l">
-          <path id="dresser-lid-l" fill="white" transform="translate(242.184 95.254)"
+          <path id="dresser-lid-l" fill="#F7F2EC" transform="translate(242.184 95.254)"
             d="M0 11.5256C31.9658 -8.25434 56.8852 -1.46618 77.3765 23.423C48.1332 25.0158 21.9613 21.6603 0 11.5256Z"/>
           <circle id="dresser-iris-l" clip-path="url(#dresser-eye-l-clip)" cx="273.2" cy="86.75" r="26.5" fill="#32261F"/>
         </g>
         <g id="dresser-eye-r">
-          <path id="dresser-lid-r" fill="white" transform="translate(143.879 80.598)"
+          <path id="dresser-lid-r" fill="#F7F2EC" transform="translate(143.879 80.598)"
             d="M0 10.5895C28.5751 -8.04618 51.0845 -0.607751 70.2191 21.3858C43.6826 22.8314 19.9319 19.7862 0 10.5895Z"/>
           <circle id="dresser-iris-r" clip-path="url(#dresser-eye-r-clip)" cx="167.9" cy="72" r="24" fill="#32261F"/>
         </g>
@@ -538,7 +631,7 @@
     }());
   </script>
 
-  <script src="/assets/scripts.js"></script>
+  <script src="/assets/scripts.js" defer></script>
   <script>
     // ─── Uniform scale to fit viewport ───────────────────────────
     // The page is a fixed 1440×1024 canvas. JS scales it uniformly
@@ -568,7 +661,12 @@
       }
     }
     scalePage();
-    window.addEventListener('resize', scalePage);
+    // Debounced resize — avoids layout thrashing during drag-resize
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(scalePage, 100);
+    });
 
     // ─── Draggable furniture ──────────────────────────────────────
     // Mouse events are in viewport pixels; furniture positions are in
@@ -579,8 +677,10 @@
     let topZ     = 10;
 
     document.querySelectorAll('.furniture').forEach(el => {
-      el.addEventListener('mouseenter', () => KT.setCursor('hover'));
-      el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      if (window.KT && window.KT.isDesktop) {
+        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
+        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      }
       
       // Ensure element doesn't scroll the page on touch
       el.style.touchAction = 'none';
@@ -593,28 +693,36 @@
         offsetY = (e.clientY - rect.top)  / scale;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
-        KT.setCursor('drag');
+        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
         el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('pointermove', e => {
+    // rAF-throttled drag move
+    var dragRaf = 0, dragMX = 0, dragMY = 0;
+    function updateDragPos() {
+      dragRaf = 0;
       if (!dragging) return;
       const pageRect = page.getBoundingClientRect();
-      // Convert viewport coords to page coords, then subtract the grab offset
-      const x = (e.clientX - pageRect.left) / scale - offsetX;
-      const y = (e.clientY - pageRect.top)  / scale - offsetY;
+      const x = (dragMX - pageRect.left) / scale - offsetX;
+      const y = (dragMY - pageRect.top)  / scale - offsetY;
       dragging.style.setProperty('left', x + 'px', 'important');
       dragging.style.setProperty('top', y + 'px', 'important');
-    });
+    }
+    document.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      dragMX = e.clientX;
+      dragMY = e.clientY;
+      if (!dragRaf) dragRaf = requestAnimationFrame(updateDragPos);
+    }, { passive: true });
 
     document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
-        KT.setCursor(under && under.closest('.furniture') ? 'hover' : 'default');
+        if (window.KT && window.KT.isDesktop) KT.setCursor(under && under.closest('.furniture') ? 'hover' : 'default');
       }
     });
     
@@ -635,7 +743,21 @@
     const homeMonIrisR  = document.getElementById('home-mon-iris-r');
     const homeMonIrisL  = document.getElementById('home-mon-iris-l');
 
-    // True if ≤5% of the element's area is inside the viewport
+    // Store original furniture positions for reset (desktop: inline Figma attrs).
+    // Mobile layout uses @media !important; el.style only sees HTML inline, so
+    // resetFurniture() clears inline left/top/width/height on narrow viewports
+    // so class rules win — do not re-apply d.left (desktop) with !important.
+    var furnitureDefaults = [];
+    document.querySelectorAll('.furniture').forEach(function (el) {
+      furnitureDefaults.push({
+        el: el,
+        left: el.style.left,
+        top: el.style.top,
+        zIndex: el.style.zIndex || ''
+      });
+    });
+
+    // True if ≤20% of the element's area is inside the viewport
     function isMostlyOffscreen(el) {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) return true;
@@ -644,14 +766,123 @@
       return (visW * visH) / (r.width * r.height) <= 0.20;
     }
 
+    var monsterShowing = false;
+
     function checkMonsterTrigger() {
       const pieces = document.querySelectorAll('.furniture');
       const allOff = Array.from(pieces).every(isMostlyOffscreen);
+      var wasShowing = monsterShowing;
+      monsterShowing = allOff;
       homeMonster.classList.toggle('is-visible', allOff);
+
+      // Pause / resume furniture eye timers to avoid wasted work
+      if (allOff && !wasShowing) {
+        pauseAllEyeAnimations();
+        startTickerAnim();
+        scheduleHomeMonsterBlink();
+      } else if (!allOff && wasShowing) {
+        resumeAllEyeAnimations();
+        stopTickerAnim();
+        stopHomeMonsterBlink();
+      }
     }
 
-    // Re-check after every drop
-    document.addEventListener('mouseup', checkMonsterTrigger);
+    // Re-check after every drop (pointerup covers mouse + touch; mouseup removed to avoid double fire)
+    document.addEventListener('pointerup', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      checkMonsterTrigger();
+    });
+
+    // ─── Ticker animation — setTimeout at tickerFrameMs (not 60Hz rAF pump) ─
+    // Driving startOffset via JS. Chained setTimeout matches wake rate to
+    // tickerFrameMs (~24 fps mobile, ~60 fps desktop) with zero rAF cost when off.
+    var tickerPath      = document.getElementById('home-ticker-textpath');
+    var tickerRunning   = false;
+    var tickerOffset    = 1 / 3;   // starts at 33.333% (viewport arch position)
+    var tickerLastTime    = 0;
+    var tickerTimeoutId   = 0;
+    var isMobileCtx     = window.innerWidth <= 768;
+    var tickerFrameMs   = isMobileCtx ? 1000 / 24 : 1000 / 60;
+    var tickerSpeed      = (1 / 3) / 30;  // fractional offset per second
+
+    function tickerStep() {
+      if (!tickerRunning) return;
+      tickerTimeoutId = 0;
+      var now = performance.now();
+      if (tickerLastTime === 0) {
+        tickerLastTime = now;
+      } else {
+        var elapsed = now - tickerLastTime;
+        tickerLastTime = now;
+        tickerOffset -= tickerSpeed * (elapsed / 1000);
+        if (tickerOffset < 0) tickerOffset += 1 / 3;
+        if (tickerPath) {
+          tickerPath.setAttribute('startOffset',
+            (tickerOffset * 100).toFixed(3) + '%');
+        }
+      }
+      if (tickerRunning) {
+        tickerTimeoutId = setTimeout(tickerStep, tickerFrameMs);
+      }
+    }
+
+    function startTickerAnim() {
+      if (tickerRunning) return;
+      tickerRunning = true;
+      tickerLastTime = 0;
+      tickerStep();
+    }
+    function stopTickerAnim() {
+      tickerRunning = false;
+      if (tickerTimeoutId) {
+        clearTimeout(tickerTimeoutId);
+        tickerTimeoutId = 0;
+      }
+    }
+
+    // ─── Reset furniture when monster is clicked ──────────────────
+    function resetFurniture() {
+      const useMobileLayout = window.matchMedia('(max-width: 768px)').matches;
+      furnitureDefaults.forEach(function (d) {
+        if (useMobileLayout) {
+          d.el.style.removeProperty('left');
+          d.el.style.removeProperty('top');
+          d.el.style.removeProperty('width');
+          d.el.style.removeProperty('height');
+          d.el.style.removeProperty('z-index');
+        } else {
+          d.el.style.setProperty('left', d.left, 'important');
+          d.el.style.setProperty('top', d.top, 'important');
+          d.el.style.zIndex = d.zIndex;
+        }
+      });
+      topZ = 10;
+      // Hide monster quickly (600ms) — nobody wants to wait 3s after clicking
+      monsterShowing = false;
+      homeMonster.classList.add('is-hiding');
+      homeMonster.classList.remove('is-visible');
+      stopTickerAnim();
+      // Strip the fast-hide override once it's offscreen so the next reveal
+      // uses the slow 3s dramatic rise.
+      setTimeout(function () { homeMonster.classList.remove('is-hiding'); }, 650);
+      resumeAllEyeAnimations();
+      stopHomeMonsterBlink();
+    }
+
+    homeMonster.addEventListener('click', resetFurniture);
+
+    // Hand cursor over the monster (desktop custom-cursor system).
+    // `cursor: pointer` in CSS does nothing here because global `cursor: none`
+    // hides the native cursor on desktop — so we swap to the 'hover' state
+    // of the custom cursor overlay.
+    if (window.KT && window.KT.isDesktop) {
+      homeMonster.addEventListener('mouseenter', function () {
+        if (homeMonster.classList.contains('is-visible')) KT.setCursor('hover');
+      });
+      homeMonster.addEventListener('mouseleave', function () {
+        if (!dragging) KT.setCursor('default');
+      });
+    }
 
     // Monster eye tracking — convert clientX/Y to wave SVG coords
     function trackMonsterIris(el, svgX, svgY, restX, restY, maxX, maxY) {
@@ -663,24 +894,83 @@
       el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
     }
 
-    document.addEventListener('mousemove', function(e) {
+    // rAF-throttled monster eye tracking
+    var monRaf = 0, monMX = 0, monMY = 0;
+    function updateMonsterEyes() {
+      monRaf = 0;
       const eyesSvg = document.getElementById('home-monster-eyes-svg');
       if (!eyesSvg) return;
       const r    = eyesSvg.getBoundingClientRect();
-      const svgX = (e.clientX - r.left) / r.width  * 1440;
-      const svgY = (e.clientY - r.top)  / r.height * 181.154;
+      const svgX = (monMX - r.left) / r.width  * 1440;
+      const svgY = (monMY - r.top)  / r.height * 181.154;
       trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  114.45, 20, 5);
       trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 114.46, 20, 5);
-    });
+    }
+    document.addEventListener('mousemove', function(e) {
+      monMX = e.clientX;
+      monMY = e.clientY;
+      if (!monRaf) monRaf = requestAnimationFrame(updateMonsterEyes);
+    }, { passive: true });
+    document.addEventListener('touchmove', function(e) {
+      if (!e.touches.length) return;
+      monMX = e.touches[0].clientX;
+      monMY = e.touches[0].clientY;
+      if (!monRaf) monRaf = requestAnimationFrame(updateMonsterEyes);
+    }, { passive: true });
 
-    // ─── Furniture eye animation ──────────────────────────────────
+    var homeMonsterBlinkGroups = document.querySelectorAll('#home-monster .eye-blink-group');
+    function homeMonsterBlink() {
+      homeMonsterBlinkGroups.forEach(function (g) { g.classList.add('closing'); });
+      setTimeout(function () {
+        homeMonsterBlinkGroups.forEach(function (g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function () {
+          homeMonsterBlinkGroups.forEach(function (g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    var homeMonsterBlinkNextId = 0;
+    function stopHomeMonsterBlink() {
+      if (homeMonsterBlinkNextId) {
+        clearTimeout(homeMonsterBlinkNextId);
+        homeMonsterBlinkNextId = 0;
+      }
+    }
+    function scheduleHomeMonsterBlink() {
+      stopHomeMonsterBlink();
+      homeMonsterBlinkNextId = setTimeout(function () {
+        homeMonsterBlinkNextId = 0;
+        if (!homeMonster.classList.contains('is-visible')) return;
+        homeMonsterBlink();
+        scheduleHomeMonsterBlink();
+      }, 2000 + Math.random() * 5000);
+    }
+
+    // ─── Furniture eye animation (cancellable) ────────────────────
+    // Each instance returns { pause(), resume() } so we can stop the
+    // recursive setTimeout chains when furniture is off-screen.
+    var allEyeControllers = [];
+
+    function pauseAllEyeAnimations() {
+      allEyeControllers.forEach(function (c) { c.pause(); });
+    }
+    function resumeAllEyeAnimations() {
+      allEyeControllers.forEach(function (c) { c.resume(); });
+    }
+
     function animateFurnitureEyes(cfg) {
       var irisL  = cfg.irisL,  irisR  = cfg.irisR;
       var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
       var restL  = cfg.restL,  restR  = cfg.restR;
       var rangeL = cfg.rangeL, rangeR = cfg.rangeR;
 
+      var paused = false;
+      var lookTimer = 0, blinkTimer = 0;
+
       function look() {
+        if (paused) return;
         var angle = Math.random() * Math.PI * 2;
         var mag   = Math.random();
         var dx    = Math.cos(angle) * mag;
@@ -689,25 +979,27 @@
         irisL.setAttribute('cy', restL.y + dy * rangeL);
         irisR.setAttribute('cx', restR.x + dx * rangeR);
         irisR.setAttribute('cy', restR.y + dy * rangeR);
-        setTimeout(look, 3000 + Math.random() * 3000);
+        lookTimer = setTimeout(look, 3000 + Math.random() * 3000);
       }
 
       function singleBlink(onDone) {
-        var holdMs = 60 + Math.random() * 90;  // 60–150ms
+        if (paused) return;
+        var holdMs = 60 + Math.random() * 90;
         eyeL.style.visibility = 'hidden';
         eyeR.style.visibility = 'hidden';
-        setTimeout(function () {
+        blinkTimer = setTimeout(function () {
           eyeL.style.visibility = '';
           eyeR.style.visibility = '';
-          setTimeout(onDone || function () {}, 0);
+          if (!paused) setTimeout(onDone || function () {}, 0);
         }, holdMs);
       }
 
       function blink() {
+        if (paused) return;
         singleBlink(function () {
           if (Math.random() < 0.25) {
-            var gapMs = 100 + Math.random() * 80;  // 100–180ms
-            setTimeout(function () { singleBlink(scheduleBlink); }, gapMs);
+            var gapMs = 100 + Math.random() * 80;
+            blinkTimer = setTimeout(function () { singleBlink(scheduleBlink); }, gapMs);
           } else {
             scheduleBlink();
           }
@@ -715,8 +1007,28 @@
       }
 
       function scheduleBlink() {
-        setTimeout(blink, 4000 + Math.random() * 4000);
+        if (paused) return;
+        blinkTimer = setTimeout(blink, 4000 + Math.random() * 4000);
       }
+
+      var ctrl = {
+        pause: function () {
+          paused = true;
+          clearTimeout(lookTimer);
+          clearTimeout(blinkTimer);
+          // Ensure eyes are visible when paused (blink may have hidden them)
+          eyeL.style.visibility = '';
+          eyeR.style.visibility = '';
+        },
+        resume: function () {
+          if (!paused) return;
+          paused = false;
+          look();
+          scheduleBlink();
+        }
+      };
+
+      allEyeControllers.push(ctrl);
 
       look();
       scheduleBlink();
@@ -791,24 +1103,31 @@
       var restX = 27.325, restY = 19.055;
       var maxX = 4.0, maxY = 2.0;
 
-      document.addEventListener('mousemove', function (e) {
+      // rAF-throttled wordmark iris
+      var wmRaf = 0, wmMX = 0, wmMY = 0;
+      function updateWmIris() {
+        wmRaf = 0;
         if (!wmIris) wmIris = document.getElementById('wordmark-iris');
         if (!wmIris) return;
 
         var rect = wmIris.ownerSVGElement.getBoundingClientRect();
-        // Eye center as fraction of the wordmark SVG's rendered size
         var eyeX = rect.left + rect.width  * 0.509;
         var eyeY = rect.top  + rect.height * 0.191;
 
-        var dx   = e.clientX - eyeX;
-        var dy   = e.clientY - eyeY;
+        var dx   = wmMX - eyeX;
+        var dy   = wmMY - eyeY;
         var dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < 1) { wmIris.setAttribute('cx', restX); wmIris.setAttribute('cy', restY); return; }
 
         var strength = Math.min(dist / 400, 1);
         wmIris.setAttribute('cx', restX + (dx / dist) * maxX * strength);
         wmIris.setAttribute('cy', restY + (dy / dist) * maxY * strength);
-      });
+      }
+      document.addEventListener('mousemove', function (e) {
+        wmMX = e.clientX;
+        wmMY = e.clientY;
+        if (!wmRaf) wmRaf = requestAnimationFrame(updateWmIris);
+      }, { passive: true });
     }());
   </script>
 

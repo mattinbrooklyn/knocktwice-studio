@@ -13,6 +13,8 @@
   --color-yellow:          #FADB4B;
   --color-pink:            #EC8EDF;
   --color-red:             #FF0004;
+  /* Figma: mobile stack / Field chips (7097:1941–1942) */
+  --color-caramel:         #9A7555;
 
   /* Fonts */
   --font-display:          'Erica One', serif;
@@ -26,6 +28,12 @@
   --type-b2:               0.75rem;
   --type-b3:               0.875rem;
   --type-nav:              clamp(1.125rem, 1.8vw, 1.375rem);
+  /* Full-screen mobile overlay menu (Figma: Handjet 34 — Regular like Nav/Unselected) */
+  --type-nav-mobile-menu:  2.125rem;
+  --leading-nav-mobile-menu: 1.12;
+  --wght-nav-mobile-menu:  400;
+  --wght-nav-mobile-menu-active: 700;
+  --tracking-nav-mobile-menu: -0.02125rem; /* -0.34px @ 16px root — Figma 7531:2089 */
   --type-field:            1rem;
   --type-button:           1rem;
   --type-error:            0.75rem;
@@ -60,6 +68,17 @@
   --content-width-mobile:  calc(100vw - 2 * var(--content-left-mobile));
 
   /* Components */
+  /* Chips / tag pills (Figma: e.g. KT_Livingroom 7086:1494–1505, Handjet Bold 16 / 22, 32× cap, 2px stroke) */
+  --chip-height:           2rem;           /* 32px */
+  --chip-radius:           2rem;           /* 32px pill */
+  --chip-pad-x:            0.625rem;       /* 10px */
+  --chip-gap:              0.625rem;       /* 10px between tags */
+  --type-chip:             1rem;           /* 16px */
+  --leading-chip:          1.375rem;       /* 22px */
+  /* Figma 7097:1941 (Field/Active_Mobile) + 7097:1942 — stack title tags, cream bg */
+  --type-chip-mobile-stack:   0.875rem;   /* 14px */
+  --leading-chip-mobile-stack: 1.375rem;  /* 22px */
+  --wght-chip-mobile-stack:   700;       /* Handjet Bold in file */
   --radius-pill:           2rem;
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
@@ -91,6 +110,19 @@
   cursor: none !important;
 }
 
+/* ── Touch override — restore native cursor on touch devices ── */
+html.is-touch *, html.is-touch *::before, html.is-touch *::after {
+  cursor: auto !important;
+}
+html.is-touch button, html.is-touch a, html.is-touch [role="button"],
+html.is-touch input, html.is-touch textarea, html.is-touch select {
+  cursor: pointer !important;
+}
+html.is-touch .obj, html.is-touch .photo, html.is-touch .photo-rotated {
+  cursor: grab !important;
+}
+html.is-touch #custom-cursor { display: none !important; }
+
 /* ── Base ───────────────────────────────────────── */
 html, body {
   width: 100%;
@@ -99,6 +131,9 @@ html, body {
   font-family: var(--font-body);
   font-size: 16px;
   cursor: none;
+}
+html.is-touch, html.is-touch body {
+  cursor: auto;
 }
 
 /* ── Typography helpers ─────────────────────────── */
@@ -218,26 +253,45 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 }
 
 /* ── Navigation — mobile overlay ───────────────── */
+/* Figma: Menu_Open 7531:2089 (440×956). Full-screen pink, safe-area insets,
+   equal flex rows, 34px Handjet, dividers, X close 7535:2125 (15×2 stroke). */
+/* Hamburger pill button — Figma node 7054:1625 (mobile header).
+   76×47 pill with ROUNDED LEFT side and SQUARED RIGHT side (the flat edge
+   aligns with the viewport's right margin). Per Figma SVG path:
+     M23.5 1 H75 V46 H23.5 C11.07 46, 1 35.93, 1 23.5 C1 11.07, 11.07 1, 23.5 1
+   2px #32261F stroke, #F7F2EC fill. 34×22 3-line hamburger centered inside
+   the rounded portion (icon is visually shifted left since the rounded half
+   is on the left). */
 .nav-mobile-trigger {
   display: none;
   position: fixed;
   top: 1.5rem;
   right: 1.5rem;
   z-index: 1001;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: none;
-  border: none;
+  width: 4.75rem;   /* 76px */
+  height: 2.9375rem; /* 47px */
+  background: var(--color-bg);
+  border: 2px solid var(--color-ink);
+  /* Rounded left, squared right */
+  border-top-left-radius: 23.5px;
+  border-bottom-left-radius: 23.5px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
   padding: 0;
   color: var(--color-ink);
   cursor: none;
+  align-items: center;
+  justify-content: center;
 }
 .nav-mobile-trigger svg,
 .nav-mobile-trigger img {
   display: block;
-  width: 2rem;
-  height: 2rem;
-  margin: 0 auto;
+  width: 2.125rem;   /* 34px */
+  height: 1.375rem;  /* 22px */
+  margin: 0;
+  /* Visually center the icon within the rounded half of the pill
+     (not the full 76px width). Per Figma inset 26.32% left, 28.95% right
+     the icon center sits at x ≈ 37.7/76 ≈ 49.6% — essentially centered. */
 }
 body.nav-open .nav-mobile-trigger {
   display: none !important;
@@ -246,94 +300,126 @@ body.nav-open .nav-mobile-trigger {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(247, 242, 236, 0.7);
-  z-index: 1000;
-  justify-content: flex-end;
+  z-index: 10000;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* Fill the visual viewport; safe-area padding paints pink into iOS home-indicator / notch gutters */
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  background: var(--color-pink);
+  overscroll-behavior: none;
 }
 .nav-mobile-overlay.is-open {
   display: flex;
 }
 .nav-mobile-menu {
-  width: calc(100% - 2.25rem);
-  max-width: 404px;
-  height: 100%;
-  background: var(--color-pink);
-  border-left: 1px solid var(--color-ink);
   position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
+/* Close control — Figma Menu_Open 7531:2089: X 15×15, frame top 30px / right 26px */
 .nav-mobile-close {
   position: absolute;
   top: 1.875rem;
-  right: 1.875rem;
-  width: 1.3rem;
-  height: 2.5rem;
+  right: 1.625rem;
+  z-index: 1;
+  width: 2.75rem;
+  height: 2.75rem;
   background: none;
   border: none;
   padding: 0;
   color: var(--color-ink);
   cursor: none;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 .nav-mobile-close svg {
-  width: 100%;
-  height: 100%;
+  width: 0.9375rem;
+  height: 0.9375rem;
   display: block;
+  flex-shrink: 0;
 }
 .nav-mobile-overlay a {
   font-family: var(--font-ui);
-  font-size: 1.125rem;
-  font-weight: 700;
-  line-height: 1.5rem;
+  font-size: var(--type-nav-mobile-menu);
+  font-weight: var(--wght-nav-mobile-menu);
+  line-height: var(--leading-nav-mobile-menu);
   color: var(--color-ink);
   text-decoration: none;
-  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' var(--wght-nav-mobile-menu);
   width: 100%;
   text-align: center;
-  padding: 1.5rem 1rem;
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
   background: transparent;
   border-top: 1px solid var(--color-ink);
   text-transform: uppercase;
+  letter-spacing: var(--tracking-nav-mobile-menu);
 }
 .nav-mobile-overlay a:last-of-type {
   border-bottom: 1px solid var(--color-ink);
 }
 .nav-mobile-overlay a.active,
 .nav-mobile-overlay a:hover {
+  font-weight: var(--wght-nav-mobile-menu-active);
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' var(--wght-nav-mobile-menu-active);
   background: var(--color-yellow);
 }
 body.nav-open {
   overflow: hidden;
 }
 
-/* ── Tag pills ──────────────────────────────────── */
+/* ── Tag pills (Figma: pill 32px tall, 2px border, 10px gap, text Handjet 16/22) */
 .card-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--chip-height);
+  padding: 0 var(--chip-pad-x);
   font-family: var(--font-ui);
-  font-size: var(--type-b2);
-  line-height: 1.375rem;
+  font-size: var(--type-chip);
+  line-height: var(--leading-chip);
   font-weight: 700;
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--color-bg);
-  padding: 0.13rem 1rem;
-  display: inline-block;
-  height: 2rem;
+  color: var(--color-ink);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--chip-radius);
+  background: transparent;
+}
+
+/* Mobile project stacks — Saya, Living Room, etc. (Figma: 7097:1941 text, 7097:1942 pill) */
+.project-mobile .card-tag {
+  min-height: 1.75rem;
+  padding: 0.125rem 0.625rem;
+  font-size: var(--type-chip-mobile-stack);
+  line-height: var(--leading-chip-mobile-stack);
+  font-weight: var(--wght-chip-mobile-stack);
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' var(--wght-chip-mobile-stack);
+  color: var(--color-caramel);
+  border: 2px solid var(--color-caramel);
+  border-radius: 2rem;
+  background: transparent;
 }
 
 /* ── Card flip ──────────────────────────────────── */
 .photo-card {
   position: absolute;
-  overflow: hidden;
   perspective: 1000px;
-  box-shadow: var(--shadow-stack);
-  transition: box-shadow 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-.photo-card:hover {
-  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
 }
 .photo-card-inner {
   position: relative;
@@ -349,13 +435,27 @@ body.nav-open {
 .photo-card-back {
   position: absolute;
   inset: 0;
+  box-sizing: border-box;
   backface-visibility: hidden;
   border-radius: 0.25rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-stack);
+  transition: box-shadow 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+.photo-card:hover .photo-card-front,
+.photo-card:hover .photo-card-back {
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
 }
 .photo-card-front img {
   width: 100%; height: 100%;
   display: block;
   object-fit: cover;
+}
+/* Front: placeholder checkerboard; back is solid khaki with copy */
+.photo-card-front--placeholder {
+  background-image: url('interior-placeholder.png');
+  background-size: 87.68px 87.68px;
+  background-repeat: repeat;
 }
 .photo-card-back {
   background: var(--color-khaki);
@@ -365,6 +465,7 @@ body.nav-open {
   justify-content: center;
   padding: 8% 7%;
   gap: 1rem;
+  min-height: 0;
 }
 .card-title {
   font-family: var(--font-display);
@@ -382,10 +483,11 @@ body.nav-open {
 }
 .card-tags {
   display: flex;
-  gap: 0.625rem;
+  gap: var(--chip-gap);
   flex-wrap: wrap;
   align-self: flex-start;
 }
+/* Khaki / dark panels: off-white text + stroke (Figma Container_Hover) */
 .photo-card-back .card-tag,
 .section-card .card-tag {
   color: var(--color-bg);
@@ -635,6 +737,7 @@ body.nav-open {
   background: rgba(247, 242, 236, 0.88);
   z-index: 14;
   display: none;
+  pointer-events: all;
 }
 .modal-card {
   display: none;
@@ -647,7 +750,7 @@ body.nav-open {
   border: 2px solid var(--color-ink);
   border-radius: 0.875rem;
   z-index: 25;
-  padding: 1.25rem;
+  padding: 2.375rem 2.375rem 2rem;
 }
 
 /* ── Mailing list modal ─────────────────────────── */
@@ -692,7 +795,7 @@ body.nav-open {
   height: var(--input-height);
   border: 2px solid var(--color-ink);
   color: var(--color-ink);
-  padding: 0 1.375rem;
+  padding: 1rem 1.375rem;
   flex: 1;
   background: var(--color-white);
   border-radius: var(--radius-button);
@@ -714,23 +817,24 @@ body.nav-open {
   justify-content: center;
   flex: none;
   width: auto;
-  padding: 0 2.5rem;
+  padding: 0 4.5rem;
   height: var(--button-height);
   border-radius: var(--radius-button);
   background: var(--color-green);
   color: var(--color-bg);
   font-family: var(--font-ui);
   font-size: var(--type-button);
-  font-weight: 400;
-  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+  font-weight: 700;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
   border: 2px solid transparent;
   cursor: none;
   text-decoration: none;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 .ml-submit:hover {
   background: var(--color-white);
   color: var(--color-green);
-  border-color: var(--color-ink);
+  border-color: var(--color-green);
 }
 .ml-submit.is-disabled {
   opacity: 0.5;
@@ -745,8 +849,9 @@ body.nav-open {
   font-family: var(--font-body);
   font-size: var(--type-b1);
   line-height: var(--leading-b1);
+  font-weight: 400;
   color: var(--color-ink);
-  opacity: 0.55;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
   margin-top: 1rem;
 }
 
@@ -777,8 +882,60 @@ body.nav-open {
   display: block;
 }
 
+/* ── Footer monster eyes (split desktop / mobile SVG) ─────────────
+   Matches coming-soon / about: circle irises + clip, eye-blink groups.
+   Pages opt in with #monster-group.has-mobile-monster-eyes */
+.monster-area .eye-blink-group {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.monster-area .eye-blink-group.closing {
+  transform: scaleY(0);
+  transition: transform 60ms ease-in;
+}
+.monster-area .eye-blink-group.opening {
+  transform: scaleY(1);
+  transition: transform 100ms ease-out;
+}
+.monster-eyes-overlay-mobile {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Home easter-egg monster: same blink treatment inside combined SVG */
+#home-monster .eye-blink-group {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+#home-monster .eye-blink-group.closing {
+  transform: scaleY(0);
+  transition: transform 60ms ease-in;
+}
+#home-monster .eye-blink-group.opening {
+  transform: scaleY(1);
+  transition: transform 100ms ease-out;
+}
+
+/* ── Tablet breakpoint (1140px to 769px) ─────────── */
+@media (max-width: 1140px) {
+  :root {
+    --content-width: 70.877vw;
+    --content-left: 27.719vw;
+    --grid-margin: 3.508vw;
+  }
+}
+
 /* ── Mobile breakpoint (canonical: 768px) ─────────── */
 @media (max-width: 768px) {
+  html, body {
+    font-size: 16px;
+  }
   :root {
     --grid-margin:    var(--grid-margin-mobile);
     --content-left: var(--content-left-mobile);
@@ -797,20 +954,48 @@ body.nav-open {
     height: 2.9375rem;
   }
   .nav-mobile-trigger {
-    display: block;
+    display: flex;
     top: 1.875rem;
-    right: var(--content-left);
-    width: 4.75rem;
-    height: 2.9375rem;
+    right: 0;
+    border-right: none!important;
+    /* width, height, border, background inherited from base rule */
   }
   .nav-mobile-trigger svg,
   .nav-mobile-trigger img {
-    width: 2rem;
-    height: 2rem;
+    width: 2.125rem;  /* 34px */
+    height: 1.375rem; /* 22px */
   }
 
   .monster-area {
-    height: var(--wave-height-mobile) !important;
+    /* height: var(--wave-height-mobile) !important; */
+  }
+
+  #monster-group.has-mobile-monster-eyes #monster-eyes-svg {
+    display: none;
+  }
+  #monster-group.has-mobile-monster-eyes .monster-eyes-overlay-mobile {
+    display: block;
+  }
+  #monster-group.has-mobile-monster-eyes .monster-area .eye-blink-group.closing {
+    transform: none;
+    opacity: 0;
+    transition: opacity 50ms linear;
+  }
+  #monster-group.has-mobile-monster-eyes .monster-area .eye-blink-group.opening {
+    transform: none;
+    opacity: 1;
+    transition: opacity 80ms linear;
+  }
+
+  #home-monster .eye-blink-group.closing {
+    transform: none;
+    opacity: 0;
+    transition: opacity 50ms linear;
+  }
+  #home-monster .eye-blink-group.opening {
+    transform: none;
+    opacity: 1;
+    transition: opacity 80ms linear;
   }
 
   /* Mobile page clearance — Figma H1 starts at y=97 (header 30+47+20).

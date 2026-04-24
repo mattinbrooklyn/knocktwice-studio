@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
   <title>Interiors — Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -134,8 +134,8 @@
     .project-mobile .stack-description {
       display: flex;
       flex-direction: column;
-      gap: 0.625rem;
-      padding-inline: var(--content-left);
+      gap: 0.35rem;
+      /* padding-inline: var(--content-left); */
     }
     .project-mobile .card-title {
       font-family: var(--font-display);
@@ -152,31 +152,28 @@
     }
     .project-mobile .card-tags {
       display: flex;
-      gap: 0.625rem;
+      gap: var(--chip-gap);
       flex-wrap: wrap;
     }
-    .project-mobile .card-tag {
-      color: var(--color-ink);
-      border-color: var(--color-ink);
-    }
 
-    /* Swipe stack container — per-stack width + aspect from Figma. */
+    /* Swipe stack container — per-stack width + aspect from Figma.
+       Width is % of content column (440px frame) so the stack centers with
+       padded .page; vw + margin-left from Figma x-offset drifted right vs viewport. */
     .swipe-stack {
       position: relative;
       overflow: visible;
       touch-action: pan-y;
+      align-self: center;
     }
-    /* Saya: canvas x=9.126, w=421.748, h=417.651 on a 440-wide frame. */
+    /* Saya: w=421.748 on 440-wide frame. */
     .swipe-stack[data-stack="saya"] {
-      width: 95.85vw;
-      margin-left: 2.07vw;
+      width: calc(100% * 421.748 / 440);
       aspect-ratio: 421.748 / 417.651;
     }
-    /* Living Room + Bedroom: canvas x=13.287, w=h=413.426 on a 440-wide frame. */
+    /* Living Room + Bedroom: w=h=413.426 on 440-wide frame. */
     .swipe-stack[data-stack="livingroom"],
     .swipe-stack[data-stack="bedroom"] {
-      width: 93.96vw;
-      margin-left: 3.02vw;
+      width: calc(100% * 413.426 / 440);
       aspect-ratio: 1 / 1;
     }
 
@@ -227,6 +224,7 @@
 
   <a href="/home/" class="logo">
     <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
       <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
       <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
     </svg>
@@ -241,16 +239,17 @@
   </nav>
 
   <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
     </svg>
   </button>
 
   <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
     <div class="nav-mobile-menu">
-      <button class="nav-mobile-close" aria-label="Close menu">
-        <svg viewBox="0 0 21 41" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M2 2L19 20.5L2 39" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
         </svg>
       </button>
       <a href="/about/">About</a>
@@ -280,14 +279,14 @@
 
       <!-- saya-01  left:2.08%  top:6.91%  w:37.01%  h:13.64% -->
       <div class="photo" style="left:2.08%; top:6.91%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-01.webp" alt="">
+        <img src="/assets/images/interior-saya-01.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-02  left:36.25% top:0%     w:37.01%  h:13.64% — hover card flip -->
       <div class="photo-card" style="left:36.25%; top:0%; width:37.01%; height:13.64%;">
         <div class="photo-card-inner">
           <div class="photo-card-front">
-            <img src="/assets/images/interior-saya-02.webp" alt="Sava's Room">
+            <img src="/assets/images/interior-saya-02.webp" alt="Sava's Room" loading="lazy">
           </div>
           <div class="photo-card-back">
             <h3 class="card-title">SAYA'S ROOM</h3>
@@ -304,62 +303,62 @@
 
       <!-- saya-04  left:75.35% top:2.31%  w:24.65%  h:20.48% -->
       <div class="photo" style="left:75.35%; top:2.31%; width:24.65%; height:20.48%;">
-        <img src="/assets/images/interior-saya-04.webp" alt="">
+        <img src="/assets/images/interior-saya-04.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-05  left:38.26% top:18.25% w:24.65%  h:20.48% -->
       <div class="photo" style="left:38.26%; top:18.25%; width:24.65%; height:20.48%;">
-        <img src="/assets/images/interior-saya-05.webp" alt="">
+        <img src="/assets/images/interior-saya-05.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-07  left:-2.92% top:21.71% w:37.01%  h:13.64% (bleeds left) -->
       <div class="photo" style="left:-2.92%; top:21.71%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-07.webp" alt="">
+        <img src="/assets/images/interior-saya-07.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-03  left:65.0%  top:23.89% w:37.01%  h:13.64% -->
       <div class="photo" style="left:65.0%; top:23.89%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-03.webp" alt="">
+        <img src="/assets/images/interior-saya-03.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-08  left:10.42% top:36.50% w:37.01%  h:13.64% -->
       <div class="photo" style="left:10.42%; top:36.50%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-08.webp" alt="">
+        <img src="/assets/images/interior-saya-08.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-06  left:54.72% top:41.0%  w:37.01%  h:13.64% -->
       <div class="photo" style="left:54.72%; top:41.0%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-06.webp" alt="">
+        <img src="/assets/images/interior-saya-06.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-14  left:6.04%  top:52.44% w:24.72%  h:20.48% -->
       <div class="photo" style="left:6.04%; top:52.44%; width:24.72%; height:20.48%;">
-        <img src="/assets/images/interior-saya-14.webp" alt="">
+        <img src="/assets/images/interior-saya-14.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-11  left:34.93% top:56.93% w:37.01%  h:13.64% -->
       <div class="photo" style="left:34.93%; top:56.93%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-11.webp" alt="">
+        <img src="/assets/images/interior-saya-11.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-13  left:76.11% top:61.54% w:24.65%  h:20.48% -->
       <div class="photo" style="left:76.11%; top:61.54%; width:24.65%; height:20.48%;">
-        <img src="/assets/images/interior-saya-13.webp" alt="">
+        <img src="/assets/images/interior-saya-13.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-10  left:24.51% top:71.73% w:24.65%  h:20.48% -->
       <div class="photo" style="left:24.51%; top:71.73%; width:24.65%; height:20.48%;">
-        <img src="/assets/images/interior-saya-10.webp" alt="">
+        <img src="/assets/images/interior-saya-10.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-12  left:53.54% top:74.03% w:24.65%  h:20.48% -->
       <div class="photo" style="left:53.54%; top:74.03%; width:24.65%; height:20.48%;">
-        <img src="/assets/images/interior-saya-12.webp" alt="">
+        <img src="/assets/images/interior-saya-12.webp" alt="" loading="lazy">
       </div>
 
       <!-- saya-09  left:0%     top:88.0%  w:37.01%  h:13.64% -->
       <div class="photo" style="left:0%; top:86.36%; width:37.01%; height:13.64%;">
-        <img src="/assets/images/interior-saya-09.webp" alt="Saya's Room">
+        <img src="/assets/images/interior-saya-09.webp" alt="Saya's Room" loading="lazy">
       </div>
 
       <!-- ── Mobile variant (Figma 7095:1212 → Saya) ─────────────── -->
@@ -381,46 +380,46 @@
 
           <!-- DOM order: Saya-1 (bottom of pile) → Saya-14 (top) -->
           <div class="swipe-card" style="left:2.58%; top:18.16%; width:94.85%; aspect-ratio:400/267;">
-            <img src="/assets/images/interior-saya-01.webp" alt="">
+            <img src="/assets/images/interior-saya-01.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:16.03%; top:3.85%; width:68.18%; aspect-ratio:287.568/413.426;">
-            <img src="/assets/images/interior-saya-02.webp" alt="">
+            <img src="/assets/images/interior-saya-02.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:3.14%; top:17.32%; width:95.93%; aspect-ratio:404.599/273.940;">
-            <img src="/assets/images/interior-saya-03.webp" alt="">
+            <img src="/assets/images/interior-saya-03.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:4.90%; top:14.89%; width:99.03%; aspect-ratio:417.651/294.252;">
-            <img src="/assets/images/interior-saya-04.webp" alt="">
+            <img src="/assets/images/interior-saya-04.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:15.23%; top:4.46%; width:69.77%; aspect-ratio:294.252/417.651;">
-            <img src="/assets/images/interior-saya-05.webp" alt="">
+            <img src="/assets/images/interior-saya-05.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:5.52%; top:14.10%; width:100%; aspect-ratio:421.748/300.846;">
-            <img src="/assets/images/interior-saya-06.webp" alt="">
+            <img src="/assets/images/interior-saya-06.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:0.99%; top:20.71%; width:98.03%; aspect-ratio:413.426/287.568;">
-            <img src="/assets/images/interior-saya-07.webp" alt="">
+            <img src="/assets/images/interior-saya-07.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:4.30%; top:15.69%; width:98.03%; aspect-ratio:413.426/287.568;">
-            <img src="/assets/images/interior-saya-08.webp" alt="">
+            <img src="/assets/images/interior-saya-08.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:17.64%; top:2.68%; width:64.95%; aspect-ratio:273.940/404.599;">
-            <img src="/assets/images/interior-saya-09.webp" alt="">
+            <img src="/assets/images/interior-saya-09.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:4.30%; top:15.69%; width:98.03%; aspect-ratio:413.426/287.568;">
-            <img src="/assets/images/interior-saya-10.webp" alt="">
+            <img src="/assets/images/interior-saya-10.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:16.83%; top:3.26%; width:66.58%; aspect-ratio:280.797/409.075;">
-            <img src="/assets/images/interior-saya-11.webp" alt="">
+            <img src="/assets/images/interior-saya-11.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:19.30%; top:1.56%; width:64.95%; aspect-ratio:273.940/404.599;">
-            <img src="/assets/images/interior-saya-12.webp" alt="">
+            <img src="/assets/images/interior-saya-12.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:21.85%; top:0%; width:69.77%; aspect-ratio:294.252/417.651;">
-            <img src="/assets/images/interior-saya-13.webp" alt="">
+            <img src="/assets/images/interior-saya-13.webp" alt="" loading="lazy">
           </div>
           <div class="swipe-card" style="left:2.03%; top:18.76%; width:96.02%; aspect-ratio:404.960/273.947;">
-            <img src="/assets/images/interior-saya-14.webp" alt="">
+            <img src="/assets/images/interior-saya-14.webp" alt="" loading="lazy">
           </div>
 
           <div class="project-stickers">
@@ -439,35 +438,37 @@
     <!-- ── The Living Room ───────────────────────────────────────────── -->
     <div class="project-section" style="aspect-ratio: 1440 / 1838;">
 
-      <!-- 1  left:42.50% top:0%     w:37.01% h:19.31% -->
-      <div class="placeholder" style="left:42.50%; top:0%;    width:37.01%; height:19.31%;"></div>
+      <!-- 1: KT_Livingroom Container_Hover (7086:1444) — only flip in this block per Figma -->
+      <div class="photo-card" style="left:42.50%; top:0%;    width:37.01%; height:19.31%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front photo-card-front--placeholder" aria-hidden="true"></div>
+          <div class="photo-card-back">
+            <h3 class="card-title">THE LIVING ROOM</h3>
+            <p class="card-body">A minimalist living room built around a lava lamp mural that spills across every surface. Eccentric, layered, and somehow completely coherent.</p>
+            <div class="card-tags">
+              <span class="card-tag">Residential Interior</span>
+              <span class="card-tag">Creative Direction</span>
+              <span class="card-tag">Design</span>
+              <span class="card-tag">Installation</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- 2  left:5.35%  top:9.79%  w:24.65% h:29.0% -->
+      <!-- 2–8: checkerboard only (Figma — flip only on KT_Livingroom Container_Hover) -->
       <div class="placeholder" style="left:5.35%;  top:9.79%; width:24.65%; height:29.0%;"></div>
-
-      <!-- 3  left:75.35% top:13.06% w:24.65% h:29.0% -->
       <div class="placeholder" style="left:75.35%; top:13.06%; width:24.65%; height:29.0%;"></div>
-
-      <!-- 4  left:36.25% top:24.21% w:37.01% h:19.31% -->
       <div class="placeholder" style="left:36.25%; top:24.21%; width:37.01%; height:19.31%;"></div>
-
-      <!-- 5  left:20.83% top:45.16% w:37.01% h:19.31% -->
       <div class="placeholder" style="left:20.83%; top:45.16%; width:37.01%; height:19.31%;"></div>
-
-      <!-- 6  left:66.18% top:48.42% w:24.65% h:29.0% -->
       <div class="placeholder" style="left:66.18%; top:48.42%; width:24.65%; height:29.0%;"></div>
-
-      <!-- 7  left:27.08% top:67.74% w:37.01% h:19.31% -->
       <div class="placeholder" style="left:27.08%; top:67.74%; width:37.01%; height:19.31%;"></div>
-
-      <!-- 8  left:4.17%  top:71.0%  w:24.65% h:29.0% -->
       <div class="placeholder" style="left:4.17%;  top:71.0%;  width:24.65%; height:29.0%;"></div>
 
       <!-- ── Mobile variant (Figma 7095:1212 → Living Room) ──────── -->
       <div class="project-mobile" data-project="livingroom">
         <div class="stack-description">
           <h3 class="card-title">THE LIVING ROOM</h3>
-          <p class="card-body">Where the day lands. A room that works for quiet mornings, long dinners, and every mood in between.</p>
+          <p class="card-body">A minimalist living room built around a lava lamp mural that spills across every surface. Eccentric, layered, and somehow completely coherent.</p>
           <div class="card-tags">
             <span class="card-tag">Residential Interior</span>
             <span class="card-tag">Creative Direction</span>
@@ -503,35 +504,37 @@
     <!-- ── The Bedroom ───────────────────────────────────────────────── -->
     <div class="project-section" style="aspect-ratio: 1440 / 1713; margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));">
 
-      <!-- 1  left:36.25% top:0%     w:37.01% h:20.72% -->
-      <div class="placeholder" style="left:36.25%; top:0%;     width:37.01%; height:20.72%;"></div>
+      <!-- 1: KT_Bedroom Container_Hover (7086:1455) — only flip in this block per Figma -->
+      <div class="photo-card" style="left:36.25%; top:0%;     width:37.01%; height:20.72%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front photo-card-front--placeholder" aria-hidden="true"></div>
+          <div class="photo-card-back">
+            <h3 class="card-title">THE BEDROOM</h3>
+            <p class="card-body">A color-drenched retreat. Lush, vibrant, and deeply relaxing, the kind of bedroom you don't want to leave.</p>
+            <div class="card-tags">
+              <span class="card-tag">Residential Interior</span>
+              <span class="card-tag">Creative Direction</span>
+              <span class="card-tag">Design</span>
+              <span class="card-tag">Installation</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <!-- 2  left:75.35% top:1.75%  w:24.65% h:31.11% -->
+      <!-- 2–8: checkerboard only -->
       <div class="placeholder" style="left:75.35%; top:1.75%;  width:24.65%; height:31.11%;"></div>
-
-      <!-- 3  left:0%     top:31.46% w:37.01% h:20.72% -->
       <div class="placeholder" style="left:0%;     top:31.46%; width:37.01%; height:20.72%;"></div>
-
-      <!-- 4  left:58.82% top:29.48% w:37.01% h:20.72% -->
       <div class="placeholder" style="left:58.82%; top:29.48%; width:37.01%; height:20.72%;"></div>
-
-      <!-- 5  left:32.08% top:35.43% w:24.65% h:31.11% -->
       <div class="placeholder" style="left:32.08%; top:35.43%; width:24.65%; height:31.11%;"></div>
-
-      <!-- 6  left:-2.08% top:55.69% w:24.65% h:31.11% (bleeds left) -->
       <div class="placeholder" style="left:-2.08%; top:55.69%; width:24.65%; height:31.11%;"></div>
-
-      <!-- 7  left:65.07% top:55.46% w:24.65% h:31.11% -->
       <div class="placeholder" style="left:65.07%; top:55.46%; width:24.65%; height:31.11%;"></div>
-
-      <!-- 8  left:30.90% top:79.22% w:37.01% h:20.72% -->
       <div class="placeholder" style="left:30.90%; top:79.22%; width:37.01%; height:20.72%;"></div>
 
       <!-- ── Mobile variant (Figma 7095:1212 → The Bedroom) ──────── -->
       <div class="project-mobile" data-project="bedroom">
         <div class="stack-description">
           <h3 class="card-title">THE BEDROOM</h3>
-          <p class="card-body">A room built for softer weather. Where the light lingers and the day slows down on purpose.</p>
+          <p class="card-body">A color-drenched retreat. Lush, vibrant, and deeply relaxing, the kind of bedroom you don't want to leave.</p>
           <div class="card-tags">
             <span class="card-tag">Residential Interior</span>
             <span class="card-tag">Creative Direction</span>
@@ -650,11 +653,13 @@
   </div><!-- /.page -->
 
   <!-- ── Monster footer wave ──────────────────────────────────────── -->
-  <div id="monster-group">
+  <div id="monster-group" class="has-mobile-monster-eyes">
     <div class="monster-area" id="monster-area">
       <img class="wave" src="/assets/monster-wave.svg" alt="">
       <svg class="monster-eyes-overlay" id="monster-eyes-svg"
-           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+           viewBox="0 0 1440 116.154"
+           preserveAspectRatio="none"
+           xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="mon-eye-r-clip">
             <path transform="translate(593.13 32.7)"
@@ -665,14 +670,45 @@
               d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
           </clipPath>
         </defs>
-        <path fill="white" transform="translate(593.13 32.7)"
-          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-        <path fill="white" transform="translate(431.49 31.57)"
-          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
-          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
-        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
-          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </g>
+      </svg>
+      <svg class="monster-eyes-overlay-mobile" id="monster-eyes-svg-mobile"
+           viewBox="0 0 440 64"
+           preserveAspectRatio="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip-m">
+            <path transform="translate(197.14 30.76)"
+              d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip-m">
+            <path transform="translate(88 30)"
+              d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          </clipPath>
+        </defs>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(197.14 30.76)"
+            d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          <circle id="mon-iris-r-m" clip-path="url(#mon-eye-r-clip-m)"
+            cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(88 30)"
+            d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          <circle id="mon-iris-l-m" clip-path="url(#mon-eye-l-clip-m)"
+            cx="142" cy="64" r="29" fill="#32261F"/>
+        </g>
       </svg>
     </div>
   </div><!-- /#monster-group -->
@@ -687,7 +723,7 @@
 
   </div><!-- /#page-scaler -->
 
-  <script src="/assets/scripts.js"></script>
+  <script src="/assets/scripts.js" defer></script>
   <script>
     // ── Skeleton constants ─────────────────────────────────────────
     const page         = document.querySelector('.page');
@@ -695,6 +731,42 @@
     const monsterArea  = document.getElementById('monster-area');
     const monIrisR     = document.getElementById('mon-iris-r');
     const monIrisL     = document.getElementById('mon-iris-l');
+    const monIrisRM    = document.getElementById('mon-iris-r-m');
+    const monIrisLM    = document.getElementById('mon-iris-l-m');
+
+    function isMonsterMobileLayout() {
+      return window.innerWidth <= 768;
+    }
+
+    function moveMobileMonsterEyes(vx, vy) {
+      if (!monIrisRM || !monIrisLM) return;
+      var wr = monsterArea.getBoundingClientRect();
+      var svgX = ((vx - wr.left) / wr.width) * 440;
+      var svgY = ((vy - wr.top) / wr.height) * 64;
+      trackIris(monIrisRM, svgX, svgY, 248.5, 62.5, 10, 3);
+      trackIris(monIrisLM, svgX, svgY, 142, 64, 10, 3);
+    }
+
+    var monsterBlinkGroups = document.querySelectorAll('#monster-area .eye-blink-group');
+    function footerMonsterBlink() {
+      monsterBlinkGroups.forEach(function (g) { g.classList.add('closing'); });
+      setTimeout(function () {
+        monsterBlinkGroups.forEach(function (g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function () {
+          monsterBlinkGroups.forEach(function (g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    function scheduleFooterMonsterBlink() {
+      setTimeout(function () {
+        footerMonsterBlink();
+        scheduleFooterMonsterBlink();
+      }, 2000 + Math.random() * 5000);
+    }
+    scheduleFooterMonsterBlink();
 
     // Pop the monster up on load — double rAF ensures the initial
     // translateY(250px) has painted before the transition fires.
@@ -728,15 +800,32 @@
       el.setAttribute('cy', restY + ny * maxY * strength);
     }
 
-    document.addEventListener('mousemove', e => {
+    // rAF-throttled monster eye tracking
+    var monRaf = 0, monMX = 0, monMY = 0;
+    function updateMonsterFrame() {
+      monRaf = 0;
+      if (isMonsterMobileLayout()) {
+        moveMobileMonsterEyes(monMX, monMY);
+        return;
+      }
       const waveTop  = getWaveTop();
       const pageRect = page.getBoundingClientRect();
-      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
-      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
-      const y = e.clientY - pageRect.top;
+      const x = ((monMX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = monMY - pageRect.top;
       trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
       trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
-    });
+    }
+    document.addEventListener('mousemove', function (e) {
+      monMX = e.clientX;
+      monMY = e.clientY;
+      if (!monRaf) monRaf = requestAnimationFrame(updateMonsterFrame);
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (!e.touches.length) return;
+      monMX = e.touches[0].clientX;
+      monMY = e.touches[0].clientY;
+      if (!monRaf) monRaf = requestAnimationFrame(updateMonsterFrame);
+    }, { passive: true });
   </script>
 
   <script>
@@ -746,8 +835,10 @@
     const draggableSelector = '.obj, .photo, .photo-rotated, .placeholder, .photo-card';
 
     document.querySelectorAll(draggableSelector).forEach(el => {
-      el.addEventListener('mouseenter', () => KT.setCursor('hover'));
-      el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      if (window.KT && window.KT.isDesktop) {
+        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
+        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      }
       
       // Ensure element doesn't scroll the page on touch
       el.style.touchAction = 'none';
@@ -759,26 +850,35 @@
         offsetY = e.clientY - rect.top;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
-        KT.setCursor('drag');
+        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
         el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
     });
 
-    document.addEventListener('pointermove', e => {
+    // rAF-throttled drag
+    var dragRaf = 0, dragMX = 0, dragMY = 0;
+    function updateDragPos() {
+      dragRaf = 0;
       if (!dragging) return;
       const parent = dragging.offsetParent;
       const parentRect = parent.getBoundingClientRect();
-      dragging.style.setProperty('left', (e.clientX - parentRect.left - offsetX) + 'px', 'important');
-      dragging.style.setProperty('top', (e.clientY - parentRect.top  - offsetY) + 'px', 'important');
-    });
+      dragging.style.setProperty('left', (dragMX - parentRect.left - offsetX) + 'px', 'important');
+      dragging.style.setProperty('top', (dragMY - parentRect.top  - offsetY) + 'px', 'important');
+    }
+    document.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dragMX = e.clientX;
+      dragMY = e.clientY;
+      if (!dragRaf) dragRaf = requestAnimationFrame(updateDragPos);
+    }, { passive: true });
 
     document.addEventListener('pointerup', e => {
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
         const under = document.elementFromPoint(e.clientX, e.clientY);
-        KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
+        if (window.KT && window.KT.isDesktop) KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
       }
     });
 
@@ -796,12 +896,22 @@
 
   <script>
     // ── Mobile swipe stacks (C4 → D3) ─────────────────────────────
-    // KT.swipeStack internally gates on touch context; safe to call on desktop.
-    if (window.KT && window.KT.swipeStack) {
-      document.querySelectorAll('.swipe-stack').forEach(function (el) {
-        window.KT.swipeStack(el);
-      });
-    }
+    // scripts.js is deferred; inline scripts run before deferred, so wait for
+    // DOMContentLoaded (fires after deferred scripts execute).
+    (function initSwipeStacks() {
+      function run() {
+        if (window.KT && window.KT.swipeStack) {
+          document.querySelectorAll('.swipe-stack').forEach(function (el) {
+            window.KT.swipeStack(el);
+          });
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
+      }
+    }());
   </script>
 
 </body>
