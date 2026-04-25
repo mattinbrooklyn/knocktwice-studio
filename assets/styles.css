@@ -933,8 +933,14 @@ body.nav-open {
 
 /* ── Mobile breakpoint (canonical: 768px) ─────────── */
 @media (max-width: 768px) {
+  /* Mobile: unify document background with About (#F7F2EC). Some routes set
+     `html, body { background: var(--color-blue) }` inline; without this,
+     overscroll, pull-to-refresh, and the safe-area behind fixed logo and
+     hamburger show blue and read as a blue “header” or blue/cream edge
+     while scrolling. !important wins over those inline rules. */
   html, body {
     font-size: 16px;
+    background: var(--color-bg) !important;
   }
   :root {
     --grid-margin:    var(--grid-margin-mobile);
