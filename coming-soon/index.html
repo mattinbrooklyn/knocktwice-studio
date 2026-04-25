@@ -457,11 +457,11 @@
 
     function scheduleWander() {
       setTimeout(function() {
-        wanderTargetX = (Math.random() - 0.5) * 36;
-        wanderTargetY = (Math.random() - 0.5) * 8;
+        wanderTargetX = (Math.random() - 0.5) * 20;
+        wanderTargetY = (Math.random() - 0.5) * 4;
         setTimeout(function() {
-          wanderTargetX = (Math.random() - 0.3) * 10;
-          wanderTargetY = (Math.random() - 0.3) * 4;
+          wanderTargetX = (Math.random() - 0.3) * 6;
+          wanderTargetY = (Math.random() - 0.3) * 2.5;
           scheduleWander();
         }, 1000 + Math.random() * 1500);
       }, 2000 + Math.random() * 4000);
@@ -485,8 +485,9 @@
       var dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
       var s = Math.min(dist / 300, 1);
-      el.setAttribute('cx', restX + (dx / dist) * maxX * s);
-      el.setAttribute('cy', restY + (dy / dist) * maxY * s);
+      var kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + (dx / dist) * maxX * kx * s);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * ky * s);
     }
 
     document.addEventListener('mousemove', function(e) {

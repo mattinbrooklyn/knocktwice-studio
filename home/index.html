@@ -920,8 +920,9 @@
       const dist = Math.sqrt(dx * dx + dy * dy);
       if (dist < 1) { el.setAttribute('cx', restX); el.setAttribute('cy', restY); return; }
       const strength = Math.min(dist / 200, 1);
-      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
-      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+      const kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + (dx / dist) * maxX * kx * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * ky * strength);
     }
 
     // rAF-throttled monster eye tracking
@@ -1005,6 +1006,14 @@
       allEyeControllers.forEach(function (c) { c.resume(); });
     }
 
+    // Tighter vertical than horizontal travel (~2–5px pupil–sclera margin; Figma Animated Eyes).
+    function furnitureEyeVerticalRange(horizRange) {
+      var margin = 3.5;
+      var v = horizRange - margin;
+      if (v > 0) return v;
+      return Math.max(horizRange * 0.4, 0.8);
+    }
+
     function animateFurnitureEyes(cfg) {
       var irisL  = cfg.irisL,  irisR  = cfg.irisR;
       var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
@@ -1020,10 +1029,12 @@
         var mag   = Math.random();
         var dx    = Math.cos(angle) * mag;
         var dy    = Math.sin(angle) * mag;
+        var rYL   = furnitureEyeVerticalRange(rangeL);
+        var rYR   = furnitureEyeVerticalRange(rangeR);
         irisL.setAttribute('cx', restL.x + dx * rangeL);
-        irisL.setAttribute('cy', restL.y + dy * rangeL);
+        irisL.setAttribute('cy', restL.y + dy * rYL);
         irisR.setAttribute('cx', restR.x + dx * rangeR);
-        irisR.setAttribute('cy', restR.y + dy * rangeR);
+        irisR.setAttribute('cy', restR.y + dy * rYR);
         lookTimer = setTimeout(look, 3000 + Math.random() * 3000);
       }
 
@@ -1165,8 +1176,9 @@
         if (dist < 1) { wmIris.setAttribute('cx', restX); wmIris.setAttribute('cy', restY); return; }
 
         var strength = Math.min(dist / 400, 1);
-        wmIris.setAttribute('cx', restX + (dx / dist) * maxX * strength);
-        wmIris.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+        var wkx = 0.55, wky = 0.28;
+        wmIris.setAttribute('cx', restX + (dx / dist) * maxX * strength * wkx);
+        wmIris.setAttribute('cy', restY + (dy / dist) * maxY * strength * wky);
       }
       document.addEventListener('mousemove', function (e) {
         wmMX = e.clientX;

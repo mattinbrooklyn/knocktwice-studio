@@ -220,9 +220,9 @@
       const ny = dy / dist;
       const maxR     = 1 / Math.sqrt((nx / MAX_X) ** 2 + (ny / MAX_Y) ** 2);
       const strength = Math.min(dist / 60, 1);
-
-      tx = nx * maxR * strength;
-      ty = ny * maxR * strength;
+      const kx = 0.55, ky = 0.28;
+      tx = nx * maxR * strength * kx;
+      ty = ny * maxR * strength * ky;
     }
 
     document.addEventListener('mousemove', e => {

@@ -731,8 +731,9 @@
         return;
       }
       const strength = Math.min(dist / 200, 1);
-      el.setAttribute('cx', restX + (dx / dist) * maxX * strength);
-      el.setAttribute('cy', restY + (dy / dist) * maxY * strength);
+      const kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + (dx / dist) * maxX * kx * strength);
+      el.setAttribute('cy', restY + (dy / dist) * maxY * ky * strength);
     }
 
     const monIrisR = document.getElementById('mon-iris-r');

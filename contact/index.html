@@ -547,8 +547,9 @@
       const nx = dx / dist;
       const ny = dy / dist;
       const strength = Math.min(dist / 200, 1);
-      el.setAttribute('cx', restX + nx * maxX * strength);
-      el.setAttribute('cy', restY + ny * maxY * strength);
+      const kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + nx * maxX * kx * strength);
+      el.setAttribute('cy', restY + ny * maxY * ky * strength);
     }
 
     // Monster wave — viewBox 1440×116.154 (desktop) / 440×64 (mobile)

@@ -508,6 +508,7 @@
 
     // Moves an SVG circle toward the cursor within an elliptical envelope.
     // restX/Y: resting center in SVG units. maxX/Y: max travel in SVG units.
+    // kx/ky: keep pupil mass inside sclera (Figma Animated Eyes).
     function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
       const dx = localX - restX;
       const dy = localY - restY;
@@ -520,8 +521,10 @@
       const nx = dx / dist;
       const ny = dy / dist;
       const strength = Math.min(dist / 200, 1);
-      el.setAttribute('cx', restX + nx * maxX * strength);
-      el.setAttribute('cy', restY + ny * maxY * strength);
+      const kx = 0.55;
+      const ky = 0.28;
+      el.setAttribute('cx', restX + nx * maxX * kx * strength);
+      el.setAttribute('cy', restY + ny * maxY * ky * strength);
     }
 
     // Monster wave — SVG viewBox 0 0 1440 116, wave div top at canvas y:1000
@@ -540,6 +543,14 @@
     }
 
     // ── Object eye animation ───────────────────────────────────────
+    // Tighter vertical than horizontal travel (~2–5px margin; Figma Animated Eyes).
+    function furnitureEyeVerticalRange(horizRange) {
+      var margin = 3.5;
+      var v = horizRange - margin;
+      if (v > 0) return v;
+      return Math.max(horizRange * 0.4, 0.8);
+    }
+
     function animateFurnitureEyes(cfg) {
       var irisL  = cfg.irisL,  irisR  = cfg.irisR;
       var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
@@ -551,10 +562,12 @@
         var mag   = Math.random();
         var dx    = Math.cos(angle) * mag;
         var dy    = Math.sin(angle) * mag;
+        var rYL   = furnitureEyeVerticalRange(rangeL);
+        var rYR   = furnitureEyeVerticalRange(rangeR);
         irisL.setAttribute('cx', restL.x + dx * rangeL);
-        irisL.setAttribute('cy', restL.y + dy * rangeL);
+        irisL.setAttribute('cy', restL.y + dy * rYL);
         irisR.setAttribute('cx', restR.x + dx * rangeR);
-        irisR.setAttribute('cy', restR.y + dy * rangeR);
+        irisR.setAttribute('cy', restR.y + dy * rYR);
         setTimeout(look, 3000 + Math.random() * 3000);
       }
 
