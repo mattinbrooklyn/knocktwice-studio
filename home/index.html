@@ -141,6 +141,17 @@
       pointer-events: none;
     }
     .home-monster-ticker-mobile svg { display: block; }
+    /* Ticker + overflow: only when easter egg is on (or sliding away). The ticker sits
+       above the wave (absolute, tall); with overflow:visible and translateY(100%), that
+       arch can still paint in the viewport before the empty state — so clip + hide text. */
+    #home-monster:not(.is-visible):not(.is-hiding) {
+      overflow: hidden;
+    }
+    #home-monster:not(.is-visible):not(.is-hiding) .home-monster-ticker,
+    #home-monster:not(.is-visible):not(.is-hiding) .home-monster-ticker-mobile {
+      visibility: hidden;
+      opacity: 0;
+    }
     #home-monster .home-monster-area {
       position: relative;
       width: 100%;
@@ -161,9 +172,15 @@
       top: 0; left: 0;
       width: 100%;
       height: 100%;
-      display: block;
       pointer-events: none;
       overflow: visible;
+    }
+    /* Desktop: only 1440×116 eyes — do not set mobile overlay to block (would stack two pairs). */
+    #home-monster .home-monster-area .monster-eyes-overlay {
+      display: block;
+    }
+    #home-monster .home-monster-area .monster-eyes-overlay-mobile {
+      display: none;
     }
     #home-monster .monster-fill {
       width: 100%;
