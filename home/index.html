@@ -96,35 +96,74 @@
       pointer-events: none;
       transform: translateY(100%);
       transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
-      /* Flex column: removes any block-level gap between the SVG and the
-         fill div. On mobile, height:auto on SVG has cross-browser sizing
-         quirks; flex + aspect-ratio is the reliable fix. */
+      /* Flex: wave stack + blue fill; matches About modal foot (rem-height wave + tickers). */
       display: flex;
       flex-direction: column;
     }
     /* Above home footer (600), below .logo / .nav (1000) so clicks hit the monster */
+    /* Risen: not as high as 15% — closer to About newsletter / modal wave band */
     #home-monster.is-visible {
       z-index: 650;
-      transform: translateY(15%);
+      transform: translateY(40%);
       pointer-events: auto;
       cursor: pointer;
     }
     #home-monster.is-hiding   { transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* Ticker: startOffset via chained setTimeout at ~60/24 Hz (not 60Hz rAF).
-       font-variation-settings omitted on ticker text — ELGR/ELSH axes
-       force per-glyph OpenType reshaping on every update. */
-    #home-monster .monster-area {
+    /* About modal monster layout: fixed wave strip + separate desktop/mobile tickers
+       (see about/index.html .monster-ticker / .monster-ticker-mobile / .monster-area). */
+    #home-monster .home-monster-stack {
+      position: relative;
       width: 100%;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+    .home-monster-ticker {
+      position: absolute;
+      bottom: calc(100% - 96px);
+      left: 0;
+      width: 100%;
+      height: 156px;
+      overflow: hidden;
+      z-index: 6;
+      pointer-events: none;
+    }
+    .home-monster-ticker svg { display: block; }
+    .home-monster-ticker-mobile {
+      display: none;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: calc(var(--wave-height-mobile) + 20px);
+      overflow: hidden;
+      z-index: 7;
+      pointer-events: none;
+    }
+    .home-monster-ticker-mobile svg { display: block; }
+    #home-monster .home-monster-area {
+      position: relative;
+      width: 100%;
+      height: var(--wave-height-desktop);
       line-height: 0;
       flex-shrink: 0;
     }
-    #home-monster .monster-area svg {
+    #home-monster .home-monster-area img.wave {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       display: block;
+      pointer-events: none;
+    }
+    #home-monster .home-monster-area .monster-eyes-overlay,
+    #home-monster .home-monster-area .monster-eyes-overlay-mobile {
+      position: absolute;
+      top: 0; left: 0;
       width: 100%;
-      /* aspect-ratio replaces height:auto — explicit intrinsic ratio avoids
-         the mobile cross-browser SVG sizing ambiguity that caused the gap. */
-      aspect-ratio: 1440 / 181.154;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+      overflow: visible;
     }
     #home-monster .monster-fill {
       width: 100%;
@@ -240,25 +279,19 @@
         max-height: calc(100vh - 56px);
         height: calc(100dvh - 56px);
         max-height: calc(100dvh - 56px);
+        /* Slightly lower band than desktop — same idea as About wave-risen on small viewports */
+        transform: translateY(44%);
       }
-      /* Wave strip stays at the *top* of the overlay (curve meets the page). flex-end
-         pinned it to the bottom of this row — only the straight SVG baseline showed at
-         the top → looked like a flat cut. */
-      #home-monster .monster-area {
-        display: block;
+      .home-monster-ticker { display: none; }
+      .home-monster-ticker-mobile { display: block; }
+      #home-monster .home-monster-area {
+        height: var(--wave-height-mobile) !important;
         overflow: hidden;
         line-height: 0;
         background: transparent;
         flex: 0 0 auto;
       }
-      #home-monster .monster-area svg {
-        display: block;
-        width: 100%;
-        height: auto;
-        aspect-ratio: 1440 / 181.154;
-        /* ~55px for 440px design width — do not cap height or the wave flattens/clips */
-        max-height: none;
-      }
+      #home-monster .home-monster-area img.wave { object-fit: fill; }
       #home-monster .monster-fill {
         flex: 1 1 auto;
         min-height: 0;
@@ -268,61 +301,85 @@
 </head>
 <body class="home">
 
-  <!-- Monster easter egg — rises when all furniture is off-screen -->
+  <!-- Monster easter egg — same layout as About #monster-group (modal up): rem wave + tickers. -->
   <div id="home-monster">
-    <!-- Single combined SVG: wave fill + eyes + ticker text all in one coordinate space.
-         viewBox is 1440×181.154 — wave arch spans y=156.154 at the sides up to y=40
-         at the peak, leaving 40px for the ticker text to ride the crest.
-         Ticker uses startOffset animation (the correct tool for arch-following text).
-         Font-variation-settings removed from the ticker only — ELGR/ELSH custom axes
-         trigger per-glyph OpenType reshaping every frame; dropping them is the largest
-         single perf win without changing the visual approach. Handjet at default axes
-         still reads correctly. 12 reps (was 18) reduces total glyph count by 33%. -->
-    <div class="monster-area">
-      <svg id="home-monster-eyes-svg"
-           viewBox="0 0 1440 181.154"
-           xmlns="http://www.w3.org/2000/svg"
-           preserveAspectRatio="xMidYMin meet">
-        <defs>
-          <!-- 3-tile path required for startOffset animation headroom.
-               Text starts at 33.333% (= tile 2, the viewport arch) and
-               scrolls to 0% over 30s. Both tiles are identical arch shapes
-               so the loop restart is visually seamless. -->
-          <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-          <clipPath id="home-mon-eye-r-clip">
-            <path transform="translate(593.13 97.7)"
-              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          </clipPath>
-          <clipPath id="home-mon-eye-l-clip">
-            <path transform="translate(431.49 96.57)"
-              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          </clipPath>
-        </defs>
-
-        <!-- Wave fill -->
-        <path fill="#378CDA"
-          d="M0 181.154 C0 181.154 263 65 574.834 65 C862.5 65 1440 181.154 1440 181.154 Z"/>
-
-        <g class="eye-blink-group">
-          <path fill="#F7F2EC" transform="translate(593.13 97.7)"
-            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
-          <circle id="home-mon-iris-r" clip-path="url(#home-mon-eye-r-clip)"
-            cx="652.9" cy="114.45" r="30" fill="#32261F"/>
-        </g>
-        <g class="eye-blink-group">
-          <path fill="#F7F2EC" transform="translate(431.49 96.57)"
-            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
-          <circle id="home-mon-iris-l" clip-path="url(#home-mon-eye-l-clip)"
-            cx="495.41" cy="114.46" r="30" fill="#32261F"/>
-        </g>
-
-        <!-- Ticker: setTimeout-driven startOffset; font-variation-settings omitted. -->
-        <text font-family="Handjet, sans-serif" font-size="22" font-weight="400"
-              fill="#51B18C" letter-spacing="-0.22">
-          <textPath id="home-ticker-textpath" href="#home-wave-text-path" startOffset="33.333%">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   </textPath>
-        </text>
-      </svg>
-    </div>
+    <div class="home-monster-stack" id="home-monster-stack">
+      <div class="home-monster-ticker" aria-hidden="true">
+        <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
+                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+          </text>
+        </svg>
+      </div>
+      <div class="home-monster-ticker-mobile" aria-hidden="true">
+        <svg width="100%" height="100%" viewBox="0 0 440 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <path id="home-wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
+          </defs>
+          <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
+                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
+            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
+          </text>
+        </svg>
+      </div>
+      <div class="home-monster-area" id="home-monster-area">
+        <img class="wave" src="/assets/monster-wave.svg" alt="">
+          <svg id="home-monster-eyes-svg" class="monster-eyes-overlay"
+               viewBox="0 0 1440 116.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="home-hm-eye-r-clip">
+                <path transform="translate(593.13 32.7)"
+                  d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+              </clipPath>
+              <clipPath id="home-hm-eye-l-clip">
+                <path transform="translate(431.49 31.57)"
+                  d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+              </clipPath>
+            </defs>
+            <g class="eye-blink-group">
+              <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+              <circle id="home-mon-iris-r" clip-path="url(#home-hm-eye-r-clip)"
+                cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+            </g>
+            <g class="eye-blink-group">
+              <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+              <circle id="home-mon-iris-l" clip-path="url(#home-hm-eye-l-clip)"
+                cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+            </g>
+          </svg>
+          <svg id="home-monster-eyes-svg-mobile" class="monster-eyes-overlay-mobile"
+               viewBox="0 0 440 64" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <clipPath id="home-hm-eye-r-clip-m">
+                <path transform="translate(197.14 30.76)"
+                  d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+              </clipPath>
+              <clipPath id="home-hm-eye-l-clip-m">
+                <path transform="translate(88 30)"
+                  d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+              </clipPath>
+            </defs>
+            <g class="eye-blink-group">
+              <path fill="#F7F2EC" transform="translate(197.14 30.76)"
+                d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+              <circle id="home-mon-iris-r-m" clip-path="url(#home-hm-eye-r-clip-m)"
+                cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+            </g>
+            <g class="eye-blink-group">
+              <path fill="#F7F2EC" transform="translate(88 30)"
+                d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+              <circle id="home-mon-iris-l-m" clip-path="url(#home-hm-eye-l-clip-m)"
+                cx="142" cy="64" r="29" fill="#32261F"/>
+            </g>
+          </svg>
+        </div>
+      </div>
     <div class="monster-fill"></div>
   </div>
 
@@ -742,6 +799,9 @@
     const homeMonster   = document.getElementById('home-monster');
     const homeMonIrisR  = document.getElementById('home-mon-iris-r');
     const homeMonIrisL  = document.getElementById('home-mon-iris-l');
+    const homeMonIrisRM = document.getElementById('home-mon-iris-r-m');
+    const homeMonIrisLM = document.getElementById('home-mon-iris-l-m');
+    const homeMonsterArea = document.getElementById('home-monster-area');
 
     // Store original furniture positions for reset (desktop: inline Figma attrs).
     // Mobile layout uses @media !important; el.style only sees HTML inline, so
@@ -778,11 +838,9 @@
       // Pause / resume furniture eye timers to avoid wasted work
       if (allOff && !wasShowing) {
         pauseAllEyeAnimations();
-        startTickerAnim();
         scheduleHomeMonsterBlink();
       } else if (!allOff && wasShowing) {
         resumeAllEyeAnimations();
-        stopTickerAnim();
         stopHomeMonsterBlink();
       }
     }
@@ -793,52 +851,7 @@
       checkMonsterTrigger();
     });
 
-    // ─── Ticker animation — setTimeout at tickerFrameMs (not 60Hz rAF pump) ─
-    // Driving startOffset via JS. Chained setTimeout matches wake rate to
-    // tickerFrameMs (~24 fps mobile, ~60 fps desktop) with zero rAF cost when off.
-    var tickerPath      = document.getElementById('home-ticker-textpath');
-    var tickerRunning   = false;
-    var tickerOffset    = 1 / 3;   // starts at 33.333% (viewport arch position)
-    var tickerLastTime    = 0;
-    var tickerTimeoutId   = 0;
-    var isMobileCtx     = window.innerWidth <= 768;
-    var tickerFrameMs   = isMobileCtx ? 1000 / 24 : 1000 / 60;
-    var tickerSpeed      = (1 / 3) / 30;  // fractional offset per second
-
-    function tickerStep() {
-      if (!tickerRunning) return;
-      tickerTimeoutId = 0;
-      var now = performance.now();
-      if (tickerLastTime === 0) {
-        tickerLastTime = now;
-      } else {
-        var elapsed = now - tickerLastTime;
-        tickerLastTime = now;
-        tickerOffset -= tickerSpeed * (elapsed / 1000);
-        if (tickerOffset < 0) tickerOffset += 1 / 3;
-        if (tickerPath) {
-          tickerPath.setAttribute('startOffset',
-            (tickerOffset * 100).toFixed(3) + '%');
-        }
-      }
-      if (tickerRunning) {
-        tickerTimeoutId = setTimeout(tickerStep, tickerFrameMs);
-      }
-    }
-
-    function startTickerAnim() {
-      if (tickerRunning) return;
-      tickerRunning = true;
-      tickerLastTime = 0;
-      tickerStep();
-    }
-    function stopTickerAnim() {
-      tickerRunning = false;
-      if (tickerTimeoutId) {
-        clearTimeout(tickerTimeoutId);
-        tickerTimeoutId = 0;
-      }
-    }
+    // Ticker: SMIL <animate> on textPath (same 30s / 18s as About modal).
 
     // ─── Reset furniture when monster is clicked ──────────────────
     function resetFurniture() {
@@ -861,7 +874,6 @@
       monsterShowing = false;
       homeMonster.classList.add('is-hiding');
       homeMonster.classList.remove('is-visible');
-      stopTickerAnim();
       // Strip the fast-hide override once it's offscreen so the next reveal
       // uses the slow 3s dramatic rise.
       setTimeout(function () { homeMonster.classList.remove('is-hiding'); }, 650);
@@ -898,20 +910,35 @@
     var monRaf = 0, monMX = 0, monMY = 0;
     function updateMonsterEyes() {
       monRaf = 0;
+      // Mobile: same 440×64 mapping as About / footer (wave strip rect).
+      if (window.innerWidth <= 768) {
+        if (!homeMonIrisRM || !homeMonIrisLM || !homeMonsterArea) return;
+        const wr = homeMonsterArea.getBoundingClientRect();
+        if (!wr.width || !wr.height) return;
+        const svgX = ((monMX - wr.left) / wr.width) * 440;
+        const svgY = ((monMY - wr.top) / wr.height) * 64;
+        trackMonsterIris(homeMonIrisRM, svgX, svgY, 248.5, 62.5, 10, 3);
+        trackMonsterIris(homeMonIrisLM, svgX, svgY, 142, 64, 10, 3);
+        return;
+      }
+      // Desktop: eyes layer viewBox 1440×116.154 (matches About rest positions).
       const eyesSvg = document.getElementById('home-monster-eyes-svg');
-      if (!eyesSvg) return;
+      if (!eyesSvg || !homeMonIrisR || !homeMonIrisL) return;
       const r    = eyesSvg.getBoundingClientRect();
+      if (!r.width || !r.height) return;
       const svgX = (monMX - r.left) / r.width  * 1440;
-      const svgY = (monMY - r.top)  / r.height * 181.154;
-      trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  114.45, 20, 5);
-      trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 114.46, 20, 5);
+      const svgY = (monMY - r.top)  / r.height * 116.154;
+      trackMonsterIris(homeMonIrisR, svgX, svgY, 652.9,  49.45, 20, 5);
+      trackMonsterIris(homeMonIrisL, svgX, svgY, 495.41, 49.46, 20, 5);
     }
     document.addEventListener('mousemove', function(e) {
+      if (document.hidden) return;
       monMX = e.clientX;
       monMY = e.clientY;
       if (!monRaf) monRaf = requestAnimationFrame(updateMonsterEyes);
     }, { passive: true });
     document.addEventListener('touchmove', function(e) {
+      if (document.hidden) return;
       if (!e.touches.length) return;
       monMX = e.touches[0].clientX;
       monMY = e.touches[0].clientY;

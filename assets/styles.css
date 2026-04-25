@@ -966,8 +966,10 @@ body.nav-open {
     height: 1.375rem; /* 22px */
   }
 
-  .monster-area {
-    /* height: var(--wave-height-mobile) !important; */
+  /* Figma mobile wave strip: 440×64 — same as About. Without this, .monster-area
+     stays at --wave-height-desktop and the 1440×116 wave + 440×64 eyes stretch wrong. */
+  #monster-group .monster-area {
+    height: var(--wave-height-mobile) !important;
   }
 
   #monster-group.has-mobile-monster-eyes #monster-eyes-svg {
@@ -985,6 +987,14 @@ body.nav-open {
     transform: none;
     opacity: 1;
     transition: opacity 80ms linear;
+  }
+
+  /* Home easter egg: same desktop/mobile eye swap as footer */
+  #home-monster #home-monster-eyes-svg {
+    display: none;
+  }
+  #home-monster #home-monster-eyes-svg-mobile {
+    display: block;
   }
 
   #home-monster .eye-blink-group.closing {
