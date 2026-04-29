@@ -83,6 +83,10 @@
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
   --footer-height:         6.25vw;
+  /* Mobile footer blue bar — Figma 56px tall (not vw; vw was ~23px on phones). */
+  --footer-height-mobile:  3.5rem;
+  /* Horizontal inset: desktop matches nav (40px); mobile matches Figma page margin (20px). */
+  --footer-pad-x:          var(--nav-left);
   --wave-height-mobile:    4rem;
   --wave-height-desktop:   6.875rem;
   --input-height:          3.4375rem;
@@ -642,16 +646,15 @@ body.nav-open {
   background: var(--color-blue);
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--footer-pad-x);
   z-index: 100;
 }
 .footer-icons {
-  position: absolute;
-  left: var(--nav-left);
-  top: 50%;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  flex-shrink: 0;
 }
 .footer-icons a {
   display: flex;
@@ -665,10 +668,7 @@ body.nav-open {
   display: block;
 }
 .footer-copyright {
-  position: absolute;
-  right: var(--nav-left);
-  top: 50%;
-  transform: translateY(-50%);
+  flex-shrink: 0;
   font-family: var(--font-ui);
   font-size: var(--type-field);
   font-weight: 400;
@@ -945,20 +945,79 @@ body.nav-open {
 
 /* ── Mobile breakpoint (canonical: 768px) ─────────── */
 @media (max-width: 768px) {
-  /* Mobile: unify document background with About (#F7F2EC). Some routes set
-     `html, body { background: var(--color-blue) }` inline; without this,
-     overscroll, pull-to-refresh, and the safe-area behind fixed logo and
-     hamburger show blue and read as a blue “header” or blue/cream edge
-     while scrolling. !important wins over those inline rules. */
-  html, body {
+  /* ── Overscroll split (Safari/mobile): ──────────────────────────────────
+     - html = cream (#F7F2EC): top rubber-band stays on-brand without painting
+       body globally blue (which would tint top bounce too).
+     - body stays transparent — inline routes that set blue body backgrounds lose
+       to `transparent !important` so overscroll behaves consistently.
+     - Fixed body::after = footer blue in lower half viewport; bottom bounce reveals it.
+     - #page-scaler sits above the wash so normal content/footer still read cream/blue bars. */
+  html {
     font-size: 16px;
     background: var(--color-bg) !important;
+  }
+  body {
+    font-size: 16px;
+    background: transparent !important;
+    position: relative;
+    isolation: isolate;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 50vh;
+    background: var(--color-blue);
+    z-index: 0;
+    pointer-events: none;
+  }
+  #page-scaler {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+    min-height: 100vh;
   }
   :root {
     --grid-margin:    var(--grid-margin-mobile);
     --content-left: var(--content-left-mobile);
     --content-width: var(--content-width-mobile);
+    --footer-height: var(--footer-height-mobile);
+    --footer-pad-x:  var(--content-left-mobile);
+    /* Total depth from viewport bottom reserved for footer + home-indicator inset. */
+    --footer-stack-height: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
   }
+  /* Wave / modal stack: anchor to full footer footprint (56px band + safe area). !important overrides per-page `<style>` bottom rules on mobile only. */
+  #monster-group {
+    bottom: var(--footer-stack-height) !important;
+  }
+
+  /* Footer grid + safe-area: fills home-indicator row with brand blue. Bottom
+     rubber-band pulls use `body::after` (see mobile base block), not global blue `body`. */
+  .footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: var(--footer-height) env(safe-area-inset-bottom, 0px);
+    justify-content: unset;
+    align-items: center;
+    height: auto;
+    min-height: var(--footer-stack-height);
+    box-sizing: border-box;
+  }
+  .footer-icons {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    justify-self: start;
+  }
+  .footer-copyright {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+  }
+
   .nav { display: none; }
 
   /* Mobile header (Figma 440-wide spec):

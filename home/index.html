@@ -263,14 +263,6 @@
         width: 281px !important;
         height: 172px !important;
       }
-      /* Mobile: keep footer pinned to the viewport (desktop reveals
-         it on scroll, but mobile has no hover-reveal affordance). */
-      body.home .footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
       /* Figma 7052:86 dresser top 483 */
       .furniture.dresser {
         left: 102px !important;
@@ -279,24 +271,32 @@
         height: 190px !important;
       }
 
+      /* Mobile: keep footer pinned to the viewport (desktop reveals
+         it on scroll, but mobile has no hover-reveal affordance).
+         Shares global `--footer-stack-height` (56px band + safe-area inset). */
+      body.home .footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: auto;
+        min-height: var(--footer-stack-height);
+        z-index: 800;
+      }
+
       /* ── Monster empty state (Figma 7053:1258) ───────────────────
          No solid background on #home-monster / .monster-area: the wave SVG
          has transparent “sky” above the path — if the parent is blue, that
          area reads as flat blue; cream must show through for the curve. */
-      body.home .footer {
-        height: 56px;
-        min-height: 56px;
-        z-index: 800;
-      }
       #home-monster {
-        bottom: 56px;
+        bottom: var(--footer-stack-height);
         background: transparent;
       }
       #home-monster.is-visible {
-        height: calc(100vh - 56px);
-        max-height: calc(100vh - 56px);
-        height: calc(100dvh - 56px);
-        max-height: calc(100dvh - 56px);
+        height: calc(100vh - var(--footer-stack-height));
+        max-height: calc(100vh - var(--footer-stack-height));
+        height: calc(100dvh - var(--footer-stack-height));
+        max-height: calc(100dvh - var(--footer-stack-height));
         /* Slightly lower band than desktop — same idea as About wave-risen on small viewports */
         transform: translateY(44%);
       }
