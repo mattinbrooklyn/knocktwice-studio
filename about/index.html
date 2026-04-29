@@ -637,7 +637,7 @@
           </defs>
           <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -760,12 +760,42 @@
     // Shows the correct ticker for the current viewport (eyes: global CSS + has-mobile-monster-eyes).
     var tickerDesktop = document.querySelector('.monster-ticker');
     var tickerMobile  = document.querySelector('.monster-ticker-mobile');
+    // Perf: the curved-textPath SMIL <animate> on `startOffset` forces the
+    // browser to recompute every glyph's position along the Bézier on every
+    // frame. Pause whichever ticker is hidden for the current viewport
+    // (mobile on desktop, desktop on mobile) and both when the tab is
+    // backgrounded — saves real CPU with zero visual effect.
+    var tickerDesktopSvg = tickerDesktop && tickerDesktop.querySelector('svg');
+    var tickerMobileSvg  = tickerMobile  && tickerMobile.querySelector('svg');
+    function setSvgAnimRunning(svg, run) {
+      if (!svg) return;
+      try {
+        if (run) {
+          if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
+        } else {
+          if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
+        }
+      } catch (_) { /* timeline may not be ready yet */ }
+    }
     function applyMonsterLayout() {
       var isMobile = window.innerWidth <= 768;
       tickerDesktop.style.display = isMobile ? 'none'  : '';
       tickerMobile.style.display  = isMobile ? 'block' : 'none';
+      setSvgAnimRunning(tickerDesktopSvg, !isMobile);
+      setSvgAnimRunning(tickerMobileSvg,   isMobile);
     }
     applyMonsterLayout();
+
+    document.addEventListener('visibilitychange', function () {
+      var isMobile = window.innerWidth <= 768;
+      if (document.hidden) {
+        setSvgAnimRunning(tickerDesktopSvg, false);
+        setSvgAnimRunning(tickerMobileSvg,  false);
+      } else {
+        setSvgAnimRunning(tickerDesktopSvg, !isMobile);
+        setSvgAnimRunning(tickerMobileSvg,   isMobile);
+      }
+    });
 
     // Debounced resize
     var resizeTimer = 0;

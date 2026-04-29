@@ -337,7 +337,7 @@
           </defs>
           <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -348,7 +348,7 @@
           </defs>
           <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -854,6 +854,38 @@
 
     var monsterShowing = false;
 
+    // Perf: the curved-textPath ticker SMIL <animate> on `startOffset` forces
+    // the browser to recompute every glyph's position along the Bézier on
+    // every frame — the ticker keeps doing this work even while hidden
+    // (visibility:hidden doesn't stop SMIL timelines). Pause the ticker
+    // timelines whenever the empty state isn't visible, and when the tab
+    // is backgrounded — saves real CPU with zero visual effect.
+    var homeTickerSvgs = document.querySelectorAll(
+      '.home-monster-ticker svg, .home-monster-ticker-mobile svg'
+    );
+    function setHomeTickersRunning(run) {
+      for (var i = 0; i < homeTickerSvgs.length; i++) {
+        var svg = homeTickerSvgs[i];
+        try {
+          if (run) {
+            if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
+          } else {
+            if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
+          }
+        } catch (_) { /* timeline may not be ready yet */ }
+      }
+    }
+    // Start paused — the empty state isn't visible on initial load.
+    setHomeTickersRunning(false);
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        setHomeTickersRunning(false);
+      } else if (monsterShowing) {
+        setHomeTickersRunning(true);
+      }
+    });
+
     function checkMonsterTrigger() {
       const pieces = document.querySelectorAll('.furniture');
       const allOff = Array.from(pieces).every(isMostlyOffscreen);
@@ -865,9 +897,11 @@
       if (allOff && !wasShowing) {
         pauseAllEyeAnimations();
         scheduleHomeMonsterBlink();
+        setHomeTickersRunning(true);
       } else if (!allOff && wasShowing) {
         resumeAllEyeAnimations();
         stopHomeMonsterBlink();
+        setHomeTickersRunning(false);
       }
     }
 
@@ -905,6 +939,7 @@
       setTimeout(function () { homeMonster.classList.remove('is-hiding'); }, 650);
       resumeAllEyeAnimations();
       stopHomeMonsterBlink();
+      setHomeTickersRunning(false);
     }
 
     homeMonster.addEventListener('click', resetFurniture);
