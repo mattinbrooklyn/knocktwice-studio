@@ -135,7 +135,7 @@
     .project-mobile .stack-description {
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.625rem;
       /* padding-inline: var(--content-left); */
     }
     .project-mobile .card-title {
@@ -145,12 +145,7 @@
       font-weight: 400;
       color: var(--color-ink);
     }
-    .project-mobile .card-body {
-      font-family: var(--font-body);
-      font-size: 1rem;
-      line-height: 1.375rem;
-      color: var(--color-ink);
-    }
+    /* .card-body: use global .card-body (B1 / --type-b1) — same as intro .body-text; was 1rem and read larger than Figma 7097:1936 */
     .project-mobile .card-tags {
       display: flex;
       gap: var(--chip-gap);
