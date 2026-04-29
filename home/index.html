@@ -114,6 +114,7 @@
       pointer-events: none;
       transform: translateY(100%);
       transition: transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      will-change: transform;
       /* Flex: wave stack + blue fill; matches About modal foot (rem-height wave + tickers). */
       display: flex;
       flex-direction: column;
@@ -333,22 +334,22 @@
       <div class="home-monster-ticker" aria-hidden="true">
         <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154"/>
+            <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
           </defs>
           <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="50%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
       <div class="home-monster-ticker-mobile" aria-hidden="true">
         <svg width="100%" height="100%" viewBox="0 0 440 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <path id="home-wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78"/>
+            <path id="home-wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
           </defs>
           <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="50%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -854,37 +855,35 @@
 
     var monsterShowing = false;
 
-    // Perf: the curved-textPath ticker SMIL <animate> on `startOffset` forces
-    // the browser to recompute every glyph's position along the Bézier on
-    // every frame — the ticker keeps doing this work even while hidden
-    // (visibility:hidden doesn't stop SMIL timelines). Pause the ticker
-    // timelines whenever the empty state isn't visible, and when the tab
-    // is backgrounded — saves real CPU with zero visual effect.
-    var homeTickerSvgs = document.querySelectorAll(
-      '.home-monster-ticker svg, .home-monster-ticker-mobile svg'
-    );
-    function setHomeTickersRunning(run) {
-      for (var i = 0; i < homeTickerSvgs.length; i++) {
-        var svg = homeTickerSvgs[i];
-        try {
-          if (run) {
-            if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
-          } else {
-            if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
-          }
-        } catch (_) { /* timeline may not be ready yet */ }
-      }
+    // Perf: textPath startOffset animation is expensive; only the visible
+    // breakpoint ticker should run, and only while the empty state is up.
+    var homeTickerDesktopSvg = document.querySelector('.home-monster-ticker svg');
+    var homeTickerMobileSvg  = document.querySelector('.home-monster-ticker-mobile svg');
+    function setHomeSvgAnimRunning(svg, run) {
+      if (!svg) return;
+      if (svg.__ktTickerRunning === run) return;
+      svg.__ktTickerRunning = run;
+      try {
+        if (run) {
+          if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
+        } else {
+          if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
+        }
+      } catch (_) { /* timeline may not be ready yet */ }
+    }
+    function syncHomeTickers() {
+      var isMobile = window.innerWidth <= 768;
+      var shouldRun = monsterShowing && !document.hidden;
+      setHomeSvgAnimRunning(homeTickerDesktopSvg, shouldRun && !isMobile);
+      setHomeSvgAnimRunning(homeTickerMobileSvg,  shouldRun && isMobile);
     }
     // Start paused — the empty state isn't visible on initial load.
-    setHomeTickersRunning(false);
+    syncHomeTickers();
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) {
-        setHomeTickersRunning(false);
-      } else if (monsterShowing) {
-        setHomeTickersRunning(true);
-      }
+      syncHomeTickers();
     });
+    window.addEventListener('resize', syncHomeTickers);
 
     function checkMonsterTrigger() {
       const pieces = document.querySelectorAll('.furniture');
@@ -897,11 +896,11 @@
       if (allOff && !wasShowing) {
         pauseAllEyeAnimations();
         scheduleHomeMonsterBlink();
-        setHomeTickersRunning(true);
+        syncHomeTickers();
       } else if (!allOff && wasShowing) {
         resumeAllEyeAnimations();
         stopHomeMonsterBlink();
-        setHomeTickersRunning(false);
+        syncHomeTickers();
       }
     }
 
@@ -939,7 +938,7 @@
       setTimeout(function () { homeMonster.classList.remove('is-hiding'); }, 650);
       resumeAllEyeAnimations();
       stopHomeMonsterBlink();
-      setHomeTickersRunning(false);
+      syncHomeTickers();
     }
 
     homeMonster.addEventListener('click', resetFurniture);

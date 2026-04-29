@@ -180,6 +180,7 @@
       width: 100%;
       z-index: 5;
       transition: transform 600ms ease-out;
+      will-change: transform;
     }
     /* Wave-risen: translateY pulls wave up. z-index above the backdrop (1010)
        so eyes and wave render on top of the cream overlay. */
@@ -633,11 +634,11 @@
         <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
-            <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154"/>
+            <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
           </defs>
           <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="50%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -655,11 +656,11 @@
                  peak y=20 at x=170. Text path offset up by 6px so text sits
                  on top of the wave edge. Troughs extended slightly off-screen
                  so the three-arch sequence wraps seamlessly. -->
-            <path id="wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78"/>
+            <path id="wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
           </defs>
           <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
                 style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#wave-text-path-mobile">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="50%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
+            <textPath href="#wave-text-path-mobile">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
           </text>
         </svg>
       </div>
@@ -760,15 +761,15 @@
     // Shows the correct ticker for the current viewport (eyes: global CSS + has-mobile-monster-eyes).
     var tickerDesktop = document.querySelector('.monster-ticker');
     var tickerMobile  = document.querySelector('.monster-ticker-mobile');
-    // Perf: the curved-textPath SMIL <animate> on `startOffset` forces the
-    // browser to recompute every glyph's position along the Bézier on every
-    // frame. Pause whichever ticker is hidden for the current viewport
-    // (mobile on desktop, desktop on mobile) and both when the tab is
-    // backgrounded — saves real CPU with zero visual effect.
+    var tickerMonsterGroup = document.getElementById('monster-group');
+    // Perf: textPath startOffset animation is expensive; only the visible
+    // breakpoint ticker should run, and only while this section is onscreen.
     var tickerDesktopSvg = tickerDesktop && tickerDesktop.querySelector('svg');
     var tickerMobileSvg  = tickerMobile  && tickerMobile.querySelector('svg');
     function setSvgAnimRunning(svg, run) {
       if (!svg) return;
+      if (svg.__ktTickerRunning === run) return;
+      svg.__ktTickerRunning = run;
       try {
         if (run) {
           if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
@@ -777,25 +778,38 @@
         }
       } catch (_) { /* timeline may not be ready yet */ }
     }
+    function isFullyOffscreen(el) {
+      if (!el) return true;
+      var r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return true;
+      return r.bottom <= 0 || r.top >= window.innerHeight || r.right <= 0 || r.left >= window.innerWidth;
+    }
+    function syncTickerAnimations() {
+      var isMobile = window.innerWidth <= 768;
+      var waveRising = tickerMonsterGroup && tickerMonsterGroup.classList.contains('wave-risen');
+      setSvgAnimRunning(tickerDesktopSvg, !document.hidden && !isMobile && (waveRising || !isFullyOffscreen(tickerDesktop)));
+      setSvgAnimRunning(tickerMobileSvg,  !document.hidden && isMobile  && (waveRising || !isFullyOffscreen(tickerMobile)));
+    }
+    var tickerSyncRaf = 0;
+    function requestTickerSync() {
+      if (tickerSyncRaf) return;
+      tickerSyncRaf = requestAnimationFrame(function () {
+        tickerSyncRaf = 0;
+        syncTickerAnimations();
+      });
+    }
     function applyMonsterLayout() {
       var isMobile = window.innerWidth <= 768;
       tickerDesktop.style.display = isMobile ? 'none'  : '';
       tickerMobile.style.display  = isMobile ? 'block' : 'none';
-      setSvgAnimRunning(tickerDesktopSvg, !isMobile);
-      setSvgAnimRunning(tickerMobileSvg,   isMobile);
+      syncTickerAnimations();
     }
     applyMonsterLayout();
 
     document.addEventListener('visibilitychange', function () {
-      var isMobile = window.innerWidth <= 768;
-      if (document.hidden) {
-        setSvgAnimRunning(tickerDesktopSvg, false);
-        setSvgAnimRunning(tickerMobileSvg,  false);
-      } else {
-        setSvgAnimRunning(tickerDesktopSvg, !isMobile);
-        setSvgAnimRunning(tickerMobileSvg,   isMobile);
-      }
+      syncTickerAnimations();
     });
+    window.addEventListener('scroll', requestTickerSync, { passive: true });
 
     // Debounced resize
     var resizeTimer = 0;
@@ -1078,6 +1092,7 @@
       modalBlueBody.style.display = 'block';
       mlModal.style.display = 'block';
       monsterGroup.classList.add('wave-risen');
+      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
     }
 
     function closeMailingList() {
@@ -1094,6 +1109,7 @@
       requestAnimationFrame(function() {
         monsterGroup.style.transition = '';
       });
+      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
     }
 
     // Desktop ticker click opens the modal
