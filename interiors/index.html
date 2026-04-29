@@ -571,25 +571,26 @@
     <!-- ── Draggable objects + sticker rings ────────────────────────── -->
     <div class="objects-layer">
 
-      <!-- Sticker rings — Figma 7078:1011, 7078:1036 (Interiors 7033:482) -->
-      <div class="sticker" style="left:calc(201 / 1440 * 100%); top:calc(2425.046875 / 1440 * 100vw); width:calc(183.0474060177803 / 1440 * 100%); aspect-ratio:1;">
-        <svg viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(60deg);">
+      <!-- Sticker rings — Figma 7078:1011, 7078:1036; path radius from copy via circular-sticker.js -->
+      <div class="sticker sticker--dynamic" data-sticker-vb-base="183" data-sticker-layout-width="183.0474060177803" style="left:calc(265 / 1440 * 100%); top:calc(2425.046875 / 1440 * 100vw); width:calc(183.0474060177803 / 1440 * 100%); aspect-ratio:1;">
+        <svg class="sticker-svg--spin-60" viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <path id="sticker-circle-1" d="M91.5,13.5 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/>
           </defs>
-          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
-            <textPath href="#sticker-circle-1" textLength="490" lengthAdjust="spacing">Where the plans turn into something you can walk into&#x2009;💅🏽&#x2009;✦&#xa0;</textPath>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" letter-spacing="0" direction="ltr" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2; unicode-bidi: isolate;" xml:space="preserve">
+            <textPath href="#sticker-circle-1">Where bedtime looks like playtime &#x20;🧸&#x20;</textPath>
           </text>
         </svg>
       </div>
 
-      <div class="sticker" style="left:calc(268 / 1440 * 100%); top:calc(6313.04736328125 / 1440 * 100vw); width:calc(183.0474060177803 / 1440 * 100%); aspect-ratio:1;">
-        <svg viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg" style="transform: rotate(60deg);">
+      <div class="sticker sticker--dynamic" data-sticker-vb-base="183" data-sticker-layout-width="183.0474060177803" style="left:calc(335 / 1440 * 100%); top:calc(6313.04736328125 / 1440 * 100vw); width:calc(183.0474060177803 / 1440 * 100%); aspect-ratio:1;">
+        <svg class="sticker-svg--spin-60" viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <path id="sticker-circle-2" d="M91.5,13.5 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/>
           </defs>
-          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2;">
-            <textPath href="#sticker-circle-2" textLength="490" lengthAdjust="spacing">Where the plans turn into something you can walk into&#x2009;💅🏽&#x2009;✦&#xa0;</textPath>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" letter-spacing="0" direction="ltr" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2; unicode-bidi: isolate;" xml:space="preserve">
+            <!-- Phrase ends with bed emoji; trailing space = gap before loop (matches Figma). direction=ltr keeps 🛏️ from bidi-jumping on the path. -->
+            <textPath href="#sticker-circle-2">more than a bedroom, it&#x2019;s a feeling 🛏&#xFE0F;&#x20;&nbsp;</textPath>
           </text>
         </svg>
       </div>
@@ -724,6 +725,7 @@
   </div><!-- /#page-scaler -->
 
   <script src="/assets/scripts.js" defer></script>
+  <script src="/assets/circular-sticker.js" defer></script>
   <script>
     // ── Skeleton constants ─────────────────────────────────────────
     const page         = document.querySelector('.page');

@@ -503,10 +503,22 @@ body.nav-open {
 .sticker svg {
   width: 100%;
   height: 100%;
+  overflow: visible;
   animation: sticker-spin 18s linear infinite;
+}
+.sticker text {
+  text-rendering: optimizeLegibility;
+}
+/* Base rotation (e.g. 60°) + continuous spin without resetting offset */
+.sticker svg.sticker-svg--spin-60 {
+  animation-name: sticker-spin-60;
 }
 @keyframes sticker-spin {
   to { transform: rotate(360deg); }
+}
+@keyframes sticker-spin-60 {
+  from { transform: rotate(60deg); }
+  to { transform: rotate(420deg); }
 }
 
 /* ── Placeholder ────────────────────────────────── */
