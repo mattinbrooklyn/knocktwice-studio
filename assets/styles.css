@@ -199,8 +199,14 @@ body[data-cursor="drag"]  #cursor-drag    { display: block; }
 .logo svg path {
   transition: fill 0.2s ease;
 }
-.logo:hover svg path {
+.logo:hover svg path,
+.logo:active svg path {
   fill: var(--color-ink);
+}
+/* Eye sclera path must stay cream — nested inside keyhole hover fill rule above */
+.logo:hover svg path.logo-eye-sclera,
+.logo:active svg path.logo-eye-sclera {
+  fill: var(--color-bg);
 }
 
 /* ── Page skeleton ──────────────────────────────── */
