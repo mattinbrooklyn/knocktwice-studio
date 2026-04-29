@@ -13,6 +13,19 @@
     html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-blue); }
     body::-webkit-scrollbar { display: none; }
 
+    /* Desktop: neutralize global #page-scaler min-height (see styles.css). */
+    body.home #page-scaler {
+      min-height: 0;
+    }
+    /* Mobile: global styles use body::after (50vh blue) behind content. Home used min-height:0
+       only — when the scaled canvas is shorter than the viewport, that wash shows through and reads
+       like a giant footer. Fill at least one viewport tall like other mobile routes. */
+    @media (max-width: 768px) {
+      body.home #page-scaler {
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+    }
     #page-scaler { position: relative; width: 100%; }
 
     /* ── Page canvas ──────────────────────────────────────────────
@@ -75,14 +88,14 @@
       height: 176px;
     }
 
-    /* Desktop: footer sits just below the fold, revealed on scroll.
-       #page-scaler is sized to exactly 100vh by the scaling JS, so a
-       relative-positioned footer lands immediately below the fold.
-       Mobile override below keeps it pinned to the viewport. */
+    /* Desktop + mobile: footer follows #page-scaler in normal flow; scaler height from JS
+       (full Figma frame + viewport fill on desktop, 956×mobile frame on small screens). */
+    /* Above #home-monster.is-visible (650) so the scrollable footer is never covered by the fixed wave */
     body.home .footer {
       position: relative;
-      z-index: 600;
-      margin-top: 0;
+      z-index: 800;
+      /* Same hairline seam as global .footer — avoids extra gap vs other routes */
+      margin-top: -2px;
     }
     /* ── Monster easter egg ──────────────────────────────────────── */
     /* Rises from the bottom when all furniture is dragged off screen.
@@ -101,7 +114,7 @@
       display: flex;
       flex-direction: column;
     }
-    /* Above home footer (600), below .logo / .nav (1000) so clicks hit the monster */
+    /* Above home footer (800), below .logo / .nav (1000) so clicks hit the monster */
     /* Risen: not as high as 15% — closer to About newsletter / modal wave band */
     #home-monster.is-visible {
       z-index: 650;
@@ -271,32 +284,23 @@
         height: 190px !important;
       }
 
-      /* Mobile: keep footer pinned to the viewport (desktop reveals
-         it on scroll, but mobile has no hover-reveal affordance).
-         Shares global `--footer-stack-height` (56px band + safe-area inset). */
-      body.home .footer {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: auto;
-        min-height: var(--footer-stack-height);
-        z-index: 800;
-      }
+      /* Footer in document flow (same as desktop): full viewport is the room;
+         footer appears when scrolled into view. Uses global mobile footer grid +
+         `--footer-stack-height` / safe-area from styles.css. */
 
       /* ── Monster empty state (Figma 7053:1258) ───────────────────
          No solid background on #home-monster / .monster-area: the wave SVG
          has transparent “sky” above the path — if the parent is blue, that
          area reads as flat blue; cream must show through for the curve. */
       #home-monster {
-        bottom: var(--footer-stack-height);
+        bottom: 0;
         background: transparent;
       }
       #home-monster.is-visible {
-        height: calc(100vh - var(--footer-stack-height));
-        max-height: calc(100vh - var(--footer-stack-height));
-        height: calc(100dvh - var(--footer-stack-height));
-        max-height: calc(100dvh - var(--footer-stack-height));
+        height: 100vh;
+        max-height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
         /* Slightly lower band than desktop — same idea as About wave-risen on small viewports */
         transform: translateY(44%);
       }
@@ -717,10 +721,8 @@
     let scale = 1;
 
     function scalePage() {
-      // Desktop: canvas is 1440 wide and stretches to match viewport
-      // height (single-screen playground). Mobile (<=768): canvas is
-      // fixed to the Figma mobile frame (440×956, id 7048:1185); scroll
-      // reveals anything below fold on short phones.
+      // Desktop: logical height ≥ 1024px (Figma frame) and ≥ viewport in page px — tall scroll
+      // region before the footer. Mobile: Figma frame 440×956; scroll reveals fold on short phones.
       const isMobile = window.innerWidth <= 768;
       const ref      = isMobile ? 440 : 1440;
       scale = window.innerWidth / ref;
@@ -730,9 +732,11 @@
         page.style.height   = '956px';
         scaler.style.height = (956 * scale) + 'px';
       } else {
-        const foldPx = Math.ceil(window.innerHeight / scale);
-        page.style.height   = foldPx + 'px';
-        scaler.style.height = foldPx * scale + 'px';
+        const designH = 1024;
+        const logicalVh = Math.ceil(window.innerHeight / scale);
+        const pageH = Math.max(designH, logicalVh);
+        page.style.height = pageH + 'px';
+        scaler.style.height = pageH * scale + 'px';
       }
     }
     scalePage();

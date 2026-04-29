@@ -82,8 +82,8 @@
   --radius-pill:           2rem;
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
-  --footer-height:         6.25vw;
-  /* Mobile footer blue bar — Figma 56px tall (not vw; vw was ~23px on phones). */
+  /* Footer blue band — Figma: 90px desktop, 56px mobile (fixed rem; no vw). */
+  --footer-height:         5.625rem;
   --footer-height-mobile:  3.5rem;
   /* Horizontal inset: desktop matches nav (40px); mobile matches Figma page margin (20px). */
   --footer-pad-x:          var(--nav-left);
