@@ -151,8 +151,9 @@
    top card flies off, is re-inserted as the first child (bottom of pile),
    and its transform resets — the deck loops forever.
 
-   Touch-only: binds listeners only when (pointer: coarse) or viewport ≤768px.
-   Desktop mouse input is intentionally untouched.
+   Uses Pointer Events so the same code works for touch and for mouse when the
+   mobile layout is active (e.g. desktop browser resized to ≤768px). Each
+   gesture re-checks swipeLayoutActive(); wide desktop does not capture drags.
 
    Options (all optional):
      threshold         px drag distance to commit  (default 80)
@@ -167,17 +168,17 @@
 
   var EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 
-  function isTouchContext() {
+  /** True when swipe UX should respond (mobile breakpoint, coarse pointer, or touch-capable). Checked per gesture so resize Desktop→narrow works. */
+  function swipeLayoutActive() {
     try {
-      if (window.matchMedia('(pointer: coarse)').matches) return true;
       if (window.matchMedia('(max-width: 768px)').matches) return true;
-    } catch (e) { /* matchMedia unavailable — bail to touch detection */ }
+      if (window.matchMedia('(pointer: coarse)').matches) return true;
+    } catch (e) { /* matchMedia unavailable */ }
     return 'ontouchstart' in window;
   }
 
   window.KT.swipeStack = function (container, opts) {
     if (!container) return { destroy: function () {} };
-    if (!isTouchContext()) return { destroy: function () {} };
 
     opts = opts || {};
     var threshold         = opts.threshold         != null ? opts.threshold         : 80;
@@ -187,6 +188,7 @@
     var onChange          = typeof opts.onChange === 'function' ? opts.onChange : null;
 
     var top = null;
+    var activePointerId = null;
     var startX = 0, startY = 0;
     var lastX = 0, lastT = 0;
     var prevX = 0, prevT = 0;
@@ -206,24 +208,30 @@
       el.style.transform = 'translate3d(' + dx + 'px, 0, 0) rotate(' + rot + 'deg)';
     }
 
-    function onStart(e) {
+    function onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (!swipeLayoutActive()) return;
       if (animating) return;
+      if (activePointerId !== null) return;
       top = getTop();
       if (!top) return;
-      var t = e.touches[0];
-      startX = lastX = prevX = t.clientX;
-      startY = t.clientY;
+      activePointerId = e.pointerId;
+      try {
+        container.setPointerCapture(e.pointerId);
+      } catch (err) { /* ignore */ }
+      startX = lastX = prevX = e.clientX;
+      startY = e.clientY;
       lastT = prevT = e.timeStamp || Date.now();
       dragging = true;
       locked = false;
       top.style.transition = 'none';
     }
 
-    function onMove(e) {
+    function onPointerMove(e) {
+      if (e.pointerId !== activePointerId) return;
       if (!dragging || !top) return;
-      var t = e.touches[0];
-      var dx = t.clientX - startX;
-      var dy = t.clientY - startY;
+      var dx = e.clientX - startX;
+      var dy = e.clientY - startY;
 
       if (!locked) {
         // Claim the gesture only when horizontal intent is clear.
@@ -231,12 +239,16 @@
         if (Math.abs(dy) > Math.abs(dx)) {
           // Vertical scroll wins — release the gesture.
           dragging = false;
+          activePointerId = null;
+          try {
+            container.releasePointerCapture(e.pointerId);
+          } catch (err) { /* ignore */ }
           top.style.transition = '';
           top.style.transform = '';
           return;
         }
         locked = true;
-        
+
         // Hide swipe hint if present
         var hint = container.querySelector('.swipe-hint-overlay');
         if (hint) hint.classList.add('is-hidden');
@@ -244,7 +256,7 @@
 
       e.preventDefault();
       prevX = lastX; prevT = lastT;
-      lastX = t.clientX;
+      lastX = e.clientX;
       lastT = e.timeStamp || Date.now();
 
       setTransform(top, dx, dx * 0.04, false, 0);
@@ -281,7 +293,12 @@
       setTransform(card, 0, 0, true, snapDuration);
     }
 
-    function onEnd(e) {
+    function onPointerUp(e) {
+      if (e.pointerId !== activePointerId) return;
+      activePointerId = null;
+      try {
+        container.releasePointerCapture(e.pointerId);
+      } catch (err) { /* ignore */ }
       if (!dragging || !top) { dragging = false; return; }
       dragging = false;
 
@@ -303,7 +320,13 @@
       }
     }
 
-    function onCancel() {
+    function onPointerCancel() {
+      if (activePointerId !== null) {
+        try {
+          container.releasePointerCapture(activePointerId);
+        } catch (err) { /* ignore */ }
+        activePointerId = null;
+      }
       if (!dragging || !top) { dragging = false; return; }
       dragging = false;
       if (locked) snapBack(top);
@@ -313,17 +336,19 @@
       }
     }
 
-    container.addEventListener('touchstart', onStart, { passive: true });
-    container.addEventListener('touchmove',  onMove,  { passive: false });
-    container.addEventListener('touchend',   onEnd,   { passive: true });
-    container.addEventListener('touchcancel', onCancel, { passive: true });
+    container.addEventListener('pointerdown', onPointerDown, { passive: true });
+    container.addEventListener('pointermove', onPointerMove, { passive: false });
+    container.addEventListener('pointerup', onPointerUp, { passive: true });
+    container.addEventListener('pointercancel', onPointerCancel, { passive: true });
+    container.addEventListener('lostpointercapture', onPointerCancel, { passive: true });
 
     return {
       destroy: function () {
-        container.removeEventListener('touchstart', onStart);
-        container.removeEventListener('touchmove',  onMove);
-        container.removeEventListener('touchend',   onEnd);
-        container.removeEventListener('touchcancel', onCancel);
+        container.removeEventListener('pointerdown', onPointerDown);
+        container.removeEventListener('pointermove', onPointerMove);
+        container.removeEventListener('pointerup', onPointerUp);
+        container.removeEventListener('pointercancel', onPointerCancel);
+        container.removeEventListener('lostpointercapture', onPointerCancel);
       }
     };
   };

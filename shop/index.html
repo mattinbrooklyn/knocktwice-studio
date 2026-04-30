@@ -81,9 +81,10 @@
       transform: translateY(250px);
       will-change: transform;
     }
-    #monster-group.popped-up {
+    #monster-group.wave-risen {
       transform: translateY(-55vh);
       transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1020;
     }
     .monster-area {
       position: relative;
@@ -104,12 +105,14 @@
       pointer-events: none;
       overflow: visible;
     }
+    /* Blue body below the wave — first in #monster-group so wave/eyes paint on top (same as About). */
     #modal-blue-body {
+      display: none;
       position: absolute;
       left: 0;
-      top: 100%;
+      top: calc(var(--wave-height-desktop) - 0px);
       width: 100%;
-      height: 2000px;
+      height: 300vh;
       background: var(--color-blue);
     }
 
@@ -121,14 +124,20 @@
     #modal-backdrop {
       z-index: 1010;
     }
-    /* Card above monster-group when risen (1020); no vertical overlap with eyes. */
+    /* Match About #newsletter-window: centered card, z above risen wave so layout clears crest. */
     #ml-modal.modal-card {
-      top: 62%;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(929px, calc(100vw - 4rem));
+      height: auto;
+      min-height: 326px;
+      padding: clamp(1.75rem, 4.167vw, 3.75rem);
       z-index: 1025;
     }
-    /* Wave + eyes above cream overlay, same as About #monster-group.wave-risen */
-    #monster-group.popped-up {
-      z-index: 1020;
+    #ml-modal.modal-card.ml-success {
+      min-height: auto;
     }
 
     /* ── Mobile (<=768px) ──────────────────────────── */
@@ -152,12 +161,16 @@
         left: var(--content-left);
         width: var(--content-width);
       }
-      /* Match modal padding exactly and fix flex height collapse */
-      .modal-card {
-        padding: 1.875rem; /* 30px padding matches Figma */
+      #monster-group.wave-risen {
+        transform: translateY(-60vh);
+      }
+      #modal-blue-body {
+        top: calc(var(--wave-height-mobile) - 4px);
       }
       #ml-modal.modal-card {
-        top: 68%;
+        top: 66%;
+        width: min(24rem, calc(100vw - 2rem));
+        padding: 1.5rem 1.25rem;
       }
       .ml-form-row {
         flex-direction: column;
@@ -243,7 +256,8 @@
   <!-- ── Monster footer wave ─────────────────────────────────────
        Same wave SVG as about page. Eye whites + iris circles match about. -->
   <div id="monster-group" class="has-mobile-monster-eyes">
-  <div class="monster-area" id="monster-area">
+    <div id="modal-blue-body"></div>
+    <div class="monster-area" id="monster-area">
     <img class="wave" src="/assets/monster-wave.svg" alt="">
     <svg class="monster-eyes-overlay" id="monster-eyes-svg"
          viewBox="0 0 1440 116.154"
@@ -299,8 +313,7 @@
           cx="142" cy="64" r="29" fill="#32261F"/>
       </g>
     </svg>
-    <div id="modal-blue-body"></div>
-  </div>
+    </div>
   </div><!-- /#monster-group -->
 
   <footer class="footer">
@@ -452,9 +465,9 @@
     function openMailingList() {
       document.documentElement.classList.add('kt-monster-modal-open');
       mlBackdrop.style.display = 'block';
+      document.getElementById('modal-blue-body').style.display = 'block';
       mlModal.style.display    = 'block';
-      monsterGroup.classList.add('popped-up');
-      document.getElementById('modal-blue-body').style.height = '2000px';
+      monsterGroup.classList.add('wave-risen');
     }
 
     function closeMailingList() {
@@ -465,16 +478,16 @@
       mlEmail.value = '';
       mlEmail.classList.remove('has-error');
       mlError.classList.remove('is-visible');
-      /* Inline z-index beats .popped-up (1020) so nav is usable while wave settles */
+      /* Inline z-index beats .wave-risen (1020) so nav is usable while wave settles */
       monsterGroup.style.zIndex = '16';
       monsterGroup.style.transition = 'transform 600ms ease-out';
       monsterGroup.style.transform  = 'translateY(0)';
       setTimeout(function() {
-        monsterGroup.classList.remove('popped-up');
+        monsterGroup.classList.remove('wave-risen');
         monsterGroup.style.transform = '';
         monsterGroup.style.transition = '';
         monsterGroup.style.zIndex = '';
-        document.getElementById('modal-blue-body').style.height = 'var(--footer-height)';
+        document.getElementById('modal-blue-body').style.display = 'none';
       }, 650);
     }
 
