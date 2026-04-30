@@ -450,6 +450,7 @@
     var mlBody      = document.getElementById('ml-body');
 
     function openMailingList() {
+      document.documentElement.classList.add('kt-monster-modal-open');
       mlBackdrop.style.display = 'block';
       mlModal.style.display    = 'block';
       monsterGroup.classList.add('popped-up');
@@ -457,6 +458,7 @@
     }
 
     function closeMailingList() {
+      document.documentElement.classList.remove('kt-monster-modal-open');
       mlBackdrop.style.display = 'none';
       mlModal.style.display    = 'none';
       mlModal.classList.remove('ml-error', 'ml-success');
@@ -477,6 +479,7 @@
     }
 
     mlClose.addEventListener('click', closeMailingList);
+    mlBackdrop.addEventListener('click', closeMailingList);
     /* Auto-open after ~8s so visitors can read headline and body copy first (7–10s range). */
     setTimeout(openMailingList, 4000);
 

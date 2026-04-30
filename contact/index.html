@@ -83,8 +83,8 @@
 
   .input-row {
     width: var(--content-width);
-    height: var(--input-height);
     display: flex;
+    align-items: flex-start;
     gap: 0.6rem;
     margin-bottom: 0.625rem;
   }
@@ -110,7 +110,7 @@
     cursor: none;
   }
   .input-row input::placeholder { color: #9A7555; }
-  .input-row input:focus { border-color: var(--color-blue); }
+  .input-row input:focus { border-color: var(--color-green); }
 
   .textarea-col {
     width: var(--content-width);
@@ -136,22 +136,13 @@
     cursor: none;
   }
   .textarea-wrap textarea::placeholder { color: #9A7555; }
-  .textarea-wrap textarea:focus { border-color: var(--color-blue); }
+  .textarea-wrap textarea:focus { border-color: var(--color-green); }
 
+  /* Send uses shared .ml-submit (same as mailing-list Sign Up) */
   #btn-send {
     width: var(--content-width);
-    height: var(--button-height);
-    background: var(--color-green);
-    border: none;
-    border-radius: var(--radius-button);
-    font-family: var(--font-ui);
-    font-size: var(--type-button);
-    font-weight: 400;
-    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-    color: var(--color-bg);
-    cursor: none;
+    box-sizing: border-box;
   }
-  #btn-send:hover { opacity: 0.85; }
 
   /* ── Error states ──────────────────────────────── */
   #error-email, #error-name, #error-body {
@@ -170,6 +161,12 @@
   .has-name-error #btn-send {
     opacity: 0.5;
     cursor: default;
+  }
+  .has-email-error #btn-send:hover,
+  .has-name-error #btn-send:hover {
+    background: var(--color-green);
+    color: var(--color-bg);
+    border-color: transparent;
   }
 
   /* ── Monster wave ──────────────────────────────── */
@@ -393,7 +390,7 @@
       <p class="field-error" id="error-body">Left this blank. That works, but more info helps.</p>
     </div>
 
-    <button class="btn-send" id="btn-send" type="button">Send</button>
+    <button class="ml-submit" id="btn-send" type="button">Send</button>
 
     <div id="modal-backdrop"></div>
 

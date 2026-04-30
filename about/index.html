@@ -1090,6 +1090,7 @@
     var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
 
     function openMailingList() {
+      document.documentElement.classList.add('kt-monster-modal-open');
       modalBackdrop.style.display = 'block';
       modalBlueBody.style.display = 'block';
       mlModal.style.display = 'block';
@@ -1098,6 +1099,7 @@
     }
 
     function closeMailingList() {
+      document.documentElement.classList.remove('kt-monster-modal-open');
       monsterGroup.style.transition = 'none';
       monsterGroup.classList.remove('wave-risen');
       modalBackdrop.style.display = 'none';
@@ -1121,6 +1123,7 @@
     // Mobile fallback: tapping the wave area (outside ticker) also opens the modal
     document.getElementById('monster-area').addEventListener('click', openMailingList);
     mlClose.addEventListener('click', closeMailingList);
+    modalBackdrop.addEventListener('click', closeMailingList);
 
     mlEmail.addEventListener('input', function() {
       mlModal.classList.remove('ml-error');

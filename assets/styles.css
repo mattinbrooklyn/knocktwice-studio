@@ -639,7 +639,7 @@ body.nav-open {
 }
 .field:focus {
   outline: none;
-  border-color: var(--color-blue);
+  border-color: var(--color-green);
 }
 
 /* ── Footer ─────────────────────────────────────── */
@@ -748,6 +748,13 @@ body.nav-open {
   display: block;
 }
 
+/* Lock document scroll while monster mailing-list modal is open (About / Shop). */
+html.kt-monster-modal-open,
+html.kt-monster-modal-open body {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
 /* ── Modals ─────────────────────────────────────── */
 .modal-backdrop {
   position: fixed;
@@ -823,7 +830,7 @@ body.nav-open {
 }
 .ml-form-row input:focus {
   outline: none;
-  border-color: var(--color-blue);
+  border-color: var(--color-green);
 }
 .ml-form-row input.has-error {
   color: var(--color-red);
@@ -850,7 +857,7 @@ body.nav-open {
   transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 .ml-submit:hover {
-  background: var(--color-white);
+  background: transparent;
   color: var(--color-green);
   border-color: var(--color-green);
 }
