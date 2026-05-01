@@ -748,9 +748,12 @@ body.nav-open {
   display: block;
 }
 
-/* Lock document scroll while monster mailing-list modal is open (About / Shop). */
+/* Lock document scroll while monster mailing-list modal is open (About / Shop),
+   or home empty-state monster is visible / dismissing. */
 html.kt-monster-modal-open,
-html.kt-monster-modal-open body {
+html.kt-home-monster-open,
+html.kt-monster-modal-open body,
+html.kt-home-monster-open body {
   overflow: hidden !important;
   overscroll-behavior: none;
 }

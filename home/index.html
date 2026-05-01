@@ -27,6 +27,9 @@
       }
     }
     #page-scaler { position: relative; width: 100%; }
+    body.home {
+      --home-monster-linear-ticker-height: clamp(38px, 5.75vw, 52px);
+    }
 
     /* ── Page canvas ──────────────────────────────────────────────
        Fixed 1440×1024 (exact Figma frame size), centered and
@@ -129,47 +132,98 @@
     }
     #home-monster.is-hiding   { transition: transform 600ms cubic-bezier(0.4, 0, 0.2, 1); }
 
-    /* About modal monster layout: fixed wave strip + separate desktop/mobile tickers
-       (see about/index.html .monster-ticker / .monster-ticker-mobile / .monster-area). */
+    /* Wave stack — linear marquee is a sibling of #home-monster (About #monster-linear-ticker pattern). */
     #home-monster .home-monster-stack {
       position: relative;
       width: 100%;
       flex-shrink: 0;
       line-height: 0;
     }
-    .home-monster-ticker {
-      position: absolute;
-      bottom: calc(100% - 96px);
-      left: 0;
-      width: 100%;
-      height: 156px;
-      overflow: hidden;
-      z-index: 6;
-      pointer-events: none;
-    }
-    .home-monster-ticker svg { display: block; }
-    .home-monster-ticker-mobile {
-      display: none;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: calc(var(--wave-height-mobile) + 20px);
-      overflow: hidden;
-      z-index: 7;
-      pointer-events: none;
-    }
-    .home-monster-ticker-mobile svg { display: block; }
-    /* Ticker + overflow: only when easter egg is on (or sliding away). The ticker sits
-       above the wave (absolute, tall); with overflow:visible and translateY(100%), that
-       arch can still paint in the viewport before the empty state — so clip + hide text. */
+    /* Clip monster graphic until the empty state so nothing leaks above the fold. */
     #home-monster:not(.is-visible):not(.is-hiding) {
       overflow: hidden;
     }
-    #home-monster:not(.is-visible):not(.is-hiding) .home-monster-ticker,
-    #home-monster:not(.is-visible):not(.is-hiding) .home-monster-ticker-mobile {
-      visibility: hidden;
+    /* Linear spring-cleaning marquee — outside transformed #home-monster; only while monster is up. */
+    #home-monster-linear-ticker {
+      position: fixed;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-width: 100vw;
+      bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+      z-index: 750;
       opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 480ms ease, visibility 0ms 480ms;
+    }
+    body.home:has(#home-monster.is-visible) #home-monster-linear-ticker,
+    body.home:has(#home-monster.is-hiding) #home-monster-linear-ticker {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 480ms ease, visibility 0ms;
+    }
+    .home-monster-linear-ticker {
+      height: var(--home-monster-linear-ticker-height);
+      background: var(--color-pink);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    .home-monster-linear-ticker .kt-linear-ticker__track {
+      display: flex;
+      flex-wrap: nowrap;
+      width: max-content;
+      will-change: transform;
+      animation: kt-home-monster-linear-ticker-scroll 40s linear infinite;
+      animation-play-state: paused;
+    }
+    .home-monster-linear-ticker .kt-linear-ticker__sequence {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0;
+      white-space: nowrap;
+      font-family: var(--font-ui), sans-serif;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      font-weight: 400;
+      font-size: clamp(0.875rem, 3.95vw, 1.375rem);
+      letter-spacing: -0.14px;
+      text-transform: uppercase;
+      color: var(--color-white);
+    }
+    @media (min-width: 769px) {
+      .home-monster-linear-ticker .kt-linear-ticker__sequence {
+        letter-spacing: -0.22px;
+      }
+    }
+    .home-monster-linear-ticker .kt-linear-ticker__chunk {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .home-monster-linear-ticker .kt-linear-ticker__text {
+      display: inline-block;
+    }
+    .home-monster-linear-ticker .kt-linear-ticker__ico {
+      font-family: inherit;
+      font-style: normal;
+      line-height: 1;
+      display: inline-block;
+      flex-shrink: 0;
+      font-variation-settings: inherit;
+      transform: translateY(0.02em);
+      margin-inline: clamp(0.28rem, 1.05vw, 0.5625rem);
+    }
+    @keyframes kt-home-monster-linear-ticker-scroll {
+      to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .home-monster-linear-ticker .kt-linear-ticker__track {
+        animation: none;
+      }
     }
     #home-monster .home-monster-area {
       position: relative;
@@ -309,8 +363,9 @@
         /* Slightly lower band than desktop — same idea as About wave-risen on small viewports */
         transform: translateY(44%);
       }
-      .home-monster-ticker { display: none; }
-      .home-monster-ticker-mobile { display: block; }
+      #home-monster-linear-ticker {
+        bottom: var(--footer-stack-height);
+      }
       #home-monster .home-monster-area {
         height: var(--wave-height-mobile) !important;
         overflow: hidden;
@@ -328,31 +383,9 @@
 </head>
 <body class="home">
 
-  <!-- Monster easter egg — same layout as About #monster-group (modal up): rem wave + tickers. -->
+  <!-- Monster easter egg — wave + fill; linear ticker is a fixed sibling (About-style). -->
   <div id="home-monster">
     <div class="home-monster-stack" id="home-monster-stack">
-      <div class="home-monster-ticker" aria-hidden="true">
-        <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <path id="home-wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-          </defs>
-          <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
-                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
-          </text>
-        </svg>
-      </div>
-      <div class="home-monster-ticker-mobile" aria-hidden="true">
-        <svg width="100%" height="100%" viewBox="0 0 440 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <path id="home-wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
-          </defs>
-          <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
-                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#home-wave-text-path-mobile">🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   🧹 SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!   <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
-          </text>
-        </svg>
-      </div>
       <div class="home-monster-area" id="home-monster-area">
         <img class="wave" src="/assets/monster-wave.svg" alt="">
           <svg id="home-monster-eyes-svg" class="monster-eyes-overlay"
@@ -408,6 +441,32 @@
         </div>
       </div>
     <div class="monster-fill"></div>
+  </div>
+
+  <!-- Sibling of #home-monster — docked above footer; visible only while monster empty-state is up. -->
+  <div class="home-monster-linear-ticker" id="home-monster-linear-ticker" aria-hidden="true">
+    <div class="kt-linear-ticker__track" id="home-monster-linear-ticker-track">
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+      </div>
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">SEEMS LIKE SOMEONE DID SOME SPRING CLEANING!</span><span class="kt-linear-ticker__ico">🧽</span></span>
+      </div>
+    </div>
   </div>
 
   <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
@@ -855,35 +914,25 @@
 
     var monsterShowing = false;
 
-    // Perf: textPath startOffset animation is expensive; only the visible
-    // breakpoint ticker should run, and only while the empty state is up.
-    var homeTickerDesktopSvg = document.querySelector('.home-monster-ticker svg');
-    var homeTickerMobileSvg  = document.querySelector('.home-monster-ticker-mobile svg');
-    function setHomeSvgAnimRunning(svg, run) {
-      if (!svg) return;
-      if (svg.__ktTickerRunning === run) return;
-      svg.__ktTickerRunning = run;
-      try {
-        if (run) {
-          if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
-        } else {
-          if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
-        }
-      } catch (_) { /* timeline may not be ready yet */ }
+    var homeLinearTickerTrack = document.getElementById('home-monster-linear-ticker-track');
+    function syncHomeLinearTickerAnimations() {
+      if (!homeLinearTickerTrack) return;
+      var up = homeMonster && (homeMonster.classList.contains('is-visible') || homeMonster.classList.contains('is-hiding'));
+      var run = up && !document.hidden;
+      homeLinearTickerTrack.style.animationPlayState = run ? 'running' : 'paused';
     }
-    function syncHomeTickers() {
-      var isMobile = window.innerWidth <= 768;
-      var shouldRun = monsterShowing && !document.hidden;
-      setHomeSvgAnimRunning(homeTickerDesktopSvg, shouldRun && !isMobile);
-      setHomeSvgAnimRunning(homeTickerMobileSvg,  shouldRun && isMobile);
+    function syncHomeMonsterScrollLock() {
+      if (!homeMonster) return;
+      var locked = homeMonster.classList.contains('is-visible') || homeMonster.classList.contains('is-hiding');
+      document.documentElement.classList.toggle('kt-home-monster-open', locked);
     }
-    // Start paused — the empty state isn't visible on initial load.
-    syncHomeTickers();
+    syncHomeLinearTickerAnimations();
+    syncHomeMonsterScrollLock();
 
     document.addEventListener('visibilitychange', function () {
-      syncHomeTickers();
+      syncHomeLinearTickerAnimations();
     });
-    window.addEventListener('resize', syncHomeTickers);
+    window.addEventListener('resize', syncHomeLinearTickerAnimations);
 
     function checkMonsterTrigger() {
       const pieces = document.querySelectorAll('.furniture');
@@ -896,12 +945,12 @@
       if (allOff && !wasShowing) {
         pauseAllEyeAnimations();
         scheduleHomeMonsterBlink();
-        syncHomeTickers();
       } else if (!allOff && wasShowing) {
         resumeAllEyeAnimations();
         stopHomeMonsterBlink();
-        syncHomeTickers();
       }
+      syncHomeLinearTickerAnimations();
+      syncHomeMonsterScrollLock();
     }
 
     // Re-check after every drop (pointerup covers mouse + touch; mouseup removed to avoid double fire)
@@ -909,8 +958,6 @@
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       checkMonsterTrigger();
     });
-
-    // Ticker: SMIL <animate> on textPath (same 30s / 18s as About modal).
 
     // ─── Reset furniture when monster is clicked ──────────────────
     function resetFurniture() {
@@ -935,10 +982,15 @@
       homeMonster.classList.remove('is-visible');
       // Strip the fast-hide override once it's offscreen so the next reveal
       // uses the slow 3s dramatic rise.
-      setTimeout(function () { homeMonster.classList.remove('is-hiding'); }, 650);
+      setTimeout(function () {
+        homeMonster.classList.remove('is-hiding');
+        syncHomeMonsterScrollLock();
+        syncHomeLinearTickerAnimations();
+      }, 650);
       resumeAllEyeAnimations();
       stopHomeMonsterBlink();
-      syncHomeTickers();
+      syncHomeLinearTickerAnimations();
+      syncHomeMonsterScrollLock();
     }
 
     homeMonster.addEventListener('click', resetFurniture);
