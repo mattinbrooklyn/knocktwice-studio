@@ -613,33 +613,34 @@
     // ── WHO'S THERE marquee ────────────────────────────────────────
     // Path starts at x=0. startOffset=0 → first char at x=0.
     // Decrementing offset scrolls text left; new chars enter from the right.
-    // Wrap interval = one text-unit width, measured via getComputedTextLength
-    // after fonts load — this guarantees a pixel-perfect seamless loop.
+    // Loop length = one repeat of the copy, measured on this <textPath> after
+    // fonts load (same geometry as paint — avoids straight-line + arcScale drift).
+    const WHOS_MARQUEE_REPEATS = 20;
     const whosTextpath = document.getElementById('whos-textpath');
     let whosOffset  = 0;
-    let whosUnit    = 0; // measured once after font load
+    let whosUnit    = 0; // path-distance for one repeat, measured once
     let whosPrev    = null;
 
-    function measureWhosUnit() {
-      // Measure one repeat of the text string on a straight line (close enough
-      // to arc length for this gentle wave). The total text is 20 identical
-      // repeats, so one unit = total / 20.
-      const ns  = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(ns, 'svg');
+    function measureWhosUnitFallback() {
+      var cell = "WHO'S THERE?        👀        ";
+      var ns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(ns, 'svg');
       svg.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
-      const txt = document.createElementNS(ns, 'text');
+      var txt = document.createElementNS(ns, 'text');
       txt.setAttribute('xml:space', 'preserve');
       txt.setAttribute('font-family', "'Handjet', sans-serif");
       txt.setAttribute('font-size', '22');
-      txt.setAttribute('font-weight', '600');
+      txt.setAttribute('font-weight', '400');
       txt.setAttribute('letter-spacing', '-0.22');
       txt.style.fontVariationSettings = "'ELGR' 1, 'ELSH' 2";
-      txt.textContent = "WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        ";
+      txt.textContent = cell;
       svg.appendChild(txt);
       document.body.appendChild(svg);
-      const total = txt.getComputedTextLength();
+      var straight = txt.getComputedTextLength();
       document.body.removeChild(svg);
-      return total / 20;
+      var pathEl = document.getElementById('whos-path');
+      var arcScale = pathEl && pathEl.getTotalLength ? pathEl.getTotalLength() / 3070 : 1;
+      return straight * arcScale;
     }
 
     // Pause marquee when tab is hidden to save CPU
@@ -649,7 +650,9 @@
       if (whosPrev !== null) {
         const dt = Math.min(ts - whosPrev, 50);
         whosOffset -= 51 * (dt / 1000);
-        if (whosUnit > 0 && whosOffset <= -whosUnit) whosOffset += whosUnit;
+        if (whosUnit > 0) {
+          while (whosOffset <= -whosUnit) whosOffset += whosUnit;
+        }
         whosTextpath.setAttribute('startOffset', whosOffset.toFixed(2));
       }
       whosPrev = ts;
@@ -667,13 +670,12 @@
 
     // Wait for Handjet to load before measuring, then kick off the loop.
     document.fonts.ready.then(() => {
-      // measureWhosUnit() returns straight-line pixels. startOffset is in
-      // arc-length pixels, which are longer on a curved path. Scale by the
-      // ratio of the path's arc length to its horizontal extent so the wrap
-      // fires at exactly the right position with no visible jump.
-      const pathEl  = document.getElementById('whos-path');
-      const arcScale = pathEl.getTotalLength() / 3070;
-      whosUnit = measureWhosUnit() * arcScale;
+      if (!whosTextpath) return;
+      var fullLen = whosTextpath.getComputedTextLength();
+      whosUnit =
+        fullLen > 0 && Number.isFinite(fullLen)
+          ? fullLen / WHOS_MARQUEE_REPEATS
+          : measureWhosUnitFallback();
       requestAnimationFrame(animateWhos);
     });
 
