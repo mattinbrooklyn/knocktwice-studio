@@ -1001,9 +1001,13 @@ html.kt-monster-modal-open body {
     /* Total depth from viewport bottom reserved for footer + home-indicator inset. */
     --footer-stack-height: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
   }
-  /* Wave / modal stack: anchor to full footer footprint (56px band + safe area). !important overrides per-page `<style>` bottom rules on mobile only. */
+  /* Wave / modal stack: anchor to footer + safe-area (overrides weaker per-page rules).
+     About mounts `#monster-linear-ticker` beneath the wave — taller bottom offset wins below. */
   #monster-group {
     bottom: var(--footer-stack-height) !important;
+  }
+  #page-scaler:has(#monster-linear-ticker) #monster-group {
+    bottom: calc(var(--footer-stack-height) + var(--about-ml-ticker-height) - 1px) !important;
   }
 
   /* Footer grid + safe-area: fills home-indicator row with brand blue. Bottom

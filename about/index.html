@@ -22,6 +22,8 @@
       flex-direction: column;
       min-height: calc(100vh + var(--footer-height));
       overflow: hidden;
+      /* Mailing marquee band height — offsets wave stack bottom by exactly this (+ 1px overlap for hairlines). */
+      --about-ml-ticker-height: clamp(38px, 5.75vw, 52px);
     }
 
     /* ── Page canvas ────────────────────────────────────────────────
@@ -35,7 +37,7 @@
       flex-direction: column;
       padding-top: 4.375rem;
       padding-left: var(--content-left);
-      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 2rem);
+      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 2rem);
       flex: 1;
       min-height: calc(100vh - var(--footer-height));
     }
@@ -178,9 +180,12 @@
        Blue wave SVG + SVG overlay with eye whites + iris circles. */
     #monster-group {
       position: absolute;
-      left: 0; bottom: var(--footer-height);
+      left: 0;
+      /* Matches ticker band height from `--about-ml-ticker-height`; −1px kills subpixel cream between wave and green strip. */
+      bottom: calc(var(--footer-height) + var(--about-ml-ticker-height) - 1px);
       width: 100%;
-      z-index: 5;
+      /* Above #monster-linear-ticker for edge cases / scroll — geometry keeps the marquee readable. */
+      z-index: 15;
       transition: transform 600ms ease-out;
       will-change: transform;
     }
@@ -202,18 +207,92 @@
       display: block;
       pointer-events: none;
     }
-    /* SVG textPath ticker */
-    .monster-ticker {
+    /* Linear mailing-list marquee — sibling of #monster-group (must NOT stay inside the
+       transformed monster band: fixed/viewport docking breaks when ancestor has transform). */
+    #monster-linear-ticker {
       position: absolute;
-      bottom: calc(100% - 96px);
       left: 0;
+      bottom: var(--footer-height);
       width: 100%;
-      height: 156px;
-      overflow: hidden;
-      z-index: 6;
-      pointer-events: auto;
+      box-sizing: border-box;
+      /* Below #monster-group idle (15) / risen (1020); stacked lower so lip rarely covers copy. */
+      z-index: 12;
     }
-    .monster-ticker svg { display: block; }
+    html.kt-monster-modal-open #monster-linear-ticker {
+      position: fixed;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-width: 100vw;
+      bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
+      transition: opacity 480ms ease, bottom 600ms cubic-bezier(0.4, 0, 0.2, 1);
+      /* Above risen monster band (1020) + blue fill so the strip stays visible; under modal card (1025). */
+      z-index: 1023;
+    }
+    .monster-linear-ticker {
+      height: var(--about-ml-ticker-height);
+      background: var(--color-green);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+    .monster-linear-ticker .kt-linear-ticker__track {
+      display: flex;
+      flex-wrap: nowrap;
+      width: max-content;
+      will-change: transform;
+      animation: kt-monster-linear-ticker-scroll 40s linear infinite;
+      animation-play-state: paused;
+    }
+    .monster-linear-ticker .kt-linear-ticker__sequence {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0;
+      white-space: nowrap;
+      font-family: var(--font-ui), sans-serif;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      font-weight: 400;
+      font-size: clamp(0.875rem, 3.95vw, 1.375rem);
+      letter-spacing: -0.14px;
+      text-transform: uppercase;
+      color: var(--color-white);
+    }
+    @media (min-width: 769px) {
+      .monster-linear-ticker .kt-linear-ticker__sequence {
+        letter-spacing: -0.22px;
+      }
+    }
+    /* Repeat unit = phrase + symmetrical space–📒–space (fixes LIST📒LIST collisions). */
+    .monster-linear-ticker .kt-linear-ticker__chunk {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .monster-linear-ticker .kt-linear-ticker__text {
+      display: inline-block;
+    }
+    .monster-linear-ticker .kt-linear-ticker__ico {
+      font-family: inherit;
+      font-style: normal;
+      line-height: 1;
+      display: inline-block;
+      flex-shrink: 0;
+      font-variation-settings: inherit;
+      transform: translateY(0.02em);
+      margin-inline: clamp(0.28rem, 1.05vw, 0.5625rem);
+    }
+    @keyframes kt-monster-linear-ticker-scroll {
+      to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .monster-linear-ticker .kt-linear-ticker__track {
+        animation: none;
+      }
+    }
     /* Eyes overlay: MUST use preserveAspectRatio=none so it stretches
        to fill the wave area at every viewport width */
     .monster-eyes-overlay {
@@ -223,24 +302,6 @@
       pointer-events: none;
       overflow: visible;
     }
-    /* Mobile ticker — hidden by default; mobile breakpoint shows it.
-       Sits directly over the wave area (same dimensions, 440×64 viewBox).
-       Text is drawn along a path that follows the wave curve, offset up by
-       ~8px so the text baseline rides along the wave top edge. Container
-       extends 20px above the wave so the text at the peak isn't clipped. */
-    .monster-ticker-mobile {
-      display: none;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      /* Wave (64px) + 20px headroom above for text at peaks */
-      height: calc(var(--wave-height-mobile) + 20px);
-      overflow: hidden;
-      z-index: 7; /* above eyes overlay so ticker sits on top */
-      pointer-events: auto;
-    }
-    .monster-ticker-mobile svg { display: block; }
     /* Blue body below the wave crest — follows monster-group transform.
        height:300vh guarantees it fills below the wave on all screens. */
     #modal-blue-body {
@@ -295,7 +356,7 @@
        desktop layout and the fully-stacked mobile layout.           */
     @media (max-width: 1140px) {
       .page {
-        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 1rem);
+        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
       }
       .person-name {
         font-size: clamp(1.125rem, 1.528vw, 1.375rem);
@@ -326,7 +387,7 @@
         left: auto !important;
         right: 1vw !important;
         top: auto !important;
-        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 3rem) !important;
+        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 3rem) !important;
         width: 20vw !important;
         height: 21vw !important;
       }
@@ -341,7 +402,7 @@
       .page {
         padding-top: 6.0625rem;
         padding-right: var(--content-left);
-        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + 1rem);
+        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
         /* Reserve space for absolute-positioned paint bucket below the
            Matt headshot (Figma: bucket bottom at y=1241, footer wave at
            y=1365). */
@@ -405,21 +466,24 @@
         width: 100% !important;
         height: 100% !important;
       }
-      /* Monster ticker: show on mobile with mobile-specific wave path */
-      .monster-ticker { display: none; }
-      .monster-ticker-mobile { display: block; }
 
-      /* Tap target (height: global #monster-group .monster-area on mobile) */
+      /* Mobile marquee + wave: ticker uses footer+safe-area; wave bottom offset lives in globals
+         `#page-scaler:has(#monster-linear-ticker) #monster-group` (beats old single-selector !important). */
+      #monster-linear-ticker {
+        bottom: var(--footer-stack-height);
+      }
+
+      html.kt-monster-modal-open #monster-linear-ticker {
+        bottom: var(--footer-stack-height);
+      }
+
       .monster-area {
         pointer-events: auto;
         cursor: pointer;
       }
 
-      /* Mobile: wave rises so it sits near the top of the viewport with the
-         ticker visible above the crest and the eyes peeking down. The blue
-         body (#modal-blue-body) fills everything below. Figma shows wave
-         top at ~15% from screen top — we use -70vh which approximates that
-         on typical phone screens (640px..900px tall). */
+      /* Mobile: wave rises near top of viewport (eyes + crest). Linear mailing-list
+         ticker is a #page-scaler sibling with its own bottom anchor (see #monster-linear-ticker). */
       #monster-group.wave-risen {
         transform: translateY(-60vh);
       }
@@ -432,7 +496,7 @@
       /* Card position: Figma shows card center at ~66% of 956px frame.
          Input stacks above button per Figma. */
       #newsletter-window.modal-card {
-        top: 66%;
+        top: 60%;
         width: min(24rem, calc(100vw - 2rem));
         padding: 1.5rem 1.25rem;
       }
@@ -631,42 +695,6 @@
       <!-- Blue body first in DOM so wave renders on top -->
       <div id="modal-blue-body"></div>
 
-      <!-- ── Desktop ticker (hidden on mobile) ────────────────────── -->
-      <div class="monster-ticker">
-        <svg width="100%" height="156" viewBox="0 0 1440 156.154" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Arch 1 starts off-screen left, arch 2 fills viewport, arch 3 off-screen right -->
-            <path id="wave-text-path" d="M-1440 156.154 C-1440 156.154 -1177 40 -865.166 40 C-577.5 40 0 156.154 0 156.154 C0 156.154 263 40 574.834 40 C862.5 40 1440 156.154 1440 156.154 C1440 156.154 1703 40 2014.834 40 C2302.5 40 2880 156.154 2880 156.154"/>
-          </defs>
-          <text font-family="Handjet, sans-serif" font-size="22" fill="#51B18C" letter-spacing="-0.22"
-                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#wave-text-path">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="30s" repeatCount="indefinite" calcMode="linear"/></textPath>
-          </text>
-        </svg>
-      </div>
-
-      <!-- ── Mobile ticker (visible on mobile, hidden on desktop) ─── -->
-      <!-- viewBox 440×84 = 64px wave area + 20px headroom above.
-           Wave top edge in this viewBox: y=20 at edges, y=20-20=0 at peak.
-           Actually wave at edges y=84, at peak x=170 y=20 (above wave area).
-           Text path follows the wave curve offset up ~6px so the text
-           baseline sits ON the wave top edge. 3 arches for seamless scroll. -->
-      <div class="monster-ticker-mobile" style="display:none;">
-        <svg width="100%" height="100%" viewBox="0 0 440 84" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <!-- Wave curve (scaled into 440×84): trough y=84 at x=0 and x=440,
-                 peak y=20 at x=170. Text path offset up by 6px so text sits
-                 on top of the wave edge. Troughs extended slightly off-screen
-                 so the three-arch sequence wraps seamlessly. -->
-            <path id="wave-text-path-mobile" d="M-440 78 C-440 78, -365.08 14, -270 14 C-158.08 14, 0 78, 0 78 C0 78, 74.92 14, 170 14 C281.92 14, 440 78, 440 78 C440 78, 514.92 14, 610 14 C721.92 14, 880 78, 880 78"/>
-          </defs>
-          <text font-family="Handjet, sans-serif" font-size="14" fill="#51B18C" letter-spacing="-0.14"
-                style="font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;">
-            <textPath href="#wave-text-path-mobile">📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST   📒 JOIN OUR MAILING LIST  <animate attributeName="startOffset" from="33.333%" to="0%" dur="18s" repeatCount="indefinite" calcMode="linear"/></textPath>
-          </text>
-        </svg>
-      </div>
-
       <div class="monster-area" id="monster-area">
         <img class="wave" src="/assets/monster-wave.svg" alt="">
 
@@ -729,8 +757,35 @@
         </svg>
 
       </div>
+
   </div><!-- /#monster-group -->
 
+  <!-- Sibling of #monster-group — docked above footer normally; viewport-fixed when mailing modal opens. -->
+  <div class="monster-linear-ticker" id="monster-linear-ticker" role="button" tabindex="0" aria-label="Open mailing list signup">
+    <div class="kt-linear-ticker__track" id="monster-linear-ticker-track">
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <!-- Duplicated strips for seamless loop (same chunk markup / width in both). -->
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+      </div>
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+      </div>
+    </div>
+  </div>
 
   <footer class="footer">
       <div class="footer-icons">
@@ -759,27 +814,10 @@
     }
     scalePage();
 
-    // ── Mobile / desktop component swap ───────────────────────────
-    // Shows the correct ticker for the current viewport (eyes: global CSS + has-mobile-monster-eyes).
-    var tickerDesktop = document.querySelector('.monster-ticker');
-    var tickerMobile  = document.querySelector('.monster-ticker-mobile');
+    // ── Linear marquee: pause CSS animation unless visible (cheap vs SVG textPath). ─────
+    var tickerEl = document.getElementById('monster-linear-ticker');
+    var tickerTrack = document.getElementById('monster-linear-ticker-track');
     var tickerMonsterGroup = document.getElementById('monster-group');
-    // Perf: textPath startOffset animation is expensive; only the visible
-    // breakpoint ticker should run, and only while this section is onscreen.
-    var tickerDesktopSvg = tickerDesktop && tickerDesktop.querySelector('svg');
-    var tickerMobileSvg  = tickerMobile  && tickerMobile.querySelector('svg');
-    function setSvgAnimRunning(svg, run) {
-      if (!svg) return;
-      if (svg.__ktTickerRunning === run) return;
-      svg.__ktTickerRunning = run;
-      try {
-        if (run) {
-          if (typeof svg.unpauseAnimations === 'function') svg.unpauseAnimations();
-        } else {
-          if (typeof svg.pauseAnimations === 'function') svg.pauseAnimations();
-        }
-      } catch (_) { /* timeline may not be ready yet */ }
-    }
     function isFullyOffscreen(el) {
       if (!el) return true;
       var r = el.getBoundingClientRect();
@@ -787,10 +825,12 @@
       return r.bottom <= 0 || r.top >= window.innerHeight || r.right <= 0 || r.left >= window.innerWidth;
     }
     function syncTickerAnimations() {
+      if (!tickerTrack || !tickerEl) return;
       var isMobile = window.innerWidth <= 768;
       var waveRising = tickerMonsterGroup && tickerMonsterGroup.classList.contains('wave-risen');
-      setSvgAnimRunning(tickerDesktopSvg, !document.hidden && !isMobile && (waveRising || !isFullyOffscreen(tickerDesktop)));
-      setSvgAnimRunning(tickerMobileSvg,  !document.hidden && isMobile  && (waveRising || !isFullyOffscreen(tickerMobile)));
+      var runDesktop = !document.hidden && !isMobile && (waveRising || !isFullyOffscreen(tickerEl));
+      var runMobile  = !document.hidden && isMobile  && (waveRising || !isFullyOffscreen(tickerEl));
+      tickerTrack.style.animationPlayState = (runDesktop || runMobile) ? 'running' : 'paused';
     }
     var tickerSyncRaf = 0;
     function requestTickerSync() {
@@ -801,9 +841,6 @@
       });
     }
     function applyMonsterLayout() {
-      var isMobile = window.innerWidth <= 768;
-      tickerDesktop.style.display = isMobile ? 'none'  : '';
-      tickerMobile.style.display  = isMobile ? 'block' : 'none';
       syncTickerAnimations();
     }
     applyMonsterLayout();
@@ -1116,11 +1153,13 @@
       if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
     }
 
-    // Desktop ticker click opens the modal
-    document.querySelector('.monster-ticker').addEventListener('click', openMailingList);
-    // Mobile ticker click also opens the modal (Figma 7057:2880 \u2014 ticker visible on mobile)
-    document.querySelector('.monster-ticker-mobile').addEventListener('click', openMailingList);
-    // Mobile fallback: tapping the wave area (outside ticker) also opens the modal
+    var monsterLinearTicker = document.getElementById('monster-linear-ticker');
+    monsterLinearTicker.addEventListener('click', openMailingList);
+    monsterLinearTicker.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      openMailingList();
+    });
     document.getElementById('monster-area').addEventListener('click', openMailingList);
     mlClose.addEventListener('click', closeMailingList);
     modalBackdrop.addEventListener('click', closeMailingList);
