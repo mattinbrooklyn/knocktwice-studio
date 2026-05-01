@@ -76,6 +76,12 @@
     overflow: visible;
   }
 
+  /* Collage objects: explicit z-index so props sit above overlapping photos.
+     (.photo-card perspective creates stacking contexts that can reorder paint.) */
+  .project-section > .obj.obj--stack-top {
+    z-index: 2;
+  }
+
   /* Mobile variant blocks hidden by default; revealed under ≤768px. */
   .project-mobile { display: none; }
 
@@ -731,8 +737,8 @@
         </div>
       </div>
 
-      <!-- Cookie -->
-      <div class="obj" style="left:27.78%; top:92.98%; width:16.67%;">
+      <!-- Cookie — above exp-mr-hotel-5 / 6 overlap -->
+      <div class="obj obj--stack-top" style="left:27.78%; top:92.98%; width:16.67%;">
         <img loading="lazy" src="/assets/images/obj-cookie.webp" alt="Cookie" style="aspect-ratio:713/685;">
       </div>
 
