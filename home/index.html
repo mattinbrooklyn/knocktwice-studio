@@ -158,11 +158,16 @@
       pointer-events: none;
       transition: opacity 480ms ease, visibility 0ms 480ms;
     }
-    body.home:has(#home-monster.is-visible) #home-monster-linear-ticker,
-    body.home:has(#home-monster.is-hiding) #home-monster-linear-ticker {
+    body.home:has(#home-monster.is-visible) #home-monster-linear-ticker {
       opacity: 1;
       visibility: visible;
       transition: opacity 480ms ease, visibility 0ms;
+    }
+    /* Monster dismiss: strip vanishes immediately (no fade through is-hiding). */
+    body.home:has(#home-monster.is-hiding) #home-monster-linear-ticker {
+      opacity: 0;
+      visibility: hidden;
+      transition: none;
     }
     .home-monster-linear-ticker {
       height: var(--home-monster-linear-ticker-height);

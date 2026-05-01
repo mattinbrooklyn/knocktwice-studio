@@ -69,6 +69,11 @@
     width: 100%; height: 100%;
     overflow: visible;
   }
+  /* One repeat, same path as visible copy — WebKit (iOS) measures long textPath inaccurately. */
+  .whos-there-marquee__measure {
+    opacity: 0;
+    pointer-events: none;
+  }
 
   .intro {
     font-family: var(--font-body);
@@ -371,7 +376,10 @@
         <defs>
           <path id="whos-path" d="M0 56 C102 36,205 36,307 56 C409 76,512 76,614 56 C716 36,819 36,921 56 C1023 76,1126 76,1228 56 C1330 36,1433 36,1535 56 C1637 76,1740 76,1842 56 C1944 36,2047 36,2149 56 C2251 76,2354 76,2456 56 C2558 36,2661 36,2763 56 C2865 76,2968 76,3070 56"/>
         </defs>
-        <text xml:space="preserve" style="font-family: var(--font-ui); font-size: 22px; font-weight: 400; letter-spacing: -0.22px; font-variation-settings: 'ELGR' 1, 'ELSH' 2; fill: #EC8EDF;">
+        <text xml:space="preserve" class="whos-there-marquee__measure" aria-hidden="true" style="font-family: var(--font-ui); font-size: 22px; font-weight: 400; letter-spacing: -0.22px; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; fill: #EC8EDF;">
+          <textPath id="whos-textpath-unit" href="#whos-path" startOffset="0">WHO'S THERE?        👀        </textPath>
+        </text>
+        <text xml:space="preserve" style="font-family: var(--font-ui); font-size: 22px; font-weight: 400; letter-spacing: -0.22px; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; fill: #EC8EDF;">
           <textPath id="whos-textpath" href="#whos-path" startOffset="0">WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        WHO'S THERE?        👀        </textPath>
         </text>
       </svg>
@@ -611,18 +619,21 @@
     }
 
     // ── WHO'S THERE marquee ────────────────────────────────────────
-    // Path starts at x=0. startOffset=0 → first char at x=0.
-    // Decrementing offset scrolls text left; new chars enter from the right.
-    // Loop length = one repeat of the copy, measured on this <textPath> after
-    // fonts load (same geometry as paint — avoids straight-line + arcScale drift).
-    const WHOS_MARQUEE_REPEATS = 20;
+    // startOffset scrolls text along #whos-path. Loop length must match one
+    // copy of the tile. Prefer the hidden single-cell textPath (same path +
+    // typography as visible) — WebKit mis-measures some long-string APIs.
+    // No per-frame modulo (causes micro-hiccups); wrap only when crossing -whosUnit.
+    const WHOS_TICKER_CELL = "WHO'S THERE?        👀        ";
     const whosTextpath = document.getElementById('whos-textpath');
+    const whosTextpathUnit = document.getElementById('whos-textpath-unit');
     let whosOffset  = 0;
-    let whosUnit    = 0; // path-distance for one repeat, measured once
+    let whosUnit    = 0;
     let whosPrev    = null;
+    var whosRemeasureTimeout = null;
+    var WHOS_SPEED = 51;
 
     function measureWhosUnitFallback() {
-      var cell = "WHO'S THERE?        👀        ";
+      var cell = WHOS_TICKER_CELL;
       var ns = 'http://www.w3.org/2000/svg';
       var svg = document.createElementNS(ns, 'svg');
       svg.style.cssText = 'position:absolute;left:-9999px;top:-9999px;visibility:hidden';
@@ -632,7 +643,7 @@
       txt.setAttribute('font-size', '22');
       txt.setAttribute('font-weight', '400');
       txt.setAttribute('letter-spacing', '-0.22');
-      txt.style.fontVariationSettings = "'ELGR' 1, 'ELSH' 2";
+      txt.style.fontVariationSettings = "'ELGR' 1, 'ELSH' 2, 'wght' 400";
       txt.textContent = cell;
       svg.appendChild(txt);
       document.body.appendChild(svg);
@@ -643,21 +654,54 @@
       return straight * arcScale;
     }
 
-    // Pause marquee when tab is hidden to save CPU
+    function syncWhosUnit() {
+      var charLen =
+        whosTextpathUnit && whosTextpathUnit.textContent
+          ? whosTextpathUnit.textContent.length
+          : WHOS_TICKER_CELL.length;
+      var u = 0;
+      var lenUnit = whosTextpathUnit && whosTextpathUnit.getComputedTextLength();
+      if (lenUnit > 0 && Number.isFinite(lenUnit)) {
+        u = lenUnit;
+      }
+      if (!(u > 0) && whosTextpath && typeof whosTextpath.getSubStringLength === 'function') {
+        try {
+          var tile0 = whosTextpath.getSubStringLength(0, charLen);
+          if (tile0 > 0 && Number.isFinite(tile0)) u = tile0;
+        } catch (e) {}
+      }
+      if (!(u > 0) && whosTextpath && typeof whosTextpath.getSubStringLength === 'function') {
+        try {
+          var spanAll = whosTextpath.getSubStringLength(0, charLen * 20);
+          if (spanAll > 0 && Number.isFinite(spanAll)) u = spanAll / 20;
+        } catch (e) {}
+      }
+      if (!(u > 0 && Number.isFinite(u))) {
+        u = measureWhosUnitFallback();
+      }
+      whosUnit = u;
+    }
+
+    function resetWhosMarqueePhase() {
+      whosOffset = 0;
+      if (whosTextpath) whosTextpath.setAttribute('startOffset', '0');
+      whosPrev = null;
+    }
+
     var whosRunning = true;
     function animateWhos(ts) {
-      if (!whosRunning) { whosPrev = null; return; }
-      if (whosPrev !== null) {
-        const dt = Math.min(ts - whosPrev, 50);
-        whosOffset -= 51 * (dt / 1000);
-        if (whosUnit > 0) {
-          while (whosOffset <= -whosUnit) whosOffset += whosUnit;
-        }
-        whosTextpath.setAttribute('startOffset', whosOffset.toFixed(2));
+      if (!whosTextpath) return;
+      if (!whosRunning) { whosPrev = null; requestAnimationFrame(animateWhos); return; }
+      if (whosPrev !== null && whosUnit > 0) {
+        var dt = Math.min(ts - whosPrev, 50);
+        whosOffset -= WHOS_SPEED * (dt / 1000);
+        while (whosOffset <= -whosUnit) whosOffset += whosUnit;
+        whosTextpath.setAttribute('startOffset', String(whosOffset));
       }
       whosPrev = ts;
       requestAnimationFrame(animateWhos);
     }
+
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) {
         whosRunning = false;
@@ -668,16 +712,26 @@
       }
     });
 
-    // Wait for Handjet to load before measuring, then kick off the loop.
-    document.fonts.ready.then(() => {
+    document.fonts.ready.then(function () {
       if (!whosTextpath) return;
-      var fullLen = whosTextpath.getComputedTextLength();
-      whosUnit =
-        fullLen > 0 && Number.isFinite(fullLen)
-          ? fullLen / WHOS_MARQUEE_REPEATS
-          : measureWhosUnitFallback();
-      requestAnimationFrame(animateWhos);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          syncWhosUnit();
+          resetWhosMarqueePhase();
+          requestAnimationFrame(animateWhos);
+        });
+      });
     });
+
+    function remeasureWhosUnitDebounced() {
+      clearTimeout(whosRemeasureTimeout);
+      whosRemeasureTimeout = setTimeout(function () {
+        syncWhosUnit();
+        resetWhosMarqueePhase();
+      }, 120);
+    }
+    window.addEventListener('orientationchange', remeasureWhosUnitDebounced);
+    window.addEventListener('resize', remeasureWhosUnitDebounced);
 
     // ── Contact form validation & success state ────────────────────
     var emailInput   = document.querySelector('.input-row input[name="email"]');
