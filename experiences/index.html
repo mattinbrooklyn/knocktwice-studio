@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC" media="(max-width: 768px)">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Experiences — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
+
+  /* ── Monster wave ────────────────────────────────────────────────── */
+  #monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 5;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: 1.1s;
+  }
+
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  /* ── Top section content ─────────────────────────────────────────── */
+  .h1 {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-sm);
+  }
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-xl);
+  }
+  .intro p { margin-bottom: 0; }
+
+  /* ── Project sections ────────────────────────────────────────────── */
+  .project-section {
+    position: relative;
+    width: 100vw;
+    max-width: 1440px;
+    margin-left: calc(-1 * var(--content-left));
+    aspect-ratio: 1440 / 1256;
+    overflow: visible;
+  }
+
+  /* Collage objects: explicit z-index so props sit above overlapping photos.
+     (.photo-card perspective creates stacking contexts that can reorder paint.) */
+  .project-section > .obj.obj--stack-top {
+    z-index: 2;
+  }
+
+  /* Mobile variant blocks hidden by default; revealed under ≤768px. */
+  .project-mobile { display: none; }
+
+  /* ── Mobile (Figma 7097:2441 — 440-wide frame) ────────────────── */
+  @media (max-width: 768px) {
+    /* Intro → first stack gap (Figma: 30px from body end y=311 to divider y=341) */
+    .intro { margin-bottom: 1.875rem; }
+
+    /* Collapse desktop collage; project-sections become natural flow. */
+    .project-section {
+      margin-left: 0;
+      width: 100%;
+      max-width: none;
+      aspect-ratio: auto;
+    }
+    .project-section > .photo,
+    .project-section > .photo-card,
+    .project-section > .photo-rotated,
+    .project-section > .placeholder,
+    .project-section > .obj,
+    .project-section > .sticker { display: none; }
+
+    /* Mobile variant flows vertically inside each project-section. */
+    .project-mobile {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      padding-block: 1.25rem 2.5rem;
+      border-top: 2px solid var(--color-ink);
+    }
+    .project-mobile .stack-description {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      /* padding-inline: var(--content-left); */
+    }
+    .project-mobile .card-title {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      line-height: 1.5625rem;
+      font-weight: 400;
+      color: var(--color-ink);
+    }
+    .project-mobile .card-body {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      line-height: 1.0625rem;
+      color: var(--color-ink);
+    }
+    .project-mobile .card-tags {
+      display: flex;
+      gap: var(--chip-gap);
+      flex-wrap: wrap;
+    }
+
+    /* Swipe stack container — per-stack width + aspect from Figma.
+       Width is % of content column (440 frame) + align-self centers in .project-mobile;
+       vw + Figma x margin-left skewed the stack right inside padded .page. */
+    .swipe-stack {
+      position: relative;
+      overflow: visible;
+      touch-action: pan-y;
+      align-self: center;
+    }
+    /* Blank Canvas Bash: w=413.43, h=409.07 on 440-wide frame. */
+    .swipe-stack[data-stack="blank-canvas-bash"] {
+      width: calc(100% * 413.43 / 440);
+      aspect-ratio: 413.43 / 409.07;
+      margin-top: 7.37vw;
+      margin-bottom: 8.87vw;
+    }
+    /* Dinner: w=h=409.074. */
+    .swipe-stack[data-stack="dinner"] {
+      width: calc(100% * 409.074 / 440);
+      aspect-ratio: 1 / 1;
+      margin-top: 12.27vw;
+      margin-bottom: 21.81vw;
+    }
+    /* Wedding: w=h=409.074. */
+    .swipe-stack[data-stack="wedding"] {
+      width: calc(100% * 409.074 / 440);
+      aspect-ratio: 1 / 1;
+      margin-top: 12.43vw;
+      margin-bottom: 16.88vw;
+    }
+    /* Hotel MR: w=417.651, h=294.252. */
+    .swipe-stack[data-stack="hotel-mr"] {
+      width: calc(100% * 417.651 / 440);
+      aspect-ratio: 417.651 / 294.252;
+      margin-top: 13.82vw;
+    }
+    /* MR Buffet: w=409.074, h=409.393. */
+    .swipe-stack[data-stack="mr-buffet"] {
+      width: calc(100% * 409.074 / 440);
+      aspect-ratio: 409.074 / 409.393;
+      margin-top: 7.65vw;
+      margin-bottom: 9.62vw;
+    }
+    /* Sister Soiree: w=413.426, h=287.568. */
+    .swipe-stack[data-stack="sister-soiree"] {
+      width: calc(100% * 413.426 / 440);
+      aspect-ratio: 413.426 / 287.568;
+      margin-top: 18.69vw;
+      margin-bottom: 10.17vw;
+    }
+
+    .swipe-card {
+      position: absolute;
+      border-radius: 0.25rem;
+      box-shadow: var(--shadow-stack);
+      overflow: hidden;
+      will-change: transform;
+      background: var(--color-bg);
+      user-select: none;
+    }
+    .swipe-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Stickers sit over the stack — % values resolve against .swipe-stack. */
+    .project-stickers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    /* Outer = Figma post-rotation bbox (axis-aligned). Inner (if present)
+       holds the pre-rotation rect + rotation, centered via flex so the
+       rotated content lands exactly inside the bbox. */
+    .mobile-sticker {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mobile-sticker-inner {
+      flex: none;
+      position: relative;
+    }
+    .mobile-sticker img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      pointer-events: none;
+      user-select: none;
+    }
+  }
+  </style>
+</head>
+<body>
+
+  <a href="/home/" class="logo">
+    <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path class="logo-eye-sclera" d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
+      <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+    </svg>
+  </a>
+
+  <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/" class="active">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/" class="active">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+
+  <div id="page-scaler">
+  <div class="page">
+
+    <h1 class="h1">TAKE A SEAT</h1>
+
+    <div class="body-text intro">
+      <p>We create the kinds of experiences you feel before you walk in and stay with you well after leaving.</p>
+      <p>&nbsp;</p>
+      <p>From intimate celebrations with loved ones to weekend-long retreats for global communities, we work across scales and priorities to bring ideas to life and vibes to fruition.</p>
+      <p>&nbsp;</p>
+      <p>If you have something in mind, or just a feeling you want to chase, reach out and we will make it happen.</p>
+    </div>
+
+    <!-- ── Mr. Tao ──────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1256 (canvas y:360 to y:1616). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1256;">
+
+      <!-- exp-mr-tao-1  left:13.54% top:0%     w:37.01% h:28.26% — hover card flip -->
+      <div class="photo-card" style="left:13.54%; top:0%; width:37.01%; height:28.26%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-1.webp" alt="Blank Canvas Bash">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">BLANK CANVAS BASH</h3>
+            <p class="card-body">The Animal Observatory's first US activation — an open-house invitation for children and parents to explore, make, and play.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-tao-3  left:52.64% top:6.21%  w:36.94% h:28.26% -->
+      <div class="photo" style="left:52.64%; top:6.21%; width:36.94%; height:28.26%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-3.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-6  left:-7.01% top:30.65% w:36.94% h:28.26% (bleeds left) -->
+      <div class="photo" style="left:-7.01%; top:30.65%; width:36.94%; height:28.26%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-6.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-4  left:36.18% top:30.65% w:24.65% h:42.36% portrait -->
+      <div class="photo" style="left:36.18%; top:30.65%; width:24.65%; height:42.36%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-2  left:65.0%  top:36.31% w:36.94% h:28.26% -->
+      <div class="photo" style="left:65.0%; top:36.31%; width:36.94%; height:28.26%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-7  left:10.42% top:63.69% w:36.94% h:28.26% -->
+      <div class="photo" style="left:10.42%; top:63.69%; width:36.94%; height:28.26%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-7.webp" alt="">
+      </div>
+
+      <!-- exp-mr-tao-5  left:54.72% top:71.73% w:36.94% h:28.26% -->
+      <div class="photo" style="left:54.72%; top:71.73%; width:36.94%; height:28.26%;">
+        <img loading="lazy" src="/assets/images/exp-mr-tao-5.webp" alt="">
+      </div>
+
+
+      <!-- Box Tape -->
+      <div class="obj has-rotation" style="left:1.63%; top:11.74%; width:19.72%;">
+        <div class="obj-inner" style="transform:rotate(90deg); aspect-ratio:2332/796;">
+          <img loading="lazy" src="/assets/images/obj-box-tape.webp" alt="Box Tape">
+        </div>
+      </div>
+
+      <!-- Yellow Pencil -->
+      <div class="obj has-rotation" style="left:94.08%; top:11.38%; width:3.41%;">
+        <div class="obj-inner" style="transform:rotate(-24.05deg); aspect-ratio:61/546;">
+          <img loading="lazy" src="/assets/images/obj-yellow-pencil.webp" alt="Yellow Pencil">
+        </div>
+      </div>
+
+      <!-- Duct Tape -->
+      <div class="obj has-rotation" style="left:61.67%; top:62.34%; width:21.68%;">
+        <div class="obj-inner" style="transform:rotate(180deg); aspect-ratio:326/94;">
+          <img loading="lazy" src="/assets/images/obj-duct-tape.webp" alt="Duct Tape">
+        </div>
+      </div>
+
+      <!-- Pink Eraser -->
+      <div class="obj has-rotation" style="left:3.72%; top:65.63%; width:14.60%;">
+        <div class="obj-inner" style="transform:rotate(-16.85deg); aspect-ratio:319/142;">
+          <img loading="lazy" src="/assets/images/obj-pink-eraser.webp" alt="Pink Eraser">
+        </div>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Blank Canvas Bash) ── -->
+      <div class="project-mobile" data-project="blank-canvas-bash">
+        <div class="stack-description">
+          <h3 class="card-title">BLANK CANVAS BASH</h3>
+          <p class="card-body">The Animal Observatory's first US activation — an open-house invitation for children and parents to explore, make, and play.</p>
+          <div class="card-tags">
+            <span class="card-tag">Brand Activation</span>
+            <span class="card-tag">Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="blank-canvas-bash">
+          <!-- Swipe hint (dismissed on first interactions) -->
+          <img loading="lazy" src="/assets/images/swipe-hint.png" alt="Swipe through the stack" class="swipe-hint-overlay" />
+
+          <!-- DOM order: MR_TAO-1 (bottom) → MR_TAO-7 (top). Positions = visual outer-container coords from Figma 7097:2485 (ImageStack x=3.287, y=493.46, w=413.43, h=409.07). -->
+          <div class="swipe-card" style="left:0.53%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:14.97%; width:100%; aspect-ratio:413.426/287.568;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.16%; top:0%; width:67.92%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.07%; top:16.64%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-6.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.53%; top:15.80%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-tao-7.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- BoxTape: file is tall (97×284); pre-rotate 90° + Figma -177.15° = -87.15°. -->
+            <div class="mobile-sticker" style="left:1.14%; top:80%; width:43.19%; aspect-ratio:178.541/68.665;">
+              <div class="mobile-sticker-inner" style="width:33.62%; aspect-ratio:97/284; transform:rotate(-87.15deg);">
+                <img loading="lazy" src="/assets/images/obj-box-tape.webp" alt="">
+              </div>
+            </div>
+            <!-- YellowPencil: tall, slight tilt (Figma -12.09°). -->
+            <div class="mobile-sticker" style="left:91.36%; top:-7.94%; width:21.03%; aspect-ratio:86.948/273.194;">
+              <div class="mobile-sticker-inner" style="width:35.06%; aspect-ratio:30.484/272.86; transform:rotate(-12.09deg);">
+                <img loading="lazy" src="/assets/images/obj-yellow-pencil.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Blank Canvas Bash) -->
+
+    </div><!-- /.project-section (Mr. Tao) -->
+
+    <!-- ── Dinner ────────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1414 (canvas y:1605 to y:3019). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1414;">
+
+      <!-- exp-dinner-151  left:6.11%  top:0%     w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:6.11%; top:0%; width:24.65%; height:37.62%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-151.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-123  left:34.93% top:5.73%  w:36.94% h:25.11% — hover card flip -->
+      <div class="photo-card" style="left:34.93%; top:5.73%; width:36.94%; height:25.11%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-dinner-123.webp" alt="Yumi Matsuo Industry Dinner">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">YUMI MATSUO INDUSTRY DINNER</h3>
+            <p class="card-body">An intimate dinner party for NYC based-photographers — candlelit, citrus-laden, and good to the last drop.</p>
+            <div class="card-tags">
+              <span class="card-tag">Private Event</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-dinner-145  left:77.43% top:21.85% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:77.43%; top:21.85%; width:24.65%; height:37.62%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-145.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-112  left:28.13% top:28.71% w:24.65% h:37.69% portrait -->
+      <div class="photo" style="left:28.13%; top:28.71%; width:24.65%; height:37.69%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-112.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-138  left:54.86% top:35.08% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:54.86%; top:35.08%; width:24.65%; height:37.62%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-138.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-108  left:-2.08% top:46.11% w:24.65% h:37.62% portrait, bleeds left -->
+      <div class="photo" style="left:-2.08%; top:46.11%; width:24.65%; height:37.62%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-108.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-102  left:72.92% top:63.72% w:24.65% h:37.62% portrait -->
+      <div class="photo" style="left:72.92%; top:63.72%; width:24.65%; height:37.62%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-102.webp" alt="">
+      </div>
+
+      <!-- exp-dinner-101  left:13.54% top:74.89% w:36.77% h:25.11% landscape -->
+      <div class="photo" style="left:13.54%; top:74.89%; width:36.77%; height:25.11%;">
+        <img loading="lazy" src="/assets/images/exp-dinner-101.webp" alt="">
+      </div>
+
+
+      <!-- Grapefruit -->
+      <div class="obj" style="left:72.92%; top:8.70%; width:14.58%;">
+        <img loading="lazy" src="/assets/images/obj-grapefruit.webp" alt="Grapefruit" style="aspect-ratio:660/692;">
+      </div>
+
+      <!-- Halved Plum -->
+      <div class="obj" style="left:24.31%; top:61.81%; width:15.28%;">
+        <img loading="lazy" src="/assets/images/obj-halved-plum.webp" alt="Halved Plum" style="aspect-ratio:272/271;">
+      </div>
+
+      <!-- Orange 3 -->
+      <div class="obj" style="left:61.11%; top:67.75%; width:14.72%;">
+        <img loading="lazy" src="/assets/images/obj-orange-3.webp" alt="Orange" style="aspect-ratio:231/220;">
+      </div>
+
+      <!-- Old Fashioned -->
+      <div class="obj has-rotation" style="left:74.43%; top:103.72%; width:15.47%; mix-blend-mode:multiply;">
+        <div class="obj-inner" style="transform:rotate(9.06deg); aspect-ratio:492/630;">
+          <img loading="lazy" src="/assets/images/obj-old-fashioned.webp" alt="Old Fashioned">
+        </div>
+      </div>
+
+      <!-- Sticker Ring 1 — Figma 7074:1273 (Dinner): phrase + 💅, spaces around emoji, gap after for loop -->
+      <div class="sticker sticker--dynamic" data-sticker-vb-base="183" data-sticker-layout-width="183.0474060177803" style="left:calc(825 / 1440 * 100%); top:calc((2724.046875 - 1605) / 1414 * 100% - 5%); width:calc(183.0474060177803 / 1440 * 100%); aspect-ratio:1;">
+        <svg viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="exp-sticker-1" d="M91.5,13.5 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/></defs>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" letter-spacing="0" direction="ltr" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2; unicode-bidi: isolate;" xml:space="preserve">
+            <textPath href="#exp-sticker-1">Where the plans turn into something you can walk into &#x20;💅🏽&#xFE0F;&#x20;</textPath>
+          </text>
+        </svg>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Dinner) ───────────── -->
+      <div class="project-mobile" data-project="dinner">
+        <div class="stack-description">
+          <h3 class="card-title">YUMI MATSUO INDUSTRY DINNER</h3>
+          <p class="card-body">An intimate dinner party for NYC based-photographers — candlelit, citrus-laden, and good to the last drop.</p>
+          <div class="card-tags">
+            <span class="card-tag">Private Event</span>
+            <span class="card-tag">Experience Design + Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="dinner">
+          <!-- DOM order: Dinner_1 (bottom) → Dinner_8 (top); photos 101/102/108/112/123/138/145/151 → Dinner_1..8.
+               Positions = visual outer-container coords from Figma 7104:1539 (ImageStack x=5, y=1121, w=409.07, h=409.07). -->
+          <div class="swipe-card" style="left:15.90%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-dinner-101.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.73%; top:16.63%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-dinner-102.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:15.90%; width:100%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-dinner-108.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.63%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-dinner-112.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.90%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-dinner-123.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.62%; top:0.82%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-dinner-138.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.63%; top:0.73%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-dinner-145.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.62%; top:0.82%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-dinner-151.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <div class="mobile-sticker" style="left:86.05%; top:-13.20%; width:34.22%; aspect-ratio:140/146;">
+              <img loading="lazy" src="/assets/images/obj-grapefruit.webp" alt="">
+            </div>
+            <div class="mobile-sticker" style="left:-12.22%; top:85.56%; width:38.14%; aspect-ratio:156/155;">
+              <img loading="lazy" src="/assets/images/obj-halved-plum.webp" alt="">
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Dinner) -->
+
+    </div><!-- /.project-section (Dinner) -->
+
+    <!-- ── Wedding ─────────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1212 (canvas y:3079 to y:4291). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1212;">
+
+      <!-- exp-wedding-228  left:80%    top:0%     w:24.65% h:43.98% portrait -->
+      <div class="photo" style="left:0%; top:0%; width:24.65%; height:43.98%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-228.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-311  left:26.67% top:4.70%  w:37.01% h:29.29% — hover card flip -->
+      <div class="photo-card" style="left:26.67%; top:4.70%; width:37.01%; height:29.29%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-wedding-311.webp" alt="Not a Regular Wedding">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">NOT A REGULAR WEDDING</h3>
+            <p class="card-body">An intimate restaurant wedding for 60 — a quick garden ceremony followed by dinner and a lounge that didn't want to end. Warm, considered, and entirely them.</p>
+            <div class="card-tags">
+              <span class="card-tag">Wedding</span>
+              <span class="card-tag">Event Design + Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-wedding-229  left:59.44% top:24.26% w:37.01% h:29.29% -->
+      <div class="photo" style="left:59.44%; top:24.26%; width:37.01%; height:29.29%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-229.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-222  left:20.42% top:38.94% w:37.01% h:29.29% -->
+      <div class="photo" style="left:20.42%; top:38.94%; width:37.01%; height:29.29%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-222.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-309  left:-0.83% top:53.88% w:24.65% h:43.98% portrait, bleeds left -->
+      <div class="photo" style="left:-0.83%; top:53.88%; width:24.65%; height:43.98%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-309.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-233  left:67.08% top:57.67% w:24.65% h:43.98% portrait -->
+      <div class="photo" style="left:67.08%; top:57.67%; width:24.65%; height:43.98%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-233.webp" alt="">
+      </div>
+
+      <!-- exp-wedding-398  left:27.99% top:70.71% w:37.01% h:29.29% -->
+      <div class="photo" style="left:27.99%; top:70.71%; width:37.01%; height:29.29%;">
+        <img loading="lazy" src="/assets/images/exp-wedding-398.webp" alt="">
+      </div>
+
+
+      <!-- Napkin -->
+      <div class="obj has-rotation" style="left:85.77%; top:43.90%; width:19.10%;">
+        <div class="obj-inner" style="transform:rotate(-12.02deg); aspect-ratio:291/317;">
+          <img loading="lazy" src="/assets/images/obj-napkin.webp" alt="Napkin">
+        </div>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Wedding) ──────────── -->
+      <div class="project-mobile" data-project="wedding">
+        <div class="stack-description">
+          <h3 class="card-title">NOT A REGULAR WEDDING</h3>
+          <p class="card-body">An intimate restaurant wedding for 60 — a quick garden ceremony followed by dinner and a lounge that didn't want to end. Warm, considered, and entirely them.</p>
+          <div class="card-tags">
+            <span class="card-tag">Wedding</span>
+            <span class="card-tag">Event Design + Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="wedding">
+          <!-- DOM order: Wedding-1 (bottom) → Wedding-7 (top); photos 222/228/229/233/309/311/398 → Wedding_1..7.
+               Positions = visual outer-container coords from Figma 7104:1493 (ImageStack x=5.244, y=1821.68, w=409.07, h=409.07).
+               NOTE: get_metadata returned post-rotation bbox X values (~405) that put cards off-screen — design context gave the true visual coords used here. -->
+          <div class="swipe-card" style="left:0.44%; top:16.70%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-wedding-222.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.63%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-wedding-228.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-wedding-229.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.53%; top:16.71%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-wedding-233.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.59%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-wedding-309.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.58%; top:0.89%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-wedding-311.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:15.97%; width:100%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-wedding-398.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- OldFashioned: tall, Figma -12.48°. -->
+            <div class="mobile-sticker" style="left:84.28%; top:-13.37%; width:35.02%; aspect-ratio:143.266/167.645;">
+              <div class="mobile-sticker-inner" style="width:79.80%; aspect-ratio:114.328/146.395; transform:rotate(-12.48deg);">
+                <img loading="lazy" src="/assets/images/obj-old-fashioned.webp" alt="">
+              </div>
+            </div>
+            <!-- Napkin: Figma -166.19° + scaleY(-1). -->
+            <div class="mobile-sticker" style="left:-20.10%; top:68.28%; width:47.34%; aspect-ratio:193.650/203.944;">
+              <div class="mobile-sticker-inner" style="width:81.23%; aspect-ratio:157.3/171.355; transform:rotate(-166.19deg) scaleY(-1);">
+                <img loading="lazy" src="/assets/images/obj-napkin.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Wedding) -->
+
+    </div><!-- /.project-section (Wedding) -->
+
+    <!-- ── Mr. Hotel ───────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1225 (canvas y:4341 to y:5566). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1225;">
+
+      <!-- exp-mr-hotel-3   left:52.57% top:0%     w:37.01% h:28.98% -->
+      <div class="photo" style="left:52.57%; top:0%; width:37.01%; height:28.98%;">
+        <img loading="lazy" src="/assets/images/exp-mr-hotel-3.webp" alt="">
+      </div>
+
+      <!-- exp-mr-hotel-1   left:13.54% top:5.71%  w:37.01% h:29.06% — hover card flip -->
+      <div class="photo-card" style="left:13.54%; top:5.71%; width:37.01%; height:29.06%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-1.webp" alt="Hotel Man Repeller">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">HOTEL MAN REPELLER</h3>
+            <p class="card-body">A weekend-long immersive activation that turned a digital media brand's platform into something guests could experience IRL. 14 events, 200 guests, 40+ brand partners.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-hotel-4   left:-4.17% top:32.24% w:37.08% h:28.98% bleeds left -->
+      <div class="photo" style="left:-4.17%; top:32.24%; width:37.08%; height:28.98%;">
+        <img loading="lazy" src="/assets/images/exp-mr-hotel-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-hotel-2   left:44.93% top:37.14% w:37.01% h:28.98% -->
+      <div class="photo" style="left:44.93%; top:37.14%; width:37.01%; height:28.98%;">
+        <img loading="lazy" src="/assets/images/exp-mr-hotel-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-hotel-5   left:17.64% top:58.45% w:36.94% h:28.98% -->
+      <div class="photo" style="left:17.64%; top:58.45%; width:36.94%; height:28.98%;">
+        <img loading="lazy" src="/assets/images/exp-mr-hotel-5.webp" alt="">
+      </div>
+
+      <!-- exp-mr-hotel-6   left:58.75% top:70.98% w:36.94% h:28.98% -->
+      <div class="photo" style="left:58.75%; top:70.98%; width:36.94%; height:28.98%;">
+        <img loading="lazy" src="/assets/images/exp-mr-hotel-6.webp" alt="">
+      </div>
+
+
+      <!-- Lemon Wedge -->
+      <div class="obj has-rotation" style="left:78.84%; top:29.45%; width:13.06%;">
+        <div class="obj-inner" style="transform:rotate(142.99deg) scaleY(-1); aspect-ratio:292/338;">
+          <img loading="lazy" src="/assets/images/obj-lemon-wedge.webp" alt="Lemon Wedge">
+        </div>
+      </div>
+
+      <!-- Cookie — above exp-mr-hotel-5 / 6 overlap -->
+      <div class="obj obj--stack-top" style="left:27.78%; top:92.98%; width:16.67%;">
+        <img loading="lazy" src="/assets/images/obj-cookie.webp" alt="Cookie" style="aspect-ratio:713/685;">
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Hotel MR) ─────────── -->
+      <div class="project-mobile" data-project="hotel-mr">
+        <div class="stack-description">
+          <h3 class="card-title">HOTEL MAN REPELLER</h3>
+          <p class="card-body">A weekend-long immersive activation that turned a digital media brand's platform into something guests could experience IRL. 14 events, 200 guests, 40+ brand partners.</p>
+          <div class="card-tags">
+            <span class="card-tag">Brand Activation</span>
+            <span class="card-tag">Experience Design</span>
+            <span class="card-tag">Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="hotel-mr">
+          <!-- DOM order: MR_Hotel-1 (bottom) → MR_Hotel-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1518 (ImageStack x=1, y=2508, w=417.65, h=294.25). -->
+          <div class="swipe-card" style="left:0.88%; top:2.34%; width:97.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.48%; top:1.35%; width:98.99%; aspect-ratio:413.426/287.568;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.76%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:0%; width:100%; aspect-ratio:417.651/294.252;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.76%; top:3.71%; width:96.88%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.96%; top:2.36%; width:97.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-hotel-6.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- LemonWedge: Figma 98.31° + scaleY(-1). -->
+            <div class="mobile-sticker" style="left:79.29%; top:-20.69%; width:32.93%; aspect-ratio:137.520/123.244;">
+              <div class="mobile-sticker-inner" style="width:77.53%; aspect-ratio:106.623/123.391; transform:rotate(98.31deg) scaleY(-1);">
+                <img loading="lazy" src="/assets/images/obj-lemon-wedge.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Hotel MR) -->
+
+    </div><!-- /.project-section (Mr. Hotel) -->
+
+    <!-- ── Mr. Buffet ──────────────────────────────────────────────── -->
+    <!-- Container: 1440 × 936 (canvas y:5596 to y:6532). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 936;">
+
+      <!-- exp-mr-buffet-6  left:46.88% top:0%     w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:46.88%; top:0%; width:24.65%; height:56.94%;">
+        <img loading="lazy" src="/assets/images/exp-mr-buffet-6.webp" alt="">
+      </div>
+
+      <!-- exp-mr-buffet-3  left:5.69%  top:8.01%  w:37.01% h:37.93% — hover card flip -->
+      <div class="photo-card" style="left:5.69%; top:8.01%; width:37.01%; height:37.93%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-3.webp" alt="Mr Buffet Holiday Activation">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">MR BUFFET HOLIDAY ACTIVATION</h3>
+            <p class="card-body">A bakery takeover celebrating a seasonal accessories collection — custom desserts, new product, three days open to the public.</p>
+            <div class="card-tags">
+              <span class="card-tag">Brand Activation</span>
+              <span class="card-tag">Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-buffet-2  left:77.78% top:9.72%  w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:77.78%; top:9.72%; width:24.65%; height:56.94%;">
+        <img loading="lazy" src="/assets/images/exp-mr-buffet-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-buffet-5  left:31.94% top:52.35% w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:31.94%; top:52.35%; width:24.65%; height:56.94%;">
+        <img loading="lazy" src="/assets/images/exp-mr-buffet-5.webp" alt="">
+      </div>
+
+      <!-- exp-mr-buffet-4  left:63.54% top:58.76% w:24.65% h:56.94% portrait -->
+      <div class="photo" style="left:63.54%; top:58.76%; width:24.65%; height:56.94%;">
+        <img loading="lazy" src="/assets/images/exp-mr-buffet-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-buffet-1  left:-2.92% top:62.07% w:36.94% h:37.93% bleeds left -->
+      <div class="photo" style="left:-2.92%; top:62.07%; width:36.94%; height:37.93%;">
+        <img loading="lazy" src="/assets/images/exp-mr-buffet-1.webp" alt="">
+      </div>
+
+
+      <!-- Dark Cherry -->
+      <div class="obj has-rotation" style="left:2.77%; top:36.45%; width:14.72%;">
+        <div class="obj-inner" style="transform:rotate(12.54deg); aspect-ratio:428/473;">
+          <img loading="lazy" src="/assets/images/obj-dark-cherry.webp" alt="Dark Cherry">
+        </div>
+      </div>
+
+      <!-- Orange 1 -->
+      <div class="obj has-rotation" style="left:13.61%; top:115.71%; width:13.89%;">
+        <div class="obj-inner" style="transform:rotate(180deg) scaleY(-1); aspect-ratio:229/209;">
+          <img loading="lazy" src="/assets/images/obj-orange-1.webp" alt="Orange">
+        </div>
+      </div>
+
+      <!-- Sticker Ring 2 — Figma 7065:993 (Mr Buffet): … + straight quotes per dev frame; 🪩 with spaces; smaller layout ring -->
+      <div class="sticker sticker--dynamic" data-sticker-vb-base="152" data-sticker-layout-width="151.6288241953407" style="left:calc(1062 / 1440 * 100%); top:calc((5651.814453125 - 5596) / 936 * 100% - 4%); width:calc(151.6288241953407 / 1440 * 100%); aspect-ratio:1;">
+        <svg viewBox="0 0 183 183" xmlns="http://www.w3.org/2000/svg">
+          <defs><path id="exp-sticker-2" d="M91.5,13.5 a78,78 0 1,1 0,156 a78,78 0 1,1 0,-156"/></defs>
+          <text font-family="Handjet, sans-serif" font-size="18" fill="#32261F" font-weight="400" letter-spacing="0" direction="ltr" style="font-variation-settings: 'ELGR' 1, 'ELSH' 2; unicode-bidi: isolate;" xml:space="preserve">
+            <textPath href="#exp-sticker-2">…because &#x22;just an event&#x22; was never the plan &#x20;🪩&#xFE0F;&#x20;&nbsp;</textPath>
+          </text>
+        </svg>
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → MR Buffet) ────────── -->
+      <div class="project-mobile" data-project="mr-buffet">
+        <div class="stack-description">
+          <h3 class="card-title">MR BUFFET HOLIDAY ACTIVATION</h3>
+          <p class="card-body">A bakery takeover celebrating a seasonal accessories collection — custom desserts, new product, three days open to the public.</p>
+          <div class="card-tags">
+            <span class="card-tag">Retail Pop-up</span>
+            <span class="card-tag">Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="mr-buffet">
+          <!-- DOM order: MR_Buffet-1 (bottom) → MR_Buffet-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1598 (ImageStack x=5.682, y=2980.68, w=409.07, h=409.39). -->
+          <div class="swipe-card" style="left:0%; top:15.96%; width:100%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:16.70%; top:0.89%; width:66.97%; aspect-ratio:273.940/404.599;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.97%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.89%; top:16.69%; width:98.91%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.97%; top:0%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:15.98%; top:0.08%; width:68.64%; aspect-ratio:280.797/409.075;">
+            <img loading="lazy" src="/assets/images/exp-mr-buffet-6.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- Cookie: no rotation. -->
+            <div class="mobile-sticker" style="left:87.11%; top:-8.23%; width:35.20%; aspect-ratio:144/138;">
+              <img loading="lazy" src="/assets/images/obj-cookie.webp" alt="">
+            </div>
+            <!-- DarkCherry: Figma 0.79° (subtle). -->
+            <div class="mobile-sticker" style="left:-4.16%; top:70.64%; width:36.02%; aspect-ratio:147.374/162.425;">
+              <div class="mobile-sticker-inner" style="width:98.51%; aspect-ratio:145.173/160.437; transform:rotate(0.79deg);">
+                <img loading="lazy" src="/assets/images/obj-dark-cherry.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (MR Buffet) -->
+
+    </div><!-- /.project-section (Mr. Buffet) -->
+
+    <!-- ── Mr. Nine West ───────────────────────────────────────────── -->
+    <!-- Container: 1440 × 1145 (canvas y:6709 to y:7854). Positions % of this container. -->
+    <div class="project-section" style="aspect-ratio: 1440 / 1145; margin-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--space-lg));">
+
+      <!-- exp-mr-nine-west-1  left:31.74% top:0%     w:37.01% h:31.0% — hover card flip -->
+      <div class="photo-card" style="left:31.74%; top:0%; width:37.01%; height:31.0%;">
+        <div class="photo-card-inner">
+          <div class="photo-card-front">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-1.webp" alt="Sole Sister Soirée">
+          </div>
+          <div class="photo-card-back">
+            <h3 class="card-title">SOLE SISTER SOIRÉE</h3>
+            <p class="card-body">A sister-themed cocktail party in partnership with Nine West. Sixty guests, one rule: bring someone like a sister.</p>
+            <div class="card-tags">
+              <span class="card-tag">Private Event</span>
+              <span class="card-tag">Experience Design + Production</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- exp-mr-nine-west-3  left:-7.29% top:10.83% w:36.94% h:31.0% bleeds left -->
+      <div class="photo" style="left:-7.29%; top:10.83%; width:36.94%; height:31.0%;">
+        <img loading="lazy" src="/assets/images/exp-mr-nine-west-3.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-4  left:57.43% top:22.27% w:36.94% h:31.0% -->
+      <div class="photo" style="left:57.43%; top:22.27%; width:36.94%; height:31.0%;">
+        <img loading="lazy" src="/assets/images/exp-mr-nine-west-4.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-2  left:16.32% top:35.37% w:36.94% h:31.0% -->
+      <div class="photo" style="left:16.32%; top:35.37%; width:36.94%; height:31.0%;">
+        <img loading="lazy" src="/assets/images/exp-mr-nine-west-2.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-6  left:47.36% top:63.76% w:36.94% h:31.0% -->
+      <div class="photo" style="left:47.36%; top:63.76%; width:36.94%; height:31.0%;">
+        <img loading="lazy" src="/assets/images/exp-mr-nine-west-6.webp" alt="">
+      </div>
+
+      <!-- exp-mr-nine-west-5  left:2.08%  top:69.0%  w:36.94% h:31.0% -->
+      <div class="photo" style="left:2.08%; top:69.0%; width:36.94%; height:31.0%;">
+        <img loading="lazy" src="/assets/images/exp-mr-nine-west-5.webp" alt="">
+      </div>
+
+
+      <!-- White Orchid -->
+      <div class="obj has-rotation" style="left:77.78%; top:2.01%; width:17.22%;">
+        <div class="obj-inner" style="transform:rotate(3.45deg); aspect-ratio:302/255;">
+          <img loading="lazy" src="/assets/images/obj-white-orchid.webp" alt="White Orchid">
+        </div>
+      </div>
+
+      <!-- Orange 2 -->
+      <div class="obj has-rotation" style="left:-3.17%; top:40.71%; width:14.55%;">
+        <div class="obj-inner" style="transform:rotate(17.93deg); aspect-ratio:229/220;">
+          <img loading="lazy" src="/assets/images/obj-orange-2.webp" alt="Orange">
+        </div>
+      </div>
+
+      <!-- Paloma -->
+      <div class="obj" style="left:86.39%; top:55.90%; width:16.46%; mix-blend-mode:multiply;">
+        <img loading="lazy" src="/assets/images/obj-paloma.webp" alt="Paloma" style="aspect-ratio:662/909;">
+      </div>
+
+      <!-- ── Mobile variant (Figma 7097:2441 → Sister Soiree) ────── -->
+      <div class="project-mobile" data-project="sister-soiree">
+        <div class="stack-description">
+          <h3 class="card-title">SOLE SISTER SOIRÉE</h3>
+          <p class="card-body">A sister-themed cocktail party in partnership with Nine West. Sixty guests, one rule: bring someone like a sister.</p>
+          <div class="card-tags">
+            <span class="card-tag">Brand Event</span>
+            <span class="card-tag">Production</span>
+          </div>
+        </div>
+
+        <div class="swipe-stack" data-stack="sister-soiree">
+          <!-- DOM order: MR_NineWest-1 (bottom) → MR_NineWest-6 (top).
+               Positions = visual outer-container coords from Figma 7104:1670 (ImageStack x=13, y=3608, w=413.43, h=287.57). -->
+          <div class="swipe-card" style="left:0.41%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-1.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.48%; top:1.03%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-2.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0.41%; top:1.02%; width:98.95%; aspect-ratio:409.075/280.797;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-3.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:0%; top:0%; width:100%; aspect-ratio:413.426/287.568;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-4.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.05%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-5.webp" alt="">
+          </div>
+          <div class="swipe-card" style="left:1.05%; top:2.41%; width:97.87%; aspect-ratio:404.599/273.940;">
+            <img loading="lazy" src="/assets/images/exp-mr-nine-west-6.webp" alt="">
+          </div>
+
+          <div class="project-stickers">
+            <!-- Orange-2: Figma 17.93°. -->
+            <div class="mobile-sticker" style="left:-11.37%; top:75.81%; width:40.58%; aspect-ratio:167.766/164.364;">
+              <div class="mobile-sticker-inner" style="width:80.18%; aspect-ratio:134.513/129.226; transform:rotate(17.93deg);">
+                <img loading="lazy" src="/assets/images/obj-orange-2.webp" alt="">
+              </div>
+            </div>
+            <!-- WhiteOrchid: Figma 11.43°. -->
+            <div class="mobile-sticker" style="left:73.95%; top:-28.63%; width:45.32%; aspect-ratio:187.384/167.512;">
+              <div class="mobile-sticker-inner" style="width:87.14%; aspect-ratio:163.295/137.881; transform:rotate(11.43deg);">
+                <img loading="lazy" src="/assets/images/obj-white-orchid.webp" alt="">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.project-mobile (Sister Soiree) -->
+
+    </div><!-- /.project-section (Mr. Nine West) -->
+
+  </div><!-- /.page -->
+
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group" class="has-mobile-monster-eyes">
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="/assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116.154"
+           preserveAspectRatio="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+            d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+            cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+            d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+            cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+        </g>
+      </svg>
+      <svg class="monster-eyes-overlay-mobile" id="monster-eyes-svg-mobile"
+           viewBox="0 0 440 64"
+           preserveAspectRatio="none"
+           xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip-m">
+            <path transform="translate(197.14 30.76)"
+              d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip-m">
+            <path transform="translate(88 30)"
+              d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          </clipPath>
+        </defs>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(197.14 30.76)"
+            d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+          <circle id="mon-iris-r-m" clip-path="url(#mon-eye-r-clip-m)"
+            cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+        </g>
+        <g class="eye-blink-group">
+          <path fill="#F7F2EC" transform="translate(88 30)"
+            d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+          <circle id="mon-iris-l-m" clip-path="url(#mon-eye-l-clip-m)"
+            cx="142" cy="64" r="29" fill="#32261F"/>
+        </g>
+      </svg>
+    </div>
+  </div><!-- /#monster-group -->
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+
+  </div><!-- /#page-scaler -->
+
+  <script src="/assets/scripts.js" defer></script>
+  <script src="/assets/circular-sticker.js" defer></script>
+  <script>
+    // ── Skeleton constants ─────────────────────────────────────────
+    const page         = document.querySelector('.page');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
+    const monIrisRM    = document.getElementById('mon-iris-r-m');
+    const monIrisLM    = document.getElementById('mon-iris-l-m');
+
+    function isMonsterMobileLayout() {
+      return window.innerWidth <= 768;
+    }
+
+    function moveMobileMonsterEyes(vx, vy) {
+      if (!monIrisRM || !monIrisLM) return;
+      var wr = monsterArea.getBoundingClientRect();
+      var svgX = ((vx - wr.left) / wr.width) * 440;
+      var svgY = ((vy - wr.top) / wr.height) * 64;
+      trackIris(monIrisRM, svgX, svgY, 248.5, 62.5, 10, 3);
+      trackIris(monIrisLM, svgX, svgY, 142, 64, 10, 3);
+    }
+
+    var monsterBlinkGroups = document.querySelectorAll('#monster-area .eye-blink-group');
+    function footerMonsterBlink() {
+      monsterBlinkGroups.forEach(function (g) { g.classList.add('closing'); });
+      setTimeout(function () {
+        monsterBlinkGroups.forEach(function (g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function () {
+          monsterBlinkGroups.forEach(function (g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    function scheduleFooterMonsterBlink() {
+      setTimeout(function () {
+        footerMonsterBlink();
+        scheduleFooterMonsterBlink();
+      }, 2000 + Math.random() * 5000);
+    }
+    scheduleFooterMonsterBlink();
+
+    // Pop the monster up on load — double rAF ensures the initial
+    // translateY(250px) has painted before the transition fires.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
+      });
+    });
+
+    // Dynamic waveTop — measured live so it works regardless of page height.
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return waveRect.top - pageRect.top;
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      const kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + nx * maxX * kx * strength);
+      el.setAttribute('cy', restY + ny * maxY * ky * strength);
+    }
+
+    // rAF-throttled monster eye tracking
+    var eyeRaf = 0, eyeMX = 0, eyeMY = 0;
+    function updateMonsterEyesFrame() {
+      eyeRaf = 0;
+      if (isMonsterMobileLayout()) {
+        moveMobileMonsterEyes(eyeMX, eyeMY);
+        return;
+      }
+      var waveTop  = getWaveTop();
+      var pageRect = page.getBoundingClientRect();
+      var x = ((eyeMX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      var y = eyeMY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    }
+    document.addEventListener('mousemove', function (e) {
+      eyeMX = e.clientX;
+      eyeMY = e.clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateMonsterEyesFrame);
+    }, { passive: true });
+    document.addEventListener('touchmove', function (e) {
+      if (!e.touches.length) return;
+      eyeMX = e.touches[0].clientX;
+      eyeMY = e.touches[0].clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateMonsterEyesFrame);
+    }, { passive: true });
+
+    // ── Draggable objects ──────────────────────────────────────────
+    let dragging = null, offsetX = 0, offsetY = 0, topZ = 10;
+
+    const draggableSelector = '.obj, .photo, .photo-rotated, .placeholder, .photo-card';
+
+    document.querySelectorAll(draggableSelector).forEach(el => {
+      if (window.KT && window.KT.isDesktop) {
+        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
+        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      }
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+
+      el.addEventListener('pointerdown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+    });
+
+    // rAF-throttled drag movement
+    var dragRaf = 0;
+    document.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      if (dragRaf) return;
+      dragRaf = requestAnimationFrame(() => {
+        dragRaf = 0;
+        if (!dragging) return;
+        const parent = dragging.offsetParent;
+        const parentRect = parent.getBoundingClientRect();
+        dragging.style.setProperty('left', (e.clientX - parentRect.left - offsetX) + 'px', 'important');
+        dragging.style.setProperty('top', (e.clientY - parentRect.top  - offsetY) + 'px', 'important');
+      });
+    });
+
+    document.addEventListener('pointerup', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        if (window.KT && window.KT.isDesktop) {
+          const under = document.elementFromPoint(e.clientX, e.clientY);
+          KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
+        }
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+      }
+    });
+
+    document.querySelectorAll('.obj img, .photo img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
+
+    // ── Mobile swipe stacks (C4 → D4) ─────────────────────────────
+    // scripts.js is deferred; inline scripts run before deferred, so wait for
+    // DOMContentLoaded (fires after deferred scripts execute).
+    (function initSwipeStacks() {
+      function run() {
+        if (window.KT && window.KT.swipeStack) {
+          document.querySelectorAll('.swipe-stack').forEach(function (el) {
+            window.KT.swipeStack(el);
+          });
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+      } else {
+        run();
+      }
+    }());
+  </script>
+
+</body>
+</html>

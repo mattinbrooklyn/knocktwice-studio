@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC" media="(max-width: 768px)">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>About — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans&display=optional" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    html, body { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; background: var(--color-bg); }
+    body::-webkit-scrollbar { display: none; }
+
+    #page-scaler {
+      position: relative;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh + var(--footer-height));
+      overflow: hidden;
+      /* Mailing marquee band height — offsets wave stack bottom by exactly this (+ 1px overlap for hairlines). */
+      --about-ml-ticker-height: clamp(38px, 5.75vw, 52px);
+    }
+
+    /* ── Page canvas ────────────────────────────────────────────────
+       Fixed 1440×1206 (exact Figma frame), centered and uniformly
+       scaled by JS to fit the viewport. */
+    .page {
+      position: relative;
+      width: 100%;
+      background: var(--color-bg);
+      display: flex;
+      flex-direction: column;
+      padding-top: 4.375rem;
+      padding-left: var(--content-left);
+      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 2rem);
+      flex: 1;
+      min-height: calc(100vh - var(--footer-height));
+    }
+
+
+    /* ── Headings ──────────────────────────────────────────────────*/
+    .h1 {
+      font-family: 'Erica One', sans-serif;
+      font-size: clamp(2.25rem, 4.514vw, 4.0625rem);
+      line-height: clamp(2.375rem, 4.722vw, 4.25rem);
+      font-weight: 400;
+      color: var(--color-ink);
+      width: var(--content-width);
+      margin-bottom: 1.875rem;
+    }
+    .h2 {
+      font-family: 'Erica One', sans-serif;
+      font-size: clamp(1.25rem, 1.667vw, 1.5rem);
+      line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
+      font-weight: 400;
+      color: var(--color-ink);
+      width: var(--content-width);
+      margin-bottom: 1.1875rem;
+    }
+
+    /* ── Body text ─────────────────────────────────────────────────*/
+    .body-text {
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: clamp(0.8125rem, 0.972vw, 0.875rem);
+      line-height: clamp(1.25rem, 1.528vw, 1.375rem);
+      font-weight: 400;
+      color: var(--color-ink);
+    }
+    .intro {
+      width: var(--content-width);
+      margin-bottom: 3.75rem;
+    }
+    .intro p + p { margin-top: 22px; }
+
+    /* ── People row ────────────────────────────────────────────────*/
+    .people-row {
+      display: flex;
+      gap: 1.25rem;
+      width: var(--content-width);
+    }
+    .person-col {
+      flex: 1;
+    }
+
+    /* ── Headshots ─────────────────────────────────────────────────*/
+    .headshot {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .headshot img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .headshot img.default { opacity: 1; }
+    .headshot img.hover   { opacity: 0; }
+    .headshot:hover img.default { opacity: 0; }
+    .headshot:hover img.hover   { opacity: 1; }
+
+    /* ── Team bios ─────────────────────────────────────────────────*/
+    .person-name {
+      font-family: 'Handjet', sans-serif;
+      font-size: clamp(1.125rem, 1.528vw, 1.375rem);
+      font-weight: 600;
+      line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
+      letter-spacing: -0.22px;
+      color: var(--color-ink);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 600;
+      margin-top: 1.25rem;
+      margin-bottom: 0.9375rem;
+    }
+    .person-bio {
+      width: 100%;
+    }
+
+    /* ── Floating objects (draggable, with character eyes) ─────────*/
+    .obj {
+      position: absolute;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .obj.is-dragging { z-index: 200; }
+    .obj img.base {
+      display: block;
+      pointer-events: none;
+    }
+    .obj .eyes {
+      position: absolute;
+      top: 0; left: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    /* Paintbrush: bristle-up, overlapping the left nav column.
+       Fluid vw units (based on 1440px design) so it scales smoothly. */
+    .paintbrush {
+      left: 4.236vw; top: 38vw;
+      width: 17vw; 
+      /* height: 36.458vw; */
+      overflow: hidden;
+      z-index: 10;
+    }
+    .paintbrush img.base { width: 100%; height: 100%; }
+    .paintbrush .eyes   { width: 100%; height: 100%; }
+
+    /* Paint bucket: outer container holds the rotated inner.
+       Fluid vw units so bucket tracks the right edge smoothly. */
+    .paint-bucket-outer {
+      left: 70vw; top: 15vw;
+      width: 20vw; 
+      /* height: 26.389vw; */
+      overflow: visible;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .paint-bucket-inner {
+      flex-shrink: 0;
+      transform: rotate(7.63deg);
+      position: relative;
+      width: 88.46%; height: 89.47%;
+      overflow: hidden;
+    }
+    .paint-bucket-inner img.base { width: 100%; height: 100%; }
+    .paint-bucket-inner .eyes   { width: 100%; height: 100%; }
+
+    /* ── Monster footer wave ───────────────────────────────────────
+       Blue wave SVG + SVG overlay with eye whites + iris circles. */
+    #monster-group {
+      position: absolute;
+      left: 0;
+      /* Matches ticker band height from `--about-ml-ticker-height`; −1px kills subpixel cream between wave and green strip. */
+      bottom: calc(var(--footer-height) + var(--about-ml-ticker-height) - 1px);
+      width: 100%;
+      /* Above #monster-linear-ticker for edge cases / scroll — geometry keeps the marquee readable. */
+      z-index: 15;
+      transition: transform 600ms ease-out;
+      will-change: transform;
+    }
+    /* Wave-risen: translateY pulls wave up. z-index above the backdrop (1010)
+       so eyes and wave render on top of the cream overlay. */
+    #monster-group.wave-risen {
+      transform: translateY(-55vh);
+      z-index: 1020;
+    }
+    .monster-area {
+      position: relative;
+      width: 100%;
+      height: var(--wave-height-desktop);
+    }
+    .monster-area img.wave {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+    /* Linear mailing-list marquee — sibling of #monster-group (must NOT stay inside the
+       transformed monster band: fixed/viewport docking breaks when ancestor has transform). */
+    #monster-linear-ticker {
+      position: absolute;
+      left: 0;
+      bottom: var(--footer-height);
+      width: 100%;
+      box-sizing: border-box;
+      /* Below #monster-group idle (15) / risen (1020); stacked lower so lip rarely covers copy. */
+      z-index: 12;
+    }
+    html.kt-monster-modal-open #monster-linear-ticker {
+      position: fixed;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-width: 100vw;
+      bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: none;
+      /* Stay below modal card while invisible so nothing steals focus. */
+      z-index: 1023;
+    }
+    .monster-linear-ticker {
+      height: var(--about-ml-ticker-height);
+      background: var(--color-green);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+      box-sizing: border-box;
+    }
+    .monster-linear-ticker .kt-linear-ticker__track {
+      display: flex;
+      flex-wrap: nowrap;
+      width: max-content;
+      will-change: transform;
+      animation: kt-monster-linear-ticker-scroll 40s linear infinite;
+      animation-play-state: paused;
+    }
+    .monster-linear-ticker .kt-linear-ticker__sequence {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      gap: 0;
+      white-space: nowrap;
+      font-family: var(--font-ui), sans-serif;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      font-weight: 400;
+      font-size: clamp(0.875rem, 3.95vw, 1.375rem);
+      letter-spacing: -0.14px;
+      text-transform: uppercase;
+      color: var(--color-white);
+    }
+    @media (min-width: 769px) {
+      .monster-linear-ticker .kt-linear-ticker__sequence {
+        letter-spacing: -0.22px;
+      }
+    }
+    /* Repeat unit = phrase + symmetrical space–📒–space (fixes LIST📒LIST collisions). */
+    .monster-linear-ticker .kt-linear-ticker__chunk {
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .monster-linear-ticker .kt-linear-ticker__text {
+      display: inline-block;
+    }
+    .monster-linear-ticker .kt-linear-ticker__ico {
+      font-family: inherit;
+      font-style: normal;
+      line-height: 1;
+      display: inline-block;
+      flex-shrink: 0;
+      font-variation-settings: inherit;
+      transform: translateY(0.02em);
+      margin-inline: clamp(0.28rem, 1.05vw, 0.5625rem);
+    }
+    @keyframes kt-monster-linear-ticker-scroll {
+      to { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .monster-linear-ticker .kt-linear-ticker__track {
+        animation: none;
+      }
+    }
+    /* Eyes overlay: MUST use preserveAspectRatio=none so it stretches
+       to fill the wave area at every viewport width */
+    .monster-eyes-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: visible;
+    }
+    /* Blue body below the wave crest — follows monster-group transform.
+       height:300vh guarantees it fills below the wave on all screens. */
+    #modal-blue-body {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(var(--wave-height-desktop) - 0px);
+      width: 100%;
+      height: 300vh;
+      background: var(--color-blue);
+    }
+
+    .footer { position: relative; z-index: 100; }
+
+    /* ── Object eye animation ──────────────────────────────────────── */
+    #brush-iris-l, #brush-iris-r,
+    #bucket-iris-l, #bucket-iris-r {
+      transition: cx 200ms ease-out, cy 200ms ease-out;
+    }
+
+    /* ── Newsletter modal ───────────────────────────────────────────
+       #newsletter-window is a sibling of #monster-group (NOT inside it).
+       CSS transforms on a parent break position:fixed for children. */
+    #modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(247, 242, 236, 0.88);
+      z-index: 1010;
+      pointer-events: all;
+    }
+    /* Card sits above the monster-group (1020) — z-index 1025.
+       Wave crest + eyes are at top of viewport; card is in the middle.
+       No vertical overlap between them so card doesn’t hide eyes. */
+    #newsletter-window.modal-card {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: min(929px, calc(100vw - 4rem));
+      height: auto;
+      min-height: 326px;
+      padding: clamp(1.75rem, 4.167vw, 3.75rem);
+      z-index: 1025;
+    }
+    #newsletter-window.modal-card.ml-success {
+      min-height: auto;
+    }
+
+    /* ── Tablet transition (1140→769) ─────────────────────────────
+       Smooths scaling of text, people row, and objects between the
+       desktop layout and the fully-stacked mobile layout.           */
+    @media (max-width: 1140px) {
+      .page {
+        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
+      }
+      .person-name {
+        font-size: clamp(1.125rem, 1.528vw, 1.375rem);
+        line-height: clamp(1.375rem, 1.875vw, 1.6875rem);
+      }
+    }
+
+    /* ── Narrow tablet (<=960px): stack people vertically early ───
+       Prevents cramped headshots. Paintbrush and paint bucket
+       reposition to flow with the stacked layout.                   */
+    @media (max-width: 960px) {
+      .people-row {
+        flex-direction: column;
+        gap: 2rem;
+      }
+      .person-col {
+        max-width: 28rem;
+      }
+      /* Paintbrush: nudge into nav gutter, scale down */
+      .paintbrush {
+        left: 1vw !important;
+        top: 32vw !important;
+        width: 15vw !important;
+        height: 28.25vw !important;
+      }
+      /* Paint bucket: pull inside viewport, scale down */
+      .paint-bucket-outer {
+        left: auto !important;
+        right: 1vw !important;
+        top: auto !important;
+        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 3rem) !important;
+        width: 20vw !important;
+        height: 21vw !important;
+      }
+    }
+
+    /* ── Mobile (<=768px) ──────────────────────────────────────────
+       Figma mobile master: frame id 7055:2255 (About state A), 440×1485.
+       Headshots stack vertically, paintbrush overlaps Rodrigo from the
+       left (x=-15), paint bucket overlaps Matt from the right (x=310).
+       Coords are relative to .page (which is 100vw wide on mobile). */
+    @media (max-width: 768px) {
+      .page {
+        padding-top: 6.0625rem;
+        padding-right: var(--content-left);
+        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
+        /* Reserve space for absolute-positioned paint bucket below the
+           Matt headshot (Figma: bucket bottom at y=1241, footer wave at
+           y=1365). */
+        min-height: 80rem;
+      }
+      .h1 {
+        font-size: clamp(2.25rem, 10vw, 3rem);
+        line-height: 1.05;
+        width: var(--content-width);
+        margin-bottom: 0.9375rem;
+      }
+      .h2 {
+        font-size: 1.25rem;
+        line-height: 1.4rem;
+        width: var(--content-width);
+      }
+      .intro {
+        width: var(--content-width);
+        margin-bottom: 2.5rem;
+      }
+      .people-row {
+        flex-direction: column;
+        gap: 2rem;
+        width: var(--content-width);
+      }
+      .person-col {
+        max-width: none;
+      }
+      /* Paintbrush per Figma: x=-15, y=340, 144×271.
+         `.page` has padding-left:var(--content-left)=1.25rem (20px), but
+         paintbrush is position:absolute so it sits relative to .page's
+         padding box origin. Subtract 20 from Figma x to align. */
+      .paintbrush {
+        left: -30px !important;
+        top: 360px !important;
+        width: 144px !important;
+        height: 271px !important;
+      }
+      .paintbrush img.base,
+      .paintbrush .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      /* Paint bucket per Figma: x=310, y=1045, 188×196.
+         Inner rotated container scales to fit outer.
+         Reset right/bottom (set by 960px breakpoint) back to auto. */
+      .paint-bucket-outer {
+        left: 290px !important;
+        right: auto !important;
+        top: 1100px !important;
+        bottom: auto !important;
+        width: 188px !important;
+        height: 196px !important;
+      }
+      .paint-bucket-inner {
+        width: 166px !important;
+        height: 176px !important;
+      }
+      .paint-bucket-inner img.base,
+      .paint-bucket-inner .eyes {
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      /* Mobile marquee + wave: ticker uses footer+safe-area; wave bottom offset lives in globals
+         `#page-scaler:has(#monster-linear-ticker) #monster-group` (beats old single-selector !important). */
+      #monster-linear-ticker {
+        bottom: var(--footer-stack-height);
+      }
+
+      html.kt-monster-modal-open #monster-linear-ticker {
+        bottom: var(--footer-stack-height);
+      }
+
+      .monster-area {
+        pointer-events: auto;
+        cursor: pointer;
+      }
+
+      /* Mobile: wave rises near top of viewport (eyes + crest). Linear mailing-list
+         ticker is a #page-scaler sibling with its own bottom anchor (see #monster-linear-ticker). */
+      #monster-group.wave-risen {
+        transform: translateY(-60vh);
+      }
+
+      /* Blue body top aligns with mobile wave bottom */
+      #modal-blue-body {
+        top: calc(var(--wave-height-mobile) - 0px);
+      }
+
+      /* Card position: Figma shows card center at ~66% of 956px frame.
+         Input stacks above button per Figma. */
+      #newsletter-window.modal-card {
+        top: 60%;
+        width: min(24rem, calc(100vw - 2rem));
+        padding: 1.5rem 1.25rem;
+      }
+
+      /* Vertical form layout on mobile */
+      .ml-form-row {
+        flex-direction: column;
+        gap: 0.625rem;
+      }
+      .ml-submit { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
+  <a href="/home/" class="logo">
+      <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="logo-eye-sclera" d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
+        <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+        <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+      </svg>
+  </a>
+
+  <nav class="nav">
+    <a href="/about/" class="active">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <a href="/about/" class="active">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+
+  <div id="page-scaler">
+  <!-- ── Page canvas ─────────────────────────────────────────────── -->
+  <div class="page">
+
+    <!-- Headline -->
+    <h1 class="h1">THERE YOU ARE</h1>
+
+    <!-- Studio description -->
+    <div class="intro body-text">
+      <p>Knock Twice is a Brooklyn design studio. We work across interiors, products, and everything in between, bringing the same considered eye to a space as we do to the things inside of it.</p>
+      <p>The process is rigorous. The experience? Like finding a curly fry in a regular basket 🍟 🍟 🍟</p>
+    </div>
+
+    <!-- Team subheadline -->
+    <h2 class="h2">SINCE YOU ASKED</h2>
+
+    <!-- Headshots + bios -->
+    <div class="people-row">
+      <div class="person-col">
+        <div class="headshot headshot-rodrigo">
+          <img class="default" src="/assets/images/headshot-rodrigo.webp" alt="Rodrigo Miguel">
+          <img class="hover"   src="/assets/images/headshot-rodrigo-hover.webp" alt="Rodrigo Miguel">
+        </div>
+        <p class="person-name person-rodrigo">Rodrigo Miguel</p>
+        <div class="body-text person-bio person-rodrigo">
+          <p>Maker of things. Over a decade across toy design, industrial design, fashion accessories, and interiors.</p>
+          <p>He thinks in materials and proportions and knows when something is exactly right</p>
+        </div>
+      </div>
+      <div class="person-col">
+        <div class="headshot headshot-matt">
+          <img class="default" src="/assets/images/headshot-matt.webp" alt="Matt Little">
+          <img class="hover"   src="/assets/images/headshot-matt-hover.webp" alt="Matt Little">
+        </div>
+        <p class="person-name person-matt">Matt Little</p>
+        <div class="body-text person-bio person-matt">
+          <p>Builder of things. Years leading media companies, consultancies, and creative operations.</p>
+          <p>He thinks in systems and relationships and knows how to make a project move.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Paintbrush (draggable) ──────────────────────────────────
+         Figma: left:61 top:537 w:279 h:525
+         Eyes in SVG viewBox 0 0 279 525:
+           Right white almond: translate(117.7, 98.4), iris center ≈ (140, 107)
+           Left  white almond: translate(43.6, 117.3),  iris center ≈ (71, 128) -->
+    <div class="obj paintbrush" id="obj-brush">
+      <img class="base" src="/assets/images/render-paintbrush.webp" alt="Paintbrush" loading="lazy">
+      <svg class="eyes" viewBox="0 0 279 525" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="brush-eye-r-clip">
+            <path transform="translate(117.7 98.4)"
+              d="M0 17.6931C11.9644 -1.0084 26.9782 -3.77549 44.2694 4.22012C29.0986 12.5511 14.2961 17.4632 0 17.6931Z"/>
+          </clipPath>
+          <clipPath id="brush-eye-l-clip">
+            <path transform="translate(43.6 117.3)"
+              d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
+          </clipPath>
+        </defs>
+        <g id="brush-eye-r">
+          <path id="brush-lid-r" fill="#F7F2EC" transform="translate(117.7 98.4)"
+            d="M0 17.6931C11.9644 -1.0084 26.9782 -3.77549 44.2694 4.22012C29.0986 12.5511 14.2961 17.4632 0 17.6931Z"/>
+          <circle id="brush-iris-r" clip-path="url(#brush-eye-r-clip)"
+            cx="150.6" cy="92.8" r="15.65" fill="#32261F"/>
+        </g>
+        <g id="brush-eye-l">
+          <path id="brush-lid-l" fill="#F7F2EC" transform="translate(43.6 117.3)"
+            d="M0 22.0263C14.464 -1.81446 33.697 -4.31107 55.6056 5.1046C36.5486 15.5698 17.9575 21.7396 0 22.0263Z"/>
+          <circle id="brush-iris-l" clip-path="url(#brush-eye-l-clip)"
+            cx="84.2" cy="110.2" r="19.65" fill="#32261F"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- ── Paint bucket (draggable) ────────────────────────────────
+         Figma: outer left:1121 top:163 w:364 h:380
+                inner 322×340, rotated 7.63deg, centered in outer.
+         Eyes in SVG viewBox 0 0 322 340:
+           Right white crest: translate(112.2, 80.1) scale(1.133, 1.12),  iris ≈ (141, 88)
+           Left  white crest: translate(47.0, 61.6)  scale(1.132, 1.114), iris ≈ (73, 69) -->
+    <div class="obj paint-bucket-outer" id="obj-bucket">
+      <div class="paint-bucket-inner" id="bucket-inner">
+        <img class="base" src="/assets/images/render-paint-bucket.webp" alt="Paint bucket" loading="lazy">
+        <svg class="eyes" viewBox="0 0 322 340" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="bucket-eye-r-clip">
+              <path transform="translate(112.2 80.1) scale(1.133 1.12)"
+                d="M0 5.06111C23.3024 -5.57823 39.5691 1.143 51.2976 19.7283C31.3899 18.3021 13.9841 13.7951 0 5.06111Z"/>
+            </clipPath>
+            <clipPath id="bucket-eye-l-clip">
+              <path transform="translate(47.0 61.6) scale(1.132 1.114)"
+                d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
+            </clipPath>
+          </defs>
+          <g id="bucket-eye-r">
+            <path id="bucket-lid-r" fill="#F7F2EC" transform="translate(112.2 80.1) scale(1.133 1.12)"
+              d="M0 5.06111C23.3024 -5.57823 39.5691 1.143 51.2976 19.7283C31.3899 18.3021 13.9841 13.7951 0 5.06111Z"/>
+            <circle id="bucket-iris-r" clip-path="url(#bucket-eye-r-clip)"
+              cx="127.8" cy="94.1" r="18.05" fill="#32261F"/>
+          </g>
+          <g id="bucket-eye-l">
+            <path id="bucket-lid-l" fill="#F7F2EC" transform="translate(47.0 61.6) scale(1.132 1.114)"
+              d="M0 4.74039C20.9124 -5.41535 35.4941 1.54098 46.5511 18.0508C28.4852 16.7567 12.6884 12.6662 0 4.74039Z"/>
+            <circle id="bucket-iris-l" clip-path="url(#bucket-eye-l-clip)"
+              cx="57.7" cy="75.4" r="16.37" fill="#32261F"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── Monster footer wave ─────────────────────────────────────
+         Blue wave SVG + eye whites + iris circles (cursor-tracking).
+         Wave is a simple blue curve; eye whites overlaid via SVG.
+         Eye white paths from Figma (in wave SVG space 0 0 1440 116):
+           Right (119.75×33.51): translate(593.13, 32.7)
+           Left  (127.85×35.77): translate(431.49, 31.57)
+         Iris centers: right (652.9, 49.45), left (495.41, 49.46) -->
+  </div><!-- /page -->
+
+  <!-- ── Newsletter risen state ──────────────────────────────────── -->
+  <!-- Backdrop: fixed overlay that dims everything behind the modal -->
+  <div id="modal-backdrop"></div>
+
+  <!-- Newsletter card: sibling of monster-group (NOT inside it).
+       position:fixed is broken by CSS transforms on ancestor elements.
+       Keeping it outside ensures it stays truly fixed while the wave animates. -->
+  <div id="newsletter-window" class="modal-card">
+    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
+    <div class="ml-form-row">
+      <input class="field" type="email" id="ml-email" placeholder="Email*" autocomplete="email">
+      <button class="ml-submit" id="ml-submit">Sign Up</button>
+    </div>
+    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+  </div>
+
+  <div id="monster-group" class="has-mobile-monster-eyes">
+      <!-- Blue body first in DOM so wave renders on top -->
+      <div id="modal-blue-body"></div>
+
+      <div class="monster-area" id="monster-area">
+        <img class="wave" src="/assets/monster-wave.svg" alt="">
+
+        <!-- Desktop eyes overlay: viewBox 1440×116 -->
+        <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+             viewBox="0 0 1440 116.154"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip">
+              <path transform="translate(593.13 32.7)"
+                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip">
+              <path transform="translate(431.49 31.57)"
+                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            </clipPath>
+          </defs>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+            <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+              cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+          </g>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+            <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+              cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+          </g>
+        </svg>
+
+        <!-- Mobile eyes: same geometry as coming-soon (circle irises + clip, 440×64) -->
+        <svg class="monster-eyes-overlay-mobile" id="monster-eyes-svg-mobile"
+             viewBox="0 0 440 64"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="mon-eye-r-clip-m">
+              <path transform="translate(197.14 30.76)"
+                d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+            </clipPath>
+            <clipPath id="mon-eye-l-clip-m">
+              <path transform="translate(88 30)"
+                d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+            </clipPath>
+          </defs>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(197.14 30.76)"
+              d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"/>
+            <circle id="mon-iris-r-m" clip-path="url(#mon-eye-r-clip-m)"
+              cx="248.5" cy="62.5" r="27.5" fill="#32261F"/>
+          </g>
+          <g class="eye-blink-group">
+            <path fill="#F7F2EC" transform="translate(88 30)"
+              d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"/>
+            <circle id="mon-iris-l-m" clip-path="url(#mon-eye-l-clip-m)"
+              cx="142" cy="64" r="29" fill="#32261F"/>
+          </g>
+        </svg>
+
+      </div>
+
+  </div><!-- /#monster-group -->
+
+  <!-- Sibling of #monster-group — docked above footer normally; viewport-fixed when mailing modal opens. -->
+  <div class="monster-linear-ticker" id="monster-linear-ticker" role="button" tabindex="0" aria-label="Open mailing list signup">
+    <div class="kt-linear-ticker__track" id="monster-linear-ticker-track">
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <!-- Duplicated strips for seamless loop (same chunk markup / width in both). -->
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+      </div>
+      <div class="kt-linear-ticker__sequence" aria-hidden="true">
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+      <div class="footer-icons">
+        <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+        <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+      </div>
+      <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+    </footer>
+
+  </div><!-- /#page-scaler -->
+
+  <script src="/assets/scripts.js" defer></script>
+  <script>
+    // ── Scale page ─────────────────────────────────────────────────
+    // 1440×1206 canvas (exact Figma frame). Uniform scale keeps all
+    // pixel coordinates correct at any viewport size.
+    const PAGE_H = 1227;
+    const page   = document.querySelector('.page');
+    const scaler = document.getElementById('page-scaler');
+    let scale = 1;
+
+    function scalePage() {
+      scale = window.innerWidth / 1440;
+      page.style.transform = '';
+      scaler.style.height = '';
+    }
+    scalePage();
+
+    // ── Linear marquee: pause CSS animation unless visible (cheap vs SVG textPath). ─────
+    var tickerEl = document.getElementById('monster-linear-ticker');
+    var tickerTrack = document.getElementById('monster-linear-ticker-track');
+    var tickerMonsterGroup = document.getElementById('monster-group');
+    function isFullyOffscreen(el) {
+      if (!el) return true;
+      var r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return true;
+      return r.bottom <= 0 || r.top >= window.innerHeight || r.right <= 0 || r.left >= window.innerWidth;
+    }
+    function syncTickerAnimations() {
+      if (!tickerTrack || !tickerEl) return;
+      var isMobile = window.innerWidth <= 768;
+      var waveRising = tickerMonsterGroup && tickerMonsterGroup.classList.contains('wave-risen');
+      var runDesktop = !document.hidden && !isMobile && (waveRising || !isFullyOffscreen(tickerEl));
+      var runMobile  = !document.hidden && isMobile  && (waveRising || !isFullyOffscreen(tickerEl));
+      tickerTrack.style.animationPlayState = (runDesktop || runMobile) ? 'running' : 'paused';
+    }
+    var tickerSyncRaf = 0;
+    function requestTickerSync() {
+      if (tickerSyncRaf) return;
+      tickerSyncRaf = requestAnimationFrame(function () {
+        tickerSyncRaf = 0;
+        syncTickerAnimations();
+      });
+    }
+    function applyMonsterLayout() {
+      syncTickerAnimations();
+    }
+    applyMonsterLayout();
+
+    document.addEventListener('visibilitychange', function () {
+      syncTickerAnimations();
+    });
+    window.addEventListener('scroll', requestTickerSync, { passive: true });
+
+    // Debounced resize
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() { scalePage(); applyMonsterLayout(); }, 100);
+    });
+
+
+    // rAF-throttled eye tracking
+    var eyeRaf = 0, eyeMX = 0, eyeMY = 0;
+    function updateEyesFrame() {
+      eyeRaf = 0;
+      if (document.hidden) return;
+      updateAllEyes(eyeMX, eyeMY);
+    }
+    document.addEventListener('mousemove', function (e) {
+      if (document.hidden) return;
+      eyeMX = e.clientX;
+      eyeMY = e.clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateEyesFrame);
+    }, { passive: true });
+    // Touch: track finger for mobile eye animation
+    document.addEventListener('touchmove', function (e) {
+      if (document.hidden) return;
+      if (!e.touches.length) return;
+      eyeMX = e.touches[0].clientX;
+      eyeMY = e.touches[0].clientY;
+      if (!eyeRaf) eyeRaf = requestAnimationFrame(updateEyesFrame);
+    }, { passive: true });
+
+
+    // ── Eye tracking ───────────────────────────────────────────────
+    // Converts viewport coords → canvas coords (undoes scale + centering).
+    function toCanvas(vx, vy) {
+      const r = page.getBoundingClientRect();
+      return { x: (vx - r.left) / scale, y: (vy - r.top) / scale };
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical envelope.
+    // restX/Y: resting center in SVG units. maxX/Y: max travel in SVG units.
+    // kx/ky cap cursor follow so the pupil keeps visible black inside the sclera (Figma Animated Eyes).
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
+      }
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      const kx = 0.55;
+      const ky = 0.28;
+      el.setAttribute('cx', restX + nx * maxX * kx * strength);
+      el.setAttribute('cy', restY + ny * maxY * ky * strength);
+    }
+
+    // Monster wave — SVG viewBox 0 0 1440 116, wave div top at canvas y:1000
+    // Canvas X maps 1:1 to wave SVG X (wave starts at left:0)
+    const monIrisR = document.getElementById('mon-iris-r');
+    const monIrisL = document.getElementById('mon-iris-l');
+
+    function moveMonsterEyes(cx, cy) {
+      trackIris(monIrisR, cx, cy - 1021, 652.9,  49.45, 20, 5);
+      trackIris(monIrisL, cx, cy - 1021, 495.41, 49.46, 20, 5);
+    }
+
+    // Mobile footer eyes: same circle + clip setup as coming-soon (440×64).
+    var monIrisLMob = document.getElementById('mon-iris-l-m');
+    var monIrisRMob = document.getElementById('mon-iris-r-m');
+    function moveMobileMonsterEyes(vx, vy) {
+      if (!monIrisLMob || !monIrisRMob) return;
+      var waveEl = document.getElementById('monster-area');
+      if (!waveEl) return;
+      var wr = waveEl.getBoundingClientRect();
+      var svgX = ((vx - wr.left) / wr.width)  * 440;
+      var svgY = ((vy - wr.top)  / wr.height) * 64;
+      trackIris(monIrisRMob, svgX, svgY, 248.5, 62.5, 10, 3);
+      trackIris(monIrisLMob, svgX, svgY, 142, 64, 10, 3);
+    }
+
+    // Footer monster blink (desktop scaleY, mobile opacity — see CSS)
+    var monsterBlinkGroups = document.querySelectorAll('#monster-area .eye-blink-group');
+    function footerMonsterBlink() {
+      monsterBlinkGroups.forEach(function (g) { g.classList.add('closing'); });
+      setTimeout(function () {
+        monsterBlinkGroups.forEach(function (g) {
+          g.classList.remove('closing');
+          g.classList.add('opening');
+        });
+        setTimeout(function () {
+          monsterBlinkGroups.forEach(function (g) { g.classList.remove('opening'); });
+        }, 110);
+      }, 65);
+    }
+    function scheduleFooterMonsterBlink() {
+      setTimeout(function () {
+        footerMonsterBlink();
+        scheduleFooterMonsterBlink();
+      }, 2000 + Math.random() * 5000);
+    }
+    scheduleFooterMonsterBlink();
+
+    function updateAllEyes(vx, vy) {
+      const { x, y } = toCanvas(vx, vy);
+      moveMonsterEyes(x, y);
+      if (window.innerWidth <= 768) moveMobileMonsterEyes(vx, vy);
+    }
+
+    // ── Object eye animation ───────────────────────────────────────
+    // Tighter vertical than horizontal travel (~2–5px margin; Figma Animated Eyes).
+    function furnitureEyeVerticalRange(horizRange) {
+      var margin = 3.5;
+      var v = horizRange - margin;
+      if (v > 0) return v;
+      return Math.max(horizRange * 0.4, 0.8);
+    }
+
+    function animateFurnitureEyes(cfg) {
+      var irisL  = cfg.irisL,  irisR  = cfg.irisR;
+      var eyeL   = cfg.eyeL,   eyeR   = cfg.eyeR;
+      var restL  = cfg.restL,  restR  = cfg.restR;
+      var rangeL = cfg.rangeL, rangeR = cfg.rangeR;
+
+      function look() {
+        var angle = Math.random() * Math.PI * 2;
+        var mag   = Math.random();
+        var dx    = Math.cos(angle) * mag;
+        var dy    = Math.sin(angle) * mag;
+        var rYL   = furnitureEyeVerticalRange(rangeL);
+        var rYR   = furnitureEyeVerticalRange(rangeR);
+        irisL.setAttribute('cx', restL.x + dx * rangeL);
+        irisL.setAttribute('cy', restL.y + dy * rYL);
+        irisR.setAttribute('cx', restR.x + dx * rangeR);
+        irisR.setAttribute('cy', restR.y + dy * rYR);
+        setTimeout(look, 3000 + Math.random() * 3000);
+      }
+
+      function singleBlink(onDone) {
+        var holdMs = 60 + Math.random() * 90;
+        eyeL.style.visibility = 'hidden';
+        eyeR.style.visibility = 'hidden';
+        setTimeout(function () {
+          eyeL.style.visibility = '';
+          eyeR.style.visibility = '';
+          setTimeout(onDone || function () {}, 0);
+        }, holdMs);
+      }
+
+      function blink() {
+        singleBlink(function () {
+          if (Math.random() < 0.25) {
+            var gapMs = 100 + Math.random() * 80;
+            setTimeout(function () { singleBlink(scheduleBlink); }, gapMs);
+          } else {
+            scheduleBlink();
+          }
+        });
+      }
+
+      function scheduleBlink() {
+        setTimeout(blink, 4000 + Math.random() * 4000);
+      }
+
+      look();
+      scheduleBlink();
+    }
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('brush-iris-l'),
+        irisR:    document.getElementById('brush-iris-r'),
+        eyeL:     document.getElementById('brush-eye-l'),
+        eyeR:     document.getElementById('brush-eye-r'),
+        restL:    { x: 84.2,  y: 110.2 },
+        restR:    { x: 150.6, y: 92.8 },
+        rangeL:   12,  // bumped — iris sits at ~73% from left edge
+        rangeR:   10,  // same reason
+      });
+    }, Math.random() * 3000);
+
+    setTimeout(function () {
+      animateFurnitureEyes({
+        irisL:    document.getElementById('bucket-iris-l'),
+        irisR:    document.getElementById('bucket-iris-r'),
+        eyeL:     document.getElementById('bucket-eye-l'),
+        eyeR:     document.getElementById('bucket-eye-r'),
+        restL:    { x: 57.7,  y: 75.4 },
+        restR:    { x: 127.8, y: 94.1 },
+        rangeL:   9,   // iris sits at ~20% from left — standard formula
+        rangeR:   10,  // iris sits at ~27% from left — standard formula
+      });
+    }, Math.random() * 3000);
+
+
+    // ── Draggable objects ──────────────────────────────────────────
+    // Mouse events are in viewport pixels; object positions are in
+    // canvas pixels (pre-scale). Divide by scale to convert.
+    let dragging = null;
+    let offsetX = 0, offsetY = 0;
+    let topZ = 10;
+
+    document.querySelectorAll('.obj').forEach(el => {
+      if (window.KT && window.KT.isDesktop) {
+        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
+        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+      }
+      
+      // Ensure element doesn't scroll the page on touch
+      el.style.touchAction = 'none';
+
+      el.addEventListener('pointerdown', e => {
+        dragging = el;
+        const rect = el.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        el.classList.add('is-dragging');
+        el.style.zIndex = ++topZ;
+        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
+        el.setPointerCapture(e.pointerId);
+        e.preventDefault();
+      });
+    });
+
+    // rAF-throttled drag
+    var dragRaf = 0, dragMX = 0, dragMY = 0;
+    function updateDragPos() {
+      dragRaf = 0;
+      if (!dragging) return;
+      const pr = page.getBoundingClientRect();
+      dragging.style.setProperty('left', (dragMX - pr.left - offsetX) + 'px', 'important');
+      dragging.style.setProperty('top',  (dragMY - pr.top  - offsetY) + 'px', 'important');
+    }
+    document.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      dragMX = e.clientX;
+      dragMY = e.clientY;
+      if (!dragRaf) dragRaf = requestAnimationFrame(updateDragPos);
+    }, { passive: true });
+
+    document.addEventListener('pointerup', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+        const under = document.elementFromPoint(e.clientX, e.clientY);
+        if (window.KT && window.KT.isDesktop) KT.setCursor(under && under.closest('.obj') ? 'hover' : 'default');
+      }
+    });
+
+    document.addEventListener('pointercancel', e => {
+      if (dragging) {
+        dragging.classList.remove('is-dragging');
+        dragging = null;
+      }
+    });
+
+    document.querySelectorAll('.obj img').forEach(img => {
+      img.addEventListener('dragstart', e => e.preventDefault());
+    });
+  </script>
+
+  <script>
+    var monsterGroup     = document.getElementById('monster-group');
+    var modalBackdrop    = document.getElementById('modal-backdrop');
+    var modalBlueBody    = document.getElementById('modal-blue-body');
+    var mlModal          = document.getElementById('newsletter-window');
+    var mlClose          = document.getElementById('ml-close');
+    var mlHeading        = document.getElementById('ml-heading');
+    var mlEmail          = document.getElementById('ml-email');
+    var mlSubmit         = document.getElementById('ml-submit');
+    var mlError          = document.getElementById('ml-error');
+
+    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
+
+    function openMailingList() {
+      document.documentElement.classList.add('kt-monster-modal-open');
+      modalBackdrop.style.display = 'block';
+      modalBlueBody.style.display = 'block';
+      mlModal.style.display = 'block';
+      monsterGroup.classList.add('wave-risen');
+      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
+    }
+
+    function closeMailingList() {
+      document.documentElement.classList.remove('kt-monster-modal-open');
+      monsterGroup.style.transition = 'none';
+      monsterGroup.classList.remove('wave-risen');
+      modalBackdrop.style.display = 'none';
+      modalBlueBody.style.display = 'none';
+      mlModal.style.display = 'none';
+      mlModal.classList.remove('ml-error', 'ml-success');
+      mlHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+      mlEmail.value = '';
+      mlEmail.classList.remove('has-error');
+      mlError.classList.remove('is-visible');
+      requestAnimationFrame(function() {
+        monsterGroup.style.transition = '';
+      });
+      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
+    }
+
+    var monsterLinearTicker = document.getElementById('monster-linear-ticker');
+    monsterLinearTicker.addEventListener('click', openMailingList);
+    monsterLinearTicker.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      openMailingList();
+    });
+    document.getElementById('monster-area').addEventListener('click', openMailingList);
+    mlClose.addEventListener('click', closeMailingList);
+    modalBackdrop.addEventListener('click', closeMailingList);
+
+    mlEmail.addEventListener('input', function() {
+      mlModal.classList.remove('ml-error');
+      mlError.classList.remove('is-visible');
+      mlSubmit.classList.remove('is-disabled');
+      mlEmail.classList.remove('has-error');
+    });
+
+    mlSubmit.addEventListener('click', function() {
+      var email = mlEmail.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!valid) {
+        mlModal.classList.add('ml-error');
+        mlModal.classList.remove('ml-success');
+        mlError.classList.add('is-visible');
+        mlSubmit.classList.add('is-disabled');
+        mlEmail.classList.add('has-error');
+        return;
+      }
+      mlModal.classList.remove('ml-error');
+      mlModal.classList.add('ml-success');
+      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
+      fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
+        .catch(function() {});
+    });
+  </script>
+
+</body>
+</html>

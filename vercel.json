@@ -1,5 +1,28 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/coming-soon.html", "permanent": false }
+    { "source": "/about.html", "destination": "/about/", "permanent": true },
+    { "source": "/contact.html", "destination": "/contact/", "permanent": true },
+    { "source": "/experiences.html", "destination": "/experiences/", "permanent": true },
+    { "source": "/interiors.html", "destination": "/interiors/", "permanent": true },
+    { "source": "/shop.html", "destination": "/shop/", "permanent": true },
+    { "source": "/home.html", "destination": "/home/", "permanent": true },
+    { "source": "/coming-soon.html", "destination": "/coming-soon/", "permanent": true },
+    { "source": "/about-launch.html", "destination": "/about/", "permanent": true },
+    { "source": "/about-launch/", "destination": "/about/", "permanent": true },
+    { "source": "/contact-launch.html", "destination": "/contact/", "permanent": true },
+    { "source": "/contact-launch/", "destination": "/contact/", "permanent": true },
+    { "source": "/experiences-launch.html", "destination": "/experiences/", "permanent": true },
+    { "source": "/experiences-launch/", "destination": "/experiences/", "permanent": true },
+    { "source": "/interiors-launch.html", "destination": "/interiors/", "permanent": true },
+    { "source": "/interiors-launch/", "destination": "/interiors/", "permanent": true },
+    { "source": "/shop-launch.html", "destination": "/shop/", "permanent": true },
+    { "source": "/shop-launch/", "destination": "/shop/", "permanent": true },
+    { "source": "/home-launch.html", "destination": "/home/", "permanent": true },
+    { "source": "/home-launch/", "destination": "/home/", "permanent": true },
+    { "source": "/interiors-preview.html", "destination": "/interiors/", "permanent": true },
+    { "source": "/interiors-preview/", "destination": "/interiors/", "permanent": true },
+    { "source": "/experiences-preview.html", "destination": "/experiences/", "permanent": true },
+    { "source": "/experiences-preview/", "destination": "/experiences/", "permanent": true },
+    { "source": "/skeleton.html", "destination": "/skeleton/", "permanent": true }
   ]
 }

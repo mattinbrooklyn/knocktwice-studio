@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    .box { width: var(--content-width); height: 100px; background: red; }
+  </style>
+</head>
+<body>
+  <div class="box" id="box"></div>
+  <script>
+    window.onload = () => {
+      document.body.innerHTML += '<p>' + getComputedStyle(document.getElementById('box')).width + '</p>';
+    }
+  </script>
+</body>
+</html>
