@@ -107,7 +107,6 @@ Page folders:
 - `experiences/index.html` is the experiences page.
 - `shop/index.html` is the shop page.
 - `contact/index.html` is the contact page.
-- `coming-soon/index.html` is the coming soon page.
 - `skeleton/index.html` is a reference page.
 
 Shared assets:
