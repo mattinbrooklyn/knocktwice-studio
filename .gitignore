@@ -2,3 +2,6 @@
 
 # Cursor IDE — local only
 .cursor/
+
+# Claude Code — local only
+.claude/

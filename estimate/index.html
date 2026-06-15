@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Room for Two — Your Estimate · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       ESTIMATE PAGE
+       A standalone, natively-responsive client document. It borrows the
+       brand tokens from styles.css (colors, fonts, type scale) but does
+       NOT use the 1440 canvas-scaler / monster-wave system the portfolio
+       pages use. An estimate is a scrolling document + form, so it flows
+       naturally at any width.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Let this page scroll and use a normal cursor — the portfolio
+       pages hide the cursor, but a form needs the native one. */
+    html, body { cursor: auto !important; background: var(--color-bg); }
+    *, *::before, *::after { cursor: auto !important; }
+    a, button, label, input, textarea, [role="button"] { cursor: pointer !important; }
+    input, textarea { cursor: text !important; }
+
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    .wrap {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 2.5rem) 9rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(1rem, 2.2vw, 1.25rem);
+      letter-spacing: 0.01em;
+      color: var(--color-blue);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+    .eyebrow img { height: 1.6em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.75rem, 9vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin-bottom: 0.85rem;
+    }
+
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+      color: var(--color-blue);
+      margin-bottom: 1.5rem;
+    }
+
+    .intro {
+      font-size: clamp(0.95rem, 1.6vw, 1.0625rem);
+      max-width: 42rem;
+      margin-bottom: 0.5rem;
+    }
+    .intro strong { font-weight: 700; }
+
+    .rule {
+      border: 0;
+      border-top: 1.5px solid var(--color-ink);
+      margin: 2rem 0;
+    }
+
+    /* ── "Who's reviewing" fields ─────────────────────────────── */
+    .reviewer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .field { flex: 1 1 14rem; }
+    .field label {
+      display: block;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+    .field input {
+      width: 100%;
+      height: var(--input-height);
+      padding: 0 1rem;
+      font-family: var(--font-body);
+      font-size: var(--type-field);
+      color: var(--color-ink);
+      background: var(--color-white);
+      border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-input);
+    }
+    .field input:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+
+    /* ── Category section ─────────────────────────────────────── */
+    .category { margin-bottom: 2.75rem; }
+    .cat-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--color-ink);
+      margin-bottom: 1.25rem;
+    }
+    .cat-name {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+    }
+    .cat-sub {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      white-space: nowrap;
+    }
+    .cat-sub .approved-count { color: var(--color-green); }
+
+    /* ── Item card ────────────────────────────────────────────── */
+    .item {
+      display: grid;
+      grid-template-columns: 84px 1fr auto;
+      grid-template-areas:
+        "thumb info price"
+        "thumb toggle toggle"
+        "note  note   note";
+      gap: 0.4rem 1.1rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid var(--color-khaki);
+      align-items: start;
+    }
+    .item:last-child { border-bottom: 0; }
+
+    .thumb {
+      grid-area: thumb;
+      width: 84px; height: 84px;
+      border-radius: 0.5rem;
+      background: var(--color-white);
+      border: 1px solid var(--color-khaki);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb img.is-icon { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }
+
+    .info { grid-area: info; min-width: 0; }
+    .piece { font-weight: 700; font-size: 1.0625rem; line-height: 1.25; }
+    .meta {
+      font-size: 0.875rem;
+      color: var(--color-caramel);
+      margin-top: 0.15rem;
+    }
+    .meta .dot { opacity: 0.5; margin: 0 0.35em; }
+    .item-note-flag {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--color-ink);
+      margin-top: 0.3rem;
+    }
+    .view-link {
+      display: inline-block;
+      margin-top: 0.35rem;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--color-blue);
+      text-decoration: none;
+      border-bottom: 1.5px solid currentColor;
+    }
+    .view-link:hover { color: var(--color-ink); }
+
+    .price { grid-area: price; text-align: right; white-space: nowrap; }
+    .price .total { font-weight: 700; font-size: 1.0625rem; }
+    .price .each {
+      display: block;
+      font-size: 0.8125rem;
+      color: var(--color-caramel);
+      margin-top: 0.1rem;
+    }
+
+    /* ── Three-state toggle (native radios, styled labels) ────── */
+    .toggle {
+      grid-area: toggle;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .toggle label {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: 0.95rem;
+      line-height: 1;
+      padding: 0.5rem 0.85rem;
+      border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-pill);
+      background: var(--color-white);
+      user-select: none;
+      transition: background 0.12s, color 0.12s;
+    }
+    .toggle label:hover { background: var(--color-bg); }
+    .toggle input:focus-visible + label { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+
+    .toggle input[value="Approved"]:checked + label {
+      background: var(--color-green); color: var(--color-white); border-color: var(--color-green);
+    }
+    .toggle input[value="Thinking"]:checked + label {
+      background: var(--color-yellow); color: var(--color-ink); border-color: var(--color-ink);
+    }
+    .toggle input[value="Request alternate"]:checked + label {
+      background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
+    }
+
+    /* ── Per-item note ────────────────────────────────────────── */
+    .note { grid-area: note; }
+    .note-toggle {
+      background: none; border: 0; padding: 0;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+      color: var(--color-blue);
+      margin-top: 0.4rem;
+    }
+    .note-toggle:hover { color: var(--color-ink); }
+    .note textarea {
+      width: 100%;
+      margin-top: 0.5rem;
+      min-height: 4.5rem;
+      padding: 0.7rem 0.9rem;
+      font-family: var(--font-body); font-size: 0.95rem;
+      color: var(--color-ink);
+      background: var(--color-white);
+      border: 1.5px solid var(--color-khaki);
+      border-radius: var(--radius-input);
+      resize: vertical;
+    }
+    .note textarea:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; border-color: var(--color-ink); }
+    .note[hidden] { display: none; }
+
+    /* ── Sticky totals bar ────────────────────────────────────── */
+    .totals {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      background: var(--color-ink);
+      color: var(--color-bg);
+      z-index: 50;
+      box-shadow: 0 -6px 24px rgba(0,0,0,0.18);
+    }
+    .totals-inner {
+      max-width: 56rem;
+      margin: 0 auto;
+      padding: 0.75rem clamp(1.25rem, 4vw, 2.5rem);
+      display: flex;
+      align-items: center;
+      gap: 1.25rem 2rem;
+      flex-wrap: wrap;
+    }
+    .totals-figures { display: flex; gap: 1.75rem; flex: 1 1 auto; flex-wrap: wrap; }
+    .fig .fig-label {
+      font-family: var(--font-ui); font-weight: 600;
+      font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase;
+      opacity: 0.75;
+    }
+    .fig .fig-value {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.35rem, 4vw, 1.85rem);
+      line-height: 1.1;
+    }
+    .fig.approved .fig-value { color: var(--color-green); }
+    .totals-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+    .breakdown-btn {
+      background: none;
+      border: 1.5px solid var(--color-bg);
+      color: var(--color-bg);
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+      padding: 0.55rem 0.9rem;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+    }
+    .breakdown-btn:hover { background: var(--color-bg); color: var(--color-ink); }
+
+    .submit-btn {
+      background: var(--color-blue);
+      border: 1.5px solid var(--color-blue);
+      color: var(--color-white);
+      font-family: var(--font-ui); font-weight: 700; font-size: 1.05rem;
+      padding: 0.7rem 1.5rem;
+      border-radius: var(--radius-button);
+      white-space: nowrap;
+    }
+    .submit-btn:hover { background: var(--color-white); color: var(--color-blue); }
+    .submit-btn:disabled { opacity: 0.55; }
+
+    .hard-cost-note {
+      width: 100%;
+      font-family: var(--font-ui); font-size: 0.8rem; opacity: 0.7;
+      margin-top: -0.25rem;
+    }
+
+    /* ── Breakdown drawer ─────────────────────────────────────── */
+    .breakdown {
+      max-width: 56rem; margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 2.5rem) 0.75rem;
+    }
+    .breakdown[hidden] { display: none; }
+    .breakdown table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    .breakdown td { padding: 0.3rem 0; border-bottom: 1px solid rgba(247,242,236,0.18); }
+    .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+    .breakdown tr.grand td { border-bottom: 0; padding-top: 0.5rem; font-weight: 700; }
+    .breakdown .bd-approved { color: var(--color-green); }
+
+    /* ── Submit / confirmation states ─────────────────────────── */
+    .setup-warning {
+      background: var(--color-yellow);
+      color: var(--color-ink);
+      border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      padding: 0.85rem 1rem;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .setup-warning code { font-family: var(--font-ui); font-weight: 700; }
+
+    .thank-you {
+      display: none;
+      text-align: center;
+      padding: 4rem 1rem;
+    }
+    .thank-you h2 {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(2rem, 7vw, 3.25rem);
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .thank-you p { font-family: var(--font-ui); font-size: 1.2rem; color: var(--color-blue); }
+
+    /* ── Footer ───────────────────────────────────────────────── */
+    .foot {
+      font-family: var(--font-ui); font-weight: 600;
+      font-size: 0.85rem; color: var(--color-caramel);
+      text-align: center;
+      padding: 2rem 1rem 0;
+    }
+
+    /* ── Mobile tightening ────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .item {
+        grid-template-columns: 64px 1fr;
+        grid-template-areas:
+          "thumb info"
+          "price price"
+          "toggle toggle"
+          "note note";
+        gap: 0.5rem 0.85rem;
+      }
+      .thumb { width: 64px; height: 64px; }
+      .price { text-align: left; }
+      .price .total::before { content: "Total: "; font-weight: 600; color: var(--color-caramel); }
+      .totals-inner { gap: 0.75rem 1.25rem; }
+      .submit-btn { flex: 1 1 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <form id="estimate-form" class="wrap" action="https://formspree.io/f/mpqebeqe" method="POST">
+
+    <!-- Masthead ------------------------------------------------- -->
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      Knock Twice × Hannah Rich
+    </p>
+    <h1 class="title">A Room<br>for Two</h1>
+    <p class="lede">Ambrose &amp; Gigi’s room — your estimate to review.</p>
+    <p class="intro">
+      Here’s everything in the cart. For each piece, tell us where you land —
+      <strong>Approved</strong>, <strong>Thinking</strong>, or
+      <strong>Request alternate</strong> — and leave a note wherever you like.
+      Your picks update the totals at the bottom as you go. Hit submit when you’re ready,
+      and it comes straight to us.
+    </p>
+
+    <div class="setup-warning" id="setup-warning" hidden>
+      ⚙️ <strong>Heads up (only you see this):</strong> the form isn’t wired to a destination yet.
+      Replace <code>REPLACE_ME</code> in the form action with your Formspree endpoint to start
+      receiving responses. Until then, Submit is disabled.
+    </div>
+
+    <hr class="rule">
+
+    <!-- Reviewer ------------------------------------------------- -->
+    <div class="reviewer">
+      <div class="field">
+        <label for="reviewer-name">Your name</label>
+        <input type="text" id="reviewer-name" name="Reviewer name" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="reviewer-email">Your email</label>
+        <input type="email" id="reviewer-email" name="Reviewer email" autocomplete="email" required>
+      </div>
+    </div>
+
+    <!-- Categories render here ----------------------------------- -->
+    <div id="categories"></div>
+
+    <p class="foot">Knock Twice · Room for Two · Estimate dated April 23, 2026</p>
+  </form>
+
+  <!-- Thank-you (shown after submit) ----------------------------- -->
+  <div class="thank-you" id="thank-you">
+    <h2>Thank you ✨</h2>
+    <p>We’ve got your notes — we’ll be in touch soon.</p>
+  </div>
+
+  <!-- Sticky totals --------------------------------------------- -->
+  <div class="totals" id="totals-bar">
+    <div class="breakdown" id="breakdown" hidden>
+      <table id="breakdown-table"></table>
+    </div>
+    <div class="totals-inner">
+      <div class="totals-figures">
+        <div class="fig">
+          <div class="fig-label">Project total</div>
+          <div class="fig-value" id="project-total">$0.00</div>
+        </div>
+        <div class="fig approved">
+          <div class="fig-label">Approved so far</div>
+          <div class="fig-value" id="approved-total">$0.00</div>
+        </div>
+      </div>
+      <div class="totals-actions">
+        <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">By category ▾</button>
+        <button type="submit" form="estimate-form" class="submit-btn" id="submit-btn">Submit estimate</button>
+      </div>
+      <p class="hard-cost-note">Hard cost only — shipping, taxes, etc. not yet included.</p>
+    </div>
+  </div>
+
+  <script>
+  /* ──────────────────────────────────────────────────────────────
+     DATA — single source of truth. All values verified against the
+     Round 1 design package. Edit here to reuse this page for another
+     project. `img` is looked up at /assets/images/estimate/<slug>.webp;
+     if it’s missing, the card falls back to a category sticker.
+     ────────────────────────────────────────────────────────────── */
+  const CART = [
+    { cat: "Finishes", items: [
+      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm · 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues" },
+      { slug:"paint", piece:"Paint + Supplies", retailer:"TBD", size:"", color:"", qty:1, unit:150, total:150, link:"" },
+      { slug:"curtains", piece:"Curtains", retailer:"Crate & Barrel", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649" },
+    ]},
+    { cat: "Furniture & Storage", items: [
+      { slug:"bunk-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:'78"L × 65.5"W × 64"H', color:"White / Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed" },
+      { slug:"bunk-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", flag:"To be discussed — no impact to design" },
+      { slug:"dresser", piece:"Kane Tall 4-Drawer Dresser", retailer:"Urban Outfitters", size:'26"L × 18"W × 44.5"H', color:"Maroon", qty:1, unit:799, total:799, link:"https://www.urbanoutfitters.com/shop/kane-tall-4-drawer-dresser3?color=061" },
+      { slug:"trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:'15.8"L × 29.9"W × 18.9"H', color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html" },
+      { slug:"shelves", piece:"6×5 Grid Shelves", retailer:"Lucca House", size:'71.5 × 59.5 × 11.5"', color:"w/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120" },
+      { slug:"crates-md", piece:"Crates — Medium", retailer:"HAY", size:"Medium", color:"Multi", qty:10, unit:13, total:130, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
+      { slug:"crates-sm", piece:"Crates — Small", retailer:"HAY", size:"Small", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
+    ]},
+    { cat: "Labor & Install", items: [
+      { slug:"wallpaper-install", piece:"Wallpaper Installation", retailer:"TBD", size:"", color:"", qty:1, unit:2500, total:2500, link:"" },
+      { slug:"painters", piece:"Painters", retailer:"TBD", size:"", color:"", qty:1, unit:1000, total:1000, link:"" },
+    ]},
+    { cat: "Lighting", items: [
+      { slug:"sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/" },
+      { slug:"pendant", piece:"Puck Plug-in Pendant", retailer:"Color Cord Company", size:"OSFA", color:"Ochre", qty:1, unit:130, total:130, link:"https://www.colorcord.com/products/boutique-aio-puck-plug-in-pendant?variant=40777408774246" },
+    ]},
+    { cat: "Soft Goods", items: [
+      { slug:"duvet", piece:"Duvet Cover, Fitted + Top Sheet Set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246" },
+      { slug:"star-pillow", piece:"Star Shape Pillow", retailer:"Oeuf", size:'17" × 17"', color:"Yellow", qty:1, unit:120, total:120, link:"https://oeufnyc.com/products/star-face" },
+      { slug:"park-pillow", piece:"‘The Park’ Throw Pillow", retailer:"2Modern", size:'23.6" × 15.75"', color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877" },
+      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:'36"D × 12"H', color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa" },
+      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8 × 10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html" },
+      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:'15.8" × 29.9" × 3"', color:"Bouclé", qty:2, unit:85.75, total:171.50, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom" },
+      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035" },
+      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072" },
+    ]},
+    { cat: "Art", items: [
+      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm · Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173" },
+      { slug:"crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341" },
+      { slug:"elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973" },
+      { slug:"frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765" },
+      { slug:"frame-cloud", piece:"Peek-a-boo Frame", retailer:"Knock Twice Studio", size:'8 × 10"', color:"Cloud", qty:1, unit:55, total:55, link:"" },
+      { slug:"frame-butter", piece:"Peek-a-boo Frame", retailer:"Knock Twice Studio", size:'8 × 10"', color:"Butter", qty:1, unit:55, total:55, link:"" },
+    ]},
+  ];
+
+  // Category → fallback sticker (used when a product image is missing).
+  const CAT_ICON = {
+    "Finishes": "/assets/sticker-star.svg",
+    "Furniture & Storage": "/assets/sticker-home.svg",
+    "Labor & Install": "/assets/render-paintbrush.png",
+    "Lighting": "/assets/sticker-star.svg",
+    "Soft Goods": "/assets/sticker-star.svg",
+    "Art": "/assets/sticker-star.svg",
+  };
+
+  const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // ── Render ────────────────────────────────────────────────────
+  const catWrap = document.getElementById("categories");
+  CART.forEach(group => {
+    const section = document.createElement("section");
+    section.className = "category";
+    const subtotal = group.items.reduce((s, it) => s + it.total, 0);
+
+    section.innerHTML = `
+      <div class="cat-head">
+        <h2 class="cat-name">${group.cat}</h2>
+        <div class="cat-sub" data-cat="${group.cat}">
+          <span class="approved-count">0</span> / ${group.items.length} approved
+          <span class="dot">·</span>${money(subtotal)}
+        </div>
+      </div>`;
+
+    group.items.forEach(it => {
+      const icon = CAT_ICON[group.cat];
+      const metaBits = [it.retailer, it.size, it.color].filter(Boolean).join('<span class="dot">·</span>');
+      const eachLine = it.qty > 1 ? `<span class="each">${it.qty} × ${money(it.unit)}</span>` : "";
+      const linkLine = it.link
+        ? `<a class="view-link" href="${it.link}" target="_blank" rel="noopener">View product ↗</a>`
+        : "";
+      const flagLine = it.flag ? `<div class="item-note-flag">↳ ${it.flag}</div>` : "";
+
+      const card = document.createElement("div");
+      card.className = "item";
+      card.innerHTML = `
+        <div class="thumb">
+          <img src="/assets/images/estimate/${it.slug}.webp" alt="${it.piece}"
+               data-icon="${icon}"
+               onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">
+        </div>
+        <div class="info">
+          <div class="piece">${it.piece}</div>
+          <div class="meta">${metaBits}</div>
+          ${flagLine}
+          ${linkLine}
+        </div>
+        <div class="price">
+          <span class="total">${money(it.total)}</span>
+          ${eachLine}
+        </div>
+        <div class="toggle" role="radiogroup" aria-label="Status for ${it.piece}">
+          ${["Approved","Thinking","Request alternate"].map((state,i) => `
+            <input type="radio" id="${it.slug}-${i}" name="${it.piece} — Status" value="${state}"
+                   data-total="${it.total}" data-cat="${group.cat}">
+            <label for="${it.slug}-${i}">${state}</label>
+          `).join("")}
+        </div>
+        <div class="note">
+          <button type="button" class="note-toggle">+ Add a note</button>
+          <div class="note-body" hidden>
+            <textarea name="${it.piece} — Note" placeholder="Anything you want us to know about this piece…"></textarea>
+          </div>
+        </div>`;
+      section.appendChild(card);
+    });
+
+    catWrap.appendChild(section);
+  });
+
+  // ── Live totals ───────────────────────────────────────────────
+  const PROJECT_TOTAL = CART.reduce((s,g) => s + g.items.reduce((a,i)=>a+i.total,0), 0);
+  document.getElementById("project-total").textContent = money(PROJECT_TOTAL);
+
+  function recalc() {
+    let approved = 0;
+    const perCat = {};
+    CART.forEach(g => perCat[g.cat] = { approved: 0, count: g.items.length });
+
+    document.querySelectorAll('.toggle input:checked').forEach(r => {
+      if (r.value === "Approved") {
+        approved += parseFloat(r.dataset.total);
+        perCat[r.dataset.cat].approved++;
+      }
+    });
+
+    document.getElementById("approved-total").textContent = money(approved);
+    document.querySelectorAll(".cat-sub").forEach(el => {
+      el.querySelector(".approved-count").textContent = perCat[el.dataset.cat].approved;
+    });
+    buildBreakdown(perCat);
+  }
+
+  function buildBreakdown(perCat) {
+    const rows = CART.map(g => {
+      const sub = g.items.reduce((a,i)=>a+i.total,0);
+      const ap = perCat[g.cat].approved;
+      return `<tr><td>${g.cat} <span class="bd-approved">(${ap}/${g.items.length} ✓)</span></td><td>${money(sub)}</td></tr>`;
+    }).join("");
+    document.getElementById("breakdown-table").innerHTML =
+      rows + `<tr class="grand"><td>Project total</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
+  }
+
+  document.addEventListener("change", e => {
+    if (e.target.matches('.toggle input')) recalc();
+  });
+
+  // ── Per-item note toggles ─────────────────────────────────────
+  document.addEventListener("click", e => {
+    if (e.target.matches(".note-toggle")) {
+      const body = e.target.nextElementSibling;
+      const open = body.hasAttribute("hidden");
+      body.toggleAttribute("hidden", !open);
+      e.target.textContent = open ? "– Hide note" : "+ Add a note";
+      if (open) body.querySelector("textarea").focus();
+    }
+  });
+
+  // ── Breakdown drawer ──────────────────────────────────────────
+  const bdBtn = document.getElementById("breakdown-btn");
+  const bd = document.getElementById("breakdown");
+  bdBtn.addEventListener("click", () => {
+    const open = bd.hasAttribute("hidden");
+    bd.toggleAttribute("hidden", !open);
+    bdBtn.setAttribute("aria-expanded", String(open));
+    bdBtn.textContent = open ? "By category ▴" : "By category ▾";
+  });
+
+  // ── Formspree guard + submit handling ─────────────────────────
+  const form = document.getElementById("estimate-form");
+  const NOT_WIRED = form.action.includes("REPLACE_ME");
+  if (NOT_WIRED) {
+    document.getElementById("setup-warning").hidden = false;
+    document.getElementById("submit-btn").disabled = true;
+  }
+
+  form.addEventListener("submit", async e => {
+    if (NOT_WIRED) { e.preventDefault(); return; }
+    e.preventDefault();
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      });
+      if (res.ok) {
+        form.style.display = "none";
+        document.getElementById("totals-bar").style.display = "none";
+        document.getElementById("thank-you").style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (err) {
+      btn.disabled = false; btn.textContent = "Submit estimate";
+      alert("Something went wrong sending your responses. Please try again, or email us directly.");
+    }
+  });
+
+  recalc();
+  </script>
+</body>
+</html>
