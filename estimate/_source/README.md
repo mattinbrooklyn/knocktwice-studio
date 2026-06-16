@@ -1,44 +1,54 @@
-# Editing the estimate — how the Excel drives the page
+# Editing the estimate — the Google Sheet drives the page
 
-The estimate page (`estimate/index.html`) gets its line items from this
-spreadsheet. The spreadsheet is the **source of truth** — don't hand-edit the
-item data in the HTML; a sync would overwrite it.
+The estimate page (`estimate/index.html`) gets its line items from a **Google
+Sheet** (the source of truth). You edit the Sheet, click **Refresh Estimate**,
+and the latest data is rebuilt into the page and published.
+
+Nothing reaches the client until you refresh — it's your deliberate publish
+step, so they never see edits mid-stream.
 
 ## To change items or prices
 
-1. Open **`design-package.xlsx`** and edit the **ROUND 1** sheet
-   (category, piece, retailer, size, color, qty, price, link).
-2. From the repo root, run:
-   ```
-   python3 estimate/sync-from-excel.py
-   ```
-   It rebuilds the page's data and prints a report — totals, plus any items
-   that still need a product photo.
-3. Preview the page, then commit & push to publish.
+1. Edit the **Google Sheet** (the `ROUND 1` tab).
+2. Double-click **`Refresh Estimate.command`** (in the project's top folder).
+   It pulls the Sheet, rebuilds the page, prints a report, and pushes to staging.
+3. Give Vercel a minute, then check the staging page.
 
 ## Columns the tool reads
 
 `CATEGORY · PIECE · RETAILER · SIZE · COLOR · QTY · PRICE · LINK · SLUG`
 
-- **PRICE** is per-unit; the line total is computed (qty × price), so you don't
-  maintain it by hand.
-- **SLUG** is a short stable id that ties a row to its product photo
-  (`assets/images/estimate/<slug>.webp`). Existing rows already have one. For a
-  **new** row you can leave SLUG blank — the tool will make one from the piece
-  name and tell you what to name the image.
+- **PRICE** is per-unit; the line total is computed (qty × price).
+- **SLUG** is a short stable id tying a row to its product photo
+  (`assets/images/estimate/<slug>.webp`). Existing rows have one. For a **new**
+  row you can leave SLUG blank — the tool derives one and tells you what to name
+  the image.
 - **LINK** of `N/A`, `TBD`, or blank = no "View product" link.
+- Two items with the same PIECE name in a category are auto-distinguished by
+  size or color (e.g. "Crates — Medium" / "Crates — Small").
 
-## Adding a new product photo
+## Category order
 
-Name it `<slug>.webp` and drop it in `assets/images/estimate/`. Until it's
-there, the item shows a tasteful placeholder. (Big images are fine — resize to
-~600px before adding so the page stays light.)
+`Labor & Install` is pinned to the bottom of the list. To pin others, edit
+`LAST_CATEGORIES` near the top of `estimate/sync-from-excel.py`.
 
 ## Publishing a new round
 
-The round label/date lives in `index.html` near the top of the script:
-```
-const ROUND = { label: "Round 1", date: "April 23, 2026" };
-```
-Bump it when you publish a new version — it updates the header stamp, the
-footer, and the label on every submission email automatically.
+The round label/date lives in `index.html` (the `ROUND` constant). Bump it when
+you publish a new version — it updates the header stamp, footer, and the label
+on every submission email.
+
+## Adding a product photo
+
+Name it `<slug>.webp` and drop it in `assets/images/estimate/`. Resize to ~600px
+first so the page stays light.
+
+---
+
+### Setup / falling back to a local file
+
+The Google Sheet link is stored once in `estimate/sync-from-excel.py`
+(`GOOGLE_SHEET = "..."`). If it's left blank, the tool reads the local
+`design-package.xlsx` in this folder instead. You can also run the tool by hand:
+`python3 estimate/sync-from-excel.py` (reads the configured source) or
+`python3 estimate/sync-from-excel.py "<sheet-url-or-file>"` (one-off override).

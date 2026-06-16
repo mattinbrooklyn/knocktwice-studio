@@ -27,15 +27,21 @@ NOTES
       image.
 """
 
-import os, re, sys, zipfile
+import os, re, sys, zipfile, urllib.request
 import xml.etree.ElementTree as ET
 
 NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")
+CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
 PAGE = os.path.join(REPO, "estimate", "index.html")
 IMG_DIR = os.path.join(REPO, "assets", "images", "estimate")
 SHEET_NAME = "ROUND 1"
+
+# Paste your shared Google Sheet link here (Share → "Anyone with the link:
+# Viewer"). When set, the tool pulls the latest Sheet on each run. Leave blank
+# to read the local Excel file instead. A URL passed on the command line wins.
+GOOGLE_SHEET = ""
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
 
@@ -68,11 +74,14 @@ def read_sheet(path, sheet_name):
         pass
 
     # Resolve sheet name -> worksheet xml file via workbook + rels.
+    # Falls back to the first sheet if the named tab isn't found.
+    RID = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
     wb = ET.fromstring(z.read("xl/workbook.xml"))
-    rid = None
-    for s in wb.find(f"{NS}sheets"):
-        if s.get("name") == sheet_name:
-            rid = s.get("{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id")
+    sheets = list(wb.find(f"{NS}sheets"))
+    rid = next((s.get(RID) for s in sheets if s.get("name") == sheet_name), None)
+    if rid is None and sheets:
+        print(f"  (No '{sheet_name}' tab — using first tab '{sheets[0].get('name')}'.)")
+        rid = sheets[0].get(RID)
     rels = ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))
     target = None
     for rel in rels:
@@ -245,8 +254,42 @@ def report(cart):
     print("  ✓ index.html updated. Preview, then commit & push to publish.\n")
 
 
+# ── Google Sheet fetch ─────────────────────────────────────────────────────
+def looks_like_google(s):
+    return "docs.google.com" in s or (s and "/" not in s and "." not in s and len(s) > 20)
+
+
+def fetch_google_sheet(url_or_id):
+    """Download a shared Google Sheet as .xlsx into the local source file.
+    The Sheet must be shared 'Anyone with the link: Viewer' (or published)."""
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url_or_id)
+    sheet_id = m.group(1) if m else url_or_id.strip()
+    export = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
+    print(f"\n  Pulling latest from Google Sheet…")
+    try:
+        req = urllib.request.Request(export, headers={"User-Agent": "Mozilla/5.0"})
+        data = urllib.request.urlopen(req, timeout=30).read()
+    except Exception as e:
+        sys.exit(f"  Could not reach the Google Sheet ({e}).\n"
+                 f"  Check the link, and that it's shared 'Anyone with the link: Viewer'.")
+    if data[:2] != b"PK":   # .xlsx files are zips; HTML login page is not
+        sys.exit("  Google returned a login page, not the spreadsheet.\n"
+                 "  Set sharing to 'Anyone with the link: Viewer' (or File → Share → Publish to web).")
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    with open(CACHE, "wb") as f:    # throwaway cache — keeps refreshes from churning git
+        f.write(data)
+    return CACHE
+
+
 if __name__ == "__main__":
-    path = sys.argv[1] if len(sys.argv) > 1 else XLSX
+    arg = sys.argv[1] if len(sys.argv) > 1 else ""
+    source = arg or GOOGLE_SHEET
+    if source and looks_like_google(source):
+        path = fetch_google_sheet(source)            # Google Sheet → cached .xlsx
+        label = "Google Sheet"
+    else:
+        path = source or XLSX                        # explicit path, or local file
+        label = os.path.relpath(path, REPO)
     if not os.path.exists(path):
         sys.exit(f"Spreadsheet not found: {path}")
     rows = read_sheet(path, SHEET_NAME)
@@ -254,5 +297,5 @@ if __name__ == "__main__":
     if not cart:
         sys.exit("No item rows found — check the sheet name and columns.")
     inject(generate_js(cart))
-    print(f"\n  Synced from: {os.path.relpath(path, REPO)}  (sheet: {SHEET_NAME})")
+    print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")
     report(cart)

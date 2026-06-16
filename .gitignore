@@ -5,3 +5,6 @@
 
 # Claude Code — local only
 .claude/
+
+# Estimate — throwaway Google Sheet fetch cache
+estimate/_source/.sheet-cache.xlsx
