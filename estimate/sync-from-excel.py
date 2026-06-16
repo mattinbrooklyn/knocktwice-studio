@@ -39,6 +39,10 @@ SHEET_NAME = "ROUND 1"
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
 
+# Categories pinned to the end of the list (in this order), regardless of where
+# they sit in the spreadsheet. Everything else keeps its spreadsheet order.
+LAST_CATEGORIES = ["Labor & Install"]
+
 
 # ── Minimal .xlsx reader (stdlib only) ─────────────────────────────────────
 def _col(ref):
@@ -177,7 +181,10 @@ def build_cart(rows):
                         d["piece"] = f"{piece} — {d[field]}"
                         d[field] = ""   # avoid repeating it in the meta line
                     break
-    return [(cat, items) for cat, items in groups.items()]
+    ordered = [(cat, items) for cat, items in groups.items()]
+    # Pin LAST_CATEGORIES to the end; everything else keeps spreadsheet order.
+    ordered.sort(key=lambda ci: (1, LAST_CATEGORIES.index(ci[0])) if ci[0] in LAST_CATEGORIES else (0, 0))
+    return ordered
 
 
 def generate_js(cart):
