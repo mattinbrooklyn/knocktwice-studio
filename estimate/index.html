@@ -473,54 +473,50 @@
   </div>
 
   <script>
-  /* ──────────────────────────────────────────────────────────────
-     DATA — single source of truth. Verified against the Round 1
-     design package. Edit here to reuse for another project. Images
-     load from /assets/images/estimate/<slug>.webp; missing ones fall
-     back to a category sticker.
-     ────────────────────────────────────────────────────────────── */
+  /* ESTIMATE-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
   const CART = [
     { cat: "Finishes", items: [
-      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm · 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues" },
-      { slug:"paint", piece:"Paint + Supplies", retailer:"TBD", size:"", color:"", qty:1, unit:150, total:150, link:"" },
-      { slug:"curtains", piece:"Curtains", retailer:"Crate & Barrel", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649" },
+      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues" },
+      { slug:"paint", piece:"Paint + Supplies", retailer:"TBD", size:"-", color:"TBD", qty:1, unit:150, total:150, link:"" },
+      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649" },
     ]},
     { cat: "Furniture & Storage", items: [
-      { slug:"bunk-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:'78"L × 65.5"W × 64"H', color:"White / Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed" },
-      { slug:"bunk-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", flag:"To be discussed — no impact to design" },
-      { slug:"dresser", piece:"Kane Tall 4-Drawer Dresser", retailer:"Urban Outfitters", size:'26"L × 18"W × 44.5"H', color:"Maroon", qty:1, unit:799, total:799, link:"https://www.urbanoutfitters.com/shop/kane-tall-4-drawer-dresser3?color=061" },
-      { slug:"trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:'15.8"L × 29.9"W × 18.9"H', color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html" },
-      { slug:"shelves", piece:"6×5 Grid Shelves", retailer:"Lucca House", size:'71.5 × 59.5 × 11.5"', color:"w/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120" },
-      { slug:"crates-md", piece:"Crates — Medium", retailer:"HAY", size:"Medium", color:"Multi", qty:10, unit:13, total:130, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
-      { slug:"crates-sm", piece:"Crates — Small", retailer:"HAY", size:"Small", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
+      { slug:"bunk-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:"78\" L × 65.5\" W × 64\" H", color:"White/Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed" },
+      { slug:"bunk-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress" },
+      { slug:"dresser", piece:"Kane Tall 4-Drawer Dresser", retailer:"Urban Outfitters", size:"26\"L × 18\"W × 44.5\"H", color:"Maroon", qty:1, unit:799, total:799, link:"https://www.urbanoutfitters.com/shop/kane-tall-4-drawer-dresser3?color=061&searchparams=q=dresser&type=REGULAR&size=ONE+SIZE&quantity=1" },
+      { slug:"trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:"15.8\"L × 29.9\"W × 18.9\"H", color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html" },
+      { slug:"shelves", piece:"6×5 Grid Shelves", retailer:"Lucca House", size:"71.5 × 59.5\"x11.5\"", color:"W/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120&utm_source=Pinterest&utm_medium=organic" },
+      { slug:"crates-md", piece:"Crates — Medium", retailer:"HAY", size:"", color:"Multi", qty:10, unit:13, total:130, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
+      { slug:"crates-sm", piece:"Crates — Small", retailer:"HAY", size:"", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300" },
     ]},
     { cat: "Labor & Install", items: [
-      { slug:"wallpaper-install", piece:"Wallpaper Installation", retailer:"TBD", size:"", color:"", qty:1, unit:2500, total:2500, link:"" },
-      { slug:"painters", piece:"Painters", retailer:"TBD", size:"", color:"", qty:1, unit:1000, total:1000, link:"" },
+      { slug:"wallpaper-install", piece:"Wallpaper Installation", retailer:"TBD", size:"-", color:"-", qty:1, unit:2500, total:2500, link:"" },
+      { slug:"painters", piece:"Painters", retailer:"TBD", size:"-", color:"-", qty:1, unit:1000, total:1000, link:"" },
     ]},
     { cat: "Lighting", items: [
-      { slug:"sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/" },
+      { slug:"sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/?catalogId=71&sku=5081589&pickuplocation=ST:%7Bstore_code%7D&cm_ven=PLA&cm_cat=Google&cm_pla=Decor%20%3E%20All%20Lighting&cm_ite=5081589_14464445698_pla-1730208656294&gad_source=1&gad_campaignid=14464445698&gbraid=0AAAAABjYLmmN4N6yeFRkXJyfcORI33jdI&gclid=CjwKCAjwuanRBhBSEiwAY5y6V-2aVys04G_E5nylObQc2Ef_Lb3uOHHU217D9udo2JQlPNF4yCPmURoCKIIQAvD_BwE" },
       { slug:"pendant", piece:"Puck Plug-in Pendant", retailer:"Color Cord Company", size:"OSFA", color:"Ochre", qty:1, unit:130, total:130, link:"https://www.colorcord.com/products/boutique-aio-puck-plug-in-pendant?variant=40777408774246" },
     ]},
     { cat: "Soft Goods", items: [
-      { slug:"duvet", piece:"Duvet Cover, Fitted + Top Sheet Set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246" },
-      { slug:"star-pillow", piece:"Star Shape Pillow", retailer:"Oeuf", size:'17" × 17"', color:"Yellow", qty:1, unit:120, total:120, link:"https://oeufnyc.com/products/star-face" },
-      { slug:"park-pillow", piece:"‘The Park’ Throw Pillow", retailer:"2Modern", size:'23.6" × 15.75"', color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877" },
-      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:'36"D × 12"H', color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa" },
-      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8 × 10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html" },
-      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:'15.8" × 29.9" × 3"', color:"Bouclé", qty:2, unit:85.75, total:171.50, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom" },
-      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035" },
-      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072" },
+      { slug:"duvet", piece:"Duvet Cover, Fitted + Top sheet set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246" },
+      { slug:"star-pillow", piece:"Star Shape Pillow", retailer:"Oeuf", size:"17\" × 17\"", color:"Yellow", qty:1, unit:120, total:120, link:"https://oeufnyc.com/products/star-face" },
+      { slug:"park-pillow", piece:"The Park' Throw Pillow", retailer:"2 Modern", size:"23.6\" × 15.75\"", color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877&utm_source=google&campaign_id=20911467993&ad_id=&utm_medium=cpc&utm_campaign=HB%20%7C%20PMAX%20-%20Furniture%20-%20Group%20PMAX&utm_content=&utm_term=&gclid=Cj0KCQjww8rQBhDjARIsAE43KPNjO0yyi5CZ_Srp1QcW30MzbSuVgn4u7YswwOhHZfjN-YJEST1l4NIaAiSEEALw_wcB&gad_source=1&gad_campaignid=20918110013&gbraid=0AAAAAD_WqgmIOoRyWOi5mUEB0yjtEUP10" },
+      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:"36\" D × 12\" H", color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa" },
+      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8×10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html?piid=92279137" },
+      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:"15.8\" × 29.9\" × 3\"", color:"Boucle - 18", qty:2, unit:85.75, total:171.5, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom?ls=a&ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=35+x+20+bench+cushions&ref=sc_gallery-1-4&sr_prefetch=1&pro=1&frs=1&sts=1&nob=1&plkey=4e987bd410b80288d60817cef2fee85dfe445efc%3A1728489535&variation0=5369547128&variation1=5369547094&dd_referrer=https%3A%2F%2Fwww.google.com%2F" },
+      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035&type=REGULAR" },
+      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072&type=REGULAR" },
     ]},
     { cat: "Art", items: [
-      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm · Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173" },
-      { slug:"crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341" },
-      { slug:"elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973" },
-      { slug:"frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm · Framed", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765" },
-      { slug:"frame-cloud", piece:"Peek-a-boo Frame — Cloud", retailer:"Knock Twice Studio", size:'8 × 10"', color:"", qty:1, unit:55, total:55, link:"" },
-      { slug:"frame-butter", piece:"Peek-a-boo Frame — Butter", retailer:"Knock Twice Studio", size:'8 × 10"', color:"", qty:1, unit:55, total:55, link:"" },
+      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm — Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173" },
+      { slug:"crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341" },
+      { slug:"elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973" },
+      { slug:"frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765" },
+      { slug:"frame-cloud", piece:"Peek-a-boo Frame — Cloud", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:55, total:55, link:"" },
+      { slug:"frame-butter", piece:"Peek-a-boo Frame — Butter", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:55, total:55, link:"" },
     ]},
   ];
+  /* ESTIMATE-DATA:END */
 
   const CAT_ICON = {
     "Finishes": "/assets/sticker-star.svg",
@@ -551,7 +547,7 @@
 
   // ── Render item ───────────────────────────────────────────────
   function renderItem(it, cat) {
-    const icon = CAT_ICON[cat];
+    const icon = CAT_ICON[cat] || "/assets/sticker-star.svg";
     const meta = [it.retailer, it.size, it.color, it.qty > 1 ? `Qty ${it.qty}` : ""]
       .filter(Boolean).join('<span class="dot">·</span>');
     const link = it.link ? `<a class="view-link" href="${it.link}" target="_blank" rel="noopener">View product ↗</a>` : "";
