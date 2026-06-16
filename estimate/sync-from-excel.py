@@ -169,6 +169,7 @@ def build_cart(rows):
             "unit": round(price, 2),
             "total": round(qty * price, 2),
             "link": link,
+            "flag": (r.get("NOTES") or "").strip(),   # your note to the client (the "↳" line)
         }
         groups.setdefault(cat, []).append(item)
 
@@ -210,11 +211,12 @@ def generate_js(cart):
         lines.append(f"    {{ cat: \"{js(cat)}\", items: [")
         for it in items:
             qty = it["qty"]
+            flag = f', flag:"{js(it["flag"])}"' if it.get("flag") else ""
             lines.append(
                 f"      {{ slug:\"{js(it['slug'])}\", piece:\"{js(it['piece'])}\", "
                 f"retailer:\"{js(it['retailer'])}\", size:\"{js(it['size'])}\", "
                 f"color:\"{js(it['color'])}\", qty:{qty}, unit:{it['unit']:g}, "
-                f"total:{it['total']:g}, link:\"{js(it['link'])}\" }},"
+                f"total:{it['total']:g}, link:\"{js(it['link'])}\"{flag} }},"
             )
         lines.append("    ]},")
     lines.append("  ];")
