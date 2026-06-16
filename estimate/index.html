@@ -367,7 +367,18 @@
       font-family: var(--font-display); font-weight: 400;
       font-size: clamp(2rem, 7vw, 3.25rem); text-transform: uppercase; margin-bottom: 0.6rem;
     }
-    .thank-you p { font-family: var(--font-ui); font-size: 1.2rem; color: var(--color-blue); }
+    .thank-you p { font-family: var(--font-ui); font-size: 1.2rem; color: var(--color-blue); max-width: 34rem; margin: 0 auto; }
+    .back-to-cart {
+      margin-top: 2rem;
+      background: none; border: 1.5px solid var(--color-ink); color: var(--color-ink);
+      font-family: var(--font-ui); font-weight: 700; font-size: 1rem;
+      padding: 0.7rem 1.4rem; border-radius: var(--radius-button);
+    }
+    .back-to-cart:hover { background: var(--color-ink); color: var(--color-bg); }
+    .thank-you-note {
+      font-family: var(--font-body) !important; font-size: 0.9rem !important;
+      color: var(--color-caramel) !important; margin-top: 1.25rem !important;
+    }
 
     .foot {
       font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
@@ -458,6 +469,9 @@
     <h2>Got it ✨</h2>
     <p>Your picks are on their way to Knock Twice. Next, we’ll refine — source alternates,
        talk through the maybes — and send back an updated cart.</p>
+    <button type="button" class="back-to-cart" id="back-to-cart">← Back to your cart</button>
+    <p class="thank-you-note">Changed your mind? Head back, tweak anything, and send again —
+       we’ll always take your latest.</p>
   </div>
 
   <!-- Sticky totals --------------------------------------------- -->
@@ -762,6 +776,17 @@
       btn.disabled = false; recalc();
       alert("Something went wrong sending your picks. Please try again, or email us directly.");
     }
+  });
+
+  // Back to cart — her picks were only hidden, not cleared, so she can tweak
+  // and send again. Re-enable the send button (recalc restores its label).
+  document.getElementById("back-to-cart").addEventListener("click", () => {
+    document.getElementById("thank-you").style.display = "none";
+    form.style.display = "";
+    document.getElementById("totals-bar").style.display = "";
+    document.getElementById("submit-btn").disabled = false;
+    recalc();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
   recalc();
