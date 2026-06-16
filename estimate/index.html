@@ -13,16 +13,16 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
     /* ──────────────────────────────────────────────────────────────
-       ESTIMATE PAGE
-       A standalone, natively-responsive client document. It borrows the
-       brand tokens from styles.css (colors, fonts, type scale) but does
-       NOT use the 1440 canvas-scaler / monster-wave system the portfolio
-       pages use. An estimate is a scrolling document + form, so it flows
-       naturally at any width.
+       ESTIMATE PAGE — "her cart," not an invoice.
+       Standalone, natively-responsive client document. Borrows brand
+       tokens from styles.css but not the portfolio canvas-scaler.
+
+       Model: categories collapsed by default → one calm, digestible
+       screen. She opens what she wants, says yes to what she loves
+       (or flags it), and her picks gather in a quiet bottom bar.
+       Pieces lead; dollars recede.
        ────────────────────────────────────────────────────────────── */
 
-    /* Let this page scroll and use a normal cursor — the portfolio
-       pages hide the cursor, but a form needs the native one. */
     html, body { cursor: auto !important; background: var(--color-bg); }
     *, *::before, *::after { cursor: auto !important; }
     a, button, label, input, textarea, [role="button"] { cursor: pointer !important; }
@@ -35,198 +35,208 @@
       line-height: 1.5;
     }
 
+    /* Tighter column than before — less sprawl. */
     .wrap {
-      max-width: 56rem;
+      max-width: 44rem;
       margin: 0 auto;
-      padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 4vw, 2.5rem) 9rem;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 8.5rem;
     }
 
     /* ── Masthead ─────────────────────────────────────────────── */
     .eyebrow {
       font-family: var(--font-ui);
       font-weight: 600;
-      font-size: clamp(1rem, 2.2vw, 1.25rem);
-      letter-spacing: 0.01em;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
       color: var(--color-blue);
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      margin-bottom: 1.25rem;
+      display: flex; align-items: center; gap: 0.55rem;
+      margin-bottom: 0.9rem;
     }
-    .eyebrow img { height: 1.6em; width: auto; display: block; }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
 
     h1.title {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(2.75rem, 9vw, 5rem);
-      line-height: 0.98;
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      line-height: 0.96;
       letter-spacing: 0.01em;
       text-transform: uppercase;
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.7rem;
     }
-
     .lede {
       font-family: var(--font-ui);
       font-weight: 500;
-      font-size: clamp(1.15rem, 2.6vw, 1.5rem);
+      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
       color: var(--color-blue);
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.1rem;
     }
-
     .intro {
-      font-size: clamp(0.95rem, 1.6vw, 1.0625rem);
-      max-width: 42rem;
-      margin-bottom: 0.5rem;
-    }
-    .intro strong { font-weight: 700; }
-
-    .rule {
-      border: 0;
-      border-top: 1.5px solid var(--color-ink);
-      margin: 2rem 0;
+      font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+      max-width: 40rem;
     }
 
-    /* ── "Who's reviewing" fields ─────────────────────────────── */
-    .reviewer {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 2.5rem;
+    .setup-warning {
+      background: var(--color-yellow);
+      color: var(--color-ink);
+      border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: 0.9rem;
+      margin-top: 1.5rem;
     }
-    .field { flex: 1 1 14rem; }
+    .setup-warning code { font-family: var(--font-ui); font-weight: 700; }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Reviewer fields ──────────────────────────────────────── */
+    .reviewer { display: flex; flex-wrap: wrap; gap: 0.85rem; margin-bottom: 2rem; }
+    .field { flex: 1 1 13rem; }
     .field label {
-      display: block;
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 1rem;
-      margin-bottom: 0.35rem;
+      display: block; font-family: var(--font-ui); font-weight: 600;
+      font-size: 0.95rem; margin-bottom: 0.3rem;
     }
     .field input {
-      width: 100%;
-      height: var(--input-height);
-      padding: 0 1rem;
-      font-family: var(--font-body);
-      font-size: var(--type-field);
-      color: var(--color-ink);
-      background: var(--color-white);
-      border: 1.5px solid var(--color-ink);
+      width: 100%; height: var(--input-height); padding: 0 1rem;
+      font-family: var(--font-body); font-size: var(--type-field); color: var(--color-ink);
+      background: var(--color-white); border: 1.5px solid var(--color-ink);
       border-radius: var(--radius-input);
     }
     .field input:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; }
 
-    /* ── Category section ─────────────────────────────────────── */
-    .category { margin-bottom: 2.75rem; }
-    .cat-head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 1rem;
-      padding-bottom: 0.6rem;
-      border-bottom: 2px solid var(--color-ink);
-      margin-bottom: 1.25rem;
-    }
-    .cat-name {
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: clamp(1.4rem, 3.4vw, 1.9rem);
-      text-transform: uppercase;
-      letter-spacing: 0.01em;
-    }
-    .cat-sub {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: clamp(1rem, 2.2vw, 1.2rem);
-      white-space: nowrap;
-    }
-    .cat-sub .approved-count { color: var(--color-green); }
+    /* ── Collapsed category card ──────────────────────────────── */
+    .category { margin-bottom: 0.85rem; }
 
-    /* ── Item card ────────────────────────────────────────────── */
+    .cat-card {
+      display: flex; align-items: stretch;
+      border: 1.5px solid var(--color-ink);
+      border-radius: 0.85rem;
+      background: var(--color-white);
+      overflow: hidden;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    .cat-card:hover { box-shadow: var(--shadow-stack); }
+    .category.open .cat-card { border-radius: 0.85rem 0.85rem 0 0; }
+
+    .cat-toggle {
+      flex: 1 1 auto; min-width: 0;
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.95rem 1.05rem;
+      background: none; border: 0; text-align: left;
+    }
+    .chevron {
+      flex: 0 0 auto; font-size: 0.8rem; color: var(--color-caramel);
+      transition: transform 0.2s ease;
+    }
+    .category.open .chevron { transform: rotate(90deg); }
+
+    .cat-headings { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+    .cat-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      text-transform: uppercase; line-height: 1; letter-spacing: 0.01em;
+    }
+    /* Quiet money — pieces count + subtotal, understated. */
+    .cat-sub-meta { font-size: 0.8rem; color: var(--color-caramel); white-space: nowrap; }
+    .cat-sub-meta .dot { margin: 0 0.4em; opacity: 0.6; }
+
+    .cat-peek { display: flex; gap: 0.3rem; margin-left: auto; flex: 0 0 auto; }
+    .cat-peek .peek-thumb:nth-of-type(n+5) { display: none; }   /* cap teaser at 4 photos */
+    .peek-thumb {
+      width: 40px; height: 40px; border-radius: 0.45rem; overflow: hidden;
+      background: var(--color-bg); border: 1px solid var(--color-khaki); flex: 0 0 auto;
+    }
+    .peek-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .peek-thumb img.is-icon { object-fit: contain; padding: 7px; opacity: 0.8; }
+
+    .cat-progress {
+      flex: 0 0 auto;
+      /* body font here — Handjet's "0" reads as "8" at this size */
+      font-family: var(--font-body); font-weight: 600; font-size: 0.85rem;
+      white-space: nowrap; color: var(--color-caramel); padding-left: 0.4rem;
+    }
+    .cat-progress.partial { color: var(--color-ink); }
+    .cat-progress.complete { color: var(--color-green); }
+
+    /* One-tap "love the whole category" — for the things she fell for in the deck. */
+    .love-all {
+      flex: 0 0 auto; align-self: stretch;
+      border: 0; border-left: 1.5px solid var(--color-ink);
+      background: var(--color-bg); color: var(--color-ink);
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+      padding: 0 1.05rem; white-space: nowrap;
+      transition: background 0.12s, color 0.12s;
+    }
+    .love-all:hover { background: var(--color-green); color: var(--color-white); }
+    .love-all.all-loved { background: var(--color-green); color: var(--color-white); }
+
+    /* ── Expanded panel ───────────────────────────────────────── */
+    .cat-panel {
+      border: 1.5px solid var(--color-ink); border-top: 0;
+      border-radius: 0 0 0.85rem 0.85rem;
+      background: var(--color-white);
+      padding: 0 1.05rem;
+    }
+    .cat-panel[hidden] { display: none; }
+
+    /* ── Item row ─────────────────────────────────────────────── */
     .item {
       display: grid;
-      grid-template-columns: 84px 1fr auto;
+      grid-template-columns: 64px 1fr auto;
       grid-template-areas:
         "thumb info price"
         "thumb toggle toggle"
-        "note  note   note";
-      gap: 0.4rem 1.1rem;
-      padding: 1.1rem 0;
+        "note  note  note";
+      gap: 0.35rem 0.95rem;
+      padding: 0.95rem 0;
       border-bottom: 1px solid var(--color-khaki);
       align-items: start;
+      margin: 0 -0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;
+      border-radius: 0.5rem;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
     }
-    .item:last-child { border-bottom: 0; }
+    .cat-panel .item:last-child { border-bottom: 0; }
+
+    /* Loved = a soft, satisfying green wash + accent. Scanning a category
+       becomes a field of greens: a record of how much she loves. */
+    .item:has(input[value="Approved"]:checked) {
+      background: rgba(81, 177, 140, 0.10);
+      box-shadow: inset 3px 0 0 var(--color-green);
+    }
 
     .thumb {
-      grid-area: thumb;
-      width: 84px; height: 84px;
-      border-radius: 0.5rem;
-      background: var(--color-white);
+      grid-area: thumb; width: 64px; height: 64px;
+      border-radius: 0.5rem; background: var(--color-bg);
       border: 1px solid var(--color-khaki);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
     }
     .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .thumb img.is-icon { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }
 
     .info { grid-area: info; min-width: 0; }
-    .piece { font-weight: 700; font-size: 1.0625rem; line-height: 1.25; }
-    .meta {
-      font-size: 0.875rem;
-      color: var(--color-caramel);
-      margin-top: 0.15rem;
-    }
-    .meta .dot { opacity: 0.5; margin: 0 0.35em; }
-    .item-note-flag {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--color-ink);
-      margin-top: 0.3rem;
-    }
+    .piece { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+    .meta { font-size: 0.85rem; color: var(--color-caramel); margin-top: 0.15rem; }
+    .meta .dot { opacity: 0.55; margin: 0 0.35em; }
+    .item-note-flag { font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem; margin-top: 0.25rem; }
     .view-link {
-      display: inline-block;
-      margin-top: 0.35rem;
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 0.95rem;
-      color: var(--color-blue);
-      text-decoration: none;
-      border-bottom: 1.5px solid currentColor;
+      display: inline-block; margin-top: 0.3rem;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+      color: var(--color-blue); text-decoration: none; border-bottom: 1.5px solid currentColor;
     }
     .view-link:hover { color: var(--color-ink); }
 
+    /* Price — present, but quiet. Secondary weight + size. */
     .price { grid-area: price; text-align: right; white-space: nowrap; }
-    .price .total { font-weight: 700; font-size: 1.0625rem; }
-    .price .each {
-      display: block;
-      font-size: 0.8125rem;
-      color: var(--color-caramel);
-      margin-top: 0.1rem;
-    }
+    .price .total { font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
 
-    /* ── Three-state toggle (native radios, styled labels) ────── */
-    .toggle {
-      grid-area: toggle;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-top: 0.25rem;
-    }
+    /* ── Three-state toggle ───────────────────────────────────── */
+    .toggle { grid-area: toggle; display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.2rem; }
     .toggle input { position: absolute; opacity: 0; pointer-events: none; }
     .toggle label {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      font-size: 0.95rem;
-      line-height: 1;
-      padding: 0.5rem 0.85rem;
-      border: 1.5px solid var(--color-ink);
-      border-radius: var(--radius-pill);
-      background: var(--color-white);
-      user-select: none;
-      transition: background 0.12s, color 0.12s;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.92rem; line-height: 1;
+      padding: 0.5rem 0.8rem; border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-pill); background: var(--color-white);
+      user-select: none; transition: background 0.12s, color 0.12s;
     }
     .toggle label:hover { background: var(--color-bg); }
     .toggle input:focus-visible + label { outline: 2px solid var(--color-blue); outline-offset: 2px; }
-
     .toggle input[value="Approved"]:checked + label {
       background: var(--color-green); color: var(--color-white); border-color: var(--color-green);
     }
@@ -241,147 +251,113 @@
     .note { grid-area: note; }
     .note-toggle {
       background: none; border: 0; padding: 0;
-      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
-      color: var(--color-blue);
-      margin-top: 0.4rem;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem; color: var(--color-blue);
+      margin-top: 0.35rem;
     }
     .note-toggle:hover { color: var(--color-ink); }
     .note textarea {
-      width: 100%;
-      margin-top: 0.5rem;
-      min-height: 4.5rem;
-      padding: 0.7rem 0.9rem;
-      font-family: var(--font-body); font-size: 0.95rem;
-      color: var(--color-ink);
-      background: var(--color-white);
-      border: 1.5px solid var(--color-khaki);
-      border-radius: var(--radius-input);
-      resize: vertical;
+      width: 100%; margin-top: 0.45rem; min-height: 4rem; padding: 0.65rem 0.85rem;
+      font-family: var(--font-body); font-size: 0.95rem; color: var(--color-ink);
+      background: var(--color-bg); border: 1.5px solid var(--color-khaki);
+      border-radius: var(--radius-input); resize: vertical;
     }
     .note textarea:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; border-color: var(--color-ink); }
-    .note[hidden] { display: none; }
+    .note-body[hidden] { display: none; }
 
-    /* ── Sticky totals bar ────────────────────────────────────── */
+    /* ── Sticky totals — light, reassuring, pieces-forward ────── */
     .totals {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      background: var(--color-ink);
-      color: var(--color-bg);
+      position: fixed; left: 0; right: 0; bottom: 0;
+      background: var(--color-white);
+      border-top: 1.5px solid var(--color-ink);
       z-index: 50;
-      box-shadow: 0 -6px 24px rgba(0,0,0,0.18);
+      box-shadow: 0 -4px 20px rgba(50,38,31,0.10);
     }
     .totals-inner {
-      max-width: 56rem;
-      margin: 0 auto;
-      padding: 0.75rem clamp(1.25rem, 4vw, 2.5rem);
-      display: flex;
-      align-items: center;
-      gap: 1.25rem 2rem;
-      flex-wrap: wrap;
+      max-width: 44rem; margin: 0 auto;
+      padding: 0.7rem clamp(1.1rem, 4vw, 2rem) 0.8rem;
+      display: flex; align-items: center; gap: 0.85rem 1.5rem; flex-wrap: wrap;
     }
-    .totals-figures { display: flex; gap: 1.75rem; flex: 1 1 auto; flex-wrap: wrap; }
-    .fig .fig-label {
-      font-family: var(--font-ui); font-weight: 600;
-      font-size: 0.8rem; letter-spacing: 0.04em; text-transform: uppercase;
-      opacity: 0.75;
-    }
-    .fig .fig-value {
+    .totals-progress { flex: 1 1 14rem; min-width: 0; }
+    .pieces-headline {
       font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(1.35rem, 4vw, 1.85rem);
-      line-height: 1.1;
+      font-size: clamp(1.05rem, 3.2vw, 1.4rem); line-height: 1.05;
     }
-    .fig.approved .fig-value { color: var(--color-green); }
-    .totals-actions { display: flex; align-items: center; gap: 0.75rem; }
+    .pieces-headline #loved-count { color: var(--color-green); }
+    .progress-track {
+      height: 6px; border-radius: 6px; background: var(--color-khaki);
+      margin-top: 0.45rem; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%; border-radius: 6px;
+      background: var(--color-green); transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    /* Quiet money line. */
+    .totals-money {
+      font-family: var(--font-ui); font-size: 0.92rem; color: var(--color-caramel);
+      white-space: nowrap;
+    }
+    .totals-money strong { color: var(--color-ink); font-weight: 700; }
 
+    .totals-actions { display: flex; align-items: center; gap: 0.6rem; }
     .breakdown-btn {
-      background: none;
-      border: 1.5px solid var(--color-bg);
-      color: var(--color-bg);
-      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
-      padding: 0.55rem 0.9rem;
-      border-radius: var(--radius-pill);
-      white-space: nowrap;
+      background: none; border: 1.5px solid var(--color-ink); color: var(--color-ink);
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem;
+      padding: 0.5rem 0.85rem; border-radius: var(--radius-pill); white-space: nowrap;
     }
-    .breakdown-btn:hover { background: var(--color-bg); color: var(--color-ink); }
-
+    .breakdown-btn:hover { background: var(--color-ink); color: var(--color-bg); }
     .submit-btn {
-      background: var(--color-blue);
-      border: 1.5px solid var(--color-blue);
-      color: var(--color-white);
-      font-family: var(--font-ui); font-weight: 700; font-size: 1.05rem;
-      padding: 0.7rem 1.5rem;
-      border-radius: var(--radius-button);
-      white-space: nowrap;
+      background: var(--color-blue); border: 1.5px solid var(--color-blue); color: var(--color-white);
+      font-family: var(--font-ui); font-weight: 700; font-size: 1rem;
+      padding: 0.6rem 1.3rem; border-radius: var(--radius-button); white-space: nowrap;
     }
-    .submit-btn:hover { background: var(--color-white); color: var(--color-blue); }
-    .submit-btn:disabled { opacity: 0.55; }
-
-    .hard-cost-note {
-      width: 100%;
-      font-family: var(--font-ui); font-size: 0.8rem; opacity: 0.7;
-      margin-top: -0.25rem;
-    }
+    .submit-btn:hover { background: var(--color-ink); border-color: var(--color-ink); }
+    .submit-btn:disabled { opacity: 0.5; }
+    .hard-cost-note { width: 100%; font-family: var(--font-ui); font-size: 0.78rem; color: var(--color-caramel); }
 
     /* ── Breakdown drawer ─────────────────────────────────────── */
-    .breakdown {
-      max-width: 56rem; margin: 0 auto;
-      padding: 0 clamp(1.25rem, 4vw, 2.5rem) 0.75rem;
-    }
+    .breakdown { max-width: 44rem; margin: 0 auto; padding: 0 clamp(1.1rem, 4vw, 2rem); }
     .breakdown[hidden] { display: none; }
-    .breakdown table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-    .breakdown td { padding: 0.3rem 0; border-bottom: 1px solid rgba(247,242,236,0.18); }
-    .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
-    .breakdown tr.grand td { border-bottom: 0; padding-top: 0.5rem; font-weight: 700; }
-    .breakdown .bd-approved { color: var(--color-green); }
+    .breakdown-inner { border-top: 1px solid var(--color-khaki); padding: 0.65rem 0; }
+    .breakdown table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .breakdown td { padding: 0.28rem 0; }
+    .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-caramel); }
+    .breakdown tr.grand td { border-top: 1px solid var(--color-khaki); padding-top: 0.45rem; font-weight: 700; color: var(--color-ink); }
+    .breakdown tr.grand td:last-child { color: var(--color-ink); }
+    .breakdown .bd-loved { color: var(--color-green); font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; }
 
-    /* ── Submit / confirmation states ─────────────────────────── */
-    .setup-warning {
-      background: var(--color-yellow);
-      color: var(--color-ink);
-      border: 1.5px solid var(--color-ink);
-      border-radius: var(--radius-input);
-      padding: 0.85rem 1rem;
-      font-size: 0.9rem;
-      margin-bottom: 2rem;
-    }
-    .setup-warning code { font-family: var(--font-ui); font-weight: 700; }
-
-    .thank-you {
-      display: none;
-      text-align: center;
-      padding: 4rem 1rem;
-    }
+    /* ── Thank-you ────────────────────────────────────────────── */
+    .thank-you { display: none; text-align: center; padding: 4.5rem 1rem; }
     .thank-you h2 {
       font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(2rem, 7vw, 3.25rem);
-      text-transform: uppercase;
-      margin-bottom: 0.75rem;
+      font-size: clamp(2rem, 7vw, 3.25rem); text-transform: uppercase; margin-bottom: 0.6rem;
     }
     .thank-you p { font-family: var(--font-ui); font-size: 1.2rem; color: var(--color-blue); }
 
-    /* ── Footer ───────────────────────────────────────────────── */
     .foot {
-      font-family: var(--font-ui); font-weight: 600;
-      font-size: 0.85rem; color: var(--color-caramel);
-      text-align: center;
-      padding: 2rem 1rem 0;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-caramel); text-align: center; padding: 1.75rem 1rem 0;
     }
 
-    /* ── Mobile tightening ────────────────────────────────────── */
+    /* ── Mobile ───────────────────────────────────────────────── */
     @media (max-width: 600px) {
+      .cat-peek { display: none; }            /* keep the collapsed card calm on phones */
+      .cat-toggle { gap: 0.7rem; padding: 0.85rem 0.9rem; }
+      .love-all { padding: 0 0.85rem; font-size: 0; }
+      .love-all::before { content: "♡"; font-size: 1.3rem; }
+      .love-all.all-loved::before { content: "♥"; }
       .item {
-        grid-template-columns: 64px 1fr;
+        grid-template-columns: 56px 1fr;
         grid-template-areas:
           "thumb info"
           "price price"
           "toggle toggle"
-          "note note";
-        gap: 0.5rem 0.85rem;
+          "note  note";
+        gap: 0.45rem 0.8rem;
       }
-      .thumb { width: 64px; height: 64px; }
+      .thumb { width: 56px; height: 56px; }
       .price { text-align: left; }
-      .price .total::before { content: "Total: "; font-weight: 600; color: var(--color-caramel); }
-      .totals-inner { gap: 0.75rem 1.25rem; }
+      .price .total::before { content: "Price: "; color: var(--color-caramel); font-weight: 400; }
+      .totals-money { width: 100%; }
       .submit-btn { flex: 1 1 100%; text-align: center; }
     }
   </style>
@@ -395,19 +371,18 @@
       Knock Twice × Hannah Rich
     </p>
     <h1 class="title">A Room<br>for Two</h1>
-    <p class="lede">Ambrose &amp; Gigi’s room — your estimate to review.</p>
+    <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
     <p class="intro">
-      Here’s everything in the cart. For each piece, tell us where you land —
-      <strong>Approved</strong>, <strong>Thinking</strong>, or
-      <strong>Request alternate</strong> — and leave a note wherever you like.
-      Your picks update the totals at the bottom as you go. Hit submit when you’re ready,
-      and it comes straight to us.
+      Everything we picked for the room, by category. Open one, and for each piece tell us
+      what you <strong>love</strong>, what you’re <strong>thinking</strong> on, or what you’d
+      like us to <strong>swap</strong>. Love a whole category in one tap. Your picks gather at
+      the bottom — send them over whenever you’re ready.
     </p>
 
     <div class="setup-warning" id="setup-warning" hidden>
       ⚙️ <strong>Heads up (only you see this):</strong> the form isn’t wired to a destination yet.
-      Replace <code>REPLACE_ME</code> in the form action with your Formspree endpoint to start
-      receiving responses. Until then, Submit is disabled.
+      Replace <code>REPLACE_ME</code> in the form action with your Formspree endpoint. Until then,
+      Submit is disabled.
     </div>
 
     <hr class="rule">
@@ -430,31 +405,27 @@
     <p class="foot">Knock Twice · Room for Two · Estimate dated April 23, 2026</p>
   </form>
 
-  <!-- Thank-you (shown after submit) ----------------------------- -->
   <div class="thank-you" id="thank-you">
     <h2>Thank you ✨</h2>
-    <p>We’ve got your notes — we’ll be in touch soon.</p>
+    <p>We’ve got your picks — we’ll be in touch soon.</p>
   </div>
 
   <!-- Sticky totals --------------------------------------------- -->
   <div class="totals" id="totals-bar">
     <div class="breakdown" id="breakdown" hidden>
-      <table id="breakdown-table"></table>
+      <div class="breakdown-inner"><table id="breakdown-table"></table></div>
     </div>
     <div class="totals-inner">
-      <div class="totals-figures">
-        <div class="fig">
-          <div class="fig-label">Project total</div>
-          <div class="fig-value" id="project-total">$0.00</div>
-        </div>
-        <div class="fig approved">
-          <div class="fig-label">Approved so far</div>
-          <div class="fig-value" id="approved-total">$0.00</div>
-        </div>
+      <div class="totals-progress">
+        <div class="pieces-headline"><span id="loved-count">0</span> of <span id="total-count">0</span> pieces loved</div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <div class="totals-money">
+        <strong id="approved-total">$0.00</strong> of <span id="project-total">$0.00</span> estimate
       </div>
       <div class="totals-actions">
-        <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">By category ▾</button>
-        <button type="submit" form="estimate-form" class="submit-btn" id="submit-btn">Submit estimate</button>
+        <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">Breakdown ▾</button>
+        <button type="submit" form="estimate-form" class="submit-btn" id="submit-btn">Send to Knock Twice</button>
       </div>
       <p class="hard-cost-note">Hard cost only — shipping, taxes, etc. not yet included.</p>
     </div>
@@ -462,10 +433,10 @@
 
   <script>
   /* ──────────────────────────────────────────────────────────────
-     DATA — single source of truth. All values verified against the
-     Round 1 design package. Edit here to reuse this page for another
-     project. `img` is looked up at /assets/images/estimate/<slug>.webp;
-     if it’s missing, the card falls back to a category sticker.
+     DATA — single source of truth. Verified against the Round 1
+     design package. Edit here to reuse for another project. Images
+     load from /assets/images/estimate/<slug>.webp; missing ones fall
+     back to a category sticker.
      ────────────────────────────────────────────────────────────── */
   const CART = [
     { cat: "Finishes", items: [
@@ -510,7 +481,6 @@
     ]},
   ];
 
-  // Category → fallback sticker (used when a product image is missing).
   const CAT_ICON = {
     "Finishes": "/assets/sticker-star.svg",
     "Furniture & Storage": "/assets/sticker-home.svg",
@@ -520,129 +490,179 @@
     "Art": "/assets/sticker-star.svg",
   };
 
+  // Friendly labels in the UI; clear values in your inbox.
+  const STATES = [
+    { value: "Approved",          label: "Love it" },
+    { value: "Thinking",          label: "Thinking" },
+    { value: "Request alternate", label: "Request alt" },
+  ];
+
   const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const imgTag = (slug, alt, icon, cls="") =>
+    `<img class="${cls}" src="/assets/images/estimate/${slug}.webp" alt="${alt}" data-icon="${icon}"
+          onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`;
 
-  // ── Render ────────────────────────────────────────────────────
-  const catWrap = document.getElementById("categories");
-  CART.forEach(group => {
-    const section = document.createElement("section");
-    section.className = "category";
-    const subtotal = group.items.reduce((s, it) => s + it.total, 0);
+  const TOTAL_ITEMS = CART.reduce((s,g) => s + g.items.length, 0);
+  const PROJECT_TOTAL = CART.reduce((s,g) => s + g.items.reduce((a,i)=>a+i.total,0), 0);
 
-    section.innerHTML = `
-      <div class="cat-head">
-        <h2 class="cat-name">${group.cat}</h2>
-        <div class="cat-sub" data-cat="${group.cat}">
-          <span class="approved-count">0</span> / ${group.items.length} approved
-          <span class="dot">·</span>${money(subtotal)}
+  // ── Render item ───────────────────────────────────────────────
+  function renderItem(it, cat) {
+    const icon = CAT_ICON[cat];
+    const meta = [it.retailer, it.size, it.color, it.qty > 1 ? `Qty ${it.qty}` : ""]
+      .filter(Boolean).join('<span class="dot">·</span>');
+    const link = it.link ? `<a class="view-link" href="${it.link}" target="_blank" rel="noopener">View product ↗</a>` : "";
+    const flag = it.flag ? `<div class="item-note-flag">↳ ${it.flag}</div>` : "";
+
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="thumb">${imgTag(it.slug, it.piece, icon)}</div>
+      <div class="info">
+        <div class="piece">${it.piece}</div>
+        <div class="meta">${meta}</div>
+        ${flag}${link}
+      </div>
+      <div class="price"><span class="total">${money(it.total)}</span></div>
+      <div class="toggle" role="radiogroup" aria-label="Status for ${it.piece}">
+        ${STATES.map((s,i) => `
+          <input type="radio" id="${it.slug}-${i}" name="${it.piece} — Status" value="${s.value}"
+                 data-total="${it.total}" data-cat="${cat}">
+          <label for="${it.slug}-${i}">${s.label}</label>`).join("")}
+      </div>
+      <div class="note">
+        <button type="button" class="note-toggle">+ Add a note</button>
+        <div class="note-body" hidden>
+          <textarea name="${it.piece} — Note" placeholder="Anything you want us to know about this piece…"></textarea>
         </div>
       </div>`;
+    return el;
+  }
 
-    group.items.forEach(it => {
-      const icon = CAT_ICON[group.cat];
-      const metaBits = [it.retailer, it.size, it.color].filter(Boolean).join('<span class="dot">·</span>');
-      const eachLine = it.qty > 1 ? `<span class="each">${it.qty} × ${money(it.unit)}</span>` : "";
-      const linkLine = it.link
-        ? `<a class="view-link" href="${it.link}" target="_blank" rel="noopener">View product ↗</a>`
-        : "";
-      const flagLine = it.flag ? `<div class="item-note-flag">↳ ${it.flag}</div>` : "";
+  // ── Render categories (collapsed by default) ──────────────────
+  const catWrap = document.getElementById("categories");
+  CART.forEach(group => {
+    const subtotal = group.items.reduce((s,it)=>s+it.total,0);
+    const icon = CAT_ICON[group.cat];
+    // Peek shows real product photos only — a thumb that 404s removes itself,
+    // so placeholder stickers never clutter the teaser. CSS caps it at 4.
+    const peek = group.items
+      .map(it => `<span class="peek-thumb"><img src="/assets/images/estimate/${it.slug}.webp" alt="" onerror="this.closest('.peek-thumb').remove()"></span>`).join("");
 
-      const card = document.createElement("div");
-      card.className = "item";
-      card.innerHTML = `
-        <div class="thumb">
-          <img src="/assets/images/estimate/${it.slug}.webp" alt="${it.piece}"
-               data-icon="${icon}"
-               onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">
-        </div>
-        <div class="info">
-          <div class="piece">${it.piece}</div>
-          <div class="meta">${metaBits}</div>
-          ${flagLine}
-          ${linkLine}
-        </div>
-        <div class="price">
-          <span class="total">${money(it.total)}</span>
-          ${eachLine}
-        </div>
-        <div class="toggle" role="radiogroup" aria-label="Status for ${it.piece}">
-          ${["Approved","Thinking","Request alternate"].map((state,i) => `
-            <input type="radio" id="${it.slug}-${i}" name="${it.piece} — Status" value="${state}"
-                   data-total="${it.total}" data-cat="${group.cat}">
-            <label for="${it.slug}-${i}">${state}</label>
-          `).join("")}
-        </div>
-        <div class="note">
-          <button type="button" class="note-toggle">+ Add a note</button>
-          <div class="note-body" hidden>
-            <textarea name="${it.piece} — Note" placeholder="Anything you want us to know about this piece…"></textarea>
-          </div>
-        </div>`;
-      section.appendChild(card);
-    });
+    const section = document.createElement("section");
+    section.className = "category";
+    section.dataset.cat = group.cat;
+    section.innerHTML = `
+      <div class="cat-card">
+        <button type="button" class="cat-toggle" aria-expanded="false">
+          <span class="chevron" aria-hidden="true">▶</span>
+          <span class="cat-headings">
+            <span class="cat-name">${group.cat}</span>
+            <span class="cat-sub-meta">${group.items.length} pieces<span class="dot">·</span>${money(subtotal)}</span>
+          </span>
+          <span class="cat-peek">${peek}</span>
+          <span class="cat-progress" data-cat="${group.cat}"><span class="loved-num">0</span>/${group.items.length} loved</span>
+        </button>
+        <button type="button" class="love-all" data-cat="${group.cat}" aria-label="Love everything in ${group.cat}">♡ Love all</button>
+      </div>
+      <div class="cat-panel" hidden></div>`;
 
+    const panel = section.querySelector(".cat-panel");
+    group.items.forEach(it => panel.appendChild(renderItem(it, group.cat)));
     catWrap.appendChild(section);
   });
 
-  // ── Live totals ───────────────────────────────────────────────
-  const PROJECT_TOTAL = CART.reduce((s,g) => s + g.items.reduce((a,i)=>a+i.total,0), 0);
+  document.getElementById("total-count").textContent = TOTAL_ITEMS;
   document.getElementById("project-total").textContent = money(PROJECT_TOTAL);
 
+  // ── Live recalc ───────────────────────────────────────────────
   function recalc() {
-    let approved = 0;
+    let approved = 0, loved = 0;
     const perCat = {};
-    CART.forEach(g => perCat[g.cat] = { approved: 0, count: g.items.length });
+    CART.forEach(g => perCat[g.cat] = { loved: 0, count: g.items.length });
 
     document.querySelectorAll('.toggle input:checked').forEach(r => {
-      if (r.value === "Approved") {
-        approved += parseFloat(r.dataset.total);
-        perCat[r.dataset.cat].approved++;
-      }
+      if (r.value === "Approved") { approved += parseFloat(r.dataset.total); loved++; perCat[r.dataset.cat].loved++; }
     });
 
+    document.getElementById("loved-count").textContent = loved;
     document.getElementById("approved-total").textContent = money(approved);
-    document.querySelectorAll(".cat-sub").forEach(el => {
-      el.querySelector(".approved-count").textContent = perCat[el.dataset.cat].approved;
+    document.getElementById("progress-fill").style.width = (loved / TOTAL_ITEMS * 100) + "%";
+
+    document.querySelectorAll(".cat-progress").forEach(el => {
+      const pc = perCat[el.dataset.cat];
+      el.querySelector(".loved-num").textContent = pc.loved;
+      el.classList.toggle("complete", pc.loved === pc.count);
+      el.classList.toggle("partial", pc.loved > 0 && pc.loved < pc.count);
     });
+    document.querySelectorAll(".love-all").forEach(b => {
+      const pc = perCat[b.dataset.cat];
+      const all = pc.loved === pc.count;
+      b.classList.toggle("all-loved", all);
+      b.innerHTML = all ? "♥ All loved" : "♡ Love all";
+    });
+
     buildBreakdown(perCat);
   }
 
   function buildBreakdown(perCat) {
     const rows = CART.map(g => {
       const sub = g.items.reduce((a,i)=>a+i.total,0);
-      const ap = perCat[g.cat].approved;
-      return `<tr><td>${g.cat} <span class="bd-approved">(${ap}/${g.items.length} ✓)</span></td><td>${money(sub)}</td></tr>`;
+      const pc = perCat[g.cat];
+      return `<tr><td>${g.cat} <span class="bd-loved">${pc.loved}/${pc.count} loved</span></td><td>${money(sub)}</td></tr>`;
     }).join("");
     document.getElementById("breakdown-table").innerHTML =
-      rows + `<tr class="grand"><td>Project total</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
+      rows + `<tr class="grand"><td>Full estimate</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
   }
 
-  document.addEventListener("change", e => {
-    if (e.target.matches('.toggle input')) recalc();
-  });
+  // ── Interactions ──────────────────────────────────────────────
+  document.addEventListener("change", e => { if (e.target.matches('.toggle input')) recalc(); });
 
-  // ── Per-item note toggles ─────────────────────────────────────
   document.addEventListener("click", e => {
+    // expand / collapse a category
+    const toggle = e.target.closest(".cat-toggle");
+    if (toggle) {
+      const section = toggle.closest(".category");
+      const panel = section.querySelector(".cat-panel");
+      const open = panel.hasAttribute("hidden");
+      panel.toggleAttribute("hidden", !open);
+      section.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      return;
+    }
+
+    // love the whole category (toggles all-loved on/off)
+    const loveAll = e.target.closest(".love-all");
+    if (loveAll) {
+      const section = [...document.querySelectorAll(".category")].find(s => s.dataset.cat === loveAll.dataset.cat);
+      const items = [...section.querySelectorAll(".item")];
+      const allLoved = items.every(it => it.querySelector('input[value="Approved"]').checked);
+      items.forEach(it => { it.querySelector('input[value="Approved"]').checked = !allLoved; });
+      recalc();
+      return;
+    }
+
+    // open / close a per-item note
     if (e.target.matches(".note-toggle")) {
       const body = e.target.nextElementSibling;
       const open = body.hasAttribute("hidden");
       body.toggleAttribute("hidden", !open);
       e.target.textContent = open ? "– Hide note" : "+ Add a note";
       if (open) body.querySelector("textarea").focus();
+      return;
     }
   });
 
-  // ── Breakdown drawer ──────────────────────────────────────────
+  // breakdown drawer
   const bdBtn = document.getElementById("breakdown-btn");
   const bd = document.getElementById("breakdown");
   bdBtn.addEventListener("click", () => {
     const open = bd.hasAttribute("hidden");
     bd.toggleAttribute("hidden", !open);
     bdBtn.setAttribute("aria-expanded", String(open));
-    bdBtn.textContent = open ? "By category ▴" : "By category ▾";
+    bdBtn.textContent = open ? "Breakdown ▴" : "Breakdown ▾";
   });
 
-  // ── Formspree guard + submit handling ─────────────────────────
+  // ── Formspree guard + submit ──────────────────────────────────
   const form = document.getElementById("estimate-form");
   const NOT_WIRED = form.action.includes("REPLACE_ME");
   if (NOT_WIRED) {
@@ -657,21 +677,16 @@
     btn.disabled = true; btn.textContent = "Sending…";
     try {
       const res = await fetch(form.action, {
-        method: "POST",
-        body: new FormData(form),
-        headers: { Accept: "application/json" },
+        method: "POST", body: new FormData(form), headers: { Accept: "application/json" },
       });
-      if (res.ok) {
-        form.style.display = "none";
-        document.getElementById("totals-bar").style.display = "none";
-        document.getElementById("thank-you").style.display = "block";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        throw new Error("Submission failed");
-      }
+      if (!res.ok) throw new Error("Submission failed");
+      form.style.display = "none";
+      document.getElementById("totals-bar").style.display = "none";
+      document.getElementById("thank-you").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      btn.disabled = false; btn.textContent = "Submit estimate";
-      alert("Something went wrong sending your responses. Please try again, or email us directly.");
+      btn.disabled = false; btn.textContent = "Send to Knock Twice";
+      alert("Something went wrong sending your picks. Please try again, or email us directly.");
     }
   });
 
