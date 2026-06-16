@@ -305,26 +305,34 @@
       padding: 0.7rem clamp(1.1rem, 4vw, 2rem) 0.8rem;
       display: flex; align-items: center; gap: 0.85rem 1.5rem; flex-wrap: wrap;
     }
-    .totals-progress { flex: 1 1 14rem; min-width: 0; }
-    .pieces-headline {
-      font-family: var(--font-display); font-weight: 400;
-      font-size: clamp(1.05rem, 3.2vw, 1.4rem); line-height: 1.05;
-    }
+    /* Numbers in the bar use the body font (clean, unambiguous 0) — not the
+       display/ui faces, whose zeros read as 8s or dots at this size. */
+    .totals-progress { flex: 1 1 13rem; min-width: 0; font-family: var(--font-body); }
+    .pieces-headline { font-size: 1.1rem; font-weight: 700; line-height: 1.1; }
     .pieces-headline #loved-count { color: var(--color-green); }
     .progress-track {
       height: 6px; border-radius: 6px; background: var(--color-khaki);
-      margin-top: 0.45rem; overflow: hidden;
+      margin: 0.4rem 0 0.35rem; overflow: hidden;
     }
     .progress-fill {
       height: 100%; width: 0%; border-radius: 6px;
       background: var(--color-green); transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
     }
-    /* Quiet money line. */
-    .totals-money {
-      font-family: var(--font-ui); font-size: 0.92rem; color: var(--color-caramel);
-      white-space: nowrap;
+    .approved-line { font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-caramel); }
+    .approved-line #approved-total { color: var(--color-green); }
+
+    /* The total — a confident anchor, equal weight to the progress. Not hidden. */
+    .totals-total { flex: 0 0 auto; text-align: right; line-height: 1; }
+    .total-amount {
+      font-family: var(--font-body); font-weight: 700;
+      font-size: clamp(1.3rem, 4vw, 1.6rem); color: var(--color-ink);
+      font-variant-numeric: tabular-nums;
     }
-    .totals-money strong { color: var(--color-ink); font-weight: 700; }
+    .total-label {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.76rem;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-caramel);
+      margin-top: 0.2rem;
+    }
 
     .totals-actions { display: flex; align-items: center; gap: 0.6rem; }
     .breakdown-btn {
@@ -385,7 +393,8 @@
       .thumb { width: 56px; height: 56px; }
       .price { text-align: left; }
       .price .total::before { content: "Price: "; color: var(--color-caramel); font-weight: 400; }
-      .totals-money { width: 100%; }
+      .totals-progress { flex: 1 1 100%; }
+      .totals-total { flex: 1 1 100%; text-align: left; }
       .submit-btn { flex: 1 1 100%; text-align: center; }
       .status-top { flex-wrap: wrap; gap: 0.5rem; }
       .step { font-size: 0.76rem; gap: 0.3rem; }
@@ -460,9 +469,11 @@
       <div class="totals-progress">
         <div class="pieces-headline"><span id="loved-count">0</span> of <span id="total-count">0</span> pieces loved</div>
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="approved-line"><span id="approved-total">$0.00</span> approved so far</div>
       </div>
-      <div class="totals-money">
-        <strong id="approved-total">$0.00</strong> of <span id="project-total">$0.00</span> estimate
+      <div class="totals-total">
+        <div class="total-amount" id="project-total">$0.00</div>
+        <div class="total-label">Total estimate</div>
       </div>
       <div class="totals-actions">
         <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">Breakdown ▾</button>
