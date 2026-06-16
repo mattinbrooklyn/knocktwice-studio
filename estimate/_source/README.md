@@ -16,16 +16,25 @@ step, so they never see edits mid-stream.
 
 ## Columns the tool reads
 
-`CATEGORY · PIECE · RETAILER · SIZE · COLOR · QTY · PRICE · LINK · SLUG`
+`CATEGORY · PIECE · RETAILER · SIZE · COLOR · QTY · PRICE · LINK`  (SLUG optional)
 
 - **PRICE** is per-unit; the line total is computed (qty × price).
-- **SLUG** is a short stable id tying a row to its product photo
-  (`assets/images/estimate/<slug>.webp`). Existing rows have one. For a **new**
-  row you can leave SLUG blank — the tool derives one and tells you what to name
-  the image.
 - **LINK** of `N/A`, `TBD`, or blank = no "View product" link.
 - Two items with the same PIECE name in a category are auto-distinguished by
   size or color (e.g. "Crates — Medium" / "Crates — Small").
+
+### Product photos & slugs
+
+Each item's photo is matched by a **slug** — a short id auto-made from the piece
+name (e.g. "Yellow Swivel Sconce" → `yellow-swivel-sconce`). The photo lives at
+`assets/images/estimate/<slug>.webp`. After a refresh, the tool lists any items
+missing a photo and tells you the exact filename to use.
+
+⚠️ **If you rename an item in the Sheet, its slug changes** — so its photo needs
+to be renamed too (the refresh report will show the new name). To avoid that, you
+can add an optional **SLUG** column to the Sheet with a fixed id per row; when
+present it always wins, so you can rename the display name freely. (Not required —
+just handy if you rename things a lot.)
 
 ## Category order
 

@@ -41,7 +41,7 @@ SHEET_NAME = "ROUND 1"
 # Paste your shared Google Sheet link here (Share → "Anyone with the link:
 # Viewer"). When set, the tool pulls the latest Sheet on each run. Leave blank
 # to read the local Excel file instead. A URL passed on the command line wins.
-GOOGLE_SHEET = ""
+GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/1EpT8bsdPsnBvxHSF_FMZiubE-9elqon6iZt97bzGJ1E/edit"
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
 
@@ -160,7 +160,7 @@ def build_cart(rows):
         if link.upper() in ("", "N/A", "TBD", "NONE"):
             link = ""
         item = {
-            "slug": (r.get("SLUG") or "").strip() or slugify(piece),
+            "slug": (r.get("SLUG") or "").strip(),   # filled below from final piece if blank
             "piece": tidy(piece),
             "retailer": (r.get("RETAILER") or "").strip(),
             "size": tidy(r.get("SIZE") or ""),
@@ -190,6 +190,14 @@ def build_cart(rows):
                         d["piece"] = f"{piece} — {d[field]}"
                         d[field] = ""   # avoid repeating it in the meta line
                     break
+    # Fill any blank slug from the FINAL (disambiguated) piece name, so duplicate
+    # pieces get unique slugs (Crates — Medium → crates-medium). An explicit SLUG
+    # column always wins.
+    for items in groups.values():
+        for it in items:
+            if not it["slug"]:
+                it["slug"] = slugify(it["piece"])
+
     ordered = [(cat, items) for cat, items in groups.items()]
     # Pin LAST_CATEGORIES to the end; everything else keeps spreadsheet order.
     ordered.sort(key=lambda ci: (1, LAST_CATEGORIES.index(ci[0])) if ci[0] in LAST_CATEGORIES else (0, 0))
