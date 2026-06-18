@@ -183,18 +183,6 @@
     .cat-progress.partial { color: var(--color-ink); }
     .cat-progress.complete { color: var(--color-green); }
 
-    /* One-tap "love the whole category" — for the things she fell for in the deck. */
-    .love-all {
-      flex: 0 0 auto; align-self: stretch;
-      border: 0; border-left: 1.5px solid var(--color-ink);
-      background: var(--color-bg); color: var(--color-ink);
-      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
-      padding: 0 1.05rem; white-space: nowrap;
-      transition: background 0.12s, color 0.12s;
-    }
-    .love-all:hover { background: var(--color-green); color: var(--color-white); }
-    .love-all.all-loved { background: var(--color-green); color: var(--color-white); }
-
     /* ── Expanded panel ───────────────────────────────────────── */
     .cat-panel {
       border: 1.5px solid var(--color-ink); border-top: 0;
@@ -254,7 +242,7 @@
     .price { grid-area: price; text-align: right; white-space: nowrap; }
     .price .total { font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
 
-    /* ── Three-state toggle ───────────────────────────────────── */
+    /* ── Two-state toggle ─────────────────────────────────────── */
     .toggle { grid-area: toggle; display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.2rem; }
     .toggle input { position: absolute; opacity: 0; pointer-events: none; }
     .toggle label {
@@ -267,9 +255,6 @@
     .toggle input:focus-visible + label { outline: 2px solid var(--color-blue); outline-offset: 2px; }
     .toggle input[value="Approved"]:checked + label {
       background: var(--color-green); color: var(--color-white); border-color: var(--color-green);
-    }
-    .toggle input[value="Thinking"]:checked + label {
-      background: var(--color-yellow); color: var(--color-ink); border-color: var(--color-ink);
     }
     .toggle input[value="Request alternate"]:checked + label {
       background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
@@ -424,9 +409,8 @@
     <h1 class="title">A Room<br>for Two</h1>
     <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
     <p class="intro">
-      Everything we picked for the room, by category. Open one, and for each piece tell us
-      what you <strong>love</strong>, what you’re <strong>thinking</strong> on, or what you’d
-      like us to <strong>swap</strong>. Love a whole category in one tap.
+      Everything we picked for the room, by category. Open a category and, for each piece, tell us
+      what you <strong>love</strong> or what you’d like us to <strong>swap</strong>.
     </p>
 
     <div class="setup-warning" id="setup-warning" hidden>
@@ -554,7 +538,6 @@
   // Friendly labels in the UI; clear values in your inbox.
   const STATES = [
     { value: "Approved",          label: "Love it" },
-    { value: "Thinking",          label: "Thinking" },
     { value: "Request alternate", label: "Request alt" },
   ];
 
@@ -626,7 +609,6 @@
           <span class="cat-peek">${peek}</span>
           <span class="cat-progress" data-cat="${group.cat}"><span class="reviewed-num">0</span>/${group.items.length} reviewed</span>
         </button>
-        <button type="button" class="love-all" data-cat="${group.cat}" aria-label="Love everything in ${group.cat}">♡ Love all</button>
       </div>
       <div class="cat-panel" hidden></div>`;
 
@@ -668,12 +650,6 @@
       el.querySelector(".reviewed-num").textContent = pc.reviewed;
       el.classList.toggle("complete", pc.reviewed === pc.count);
       el.classList.toggle("partial", pc.reviewed > 0 && pc.reviewed < pc.count);
-    });
-    document.querySelectorAll(".love-all").forEach(b => {
-      const pc = perCat[b.dataset.cat];
-      const all = pc.approved === pc.count;
-      b.classList.toggle("all-loved", all);
-      b.innerHTML = all ? "♥ All loved" : "♡ Love all";
     });
 
     // Status + send button respond to how far through her review she is.
@@ -719,17 +695,6 @@
       panel.toggleAttribute("hidden", !open);
       section.classList.toggle("open", open);
       toggle.setAttribute("aria-expanded", String(open));
-      return;
-    }
-
-    // love the whole category (toggles all-loved on/off)
-    const loveAll = e.target.closest(".love-all");
-    if (loveAll) {
-      const section = [...document.querySelectorAll(".category")].find(s => s.dataset.cat === loveAll.dataset.cat);
-      const items = [...section.querySelectorAll(".item")];
-      const allLoved = items.every(it => it.querySelector('input[value="Approved"]').checked);
-      items.forEach(it => { it.querySelector('input[value="Approved"]').checked = !allLoved; });
-      recalc();
       return;
     }
 
