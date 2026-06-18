@@ -212,7 +212,7 @@
 
     /* Loved = a soft, satisfying green wash + accent. Scanning a category
        becomes a field of greens: a record of how much she loves. */
-    .item:has(input[value="Approved"]:checked) {
+    .item:has(input[value="Added to cart"]:checked) {
       background: rgba(81, 177, 140, 0.10);
       box-shadow: inset 3px 0 0 var(--color-green);
     }
@@ -253,21 +253,19 @@
     }
     .toggle label:hover { background: var(--color-bg); }
     .toggle input:focus-visible + label { outline: 2px solid var(--color-blue); outline-offset: 2px; }
-    .toggle input[value="Approved"]:checked + label {
+    .toggle input[value="Added to cart"]:checked + label {
       background: var(--color-green); color: var(--color-white); border-color: var(--color-green);
     }
     .toggle input[value="Request alternate"]:checked + label {
       background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
     }
 
-    /* ── Per-item note ────────────────────────────────────────── */
+    /* ── Per-item note — only shown when an alternate is requested ─ */
     .note { grid-area: note; }
-    .note-toggle {
-      background: none; border: 0; padding: 0;
-      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem; color: var(--color-blue);
-      margin-top: 0.35rem;
+    .note-prompt {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem;
+      color: var(--color-ink); margin: 0.5rem 0 0;
     }
-    .note-toggle:hover { color: var(--color-ink); }
     .note textarea {
       width: 100%; margin-top: 0.45rem; min-height: 4rem; padding: 0.65rem 0.85rem;
       font-family: var(--font-body); font-size: 0.95rem; color: var(--color-ink);
@@ -304,7 +302,7 @@
       background: var(--color-green); transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
     }
     .approved-line { font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-caramel); }
-    .approved-line #approved-total { color: var(--color-green); }
+    .approved-line #cart-count { color: var(--color-green); }
 
     /* The total — a confident anchor, equal weight to the progress. Not hidden. */
     .totals-total { flex: 0 0 auto; text-align: right; line-height: 1; }
@@ -409,8 +407,9 @@
     <h1 class="title">A Room<br>for Two</h1>
     <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
     <p class="intro">
-      Everything we picked for the room, by category. Open a category and, for each piece, tell us
-      what you <strong>love</strong> or what you’d like us to <strong>swap</strong>.
+      Everything we picked for the room, by category. Open a category and, for each piece,
+      <strong>add it to your cart</strong> or <strong>request an alternate</strong> — tell us what to
+      look for instead and we’ll source options.
     </p>
 
     <div class="setup-warning" id="setup-warning" hidden>
@@ -433,9 +432,8 @@
         <li class="step"><span class="dot"></span>Final cart</li>
       </ol>
       <p class="status-next" id="status-next">
-        Open a category and mark what you love. Send us your picks whenever you’ve had a
-        pass — we’ll source alternates for anything you’d like swapped and send back an
-        updated cart. We’ll go back and forth until it’s just right.
+        Open a category and, for each piece, add it to your cart or request an alternate.
+        Send us your cart whenever you’ve had a pass and we’ll get to work.
       </p>
     </div>
 
@@ -451,8 +449,8 @@
 
   <div class="thank-you" id="thank-you">
     <h2>Got it ✨</h2>
-    <p>Your picks are on their way to Knock Twice. Next, we’ll refine — source alternates,
-       talk through the maybes — and send back an updated cart.</p>
+    <p>Your cart is on its way to Knock Twice. Next, we’ll source alternates for anything
+       you asked us to swap and send back an updated cart.</p>
     <button type="button" class="back-to-cart" id="back-to-cart">← Back to your cart</button>
     <p class="thank-you-note">Changed your mind? Head back, tweak anything, and send again —
        we’ll always take your latest.</p>
@@ -467,11 +465,11 @@
       <div class="totals-progress">
         <div class="pieces-headline"><span id="reviewed-count">0</span> of <span id="total-count">0</span> pieces reviewed</div>
         <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="approved-line"><span id="approved-total">$0.00</span> approved so far</div>
+        <div class="approved-line"><span id="cart-count">0</span> in your cart</div>
       </div>
       <div class="totals-total">
-        <div class="total-amount" id="project-total">$0.00</div>
-        <div class="total-label">Total estimate</div>
+        <div class="total-amount" id="cart-total">$0.00</div>
+        <div class="total-label">In your cart</div>
       </div>
       <div class="totals-actions">
         <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">Breakdown ▾</button>
@@ -537,7 +535,7 @@
 
   // Friendly labels in the UI; clear values in your inbox.
   const STATES = [
-    { value: "Approved",          label: "Love it" },
+    { value: "Added to cart",     label: "Add to cart" },
     { value: "Request alternate", label: "Request alt" },
   ];
 
@@ -577,9 +575,9 @@
           <label for="${it.slug}-${i}">${s.label}</label>`).join("")}
       </div>
       <div class="note">
-        <button type="button" class="note-toggle">+ Add a note</button>
         <div class="note-body" hidden>
-          <textarea name="${it.piece} — Note" placeholder="Anything you want us to know about this piece…"></textarea>
+          <p class="note-prompt">What should we look for instead?</p>
+          <textarea name="${it.piece} — Alternate feedback" placeholder="Too pricey, wrong color, not the right vibe… tell us what to change and we’ll source options."></textarea>
         </div>
       </div>`;
     return el;
@@ -618,7 +616,6 @@
   });
 
   document.getElementById("total-count").textContent = TOTAL_ITEMS;
-  document.getElementById("project-total").textContent = money(PROJECT_TOTAL);
 
   // Stamp the round everywhere (header, hidden field for your inbox, footer).
   const roundText = `${ROUND.label} · ${ROUND.date}`;
@@ -628,21 +625,22 @@
 
   // ── Live recalc ───────────────────────────────────────────────
   function recalc() {
-    // Progress tracks REVIEWED (any status given). Approved drives the money
-    // and the per-category love state. Each item is a radio group, so a checked
+    // Progress tracks REVIEWED (a choice made on a piece). Items added to cart
+    // drive the running cart total. Each item is a radio group, so a checked
     // radio === a reviewed item.
-    let approved = 0, reviewed = 0;
+    let cartTotal = 0, cartCount = 0, reviewed = 0;
     const perCat = {};
-    CART.forEach(g => perCat[g.cat] = { reviewed: 0, approved: 0, count: g.items.length });
+    CART.forEach(g => perCat[g.cat] = { reviewed: 0, inCart: 0, count: g.items.length });
 
     document.querySelectorAll('.toggle input:checked').forEach(r => {
       const pc = perCat[r.dataset.cat];
       pc.reviewed++; reviewed++;
-      if (r.value === "Approved") { pc.approved++; approved += parseFloat(r.dataset.total); }
+      if (r.value === "Added to cart") { pc.inCart++; cartCount++; cartTotal += parseFloat(r.dataset.total); }
     });
 
     document.getElementById("reviewed-count").textContent = reviewed;
-    document.getElementById("approved-total").textContent = money(approved);
+    document.getElementById("cart-count").textContent = cartCount;
+    document.getElementById("cart-total").textContent = money(cartTotal);
     document.getElementById("progress-fill").style.width = (reviewed / TOTAL_ITEMS * 100) + "%";
 
     document.querySelectorAll(".cat-progress").forEach(el => {
@@ -652,21 +650,27 @@
       el.classList.toggle("partial", pc.reviewed > 0 && pc.reviewed < pc.count);
     });
 
-    // Status + send button respond to how far through her review she is.
+    // The feedback note only belongs on pieces she's asked us to swap.
+    document.querySelectorAll(".item").forEach(item => {
+      const wantsAlt = item.querySelector('input[value="Request alternate"]').checked;
+      item.querySelector(".note-body").toggleAttribute("hidden", !wantsAlt);
+    });
+
+    // Status + send button respond to how far through her cart she is.
     const allReviewed = reviewed === TOTAL_ITEMS;
     const statusNow = document.getElementById("status-now");
     statusNow.textContent = allReviewed ? "Ready to send" : "Your review";
     statusNow.classList.toggle("ready", allReviewed);
 
     document.getElementById("status-next").innerHTML = allReviewed
-      ? "You’ve reviewed everything! 🎉 Send us your picks below and we’ll get to work."
+      ? "You’ve been through everything! 🎉 Send us your cart below and we’ll get to work on your alternates."
       : reviewed > 0
-        ? "Looking good. Send us your picks whenever you’re ready — or keep going. We’ll source alternates for anything you’d like swapped."
-        : "Open a category and weigh in on each piece. Send us your picks whenever you’ve had a pass — we’ll source alternates for anything you’d like swapped and send back an updated cart.";
+        ? "Looking good. Send us your cart whenever you’re ready — or keep going. We’ll source alternates for anything you’ve asked us to swap."
+        : "Open a category and, for each piece, add it to your cart or request an alternate. Send us your cart whenever you’ve had a pass and we’ll get to work.";
 
     if (!NOT_WIRED) {
       document.getElementById("submit-btn").textContent =
-        allReviewed ? "All reviewed — send my picks 🎉" : "Send my picks to Knock Twice";
+        allReviewed ? "All set — send my cart 🎉" : "Send my cart to Knock Twice";
     }
 
     buildBreakdown(perCat);
@@ -676,14 +680,21 @@
     const rows = CART.map(g => {
       const sub = g.items.reduce((a,i)=>a+i.total,0);
       const pc = perCat[g.cat];
-      return `<tr><td>${g.cat} <span class="bd-reviewed">${pc.reviewed}/${pc.count} reviewed</span></td><td>${money(sub)}</td></tr>`;
+      return `<tr><td>${g.cat} <span class="bd-reviewed">${pc.inCart}/${pc.count} in cart</span></td><td>${money(sub)}</td></tr>`;
     }).join("");
     document.getElementById("breakdown-table").innerHTML =
       rows + `<tr class="grand"><td>Full estimate</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
   }
 
   // ── Interactions ──────────────────────────────────────────────
-  document.addEventListener("change", e => { if (e.target.matches('.toggle input')) recalc(); });
+  document.addEventListener("change", e => {
+    if (!e.target.matches('.toggle input')) return;
+    recalc();
+    // Asking for an alternate reveals the feedback box — drop her straight into it.
+    if (e.target.value === "Request alternate") {
+      e.target.closest(".item").querySelector(".note-body textarea").focus();
+    }
+  });
 
   document.addEventListener("click", e => {
     // expand / collapse a category
@@ -698,15 +709,6 @@
       return;
     }
 
-    // open / close a per-item note
-    if (e.target.matches(".note-toggle")) {
-      const body = e.target.nextElementSibling;
-      const open = body.hasAttribute("hidden");
-      body.toggleAttribute("hidden", !open);
-      e.target.textContent = open ? "– Hide note" : "+ Add a note";
-      if (open) body.querySelector("textarea").focus();
-      return;
-    }
   });
 
   // breakdown drawer
