@@ -494,10 +494,6 @@
   <script>
   /* ESTIMATE-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
   const CART = [
-    { cat: "Finishes", items: [
-      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues", img:"wallpaper.png" },
-      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649", img:"curtains.jpg" },
-    ]},
     { cat: "Furniture & Storage", items: [
       { slug:"bunk-bed-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:"78\" L × 65.5\" W × 64\" H", color:"White/Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed", img:"bunk-bed-frame.png" },
       { slug:"bunk-bed-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", img:"", flag:"to be discussed / no impact to design" },
@@ -520,6 +516,10 @@
       { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:"15.8\" × 29.9\" × 3\"", color:"Boucle - 18", qty:2, unit:85.75, total:171.5, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom?ls=a&ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=35+x+20+bench+cushions&ref=sc_gallery-1-4&sr_prefetch=1&pro=1&frs=1&sts=1&nob=1&plkey=4e987bd410b80288d60817cef2fee85dfe445efc%3A1728489535&variation0=5369547128&variation1=5369547094&dd_referrer=https%3A%2F%2Fwww.google.com%2F", img:"bench-cushion.png" },
       { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035&type=REGULAR", img:"switch-plate.png" },
       { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072&type=REGULAR", img:"throw-blanket.png" },
+    ]},
+    { cat: "Finishes", items: [
+      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues", img:"wallpaper.png" },
+      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649", img:"curtains.jpg" },
     ]},
     { cat: "Art", items: [
       { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm — Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173", img:"animal-bus.png" },
@@ -717,7 +717,34 @@
     }
   });
 
+  // Let her undo a choice: clicking the option that's already on clears it
+  // (radios don't deselect on their own). The radio is visually hidden, so the
+  // click lands on its label — we note the input's state just before the click
+  // flips it, then untick it if it was already on.
+  let alreadyChecked = null;
+  document.addEventListener("pointerdown", e => {
+    const label = e.target.closest(".toggle label");
+    const input = label && document.getElementById(label.htmlFor);
+    alreadyChecked = input && input.checked ? input : null;
+  });
+
   document.addEventListener("click", e => {
+    // undo — re-clicking the active choice clears it back to "not reviewed".
+    // We catch the label click and, if its option was already on, preventDefault
+    // (so the label doesn't re-check it) and untick it ourselves.
+    const optLabel = e.target.closest(".toggle label");
+    if (optLabel) {
+      const input = document.getElementById(optLabel.htmlFor);
+      if (input && input === alreadyChecked) {
+        e.preventDefault();
+        input.checked = false;
+        recalc();
+        saveProgress();
+      }
+      alreadyChecked = null;
+      return;
+    }
+
     // expand / collapse a category
     const toggle = e.target.closest(".cat-toggle");
     if (toggle) {
@@ -729,7 +756,6 @@
       toggle.setAttribute("aria-expanded", String(open));
       return;
     }
-
   });
 
   // breakdown drawer
