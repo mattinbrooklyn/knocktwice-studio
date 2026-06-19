@@ -25,6 +25,11 @@ NOTES
       rows already have one. For a new row you can leave SLUG blank and the
       tool will derive one from the piece name and tell you what to call its
       image.
+    - Product photos come from the IMAGE column: paste a Google Drive share
+      link (the file must be shared "Anyone with the link: Viewer") or a plain
+      image URL. The tool downloads each into assets/images/estimate/ and the
+      page loads the local copy — so a photo never breaks if the source moves.
+      Leave IMAGE blank to fall back to any existing local photo / placeholder.
 """
 
 import os, re, sys, zipfile, urllib.request
@@ -170,6 +175,8 @@ def build_cart(rows):
             "total": round(qty * price, 2),
             "link": link,
             "flag": (r.get("NOTES") or "").strip(),   # your note to the client (the "↳" line)
+            "image_url": (r.get("IMAGE") or "").strip(),  # Drive share link / direct URL; pulled below
+            "img": "",                                    # local filename, resolved by download_images()
         }
         groups.setdefault(cat, []).append(item)
 
@@ -205,6 +212,65 @@ def build_cart(rows):
     return ordered
 
 
+# ── Images: pull whatever's in the IMAGE column into the repo ───────────────
+# A Google Drive "share link" points at a viewer page, not the file — so we
+# pull the id out and hit the direct-download endpoint. Plain image URLs work
+# too. Each image lands as assets/images/estimate/<slug>.<ext> and the filename
+# is recorded on the item; the page just loads the local copy.
+DRIVE_ID_RE = re.compile(r"(?:/d/|[?&]id=)([a-zA-Z0-9_-]{20,})")
+EXT_BY_CT = {"image/png": ".png", "image/jpeg": ".jpg", "image/jpg": ".jpg",
+             "image/webp": ".webp", "image/gif": ".gif"}
+
+
+def _existing_local(slug):
+    """Any already-downloaded photo for this slug, so items without a sheet
+    image keep whatever was curated by hand before."""
+    for ext in (".webp", ".png", ".jpg", ".jpeg", ".gif"):
+        if os.path.exists(os.path.join(IMG_DIR, slug + ext)):
+            return slug + ext
+    return ""
+
+
+def _sniff_ext(data):
+    if data[:3] == b"\xff\xd8\xff": return ".jpg"
+    if data[:8] == b"\x89PNG\r\n\x1a\n": return ".png"
+    if data[:3] == b"GIF": return ".gif"
+    if data[8:12] == b"WEBP": return ".webp"
+    return None
+
+
+def download_images(cart):
+    """Resolve every item's photo. Returns (pulled, failed) for the report."""
+    os.makedirs(IMG_DIR, exist_ok=True)
+    pulled, failed = [], []
+    for _cat, items in cart:
+        for it in items:
+            url = it.get("image_url", "")
+            if not url:
+                it["img"] = _existing_local(it["slug"])     # keep hand-placed photo / placeholder
+                continue
+            m = DRIVE_ID_RE.search(url)
+            dl = f"https://drive.google.com/uc?export=download&id={m.group(1)}" if m else url
+            try:
+                req = urllib.request.Request(dl, headers={"User-Agent": "Mozilla/5.0"})
+                resp = urllib.request.urlopen(req, timeout=60)
+                data = resp.read()
+                ct = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            except Exception as e:
+                it["img"] = _existing_local(it["slug"]); failed.append((it["piece"], str(e))); continue
+            ext = EXT_BY_CT.get(ct) or _sniff_ext(data)
+            if not ext:    # got an HTML page (file not public) rather than an image
+                it["img"] = _existing_local(it["slug"])
+                failed.append((it["piece"], "link isn’t a public image — share it ‘Anyone with the link’"))
+                continue
+            fname = it["slug"] + ext
+            with open(os.path.join(IMG_DIR, fname), "wb") as f:
+                f.write(data)
+            it["img"] = fname
+            pulled.append(it["piece"])
+    return pulled, failed
+
+
 def generate_js(cart):
     lines = ["  const CART = ["]
     for cat, items in cart:
@@ -216,7 +282,7 @@ def generate_js(cart):
                 f"      {{ slug:\"{js(it['slug'])}\", piece:\"{js(it['piece'])}\", "
                 f"retailer:\"{js(it['retailer'])}\", size:\"{js(it['size'])}\", "
                 f"color:\"{js(it['color'])}\", qty:{qty}, unit:{it['unit']:g}, "
-                f"total:{it['total']:g}, link:\"{js(it['link'])}\"{flag} }},"
+                f"total:{it['total']:g}, link:\"{js(it['link'])}\", img:\"{js(it.get('img',''))}\"{flag} }},"
             )
         lines.append("    ]},")
     lines.append("  ];")
@@ -239,9 +305,9 @@ def inject(js_block):
 
 
 # ── Report ─────────────────────────────────────────────────────────────────
-def report(cart):
+def report(cart, pulled=None, failed=None):
     total = 0.0
-    missing_img, missing_slug = [], []
+    missing = []
     print("\n  Category                       Pieces      Subtotal")
     print("  " + "-" * 52)
     for cat, items in cart:
@@ -249,19 +315,21 @@ def report(cart):
         total += sub
         print(f"  {cat:<30} {len(items):>5}   ${sub:>11,.2f}")
         for it in items:
-            if not os.path.exists(os.path.join(IMG_DIR, it["slug"] + ".webp")):
-                missing_img.append((it["piece"], it["slug"]))
+            if not it.get("img"):
+                missing.append(it["piece"])
     print("  " + "-" * 52)
     n = sum(len(i) for _, i in cart)
     print(f"  {'TOTAL':<30} {n:>5}   ${total:>11,.2f}\n")
 
-    if missing_img:
-        print(f"  ⚠ {len(missing_img)} item(s) have no product photo yet")
-        print(f"    (drop a <slug>.webp into assets/images/estimate/ — a placeholder shows until then):")
-        for piece, slug in missing_img:
-            print(f"      • {piece}  →  {slug}.webp")
-        print()
-    print("  ✓ index.html updated. Preview, then commit & push to publish.\n")
+    if pulled:
+        print(f"  ⬇  Pulled {len(pulled)} photo(s) from the sheet’s IMAGE links.")
+    if failed:
+        print(f"  ⚠  {len(failed)} image link(s) couldn’t be fetched:")
+        for piece, why in failed:
+            print(f"      • {piece}  —  {why}")
+    if missing:
+        print(f"  ⚠  {len(missing)} item(s) have no photo (a placeholder shows): {', '.join(missing)}")
+    print("\n  ✓ index.html updated. Preview, then commit & push to publish.\n")
 
 
 # ── Google Sheet fetch ─────────────────────────────────────────────────────
@@ -306,6 +374,8 @@ if __name__ == "__main__":
     cart = build_cart(rows)
     if not cart:
         sys.exit("No item rows found — check the sheet name and columns.")
+    print("  Fetching product photos from the IMAGE column…")
+    pulled, failed = download_images(cart)
     inject(generate_js(cart))
     print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")
-    report(cart)
+    report(cart, pulled, failed)
