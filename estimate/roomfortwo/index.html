@@ -28,6 +28,9 @@
     a, button, label, input, textarea, [role="button"] { cursor: pointer !important; }
     input, textarea { cursor: text !important; }
 
+    /* Kill the mobile tap-highlight flash (the blue box on tap). */
+    * { -webkit-tap-highlight-color: transparent; }
+
     body {
       color: var(--color-ink);
       font-family: var(--font-body);
@@ -385,9 +388,6 @@
     @media (max-width: 600px) {
       .cat-peek { display: none; }            /* keep the collapsed card calm on phones */
       .cat-toggle { gap: 0.7rem; padding: 0.85rem 0.9rem; }
-      .love-all { padding: 0 0.85rem; font-size: 0; }
-      .love-all::before { content: "♡"; font-size: 1.3rem; }
-      .love-all.all-loved::before { content: "♥"; }
       .item {
         grid-template-columns: 56px 1fr;
         grid-template-areas:
@@ -400,9 +400,16 @@
       .thumb { width: 56px; height: 56px; }
       .price { text-align: left; }
       .price .total::before { content: "Price: "; color: var(--color-caramel); font-weight: 400; }
+
+      /* Compact sticky bar: progress on top, total + Breakdown share a row,
+         then a full-width Send. Less of the screen lost to the bar. */
+      .totals-inner { padding: 0.6rem clamp(1.1rem, 4vw, 1.5rem) 0.7rem; gap: 0.45rem 0.9rem; }
       .totals-progress { flex: 1 1 100%; }
-      .totals-total { flex: 1 1 100%; text-align: left; }
+      .totals-total { flex: 1 1 auto; text-align: left; }
+      .totals-actions { flex: 0 0 auto; }
       .submit-btn { flex: 1 1 100%; text-align: center; }
+      .hard-cost-note { font-size: 0.72rem; }
+
       .status-top { flex-wrap: wrap; gap: 0.5rem; }
       .step { font-size: 0.76rem; gap: 0.3rem; }
       .step:not(:last-child)::after { margin: 0 0.35rem; min-width: 0.4rem; }
@@ -836,6 +843,17 @@
 
   restoreProgress();
   recalc();
+
+  // Keep page content clear of the fixed totals bar — its height varies (it
+  // wraps differently on phones), so reserve exactly that much space + a little.
+  const totalsBar = document.getElementById("totals-bar");
+  const clearTotalsBar = () => {
+    if (totalsBar.style.display === "none") return;   // hidden on the thank-you screen
+    form.style.paddingBottom = (totalsBar.offsetHeight + 24) + "px";
+  };
+  clearTotalsBar();
+  window.addEventListener("resize", clearTotalsBar);
+  window.addEventListener("orientationchange", clearTotalsBar);
   </script>
 </body>
 </html>
