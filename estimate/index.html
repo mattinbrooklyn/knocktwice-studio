@@ -216,6 +216,10 @@
       background: rgba(81, 177, 140, 0.10);
       box-shadow: inset 3px 0 0 var(--color-green);
     }
+    /* Set aside — no buy, no alt. Quietly struck through, not in the cart. */
+    .item:has(input[value="Don't need"]:checked) .total {
+      text-decoration: line-through; color: var(--color-caramel);
+    }
 
     .thumb {
       grid-area: thumb; width: 64px; height: 64px;
@@ -242,8 +246,8 @@
     .price { grid-area: price; text-align: right; white-space: nowrap; }
     .price .total { font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
 
-    /* ── Two-state toggle ─────────────────────────────────────── */
-    .toggle { grid-area: toggle; display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.2rem; }
+    /* ── Choice toggle — two pills + a quiet "Don't need" ─────── */
+    .toggle { grid-area: toggle; display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-top: 0.2rem; }
     .toggle input { position: absolute; opacity: 0; pointer-events: none; }
     .toggle label {
       font-family: var(--font-ui); font-weight: 600; font-size: 0.92rem; line-height: 1;
@@ -259,6 +263,16 @@
     .toggle input[value="Request alternate"]:checked + label {
       background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
     }
+    /* The quiet escape hatch — plain text, set apart to the right, never a pill. */
+    .toggle label.opt-quiet {
+      border: 0; background: none; border-radius: 0;
+      padding: 0.5rem 0.2rem; margin-left: auto;
+      font-size: 0.85rem; font-weight: 600; color: var(--color-caramel);
+      text-decoration: underline; text-decoration-color: transparent;
+      text-underline-offset: 3px; transition: color 0.12s, text-decoration-color 0.12s;
+    }
+    .toggle label.opt-quiet:hover { background: none; color: var(--color-ink); text-decoration-color: currentColor; }
+    .toggle input:checked + label.opt-quiet { color: var(--color-ink); text-decoration-color: currentColor; }
 
     /* ── Per-item note — only shown when an alternate is requested ─ */
     .note { grid-area: note; }
@@ -536,6 +550,7 @@
   const STATES = [
     { value: "Added to cart",     label: "Add to cart" },
     { value: "Request alternate", label: "Request alt" },
+    { value: "Don't need",        label: "Don’t need", quiet: true },
   ];
 
   // ── Round config — bump this each time you republish the cart ──
@@ -571,7 +586,7 @@
         ${STATES.map((s,i) => `
           <input type="radio" id="${it.slug}-${i}" name="${it.piece} — Status" value="${s.value}"
                  data-total="${it.total}" data-cat="${cat}">
-          <label for="${it.slug}-${i}">${s.label}</label>`).join("")}
+          <label class="${s.quiet ? "opt-quiet" : ""}" for="${it.slug}-${i}">${s.label}</label>`).join("")}
       </div>
       <div class="note">
         <div class="note-body" hidden>
