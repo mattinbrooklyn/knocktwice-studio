@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Room for Two — Your Estimate · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       ESTIMATE PAGE — "her cart," not an invoice.
+       Standalone, natively-responsive client document. Borrows brand
+       tokens from styles.css but not the portfolio canvas-scaler.
+
+       Model: categories collapsed by default → one calm, digestible
+       screen. She opens what she wants, says yes to what she loves
+       (or flags it), and her picks gather in a quiet bottom bar.
+       Pieces lead; dollars recede.
+       ────────────────────────────────────────────────────────────── */
+
+    html, body { cursor: auto !important; background: var(--color-bg); }
+    *, *::before, *::after { cursor: auto !important; }
+    a, button, label, input, textarea, [role="button"] { cursor: pointer !important; }
+    input, textarea { cursor: text !important; }
+
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+
+    /* Tighter column than before — less sprawl. */
+    .wrap {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 8.5rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--color-blue);
+      display: flex; align-items: center; gap: 0.55rem;
+      margin-bottom: 0.9rem;
+    }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      line-height: 0.96;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+    }
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+      color: var(--color-blue);
+      margin-bottom: 1.1rem;
+    }
+    .intro {
+      font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+      max-width: 40rem;
+    }
+
+    .setup-warning {
+      background: var(--color-yellow);
+      color: var(--color-ink);
+      border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: 0.9rem;
+      margin-top: 1.5rem;
+    }
+    .setup-warning code { font-family: var(--font-ui); font-weight: 700; }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Status card — where we are, what's next ──────────────── */
+    .status-card {
+      border: 1.5px solid var(--color-ink); border-radius: 0.85rem;
+      background: var(--color-white); padding: 1rem 1.15rem 1.05rem;
+      margin-bottom: 2rem;
+    }
+    .status-top {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 1rem; margin-bottom: 1.05rem;
+    }
+    .round-stamp {
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.92rem;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .status-now {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-white); background: var(--color-blue);
+      padding: 0.25rem 0.65rem; border-radius: var(--radius-pill); white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .status-now.ready { background: var(--color-green); }
+
+    .stepper { list-style: none; display: flex; align-items: center; margin: 0 0 0.95rem; padding: 0; }
+    .step {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem;
+      color: var(--color-caramel); white-space: nowrap;
+    }
+    .step:not(:last-child) { flex: 1; }
+    .step:not(:last-child)::after {
+      content: ""; flex: 1; height: 2px; background: var(--color-khaki); margin: 0 0.55rem; min-width: 1rem;
+    }
+    .step .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      border: 2px solid var(--color-khaki); background: var(--color-bg); flex: 0 0 auto;
+    }
+    .step.active { color: var(--color-ink); }
+    .step.active .dot { border-color: var(--color-blue); background: var(--color-blue); }
+    .step.done { color: var(--color-green); }
+    .step.done .dot { border-color: var(--color-green); background: var(--color-green); }
+
+    .status-next { font-size: 0.92rem; color: var(--color-ink); }
+
+    /* ── Collapsed category card ──────────────────────────────── */
+    .category { margin-bottom: 0.85rem; }
+
+    .cat-card {
+      display: flex; align-items: stretch;
+      border: 1.5px solid var(--color-ink);
+      border-radius: 0.85rem;
+      background: var(--color-white);
+      overflow: hidden;
+      transition: box-shadow 0.15s ease, transform 0.15s ease;
+    }
+    .cat-card:hover { box-shadow: var(--shadow-stack); }
+    .category.open .cat-card { border-radius: 0.85rem 0.85rem 0 0; }
+
+    .cat-toggle {
+      flex: 1 1 auto; min-width: 0;
+      display: flex; align-items: center; gap: 0.9rem;
+      padding: 0.95rem 1.05rem;
+      background: none; border: 0; text-align: left;
+    }
+    .chevron {
+      flex: 0 0 auto; font-size: 0.8rem; color: var(--color-caramel);
+      transition: transform 0.2s ease;
+    }
+    .category.open .chevron { transform: rotate(90deg); }
+
+    .cat-headings { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+    .cat-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      text-transform: uppercase; line-height: 1; letter-spacing: 0.01em;
+    }
+    /* Quiet money — pieces count + subtotal, understated. */
+    .cat-sub-meta { font-size: 0.8rem; color: var(--color-caramel); white-space: nowrap; }
+    .cat-sub-meta .dot { margin: 0 0.4em; opacity: 0.6; }
+
+    .cat-peek { display: flex; gap: 0.3rem; margin-left: auto; flex: 0 0 auto; }
+    .cat-peek .peek-thumb:nth-of-type(n+5) { display: none; }   /* cap teaser at 4 photos */
+    .peek-thumb {
+      width: 40px; height: 40px; border-radius: 0.45rem; overflow: hidden;
+      background: var(--color-bg); border: 1px solid var(--color-khaki); flex: 0 0 auto;
+    }
+    .peek-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .peek-thumb img.is-icon { object-fit: contain; padding: 7px; opacity: 0.8; }
+
+    .cat-progress {
+      flex: 0 0 auto;
+      /* body font here — Handjet's "0" reads as "8" at this size */
+      font-family: var(--font-body); font-weight: 600; font-size: 0.85rem;
+      white-space: nowrap; color: var(--color-caramel); padding-left: 0.4rem;
+    }
+    .cat-progress.partial { color: var(--color-ink); }
+    .cat-progress.complete { color: var(--color-green); }
+
+    /* ── Expanded panel ───────────────────────────────────────── */
+    .cat-panel {
+      border: 1.5px solid var(--color-ink); border-top: 0;
+      border-radius: 0 0 0.85rem 0.85rem;
+      background: var(--color-white);
+      padding: 0 1.05rem;
+    }
+    .cat-panel[hidden] { display: none; }
+
+    /* ── Item row ─────────────────────────────────────────────── */
+    .item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      grid-template-areas:
+        "thumb info price"
+        "thumb toggle toggle"
+        "note  note  note";
+      gap: 0.35rem 0.95rem;
+      padding: 0.95rem 0;
+      border-bottom: 1px solid var(--color-khaki);
+      align-items: start;
+      margin: 0 -0.35rem; padding-left: 0.35rem; padding-right: 0.35rem;
+      border-radius: 0.5rem;
+      transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+    .cat-panel .item:last-child { border-bottom: 0; }
+
+    /* Loved = a soft, satisfying green wash + accent. Scanning a category
+       becomes a field of greens: a record of how much she loves. */
+    .item:has(input[value="Added to cart"]:checked) {
+      background: rgba(81, 177, 140, 0.10);
+      box-shadow: inset 3px 0 0 var(--color-green);
+    }
+    /* Set aside — no buy, no alt. Struck through in error red, out of the cart. */
+    .item:has(input[value="Don't need"]:checked) .total {
+      text-decoration: line-through; color: var(--color-red);
+    }
+
+    .thumb {
+      grid-area: thumb; width: 64px; height: 64px;
+      border-radius: 0.5rem; background: var(--color-bg);
+      border: 1px solid var(--color-khaki);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb img.is-icon { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }
+
+    .info { grid-area: info; min-width: 0; }
+    .piece { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+    .meta { font-size: 0.85rem; color: var(--color-caramel); margin-top: 0.15rem; }
+    .meta .dot { opacity: 0.55; margin: 0 0.35em; }
+    .item-note-flag { font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem; margin-top: 0.25rem; }
+    .view-link {
+      display: inline-block; margin-top: 0.3rem;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem;
+      color: var(--color-blue); text-decoration: none; border-bottom: 1.5px solid currentColor;
+    }
+    .view-link:hover { color: var(--color-ink); }
+
+    /* Price — present, but quiet. Secondary weight + size. */
+    .price { grid-area: price; text-align: right; white-space: nowrap; }
+    .price .total { font-weight: 600; font-size: 0.95rem; color: var(--color-ink); }
+
+    /* ── Choice toggle — two pills + a quiet "Don't need" ─────── */
+    .toggle { grid-area: toggle; display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-top: 0.2rem; }
+    .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .toggle label {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.92rem; line-height: 1;
+      padding: 0.5rem 0.8rem; border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-pill); background: var(--color-white);
+      user-select: none; transition: background 0.12s, color 0.12s;
+    }
+    .toggle label:hover { background: var(--color-bg); }
+    .toggle input:focus-visible + label { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+    .toggle input[value="Added to cart"]:checked + label {
+      background: var(--color-green); color: var(--color-white); border-color: var(--color-green);
+    }
+    .toggle input[value="Request alternate"]:checked + label {
+      background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
+    }
+    /* The quiet escape hatch — plain error-red text, set apart to the right.
+       Reads as a label, not a button: no underline, no hover, no pointer. */
+    .toggle label.opt-quiet {
+      border: 0; background: none; border-radius: 0;
+      padding: 0.5rem 0.2rem; margin-left: auto;
+      font-size: 0.85rem; font-weight: 600; color: var(--color-caramel);
+      cursor: default !important;
+    }
+    .toggle label.opt-quiet:hover { background: none; }
+    /* The label stays caramel throughout — the struck-out price carries the red. */
+
+    /* ── Per-item note — only shown when an alternate is requested ─ */
+    .note { grid-area: note; }
+    .note-prompt {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem;
+      color: var(--color-ink); margin: 0.5rem 0 0;
+    }
+    .note textarea {
+      width: 100%; margin-top: 0.45rem; min-height: 4rem; padding: 0.65rem 0.85rem;
+      font-family: var(--font-body); font-size: 0.95rem; color: var(--color-ink);
+      background: var(--color-bg); border: 1.5px solid var(--color-khaki);
+      border-radius: var(--radius-input); resize: vertical;
+    }
+    .note textarea:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; border-color: var(--color-ink); }
+    .note-body[hidden] { display: none; }
+
+    /* ── Sticky totals — light, reassuring, pieces-forward ────── */
+    .totals {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      background: var(--color-white);
+      border-top: 1.5px solid var(--color-ink);
+      z-index: 50;
+      box-shadow: 0 -4px 20px rgba(50,38,31,0.10);
+    }
+    .totals-inner {
+      max-width: 44rem; margin: 0 auto;
+      padding: 0.7rem clamp(1.1rem, 4vw, 2rem) 0.8rem;
+      display: flex; align-items: center; gap: 0.85rem 1.5rem; flex-wrap: wrap;
+    }
+    /* Numbers in the bar use the body font (clean, unambiguous 0) — not the
+       display/ui faces, whose zeros read as 8s or dots at this size. */
+    .totals-progress { flex: 1 1 13rem; min-width: 0; font-family: var(--font-body); }
+    .pieces-headline { font-size: 1.1rem; font-weight: 700; line-height: 1.1; }
+    .pieces-headline #reviewed-count { color: var(--color-green); }
+    .progress-track {
+      height: 6px; border-radius: 6px; background: var(--color-khaki);
+      margin: 0.4rem 0 0.35rem; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 0%; border-radius: 6px;
+      background: var(--color-green); transition: width 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .approved-line { font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; color: var(--color-caramel); }
+    .approved-line #cart-count { color: var(--color-green); }
+
+    /* The total — a confident anchor, equal weight to the progress. Not hidden. */
+    .totals-total { flex: 0 0 auto; text-align: right; line-height: 1; }
+    .total-amount {
+      font-family: var(--font-body); font-weight: 700;
+      font-size: clamp(1.3rem, 4vw, 1.6rem); color: var(--color-ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .total-label {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.76rem;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-caramel);
+      margin-top: 0.2rem;
+    }
+
+    .totals-actions { display: flex; align-items: center; gap: 0.6rem; }
+    .breakdown-btn {
+      background: none; border: 1.5px solid var(--color-ink); color: var(--color-ink);
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.88rem;
+      padding: 0.5rem 0.85rem; border-radius: var(--radius-pill); white-space: nowrap;
+    }
+    .breakdown-btn:hover { background: var(--color-ink); color: var(--color-bg); }
+    .submit-btn {
+      background: var(--color-blue); border: 1.5px solid var(--color-blue); color: var(--color-white);
+      font-family: var(--font-ui); font-weight: 700; font-size: 1rem;
+      padding: 0.6rem 1.3rem; border-radius: var(--radius-button); white-space: nowrap;
+    }
+    .submit-btn:hover { background: var(--color-ink); border-color: var(--color-ink); }
+    .submit-btn:disabled { opacity: 0.5; }
+    .hard-cost-note { width: 100%; font-family: var(--font-ui); font-size: 0.78rem; color: var(--color-caramel); }
+
+    /* ── Breakdown drawer ─────────────────────────────────────── */
+    .breakdown { max-width: 44rem; margin: 0 auto; padding: 0 clamp(1.1rem, 4vw, 2rem); }
+    .breakdown[hidden] { display: none; }
+    .breakdown-inner { border-top: 1px solid var(--color-khaki); padding: 0.65rem 0; }
+    .breakdown table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .breakdown td { padding: 0.28rem 0; }
+    .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-caramel); }
+    .breakdown tr.grand td { border-top: 1px solid var(--color-khaki); padding-top: 0.45rem; font-weight: 700; color: var(--color-ink); }
+    .breakdown tr.grand td:last-child { color: var(--color-ink); }
+
+    /* ── Thank-you ────────────────────────────────────────────── */
+    .thank-you { display: none; text-align: center; padding: 4.5rem 1rem; }
+    .thank-you h2 {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(2rem, 7vw, 3.25rem); text-transform: uppercase; margin-bottom: 0.6rem;
+    }
+    .thank-you p { font-family: var(--font-ui); font-size: 1.2rem; color: var(--color-blue); max-width: 34rem; margin: 0 auto; }
+    .back-to-cart {
+      margin-top: 2rem;
+      background: none; border: 1.5px solid var(--color-ink); color: var(--color-ink);
+      font-family: var(--font-ui); font-weight: 700; font-size: 1rem;
+      padding: 0.7rem 1.4rem; border-radius: var(--radius-button);
+    }
+    .back-to-cart:hover { background: var(--color-ink); color: var(--color-bg); }
+    .thank-you-note {
+      font-family: var(--font-body) !important; font-size: 0.9rem !important;
+      color: var(--color-caramel) !important; margin-top: 1.25rem !important;
+    }
+
+    .foot {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-caramel); text-align: center; padding: 1.75rem 1rem 0;
+    }
+
+    /* ── Mobile ───────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .cat-peek { display: none; }            /* keep the collapsed card calm on phones */
+      .cat-toggle { gap: 0.7rem; padding: 0.85rem 0.9rem; }
+      .love-all { padding: 0 0.85rem; font-size: 0; }
+      .love-all::before { content: "♡"; font-size: 1.3rem; }
+      .love-all.all-loved::before { content: "♥"; }
+      .item {
+        grid-template-columns: 56px 1fr;
+        grid-template-areas:
+          "thumb info"
+          "price price"
+          "toggle toggle"
+          "note  note";
+        gap: 0.45rem 0.8rem;
+      }
+      .thumb { width: 56px; height: 56px; }
+      .price { text-align: left; }
+      .price .total::before { content: "Price: "; color: var(--color-caramel); font-weight: 400; }
+      .totals-progress { flex: 1 1 100%; }
+      .totals-total { flex: 1 1 100%; text-align: left; }
+      .submit-btn { flex: 1 1 100%; text-align: center; }
+      .status-top { flex-wrap: wrap; gap: 0.5rem; }
+      .step { font-size: 0.76rem; gap: 0.3rem; }
+      .step:not(:last-child)::after { margin: 0 0.35rem; min-width: 0.4rem; }
+    }
+  </style>
+</head>
+<body>
+  <form id="estimate-form" class="wrap" action="https://formspree.io/f/mpqebeqe" method="POST">
+
+    <!-- Masthead ------------------------------------------------- -->
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      Knock Twice × Hannah Rich
+    </p>
+    <h1 class="title">A Room<br>for Two</h1>
+    <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
+    <p class="intro">
+      This is a working cart, not a final bill. Look through each piece, tell us
+      how it lands, and we’ll refine together from there.
+    </p>
+
+    <div class="setup-warning" id="setup-warning" hidden>
+      ⚙️ <strong>Heads up (only you see this):</strong> the form isn’t wired to a destination yet.
+      Replace <code>REPLACE_ME</code> in the form action with your Formspree endpoint. Until then,
+      Submit is disabled.
+    </div>
+
+    <hr class="rule">
+
+    <!-- Status card — where we are, what's next ------------------ -->
+    <div class="status-card">
+      <div class="status-top">
+        <span class="round-stamp" id="round-stamp">Round 1 · April 23, 2026</span>
+        <span class="status-now" id="status-now">Your review</span>
+      </div>
+      <ol class="stepper" id="stepper">
+        <li class="step active"><span class="dot"></span>You review</li>
+        <li class="step"><span class="dot"></span>We refine</li>
+        <li class="step"><span class="dot"></span>Final cart</li>
+      </ol>
+      <p class="status-next" id="status-next">
+        Open a category and, for each piece, add it to your cart or request an alternate.
+        Send whenever you’re ready — all at once or over a few visits; your progress saves as you go.
+      </p>
+    </div>
+
+    <!-- Identity is known — labels your inbox, no fields for her to fill. -->
+    <input type="hidden" name="Project" value="Room for Two — Hannah & Eugene">
+    <input type="hidden" name="Round" id="round-field" value="Round 1 · April 23, 2026">
+
+    <!-- Categories render here ----------------------------------- -->
+    <div id="categories"></div>
+
+    <p class="foot" id="foot">Knock Twice · Room for Two · Round 1 · April 23, 2026</p>
+  </form>
+
+  <div class="thank-you" id="thank-you">
+    <h2>Got it ✨</h2>
+    <p>Your cart is on its way to Knock Twice. Next, we’ll source alternates for anything
+       you asked us to swap and send back an updated cart.</p>
+    <button type="button" class="back-to-cart" id="back-to-cart">← Back to your cart</button>
+    <p class="thank-you-note">Changed your mind? Head back, tweak anything, and send again —
+       we’ll always take your latest.</p>
+  </div>
+
+  <!-- Sticky totals --------------------------------------------- -->
+  <div class="totals" id="totals-bar">
+    <div class="breakdown" id="breakdown" hidden>
+      <div class="breakdown-inner"><table id="breakdown-table"></table></div>
+    </div>
+    <div class="totals-inner">
+      <div class="totals-progress">
+        <div class="pieces-headline"><span id="reviewed-count">0</span> of <span id="total-count">0</span> pieces reviewed</div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="approved-line"><span id="cart-count">0</span> in your cart</div>
+      </div>
+      <div class="totals-total">
+        <div class="total-amount" id="cart-total">$0.00</div>
+        <div class="total-label">In your cart</div>
+      </div>
+      <div class="totals-actions">
+        <button type="button" class="breakdown-btn" id="breakdown-btn" aria-expanded="false">Breakdown ▾</button>
+        <button type="submit" form="estimate-form" class="submit-btn" id="submit-btn">Send my picks to Knock Twice</button>
+      </div>
+      <p class="hard-cost-note">Hard cost only — shipping, taxes, etc. not yet included.</p>
+    </div>
+  </div>
+
+  <script>
+  /* ESTIMATE-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
+  const CART = [
+    { cat: "Finishes", items: [
+      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:3, unit:163, total:489, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues", img:"wallpaper.png" },
+      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649", img:"curtains.jpg" },
+    ]},
+    { cat: "Furniture & Storage", items: [
+      { slug:"bunk-bed-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:"78\" L × 65.5\" W × 64\" H", color:"White/Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed", img:"bunk-bed-frame.png" },
+      { slug:"bunk-bed-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", img:"", flag:"to be discussed / no impact to design" },
+      { slug:"dresser", piece:"Dresser", retailer:"Urban Outfitters", size:"26\"L × 18\"W × 44.5\"H", color:"Maroon", qty:1, unit:799, total:799, link:"https://www.urbanoutfitters.com/shop/kane-tall-4-drawer-dresser3?color=061&searchparams=q=dresser&type=REGULAR&size=ONE+SIZE&quantity=1", img:"dresser.png" },
+      { slug:"storage-trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:"15.8\"L × 29.9\"W × 18.9\"H", color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html", img:"storage-trunk.png" },
+      { slug:"grid-shelves", piece:"Grid Shelves", retailer:"Lucca House", size:"71.5 × 59.5\"x11.5\"", color:"W/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120&utm_source=Pinterest&utm_medium=organic", img:"grid-shelves.png" },
+      { slug:"crates-medium", piece:"Crates — Medium", retailer:"HAY", size:"", color:"Multi", qty:8, unit:13, total:104, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-medium.png", flag:"assorted colors (multiple)" },
+      { slug:"crates-small", piece:"Crates — Small", retailer:"HAY", size:"", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-small.png" },
+    ]},
+    { cat: "Lighting", items: [
+      { slug:"yellow-swivel-sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/?catalogId=71&sku=5081589&pickuplocation=ST:%7Bstore_code%7D&cm_ven=PLA&cm_cat=Google&cm_pla=Decor%20%3E%20All%20Lighting&cm_ite=5081589_14464445698_pla-1730208656294&gad_source=1&gad_campaignid=14464445698&gbraid=0AAAAABjYLmmN4N6yeFRkXJyfcORI33jdI&gclid=CjwKCAjwuanRBhBSEiwAY5y6V-2aVys04G_E5nylObQc2Ef_Lb3uOHHU217D9udo2JQlPNF4yCPmURoCKIIQAvD_BwE", img:"yellow-swivel-sconce.png" },
+      { slug:"puck-plug-in-pendant", piece:"Puck Plug-in Pendant", retailer:"Color Cord Company", size:"OSFA", color:"Ochre", qty:1, unit:130, total:130, link:"https://www.colorcord.com/products/boutique-aio-puck-plug-in-pendant?variant=40777408774246", img:"puck-plug-in-pendant.png" },
+    ]},
+    { cat: "Soft Goods", items: [
+      { slug:"duvet-cover-fitted-top-sheet-set", piece:"Duvet Cover, Fitted + Top sheet set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246", img:"duvet-cover-fitted-top-sheet-set.png" },
+      { slug:"star-shape-pillow", piece:"Star Shape Pillow", retailer:"Oeuf", size:"17\" × 17\"", color:"Yellow", qty:1, unit:120, total:120, link:"https://oeufnyc.com/products/star-face", img:"star-shape-pillow.png" },
+      { slug:"the-park-throw-pillow", piece:"The Park' Throw Pillow", retailer:"2 Modern", size:"23.6\" × 15.75\"", color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877&utm_source=google&campaign_id=20911467993&ad_id=&utm_medium=cpc&utm_campaign=HB%20%7C%20PMAX%20-%20Furniture%20-%20Group%20PMAX&utm_content=&utm_term=&gclid=Cj0KCQjww8rQBhDjARIsAE43KPNjO0yyi5CZ_Srp1QcW30MzbSuVgn4u7YswwOhHZfjN-YJEST1l4NIaAiSEEALw_wcB&gad_source=1&gad_campaignid=20918110013&gbraid=0AAAAAD_WqgmIOoRyWOi5mUEB0yjtEUP10", img:"the-park-throw-pillow.png" },
+      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:"36\" D × 12\" H", color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa", img:"beanbag.png" },
+      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8×10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html?piid=92279137", img:"rug.png" },
+      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:"15.8\" × 29.9\" × 3\"", color:"Boucle - 18", qty:2, unit:85.75, total:171.5, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom?ls=a&ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=35+x+20+bench+cushions&ref=sc_gallery-1-4&sr_prefetch=1&pro=1&frs=1&sts=1&nob=1&plkey=4e987bd410b80288d60817cef2fee85dfe445efc%3A1728489535&variation0=5369547128&variation1=5369547094&dd_referrer=https%3A%2F%2Fwww.google.com%2F", img:"bench-cushion.png" },
+      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035&type=REGULAR", img:"switch-plate.png" },
+      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072&type=REGULAR", img:"throw-blanket.png" },
+    ]},
+    { cat: "Art", items: [
+      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm — Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173", img:"animal-bus.png" },
+      { slug:"green-crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341", img:"green-crocodile.png" },
+      { slug:"blue-elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973", img:"blue-elephant.png" },
+      { slug:"yellow-frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765", img:"yellow-frog.png" },
+      { slug:"peek-a-boo-frame-cloud", piece:"Peek-a-boo Frame — Cloud", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-cloud.png" },
+      { slug:"peek-a-boo-frame-butter", piece:"Peek-a-boo Frame — Butter", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-butter.png" },
+    ]},
+    { cat: "Labor & Install", items: [
+      { slug:"wallpaper-installation-painters", piece:"Wallpaper Installation & Painters", retailer:"TBD", size:"-", color:"-", qty:1, unit:2500, total:2500, link:"https://wepaintny.com/", img:"" },
+    ]},
+  ];
+  /* ESTIMATE-DATA:END */
+
+  const CAT_ICON = {
+    "Finishes": "/assets/sticker-star.svg",
+    "Furniture & Storage": "/assets/sticker-home.svg",
+    "Labor & Install": "/assets/render-paintbrush.png",
+    "Lighting": "/assets/sticker-star.svg",
+    "Soft Goods": "/assets/sticker-star.svg",
+    "Art": "/assets/sticker-star.svg",
+  };
+
+  // Friendly labels in the UI; clear values in your inbox.
+  const STATES = [
+    { value: "Added to cart",     label: "Add to cart" },
+    { value: "Request alternate", label: "Request alt" },
+    { value: "Don't need",        label: "Don’t need", quiet: true },
+  ];
+
+  // ── Round config — bump this each time you republish the cart ──
+  const ROUND = { label: "Round 1", date: "June 18, 2026" };
+
+  // Autosave key — scoped to the round, so republishing a new round starts her
+  // fresh rather than restoring last round's answers onto a different cart.
+  const STORAGE_KEY = "ktw-estimate-" + ROUND.label + "-" + ROUND.date;
+
+  const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // img is a filename resolved by the sync (e.g. "wallpaper.png"); when absent
+  // or broken, fall back to the category icon placeholder.
+  const imgTag = (img, alt, icon, cls="") =>
+    img
+      ? `<img class="${cls}" src="/assets/images/estimate/${img}" alt="${alt}" data-icon="${icon}"
+            onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`
+      : `<img class="${cls} is-icon" src="${icon}" alt="${alt}">`;
+
+  const TOTAL_ITEMS = CART.reduce((s,g) => s + g.items.length, 0);
+  const PROJECT_TOTAL = CART.reduce((s,g) => s + g.items.reduce((a,i)=>a+i.total,0), 0);
+
+  // ── Render item ───────────────────────────────────────────────
+  function renderItem(it, cat) {
+    const icon = CAT_ICON[cat] || "/assets/sticker-star.svg";
+    const meta = [it.retailer, it.size, it.color, it.qty > 1 ? `Qty ${it.qty}` : ""]
+      .filter(Boolean).join('<span class="dot">·</span>');
+    const link = it.link ? `<a class="view-link" href="${it.link}" target="_blank" rel="noopener">View product ↗</a>` : "";
+    const flag = it.flag ? `<div class="item-note-flag">↳ ${it.flag}</div>` : "";
+
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="thumb">${imgTag(it.img, it.piece, icon)}</div>
+      <div class="info">
+        <div class="piece">${it.piece}</div>
+        <div class="meta">${meta}</div>
+        ${flag}${link}
+      </div>
+      <div class="price"><span class="total">${money(it.total)}</span></div>
+      <div class="toggle" role="radiogroup" aria-label="Status for ${it.piece}">
+        ${STATES.map((s,i) => `
+          <input type="radio" id="${it.slug}-${i}" name="${it.piece} — Status" value="${s.value}"
+                 data-total="${it.total}" data-cat="${cat}">
+          <label class="${s.quiet ? "opt-quiet" : ""}" for="${it.slug}-${i}">${s.label}</label>`).join("")}
+      </div>
+      <div class="note">
+        <div class="note-body" hidden>
+          <p class="note-prompt">What should we look for instead?</p>
+          <textarea name="${it.piece} — Alternate feedback" placeholder="Too pricey, wrong color, not the right vibe… tell us what to change and we’ll source options."></textarea>
+        </div>
+      </div>`;
+    return el;
+  }
+
+  // ── Render categories (collapsed by default) ──────────────────
+  const catWrap = document.getElementById("categories");
+  CART.forEach(group => {
+    const subtotal = group.items.reduce((s,it)=>s+it.total,0);
+    const icon = CAT_ICON[group.cat];
+    // Peek shows real product photos only — a thumb that 404s removes itself,
+    // so placeholder stickers never clutter the teaser. CSS caps it at 4.
+    const peek = group.items
+      .filter(it => it.img)
+      .map(it => `<span class="peek-thumb"><img src="/assets/images/estimate/${it.img}" alt="" onerror="this.closest('.peek-thumb').remove()"></span>`).join("");
+
+    const section = document.createElement("section");
+    section.className = "category";
+    section.dataset.cat = group.cat;
+    section.innerHTML = `
+      <div class="cat-card">
+        <button type="button" class="cat-toggle" aria-expanded="false">
+          <span class="chevron" aria-hidden="true">▶</span>
+          <span class="cat-headings">
+            <span class="cat-name">${group.cat}</span>
+            <span class="cat-sub-meta">${group.items.length} pieces<span class="dot">·</span>${money(subtotal)}</span>
+          </span>
+          <span class="cat-peek">${peek}</span>
+          <span class="cat-progress" data-cat="${group.cat}"><span class="reviewed-num">0</span>/${group.items.length} reviewed</span>
+        </button>
+      </div>
+      <div class="cat-panel" hidden></div>`;
+
+    const panel = section.querySelector(".cat-panel");
+    group.items.forEach(it => panel.appendChild(renderItem(it, group.cat)));
+    catWrap.appendChild(section);
+  });
+
+  document.getElementById("total-count").textContent = TOTAL_ITEMS;
+
+  // Stamp the round everywhere (header, hidden field for your inbox, footer).
+  const roundText = `${ROUND.label} · ${ROUND.date}`;
+  document.getElementById("round-stamp").textContent = roundText;
+  document.getElementById("round-field").value = roundText;
+  document.getElementById("foot").textContent = `Knock Twice · Room for Two · ${roundText}`;
+
+  // ── Live recalc ───────────────────────────────────────────────
+  function recalc() {
+    // Progress tracks REVIEWED (a choice made on a piece). Items added to cart
+    // drive the running cart total. Each item is a radio group, so a checked
+    // radio === a reviewed item.
+    let cartTotal = 0, cartCount = 0, reviewed = 0;
+    const perCat = {};
+    CART.forEach(g => perCat[g.cat] = { reviewed: 0, inCart: 0, count: g.items.length });
+
+    document.querySelectorAll('.toggle input:checked').forEach(r => {
+      const pc = perCat[r.dataset.cat];
+      pc.reviewed++; reviewed++;
+      if (r.value === "Added to cart") { pc.inCart++; cartCount++; cartTotal += parseFloat(r.dataset.total); }
+    });
+
+    document.getElementById("reviewed-count").textContent = reviewed;
+    document.getElementById("cart-count").textContent = cartCount;
+    document.getElementById("cart-total").textContent = money(cartTotal);
+    document.getElementById("progress-fill").style.width = (reviewed / TOTAL_ITEMS * 100) + "%";
+
+    document.querySelectorAll(".cat-progress").forEach(el => {
+      const pc = perCat[el.dataset.cat];
+      el.querySelector(".reviewed-num").textContent = pc.reviewed;
+      el.classList.toggle("complete", pc.reviewed === pc.count);
+      el.classList.toggle("partial", pc.reviewed > 0 && pc.reviewed < pc.count);
+    });
+
+    // The feedback note only belongs on pieces she's asked us to swap.
+    document.querySelectorAll(".item").forEach(item => {
+      const wantsAlt = item.querySelector('input[value="Request alternate"]').checked;
+      item.querySelector(".note-body").toggleAttribute("hidden", !wantsAlt);
+    });
+
+    // Status + send button respond to how far through her cart she is.
+    const allReviewed = reviewed === TOTAL_ITEMS;
+    const statusNow = document.getElementById("status-now");
+    statusNow.textContent = allReviewed ? "Ready to send" : "Your review";
+    statusNow.classList.toggle("ready", allReviewed);
+
+    document.getElementById("status-next").innerHTML = allReviewed
+      ? "You’ve been through everything! 🎉 Send your cart below and we’ll get to work on your alternates."
+      : reviewed > 0
+        ? "Don’t worry, your progress is saved. Send whenever you’re ready, or pick it back up anytime. We’ll source alternates for anything you’ve asked us to swap."
+        : "Open a category and, for each piece, add it to your cart or request an alternate. Send whenever you’re ready — all at once or over a few visits; your progress saves as you go.";
+
+    if (!NOT_WIRED) {
+      document.getElementById("submit-btn").textContent =
+        allReviewed ? "All set — send my cart 🎉" : "Send my cart to Knock Twice";
+    }
+
+    buildBreakdown();
+  }
+
+  function buildBreakdown() {
+    const rows = CART.map(g => {
+      const sub = g.items.reduce((a,i)=>a+i.total,0);
+      return `<tr><td>${g.cat}</td><td>${money(sub)}</td></tr>`;
+    }).join("");
+    document.getElementById("breakdown-table").innerHTML =
+      rows + `<tr class="grand"><td>Full estimate</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
+  }
+
+  // ── Interactions ──────────────────────────────────────────────
+  document.addEventListener("change", e => {
+    if (!e.target.matches('.toggle input')) return;
+    recalc();
+    saveProgress();
+    // Asking for an alternate reveals the feedback box — drop her straight into it.
+    if (e.target.value === "Request alternate") {
+      e.target.closest(".item").querySelector(".note-body textarea").focus();
+    }
+  });
+
+  document.addEventListener("click", e => {
+    // expand / collapse a category
+    const toggle = e.target.closest(".cat-toggle");
+    if (toggle) {
+      const section = toggle.closest(".category");
+      const panel = section.querySelector(".cat-panel");
+      const open = panel.hasAttribute("hidden");
+      panel.toggleAttribute("hidden", !open);
+      section.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      return;
+    }
+
+  });
+
+  // breakdown drawer
+  const bdBtn = document.getElementById("breakdown-btn");
+  const bd = document.getElementById("breakdown");
+  bdBtn.addEventListener("click", () => {
+    const open = bd.hasAttribute("hidden");
+    bd.toggleAttribute("hidden", !open);
+    bdBtn.setAttribute("aria-expanded", String(open));
+    bdBtn.textContent = open ? "Breakdown ▴" : "Breakdown ▾";
+  });
+
+  // ── Formspree guard + submit ──────────────────────────────────
+  const form = document.getElementById("estimate-form");
+  const NOT_WIRED = form.action.includes("REPLACE_ME");
+  if (NOT_WIRED) {
+    document.getElementById("setup-warning").hidden = false;
+    document.getElementById("submit-btn").disabled = true;
+  }
+
+  form.addEventListener("submit", async e => {
+    if (NOT_WIRED) { e.preventDefault(); return; }
+    e.preventDefault();
+    const btn = document.getElementById("submit-btn");
+    btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const res = await fetch(form.action, {
+        method: "POST", body: new FormData(form), headers: { Accept: "application/json" },
+      });
+      if (!res.ok) throw new Error("Submission failed");
+      form.style.display = "none";
+      document.getElementById("totals-bar").style.display = "none";
+      document.getElementById("thank-you").style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      btn.disabled = false; recalc();
+      alert("Something went wrong sending your picks. Please try again, or email us directly.");
+    }
+  });
+
+  // Back to cart — her picks were only hidden, not cleared, so she can tweak
+  // and send again. Re-enable the send button (recalc restores its label).
+  document.getElementById("back-to-cart").addEventListener("click", () => {
+    document.getElementById("thank-you").style.display = "none";
+    form.style.display = "";
+    document.getElementById("totals-bar").style.display = "";
+    document.getElementById("submit-btn").disabled = false;
+    recalc();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // ── Autosave — her choices live in her browser, so leaving and coming back
+  // never loses work. It's only "sent to us" on submit; this is just her draft.
+  // Stored as { fieldName: value } and matched back by property (never a
+  // selector), so piece names with quotes, em dashes, apostrophes can't break it.
+  function saveProgress() {
+    const data = {};
+    document.querySelectorAll('.toggle input:checked').forEach(r => { data[r.name] = r.value; });
+    document.querySelectorAll('.note-body textarea').forEach(t => { if (t.value.trim()) data[t.name] = t.value; });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* private mode, full disk — fail quietly */ }
+  }
+
+  function restoreProgress() {
+    let data;
+    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) { return; }
+    document.querySelectorAll('.toggle input').forEach(r => { if (data[r.name] === r.value) r.checked = true; });
+    document.querySelectorAll('.note-body textarea').forEach(t => { if (typeof data[t.name] === "string") t.value = data[t.name]; });
+  }
+
+  // Save on every choice (after recalc, in the change handler above) and as she
+  // types a note — lightly debounced so we're not writing on every keystroke.
+  let saveTimer;
+  document.addEventListener("input", e => {
+    if (!e.target.matches('.note-body textarea')) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveProgress, 400);
+  });
+
+  restoreProgress();
+  recalc();
+  </script>
+</body>
+</html>
