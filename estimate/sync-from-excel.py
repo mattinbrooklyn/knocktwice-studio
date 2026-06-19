@@ -25,6 +25,9 @@ NOTES
       rows already have one. For a new row you can leave SLUG blank and the
       tool will derive one from the piece name and tell you what to call its
       image.
+    - The STATUS column controls visibility: only rows marked "Show" render.
+      "Hide" (or a blank cell) leaves the item off the page entirely. If the
+      column is missing, everything shows (so it can't accidentally blank out).
     - Product photos come from the IMAGE column: paste a Google Drive share
       link (the file must be shared "Anyone with the link: Viewer") or a plain
       image URL. The tool downloads each into assets/images/estimate/ and the
@@ -165,12 +168,21 @@ def js(s):
 # ── Build the CART structure from rows ─────────────────────────────────────
 def build_cart(rows):
     groups = {}   # category -> list of item dicts (insertion-ordered)
+    hidden = []   # pieces left off the page via the STATUS column
+    # Only filter by STATUS if the column actually exists — otherwise an older
+    # sheet (no STATUS column) would hide everything.
+    has_status = any("STATUS" in r for r in rows)
     for r in rows:
         cat = (r.get("CATEGORY") or "").strip()
         piece = (r.get("PIECE") or "").strip()
         qty, price = num(r.get("QTY")), num(r.get("PRICE"))
         if not (cat and piece and qty is not None and price is not None):
             continue  # skips blanks and the summary block at the bottom
+        # STATUS column: only rows marked "show" render. "hide" (or blank) are
+        # left off the page entirely.
+        if has_status and (r.get("STATUS") or "").strip().lower() != "show":
+            hidden.append(tidy(piece))
+            continue
         link = (r.get("LINK") or "").strip()
         if link.upper() in ("", "N/A", "TBD", "NONE"):
             link = ""
@@ -226,7 +238,7 @@ def build_cart(rows):
             return (0, CATEGORY_ORDER.index(cat))
         return (1, 0)
     ordered.sort(key=lambda ci: cat_rank(ci[0]))
-    return ordered
+    return ordered, hidden
 
 
 # ── Images: pull whatever's in the IMAGE column into the repo ───────────────
@@ -322,7 +334,7 @@ def inject(js_block):
 
 
 # ── Report ─────────────────────────────────────────────────────────────────
-def report(cart, pulled=None, failed=None):
+def report(cart, pulled=None, failed=None, hidden=None):
     total = 0.0
     missing = []
     print("\n  Category                       Pieces      Subtotal")
@@ -346,6 +358,8 @@ def report(cart, pulled=None, failed=None):
             print(f"      • {piece}  —  {why}")
     if missing:
         print(f"  ⚠  {len(missing)} item(s) have no photo (a placeholder shows): {', '.join(missing)}")
+    if hidden:
+        print(f"  ◦  {len(hidden)} item(s) hidden via STATUS (not on the page): {', '.join(hidden)}")
     print("\n  ✓ index.html updated. Preview, then commit & push to publish.\n")
 
 
@@ -388,11 +402,11 @@ if __name__ == "__main__":
     if not os.path.exists(path):
         sys.exit(f"Spreadsheet not found: {path}")
     rows = read_sheet(path, SHEET_NAME)
-    cart = build_cart(rows)
+    cart, hidden = build_cart(rows)
     if not cart:
-        sys.exit("No item rows found — check the sheet name and columns.")
+        sys.exit("No item rows found — check the sheet name and columns (and the STATUS column — only 'Show' rows render).")
     print("  Fetching product photos from the IMAGE column…")
     pulled, failed = download_images(cart)
     inject(generate_js(cart))
     print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")
-    report(cart, pulled, failed)
+    report(cart, pulled, failed, hidden)
