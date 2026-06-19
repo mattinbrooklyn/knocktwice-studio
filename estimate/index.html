@@ -268,11 +268,12 @@
     .toggle label.opt-quiet {
       border: 0; background: none; border-radius: 0;
       padding: 0.5rem 0.2rem; margin-left: auto;
-      font-size: 0.85rem; font-weight: 600; color: var(--color-red);
+      font-size: 0.85rem; font-weight: 600; color: var(--color-caramel);
       cursor: default !important;
     }
     .toggle label.opt-quiet:hover { background: none; }
-    .toggle input:checked + label.opt-quiet { font-weight: 700; }
+    /* Goes error red only once she's actually crossed the piece off. */
+    .toggle input:checked + label.opt-quiet { color: var(--color-red); font-weight: 700; }
 
     /* ── Per-item note — only shown when an alternate is requested ─ */
     .note { grid-area: note; }
@@ -421,9 +422,8 @@
     <h1 class="title">A Room<br>for Two</h1>
     <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
     <p class="intro">
-      Everything we picked for the room, by category. Open a category and, for each piece,
-      <strong>add it to your cart</strong> or <strong>request an alternate</strong> — tell us what to
-      look for instead and we’ll source options.
+      This is a working cart, not a final bill — a back-and-forth. Look through everything we
+      picked, tell us how each piece lands, and we’ll refine from there.
     </p>
 
     <div class="setup-warning" id="setup-warning" hidden>
@@ -447,7 +447,7 @@
       </ol>
       <p class="status-next" id="status-next">
         Open a category and, for each piece, add it to your cart or request an alternate.
-        Send us your cart whenever you’ve had a pass and we’ll get to work.
+        Send whenever you’re ready — all at once or over a few visits; your progress saves as you go.
       </p>
     </div>
 
@@ -554,7 +554,11 @@
   ];
 
   // ── Round config — bump this each time you republish the cart ──
-  const ROUND = { label: "Round 1", date: "April 23, 2026" };
+  const ROUND = { label: "Round 1", date: "June 18, 2026" };
+
+  // Autosave key — scoped to the round, so republishing a new round starts her
+  // fresh rather than restoring last round's answers onto a different cart.
+  const STORAGE_KEY = "ktw-estimate-" + ROUND.label + "-" + ROUND.date;
 
   const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const imgTag = (slug, alt, icon, cls="") =>
@@ -677,10 +681,10 @@
     statusNow.classList.toggle("ready", allReviewed);
 
     document.getElementById("status-next").innerHTML = allReviewed
-      ? "You’ve been through everything! 🎉 Send us your cart below and we’ll get to work on your alternates."
+      ? "You’ve been through everything! 🎉 Send your cart below and we’ll get to work on your alternates."
       : reviewed > 0
-        ? "Looking good. Send us your cart whenever you’re ready — or keep going. We’ll source alternates for anything you’ve asked us to swap."
-        : "Open a category and, for each piece, add it to your cart or request an alternate. Send us your cart whenever you’ve had a pass and we’ll get to work.";
+        ? "Looking good — your progress is saved. Send whenever you’re ready, or pick it back up anytime. We’ll source alternates for anything you’ve asked us to swap."
+        : "Open a category and, for each piece, add it to your cart or request an alternate. Send whenever you’re ready — all at once or over a few visits; your progress saves as you go.";
 
     if (!NOT_WIRED) {
       document.getElementById("submit-btn").textContent =
@@ -704,6 +708,7 @@
   document.addEventListener("change", e => {
     if (!e.target.matches('.toggle input')) return;
     recalc();
+    saveProgress();
     // Asking for an alternate reveals the feedback box — drop her straight into it.
     if (e.target.value === "Request alternate") {
       e.target.closest(".item").querySelector(".note-body textarea").focus();
@@ -774,6 +779,34 @@
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  // ── Autosave — her choices live in her browser, so leaving and coming back
+  // never loses work. It's only "sent to us" on submit; this is just her draft.
+  // Stored as { fieldName: value } and matched back by property (never a
+  // selector), so piece names with quotes, em dashes, apostrophes can't break it.
+  function saveProgress() {
+    const data = {};
+    document.querySelectorAll('.toggle input:checked').forEach(r => { data[r.name] = r.value; });
+    document.querySelectorAll('.note-body textarea').forEach(t => { if (t.value.trim()) data[t.name] = t.value; });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) { /* private mode, full disk — fail quietly */ }
+  }
+
+  function restoreProgress() {
+    let data;
+    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch (e) { return; }
+    document.querySelectorAll('.toggle input').forEach(r => { if (data[r.name] === r.value) r.checked = true; });
+    document.querySelectorAll('.note-body textarea').forEach(t => { if (typeof data[t.name] === "string") t.value = data[t.name]; });
+  }
+
+  // Save on every choice (after recalc, in the change handler above) and as she
+  // types a note — lightly debounced so we're not writing on every keystroke.
+  let saveTimer;
+  document.addEventListener("input", e => {
+    if (!e.target.matches('.note-body textarea')) return;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveProgress, 400);
+  });
+
+  restoreProgress();
   recalc();
   </script>
 </body>
