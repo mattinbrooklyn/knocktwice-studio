@@ -23,6 +23,29 @@
        Pieces lead; dollars recede.
        ────────────────────────────────────────────────────────────── */
 
+    /* Brand tokens inlined so this page is self-contained — it keeps its full
+       styling even if the shared /assets/styles.css is blocked (e.g. by a
+       corporate firewall / web filter on a locked-down work computer). */
+    :root {
+      --color-bg: #F7F2EC;
+      --color-ink: #32261F;
+      --color-blue: #378CDA;
+      --color-green: #51B18C;
+      --color-khaki: #D1C3B6;
+      --color-white: #FFFFFF;
+      --color-yellow: #FADB4B;
+      --color-pink: #EC8EDF;
+      --color-red: #FF0004;
+      --color-caramel: #9A7555;
+      --font-display: 'Erica One', 'Arial Black', sans-serif;
+      --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --radius-pill: 2rem;
+      --radius-button: 6.25rem;
+      --radius-input: 0.25rem;
+      --shadow-stack: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
     html, body { cursor: auto !important; background: var(--color-bg); }
     *, *::before, *::after { cursor: auto !important; }
     a, button, label, input, textarea, [role="button"] { cursor: pointer !important; }
