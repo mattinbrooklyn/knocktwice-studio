@@ -263,16 +263,16 @@
     .toggle input[value="Request alternate"]:checked + label {
       background: var(--color-pink); color: var(--color-ink); border-color: var(--color-ink);
     }
-    /* The quiet escape hatch — plain text, set apart to the right, never a pill. */
+    /* The quiet escape hatch — plain error-red text, set apart to the right.
+       Reads as a label, not a button: no underline, no hover, no pointer. */
     .toggle label.opt-quiet {
       border: 0; background: none; border-radius: 0;
       padding: 0.5rem 0.2rem; margin-left: auto;
-      font-size: 0.85rem; font-weight: 600; color: var(--color-caramel);
-      text-decoration: underline; text-decoration-color: transparent;
-      text-underline-offset: 3px; transition: color 0.12s, text-decoration-color 0.12s;
+      font-size: 0.85rem; font-weight: 600; color: var(--color-red);
+      cursor: default !important;
     }
-    .toggle label.opt-quiet:hover { background: none; color: var(--color-ink); text-decoration-color: currentColor; }
-    .toggle input:checked + label.opt-quiet { color: var(--color-ink); text-decoration-color: currentColor; }
+    .toggle label.opt-quiet:hover { background: none; }
+    .toggle input:checked + label.opt-quiet { font-weight: 700; }
 
     /* ── Per-item note — only shown when an alternate is requested ─ */
     .note { grid-area: note; }
