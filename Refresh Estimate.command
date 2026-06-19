@@ -35,26 +35,26 @@ if [ "$CURRENT" != "$PREVIEW_BRANCH" ]; then
   read -r -p "Press Return to close."; exit 1
 fi
 
-# 2) Stage only the estimate page + its images, and commit if anything changed.
+# 2) Stage the estimate page + its images; commit & push the preview if the
+#    Sheet brought any changes.
 git add "${ESTIMATE_PATHS[@]}"
 if git diff --cached --quiet; then
-  echo "  Nothing changed — the page already matches the Sheet."
-  echo ""; read -r -p "All done. Press Return to close."; exit 0
-fi
-git commit -m "Refresh estimate from Google Sheet" >/dev/null
-
-# 3) Publish to the staging preview.
-if git push origin "$PREVIEW_BRANCH" >/dev/null 2>&1; then
-  echo "  ✓  Updated the staging preview."
+  echo "  Sheet brought no new changes — preview already current."
 else
-  echo "  ✗  Couldn't push to $PREVIEW_BRANCH — check your internet / GitHub access."
-  read -r -p "Press Return to close."; exit 1
+  git commit -m "Refresh estimate from Google Sheet" >/dev/null
+  if git push origin "$PREVIEW_BRANCH" >/dev/null 2>&1; then
+    echo "  ✓  Updated the staging preview."
+  else
+    echo "  ✗  Couldn't push to $PREVIEW_BRANCH — check your internet / GitHub access."
+    read -r -p "Press Return to close."; exit 1
+  fi
 fi
 
-# 4) Promote ONLY the estimate page to the live site, using plumbing: build a
-#    commit = (current live tree) with just the estimate paths swapped in from
-#    the commit we just made, then push it. No branch switch, no working-tree
-#    changes — so unfinished rebuild work on staging can never leak to live.
+# 3) Always reconcile the live site with the current estimate (so a previous
+#    half-finished run catches up). Uses plumbing: build a commit = (current
+#    live tree) with just the estimate paths swapped in from HEAD, then push it.
+#    No branch switch, no working-tree changes — unfinished rebuild work on
+#    staging can never leak to live.
 echo "  ⏳  Publishing to the live site…"
 if ! git fetch origin --quiet; then
   echo "  ✗  Couldn't reach the live site (staging is updated). Try again, or ask Claude."
@@ -64,7 +64,7 @@ fi
 MAIN_COMMIT=$(git rev-parse "origin/$LIVE_BRANCH")
 TMP_INDEX="$(mktemp)"
 if GIT_INDEX_FILE="$TMP_INDEX" git read-tree "$MAIN_COMMIT" \
-   && GIT_INDEX_FILE="$TMP_INDEX" git rm -r --cached --quiet --ignore-unmatch estimate/roomfortwo assets/images/estimate \
+   && GIT_INDEX_FILE="$TMP_INDEX" git rm -rf --cached --quiet --ignore-unmatch estimate/roomfortwo assets/images/estimate \
    && GIT_INDEX_FILE="$TMP_INDEX" git read-tree --prefix=estimate/roomfortwo/ "HEAD:estimate/roomfortwo" \
    && GIT_INDEX_FILE="$TMP_INDEX" git read-tree --prefix=assets/images/estimate/ "HEAD:assets/images/estimate"; then
   NEW_TREE=$(GIT_INDEX_FILE="$TMP_INDEX" git write-tree)
