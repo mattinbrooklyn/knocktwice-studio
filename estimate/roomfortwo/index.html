@@ -31,6 +31,12 @@
     /* Kill the mobile tap-highlight flash (the blue box on tap). */
     * { -webkit-tap-highlight-color: transparent; }
 
+    /* Neutralize the shared site's mobile "footer blue" reveal (a fixed 50vh
+       body::after in styles.css). It's portfolio chrome that assumes a
+       #page-scaler over it; on this standalone page it just shows through as a
+       big blue rectangle in the lower half. */
+    body::after { display: none !important; content: none !important; }
+
     body {
       color: var(--color-ink);
       font-family: var(--font-body);
