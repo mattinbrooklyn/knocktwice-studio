@@ -4,7 +4,7 @@ sync-from-excel.py — rebuild the estimate page's data from the Excel.
 
 WHAT IT DOES
     Reads the design-package spreadsheet and regenerates the line-item data
-    block inside estimate/index.html (between the ESTIMATE-DATA markers).
+    block inside estimate/roomfortwo/index.html (between the ESTIMATE-DATA markers).
     Nothing else on the page is touched.
 
 HOW TO USE
@@ -39,7 +39,7 @@ NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")
 CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
-PAGE = os.path.join(REPO, "estimate", "index.html")
+PAGE = os.path.join(REPO, "estimate", "roomfortwo", "index.html")
 IMG_DIR = os.path.join(REPO, "assets", "images", "estimate")
 SHEET_NAME = "ROUND 1"
 

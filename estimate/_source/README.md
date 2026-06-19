@@ -1,6 +1,6 @@
 # Editing the estimate — the Google Sheet drives the page
 
-The estimate page (`estimate/index.html`) gets its line items from a **Google
+The estimate page (`estimate/roomfortwo/index.html`) gets its line items from a **Google
 Sheet** (the source of truth). You edit the Sheet, click **Refresh Estimate**,
 and the latest data is rebuilt into the page and published.
 

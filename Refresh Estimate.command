@@ -16,7 +16,7 @@ python3 estimate/sync-from-excel.py || {
   exit 1
 }
 
-git add estimate/index.html assets/images/estimate
+git add estimate/roomfortwo/index.html assets/images/estimate
 if git diff --cached --quiet; then
   echo "  Nothing changed — the page already matches the Sheet."
 else
