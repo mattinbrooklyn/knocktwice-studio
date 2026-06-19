@@ -216,9 +216,9 @@
       background: rgba(81, 177, 140, 0.10);
       box-shadow: inset 3px 0 0 var(--color-green);
     }
-    /* Set aside — no buy, no alt. Quietly struck through, not in the cart. */
+    /* Set aside — no buy, no alt. Struck through in error red, out of the cart. */
     .item:has(input[value="Don't need"]:checked) .total {
-      text-decoration: line-through; color: var(--color-caramel);
+      text-decoration: line-through; color: var(--color-red);
     }
 
     .thumb {
@@ -272,8 +272,7 @@
       cursor: default !important;
     }
     .toggle label.opt-quiet:hover { background: none; }
-    /* Goes error red only once she's actually crossed the piece off. */
-    .toggle input:checked + label.opt-quiet { color: var(--color-red); font-weight: 700; }
+    /* The label stays caramel throughout — the struck-out price carries the red. */
 
     /* ── Per-item note — only shown when an alternate is requested ─ */
     .note { grid-area: note; }
@@ -357,7 +356,6 @@
     .breakdown td:last-child { text-align: right; font-variant-numeric: tabular-nums; color: var(--color-caramel); }
     .breakdown tr.grand td { border-top: 1px solid var(--color-khaki); padding-top: 0.45rem; font-weight: 700; color: var(--color-ink); }
     .breakdown tr.grand td:last-child { color: var(--color-ink); }
-    .breakdown .bd-reviewed { color: var(--color-caramel); font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; }
 
     /* ── Thank-you ────────────────────────────────────────────── */
     .thank-you { display: none; text-align: center; padding: 4.5rem 1rem; }
@@ -691,14 +689,13 @@
         allReviewed ? "All set — send my cart 🎉" : "Send my cart to Knock Twice";
     }
 
-    buildBreakdown(perCat);
+    buildBreakdown();
   }
 
-  function buildBreakdown(perCat) {
+  function buildBreakdown() {
     const rows = CART.map(g => {
       const sub = g.items.reduce((a,i)=>a+i.total,0);
-      const pc = perCat[g.cat];
-      return `<tr><td>${g.cat} <span class="bd-reviewed">${pc.inCart}/${pc.count} in cart</span></td><td>${money(sub)}</td></tr>`;
+      return `<tr><td>${g.cat}</td><td>${money(sub)}</td></tr>`;
     }).join("");
     document.getElementById("breakdown-table").innerHTML =
       rows + `<tr class="grand"><td>Full estimate</td><td>${money(PROJECT_TOTAL)}</td></tr>`;
