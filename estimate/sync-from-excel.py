@@ -50,8 +50,18 @@ GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/1EpT8bsdPsnBvxHSF_FMZiubE
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
 
-# Categories pinned to the end of the list (in this order), regardless of where
-# they sit in the spreadsheet. Everything else keeps its spreadsheet order.
+# Explicit top-to-bottom category order. Categories listed here appear in this
+# order; any not listed keep their spreadsheet order, after these. Edit this list
+# to rearrange categories on the page (the Sheet's row order no longer decides it).
+CATEGORY_ORDER = [
+    "Furniture & Storage",
+    "Lighting",
+    "Soft Goods",
+    "Finishes",
+    "Art",
+]
+
+# Categories pinned to the very end (in this order), regardless of the above.
 LAST_CATEGORIES = ["Labor & Install"]
 
 
@@ -207,8 +217,15 @@ def build_cart(rows):
                 it["slug"] = slugify(it["piece"])
 
     ordered = [(cat, items) for cat, items in groups.items()]
-    # Pin LAST_CATEGORIES to the end; everything else keeps spreadsheet order.
-    ordered.sort(key=lambda ci: (1, LAST_CATEGORIES.index(ci[0])) if ci[0] in LAST_CATEGORIES else (0, 0))
+    # Order: CATEGORY_ORDER first (as listed), then any unlisted in spreadsheet
+    # order (sort is stable), then LAST_CATEGORIES pinned to the very end.
+    def cat_rank(cat):
+        if cat in LAST_CATEGORIES:
+            return (2, LAST_CATEGORIES.index(cat))
+        if cat in CATEGORY_ORDER:
+            return (0, CATEGORY_ORDER.index(cat))
+        return (1, 0)
+    ordered.sort(key=lambda ci: cat_rank(ci[0]))
     return ordered
 
 
