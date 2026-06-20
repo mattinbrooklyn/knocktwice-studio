@@ -821,22 +821,46 @@
     document.getElementById("submit-btn").disabled = true;
   }
 
-  // Build a clean, glanceable readout of her picks — this is what lands in your
-  // inbox + Formspree log, so each send is a readable record (not 50 raw fields).
+  // Map her choice (the radio value) to a friendly status label for the record.
+  const STATUS_LABEL = {
+    "Added to cart": "In cart",
+    "Request alternate": "Alternate requested",
+    "Don't need": "Don’t need"
+  };
+
+  // Build the FULL line-item record of her submission — product detail pulled
+  // from CART, her decision + note read off the page. The Apps Script turns this
+  // into a per-submission detail tab (laid out like PRODUCT LIST).
   function buildPicks() {
-    const cart = [], alts = [], skip = [], todo = [];
-    let cartTotal = 0;
+    const decided = {};   // piece name -> { value, note }
     document.querySelectorAll(".item").forEach(item => {
       const piece = item.querySelector(".piece").textContent.trim();
       const checked = item.querySelector(".toggle input:checked");
       const note = (item.querySelector(".note-body textarea")?.value || "").trim();
-      if (!checked) { todo.push(piece); return; }
-      if (checked.value === "Added to cart") { cart.push(piece); cartTotal += parseFloat(checked.dataset.total) || 0; }
-      else if (checked.value === "Request alternate") { alts.push(note ? `${piece} ("${note}")` : `${piece} (no reason given)`); }
-      else { skip.push(piece); }
+      decided[piece] = { value: checked ? checked.value : "", note };
     });
-    return { cart, alts, skip, todo, cartTotal };
+
+    const items = [];
+    const counts = { inCart: 0, alternates: 0, dontNeed: 0, notReviewed: 0 };
+    let cartTotal = 0;
+    CART.forEach(g => g.items.forEach(it => {
+      const d = decided[it.piece] || { value: "", note: "" };
+      const status = STATUS_LABEL[d.value] || "Not yet reviewed";
+      if (status === "In cart") { counts.inCart++; cartTotal += it.total; }
+      else if (status === "Alternate requested") counts.alternates++;
+      else if (status === "Don’t need") counts.dontNeed++;
+      else counts.notReviewed++;
+      items.push({
+        piece: it.piece, category: g.cat, retailer: it.retailer,
+        size: it.size, color: it.color, qty: it.qty, price: it.total,
+        link: it.link, status, note: d.note
+      });
+    }));
+    return { items, counts, cartTotal };
   }
+
+  const picksList = (p, label) => p.items.filter(i => i.status === label)
+    .map(i => i.note ? `${i.piece} ("${i.note}")` : i.piece);
 
   form.addEventListener("submit", async e => {
     if (NOT_WIRED) { e.preventDefault(); return; }
@@ -846,20 +870,17 @@
 
     const p = buildPicks();
     const roundText = `${ROUND.label} · ${ROUND.date}`;
-    const subject = `Hannah · ${ROUND.label} · ${p.cart.length} in cart · ${p.alts.length} alt${p.alts.length === 1 ? "" : "s"} · ${p.todo.length} to review`;
-    // Send a clean, named payload (Formspree shows each field) instead of dozens
-    // of raw per-item rows.
-    // Clean JSON payload → the Apps Script logs it as a row in the Responses tab
-    // (and can email you). It echoes {ok:true}, so we confirm a real success.
+    const subject = `Hannah · ${ROUND.label} · ${p.counts.inCart} in cart · ${p.counts.alternates} alt${p.counts.alternates === 1 ? "" : "s"} · ${p.counts.notReviewed} to review`;
+    // Full payload → the Apps Script writes a per-submission detail tab + a log
+    // row + emails you. It echoes {ok:true}, so we confirm a real success.
     const payload = {
       project: "Room for Two — Hannah & Eugene",
+      roundLabel: ROUND.label,
       round: roundText,
       subject,
       cartTotal: money(p.cartTotal),
-      inCart: p.cart.join(", ") || "—",
-      alternates: p.alts.join("   ·   ") || "—",
-      dontNeed: p.skip.join(", ") || "—",
-      notReviewed: p.todo.join(", ") || "—"
+      counts: p.counts,
+      items: p.items
     };
 
     try {
@@ -877,7 +898,7 @@
       btn.disabled = false; recalc();
       const saved = "We couldn’t send your picks just now — but don’t worry, everything you chose is saved on this device. Please check your connection and tap Send again.";
       if (CONTACT_EMAIL) {
-        const body = `Round: ${roundText}\n\nIn cart: ${p.cart.join(", ") || "—"}\nAlternates: ${p.alts.join("; ") || "—"}\nDon’t need: ${p.skip.join(", ") || "—"}\nStill reviewing: ${p.todo.join(", ") || "—"}`;
+        const body = `Round: ${roundText}\n\nIn cart: ${picksList(p, "In cart").join(", ") || "—"}\nAlternates: ${picksList(p, "Alternate requested").join("; ") || "—"}\nDon’t need: ${picksList(p, "Don’t need").join(", ") || "—"}\nStill reviewing: ${p.counts.notReviewed} item(s)`;
         if (confirm(saved + "\n\nPrefer to email your picks instead? Click OK.")) {
           window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
