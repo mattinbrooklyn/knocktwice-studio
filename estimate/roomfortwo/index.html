@@ -446,7 +446,7 @@
   </style>
 </head>
 <body>
-  <form id="estimate-form" class="wrap" action="https://formspree.io/f/mpqebeqe" method="POST">
+  <form id="estimate-form" class="wrap" action="#" method="POST">
 
     <!-- Masthead ------------------------------------------------- -->
     <p class="eyebrow">
@@ -462,8 +462,7 @@
 
     <div class="setup-warning" id="setup-warning" hidden>
       ⚙️ <strong>Heads up (only you see this):</strong> the form isn’t wired to a destination yet.
-      Replace <code>REPLACE_ME</code> in the form action with your Formspree endpoint. Until then,
-      Submit is disabled.
+      Set <code>SUBMIT_URL</code> to your Apps Script web-app URL. Until then, Submit is disabled.
     </div>
 
     <hr class="rule">
@@ -594,6 +593,11 @@
   // the form), she's offered a one-tap email to this address with her picks
   // pre-filled. Leave blank to just show a "saved — try again" message.
   const CONTACT_EMAIL = "";
+
+  // Where "Send" posts to — the Google Apps Script web app bound to the estimate
+  // Sheet. It appends each submission as a row in the Responses tab (and can
+  // email you). To repoint: redeploy the script and paste the new /exec URL here.
+  const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbzutK1aPWdfQ2sHXQLX_FImf9w_UNBg3CQKWXnJ0UXPct4oKuivsLSaYooBuv8owjkm/exec";
 
   // Autosave key — scoped to the round, so republishing a new round starts her
   // fresh rather than restoring last round's answers onto a different cart.
@@ -811,7 +815,7 @@
 
   // ── Formspree guard + submit ──────────────────────────────────
   const form = document.getElementById("estimate-form");
-  const NOT_WIRED = form.action.includes("REPLACE_ME");
+  const NOT_WIRED = !SUBMIT_URL;
   if (NOT_WIRED) {
     document.getElementById("setup-warning").hidden = false;
     document.getElementById("submit-btn").disabled = true;
@@ -845,22 +849,23 @@
     const subject = `Hannah · ${ROUND.label} · ${p.cart.length} in cart · ${p.alts.length} alt${p.alts.length === 1 ? "" : "s"} · ${p.todo.length} to review`;
     // Send a clean, named payload (Formspree shows each field) instead of dozens
     // of raw per-item rows.
-    const fd = new FormData();
-    fd.set("Project", "Room for Two — Hannah & Eugene");
-    fd.set("Round", roundText);
-    fd.set("Sent", new Date().toLocaleString());
-    fd.set("Cart total", money(p.cartTotal));
-    fd.set("In cart", p.cart.join(", ") || "—");
-    fd.set("Alternates requested", p.alts.join("   ·   ") || "—");
-    fd.set("Don't need", p.skip.join(", ") || "—");
-    fd.set("Not yet reviewed", p.todo.join(", ") || "—");
-    fd.set("_subject", subject);
+    // Clean JSON payload → the Apps Script logs it as a row in the Responses tab
+    // (and can email you). It echoes {ok:true}, so we confirm a real success.
+    const payload = {
+      project: "Room for Two — Hannah & Eugene",
+      round: roundText,
+      subject,
+      cartTotal: money(p.cartTotal),
+      inCart: p.cart.join(", ") || "—",
+      alternates: p.alts.join("   ·   ") || "—",
+      dontNeed: p.skip.join(", ") || "—",
+      notReviewed: p.todo.join(", ") || "—"
+    };
 
     try {
-      const res = await fetch(form.action, {
-        method: "POST", body: fd, headers: { Accept: "application/json" },
-      });
-      if (!res.ok) throw new Error("Submission failed");
+      const res = await fetch(SUBMIT_URL, { method: "POST", body: JSON.stringify(payload) });
+      const data = await res.json().catch(() => ({ ok: false }));
+      if (!data.ok) throw new Error("Submission failed");
       form.style.display = "none";
       document.getElementById("totals-bar").style.display = "none";
       document.getElementById("thank-you").style.display = "block";
