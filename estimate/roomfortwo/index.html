@@ -590,6 +590,11 @@
   // ── Round config — bump this each time you republish the cart ──
   const ROUND = { label: "Round 1", date: "June 18, 2026" };
 
+  // Fallback address: if a send ever fails (e.g. a locked-down network blocks
+  // the form), she's offered a one-tap email to this address with her picks
+  // pre-filled. Leave blank to just show a "saved — try again" message.
+  const CONTACT_EMAIL = "";
+
   // Autosave key — scoped to the round, so republishing a new round starts her
   // fresh rather than restoring last round's answers onto a different cart.
   const STORAGE_KEY = "ktw-estimate-" + ROUND.label + "-" + ROUND.date;
@@ -812,14 +817,48 @@
     document.getElementById("submit-btn").disabled = true;
   }
 
+  // Build a clean, glanceable readout of her picks — this is what lands in your
+  // inbox + Formspree log, so each send is a readable record (not 50 raw fields).
+  function buildPicks() {
+    const cart = [], alts = [], skip = [], todo = [];
+    let cartTotal = 0;
+    document.querySelectorAll(".item").forEach(item => {
+      const piece = item.querySelector(".piece").textContent.trim();
+      const checked = item.querySelector(".toggle input:checked");
+      const note = (item.querySelector(".note-body textarea")?.value || "").trim();
+      if (!checked) { todo.push(piece); return; }
+      if (checked.value === "Added to cart") { cart.push(piece); cartTotal += parseFloat(checked.dataset.total) || 0; }
+      else if (checked.value === "Request alternate") { alts.push(note ? `${piece} ("${note}")` : `${piece} (no reason given)`); }
+      else { skip.push(piece); }
+    });
+    return { cart, alts, skip, todo, cartTotal };
+  }
+
   form.addEventListener("submit", async e => {
     if (NOT_WIRED) { e.preventDefault(); return; }
     e.preventDefault();
     const btn = document.getElementById("submit-btn");
     btn.disabled = true; btn.textContent = "Sending…";
+
+    const p = buildPicks();
+    const roundText = `${ROUND.label} · ${ROUND.date}`;
+    const subject = `Hannah · ${ROUND.label} · ${p.cart.length} in cart · ${p.alts.length} alt${p.alts.length === 1 ? "" : "s"} · ${p.todo.length} to review`;
+    // Send a clean, named payload (Formspree shows each field) instead of dozens
+    // of raw per-item rows.
+    const fd = new FormData();
+    fd.set("Project", "Room for Two — Hannah & Eugene");
+    fd.set("Round", roundText);
+    fd.set("Sent", new Date().toLocaleString());
+    fd.set("Cart total", money(p.cartTotal));
+    fd.set("In cart", p.cart.join(", ") || "—");
+    fd.set("Alternates requested", p.alts.join("   ·   ") || "—");
+    fd.set("Don't need", p.skip.join(", ") || "—");
+    fd.set("Not yet reviewed", p.todo.join(", ") || "—");
+    fd.set("_subject", subject);
+
     try {
       const res = await fetch(form.action, {
-        method: "POST", body: new FormData(form), headers: { Accept: "application/json" },
+        method: "POST", body: fd, headers: { Accept: "application/json" },
       });
       if (!res.ok) throw new Error("Submission failed");
       form.style.display = "none";
@@ -827,8 +866,19 @@
       document.getElementById("thank-you").style.display = "block";
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
+      // Her picks are still safe in this browser (autosave) — say so clearly, and
+      // (if a contact email is set) offer a one-tap email fallback so even a
+      // blocked network can't strand her selections.
       btn.disabled = false; recalc();
-      alert("Something went wrong sending your picks. Please try again, or email us directly.");
+      const saved = "We couldn’t send your picks just now — but don’t worry, everything you chose is saved on this device. Please check your connection and tap Send again.";
+      if (CONTACT_EMAIL) {
+        const body = `Round: ${roundText}\n\nIn cart: ${p.cart.join(", ") || "—"}\nAlternates: ${p.alts.join("; ") || "—"}\nDon’t need: ${p.skip.join(", ") || "—"}\nStill reviewing: ${p.todo.join(", ") || "—"}`;
+        if (confirm(saved + "\n\nPrefer to email your picks instead? Click OK.")) {
+          window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+      } else {
+        alert(saved);
+      }
     }
   });
 
