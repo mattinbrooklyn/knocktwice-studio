@@ -44,7 +44,7 @@ XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")
 CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
 PAGE = os.path.join(REPO, "estimate", "roomfortwo", "index.html")
 IMG_DIR = os.path.join(REPO, "assets", "images", "estimate")
-SHEET_NAME = "ROUND 1"
+SHEET_NAME = "PRODUCT LIST"
 
 # Paste your shared Google Sheet link here (Share → "Anyone with the link:
 # Viewer"). When set, the tool pulls the latest Sheet on each run. Leave blank
