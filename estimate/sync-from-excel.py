@@ -43,6 +43,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")
 CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
 PAGE = os.path.join(REPO, "estimate", "roomfortwo", "index.html")
+FINAL_PAGE = os.path.join(REPO, "estimate", "roomfortwo", "final", "index.html")
 IMG_DIR = os.path.join(REPO, "assets", "images", "estimate")
 SHEET_NAME = "PRODUCT LIST"
 
@@ -52,6 +53,8 @@ SHEET_NAME = "PRODUCT LIST"
 GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/1EpT8bsdPsnBvxHSF_FMZiubE-9elqon6iZt97bzGJ1E/edit"
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
+FINAL_START = "/* FINAL-DATA:START"
+FINAL_END = "/* FINAL-DATA:END"
 
 # Explicit top-to-bottom category order. Categories listed here appear in this
 # order; any not listed keep their spreadsheet order, after these. Edit this list
@@ -165,10 +168,21 @@ def js(s):
     return (s or "").replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
 
 
-# ── Build the CART structure from rows ─────────────────────────────────────
+def _truthy(v):
+    """A cell that means 'yes' — tolerant of Yes/Y/TRUE/X/✓/1."""
+    return (v or "").strip().lower() in ("yes", "y", "true", "x", "✓", "1")
+
+
+# ── Build the CART structures from rows ────────────────────────────────────
 def build_cart(rows):
-    groups = {}   # category -> list of item dicts (insertion-ordered)
-    hidden = []   # pieces left off the page via the STATUS column
+    """Parse every valid row once, then derive two views that share the same
+    item objects (so one image download serves both):
+        • estimate  — rows the client sees (STATUS = Show)
+        • final     — rows approved for the confirmation doc (APPROVED = Yes),
+                      regardless of STATUS (extras can be Hidden yet Approved).
+    Returns (estimate_ordered, final_ordered, hidden)."""
+    groups = {}   # category -> list of item dicts (insertion-ordered), ALL rows
+    hidden = []   # pieces left off the estimate page via the STATUS column
     # Only filter by STATUS if the column actually exists — otherwise an older
     # sheet (no STATUS column) would hide everything.
     has_status = any("STATUS" in r for r in rows)
@@ -178,11 +192,13 @@ def build_cart(rows):
         qty, price = num(r.get("QTY")), num(r.get("PRICE"))
         if not (cat and piece and qty is not None and price is not None):
             continue  # skips blanks and the summary block at the bottom
-        # STATUS column: only rows marked "show" render. "hide" (or blank) are
-        # left off the page entirely.
-        if has_status and (r.get("STATUS") or "").strip().lower() != "show":
+        # STATUS drives the ESTIMATE view only (only "Show" rows render there).
+        # APPROVED drives the FINAL view. They're independent: a small add-on can
+        # be Hidden from the closed estimate yet Approved for the final doc.
+        show = (not has_status) or (r.get("STATUS") or "").strip().lower() == "show"
+        approved = _truthy(r.get("APPROVED"))
+        if not show:
             hidden.append(tidy(piece))
-            continue
         link = (r.get("LINK") or "").strip()
         if link.upper() in ("", "N/A", "TBD", "NONE"):
             link = ""
@@ -199,6 +215,8 @@ def build_cart(rows):
             "flag": (r.get("NOTES") or "").strip(),   # your note to the client (the "↳" line)
             "image_url": (r.get("IMAGE") or "").strip(),  # Drive share link / direct URL; pulled below
             "img": "",                                    # local filename, resolved by download_images()
+            "show": show,          # in the estimate view
+            "approved": approved,  # in the final view
         }
         groups.setdefault(cat, []).append(item)
 
@@ -213,7 +231,7 @@ def build_cart(rows):
         for piece, dupes in seen.items():
             if len(dupes) < 2:
                 continue
-            for field in ("size", "color"):
+            for field in ("color", "size"):   # prefer color ("Dresser — Lime"); fall back to size
                 vals = [d[field] for d in dupes]
                 if len(set(vals)) == len(vals) and all(vals):
                     for d in dupes:
@@ -228,7 +246,6 @@ def build_cart(rows):
             if not it["slug"]:
                 it["slug"] = slugify(it["piece"])
 
-    ordered = [(cat, items) for cat, items in groups.items()]
     # Order: CATEGORY_ORDER first (as listed), then any unlisted in spreadsheet
     # order (sort is stable), then LAST_CATEGORIES pinned to the very end.
     def cat_rank(cat):
@@ -237,8 +254,20 @@ def build_cart(rows):
         if cat in CATEGORY_ORDER:
             return (0, CATEGORY_ORDER.index(cat))
         return (1, 0)
-    ordered.sort(key=lambda ci: cat_rank(ci[0]))
-    return ordered, hidden
+
+    def view(predicate):
+        """Ordered [(cat, items)] for items matching predicate; empty cats dropped."""
+        ordered = []
+        for cat, items in groups.items():
+            sel = [it for it in items if predicate(it)]
+            if sel:
+                ordered.append((cat, sel))
+        ordered.sort(key=lambda ci: cat_rank(ci[0]))
+        return ordered
+
+    estimate = view(lambda it: it["show"])
+    final = view(lambda it: it["approved"])
+    return estimate, final, hidden
 
 
 # ── Images: pull whatever's in the IMAGE column into the repo ───────────────
@@ -268,35 +297,42 @@ def _sniff_ext(data):
     return None
 
 
-def download_images(cart):
-    """Resolve every item's photo. Returns (pulled, failed) for the report."""
+def download_images(*carts):
+    """Resolve every item's photo across one or more views. Views share item
+    objects, so we dedupe by identity to fetch each photo once.
+    Returns (pulled, failed) for the report."""
     os.makedirs(IMG_DIR, exist_ok=True)
     pulled, failed = [], []
-    for _cat, items in cart:
-        for it in items:
-            url = it.get("image_url", "")
-            if not url:
-                it["img"] = _existing_local(it["slug"])     # keep hand-placed photo / placeholder
-                continue
-            m = DRIVE_ID_RE.search(url)
-            dl = f"https://drive.google.com/uc?export=download&id={m.group(1)}" if m else url
-            try:
-                req = urllib.request.Request(dl, headers={"User-Agent": "Mozilla/5.0"})
-                resp = urllib.request.urlopen(req, timeout=60)
-                data = resp.read()
-                ct = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
-            except Exception as e:
-                it["img"] = _existing_local(it["slug"]); failed.append((it["piece"], str(e))); continue
-            ext = EXT_BY_CT.get(ct) or _sniff_ext(data)
-            if not ext:    # got an HTML page (file not public) rather than an image
-                it["img"] = _existing_local(it["slug"])
-                failed.append((it["piece"], "link isn’t a public image — share it ‘Anyone with the link’"))
-                continue
-            fname = it["slug"] + ext
-            with open(os.path.join(IMG_DIR, fname), "wb") as f:
-                f.write(data)
-            it["img"] = fname
-            pulled.append(it["piece"])
+    seen = set()
+    for cart in carts:
+        for _cat, items in cart:
+            for it in items:
+                if id(it) in seen:
+                    continue
+                seen.add(id(it))
+                url = it.get("image_url", "")
+                if not url:
+                    it["img"] = _existing_local(it["slug"])     # keep hand-placed photo / placeholder
+                    continue
+                m = DRIVE_ID_RE.search(url)
+                dl = f"https://drive.google.com/uc?export=download&id={m.group(1)}" if m else url
+                try:
+                    req = urllib.request.Request(dl, headers={"User-Agent": "Mozilla/5.0"})
+                    resp = urllib.request.urlopen(req, timeout=60)
+                    data = resp.read()
+                    ct = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+                except Exception as e:
+                    it["img"] = _existing_local(it["slug"]); failed.append((it["piece"], str(e))); continue
+                ext = EXT_BY_CT.get(ct) or _sniff_ext(data)
+                if not ext:    # got an HTML page (file not public) rather than an image
+                    it["img"] = _existing_local(it["slug"])
+                    failed.append((it["piece"], "link isn’t a public image — share it ‘Anyone with the link’"))
+                    continue
+                fname = it["slug"] + ext
+                with open(os.path.join(IMG_DIR, fname), "wb") as f:
+                    f.write(data)
+                it["img"] = fname
+                pulled.append(it["piece"])
     return pulled, failed
 
 
@@ -318,19 +354,20 @@ def generate_js(cart):
     return "\n".join(lines)
 
 
-# ── Inject into index.html ─────────────────────────────────────────────────
-def inject(js_block):
-    html = open(PAGE, encoding="utf-8").read()
-    if START not in html or END not in html:
-        sys.exit("Could not find the ESTIMATE-DATA markers in index.html.")
-    pre = html.split(START, 1)[0]
-    # Everything after the END marker's own closing "*/" — so re-running is
-    # idempotent and never accumulates stray comment tails.
-    post = html.split(END, 1)[1].split("*/", 1)[1]
-    start_line = START + " — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */"
-    end_line = END + " */"
+# ── Inject a data block into a page ────────────────────────────────────────
+def inject(page, start, end, js_block):
+    """Replace the CART data between the start/end markers in `page`.
+    Idempotent — re-running never accumulates stray comment tails."""
+    html = open(page, encoding="utf-8").read()
+    if start not in html or end not in html:
+        sys.exit(f"Could not find the {start.split()[-1]} markers in {os.path.relpath(page, REPO)}.")
+    pre = html.split(start, 1)[0]
+    # Everything after the END marker's own closing "*/".
+    post = html.split(end, 1)[1].split("*/", 1)[1]
+    start_line = start + " — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */"
+    end_line = end + " */"
     new = f"{pre}{start_line}\n{js_block}\n  {end_line}{post}"
-    open(PAGE, "w", encoding="utf-8").write(new)
+    open(page, "w", encoding="utf-8").write(new)
 
 
 # ── Report ─────────────────────────────────────────────────────────────────
@@ -361,6 +398,24 @@ def report(cart, pulled=None, failed=None, hidden=None):
     if hidden:
         print(f"  ◦  {len(hidden)} item(s) hidden via STATUS (not on the page): {', '.join(hidden)}")
     print("\n  ✓ index.html updated. Preview, then commit & push to publish.\n")
+
+
+def final_report(final):
+    """Summarize the FINAL (approved) view — what lands on the confirmation page."""
+    if not final:
+        print("  ⚠  No APPROVED rows — the final page is empty. Mark pieces "
+              "APPROVED = Yes in PRODUCT LIST to populate it.\n")
+        return
+    total = sum(it["total"] for _cat, items in final for it in items)
+    n = sum(len(items) for _cat, items in final)
+    print("  FINAL PAGE (approved)")
+    print("  " + "-" * 52)
+    for cat, items in final:
+        sub = sum(it["total"] for it in items)
+        print(f"  {cat:<30} {len(items):>5}   ${sub:>11,.2f}")
+    print("  " + "-" * 52)
+    print(f"  {'APPROVED TOTAL':<30} {n:>5}   ${total:>11,.2f}")
+    print("  → estimate/roomfortwo/final/index.html\n")
 
 
 # ── Google Sheet fetch ─────────────────────────────────────────────────────
@@ -402,11 +457,13 @@ if __name__ == "__main__":
     if not os.path.exists(path):
         sys.exit(f"Spreadsheet not found: {path}")
     rows = read_sheet(path, SHEET_NAME)
-    cart, hidden = build_cart(rows)
-    if not cart:
+    estimate, final, hidden = build_cart(rows)
+    if not estimate:
         sys.exit("No item rows found — check the sheet name and columns (and the STATUS column — only 'Show' rows render).")
     print("  Fetching product photos from the IMAGE column…")
-    pulled, failed = download_images(cart)
-    inject(generate_js(cart))
+    pulled, failed = download_images(estimate, final)   # union — one fetch per photo
+    inject(PAGE, START, END, generate_js(estimate))
+    inject(FINAL_PAGE, FINAL_START, FINAL_END, generate_js(final))
     print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")
-    report(cart, pulled, failed, hidden)
+    report(estimate, pulled, failed, hidden)
+    final_report(final)
