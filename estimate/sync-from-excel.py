@@ -35,40 +35,30 @@ NOTES
       Leave IMAGE blank to fall back to any existing local photo / placeholder.
 """
 
-import os, re, sys, zipfile, urllib.request
+import os, re, sys, json, zipfile, urllib.request
 import xml.etree.ElementTree as ET
 
 NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")
+CLIENTS_DIR = os.path.join(REPO, "clients")
+TEMPLATES_DIR = os.path.join(REPO, "templates")
+XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")  # local fallback
 CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
-PAGE = os.path.join(REPO, "estimate", "roomfortwo", "index.html")
-FINAL_PAGE = os.path.join(REPO, "estimate", "roomfortwo", "final", "index.html")
-IMG_DIR = os.path.join(REPO, "assets", "images", "estimate")
-SHEET_NAME = "PRODUCT LIST"
 
-# Paste your shared Google Sheet link here (Share → "Anyone with the link:
-# Viewer"). When set, the tool pulls the latest Sheet on each run. Leave blank
-# to read the local Excel file instead. A URL passed on the command line wins.
-GOOGLE_SHEET = "https://docs.google.com/spreadsheets/d/1EpT8bsdPsnBvxHSF_FMZiubE-9elqon6iZt97bzGJ1E/edit"
+# Everything client-specific now lives in clients/<client>/client.json — the
+# single source of truth. These module globals are populated from that config
+# in __main__ (the helpers below read them at call time). The defaults here are
+# just neutral placeholders so the module imports cleanly.
+PAGE = FINAL_PAGE = IMG_DIR = None
+SHEET_NAME = "PRODUCT LIST"
+GOOGLE_SHEET = ""
+CATEGORY_ORDER = []    # explicit top-to-bottom order; unlisted keep sheet order after these
+LAST_CATEGORIES = []   # categories pinned to the very end, in this order
+
 START = "/* ESTIMATE-DATA:START"
 END = "/* ESTIMATE-DATA:END"
 FINAL_START = "/* FINAL-DATA:START"
 FINAL_END = "/* FINAL-DATA:END"
-
-# Explicit top-to-bottom category order. Categories listed here appear in this
-# order; any not listed keep their spreadsheet order, after these. Edit this list
-# to rearrange categories on the page (the Sheet's row order no longer decides it).
-CATEGORY_ORDER = [
-    "Furniture & Storage",
-    "Lighting",
-    "Soft Goods",
-    "Finishes",
-    "Art",
-]
-
-# Categories pinned to the very end (in this order), regardless of the above.
-LAST_CATEGORIES = ["Labor & Install"]
 
 
 # ── Minimal .xlsx reader (stdlib only) ─────────────────────────────────────
@@ -445,9 +435,83 @@ def fetch_google_sheet(url_or_id):
     return CACHE
 
 
+# ── Client config ──────────────────────────────────────────────────────────
+def load_client(client_id):
+    """Load clients/<id>/client.json — the single source of truth for everything
+    client-specific (Sheet URL, output paths, category order, identity strings)."""
+    path = os.path.join(CLIENTS_DIR, client_id, "client.json")
+    if not os.path.exists(path):
+        sys.exit(f"No client config at {os.path.relpath(path, REPO)} — "
+                 f"check the client id (or scaffold it with 'ktw new {client_id}').")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def parse_args(argv):
+    """Split CLI args into (client_id, source_override). A path or Google-Sheet
+    URL is treated as a one-off source override; anything else is the client id.
+    Defaults to 'roomfortwo' so the existing double-click command keeps working."""
+    client, source_override = "roomfortwo", ""
+    for a in argv:
+        if looks_like_google(a) or "/" in a or a.lower().endswith((".xlsx", ".xls")):
+            source_override = a
+        else:
+            client = a
+    return client, source_override
+
+
+# ── Templates ──────────────────────────────────────────────────────────────
+def build_tokens(cfg):
+    """Flat {{token}} → value map from a client's config. The CART data is NOT a
+    token — it's injected between the DATA markers by inject()."""
+    idn = cfg["identity"]
+    img_base = "/" + cfg["image_dir"].strip("/")
+    return {
+        "{{eyebrow}}": idn["eyebrow"],
+        "{{h1_html}}": idn["h1_html"],
+        "{{lede_estimate}}": idn["lede_estimate"],
+        "{{lede_final}}": idn["lede_final"],
+        "{{project}}": idn["project"],
+        "{{project_short}}": idn["project_short"],
+        "{{client_first_name}}": idn["client_first_name"],
+        "{{round_label}}": cfg["round"]["label"],
+        "{{round_date}}": cfg["round"]["date"],
+        "{{final_prepared}}": cfg["final"]["prepared"],
+        "{{submit_url}}": cfg.get("submit_url", ""),
+        "{{contact_email}}": cfg.get("contact_email", ""),
+        "{{img_base}}": img_base,
+        "{{img_base_pdf}}": img_base + "-pdf",   # downscaled photos used for the PDF
+    }
+
+
+def render_template(name, tokens):
+    """Read templates/<name>, substitute every {{token}}, and fail loudly if any
+    token is left unfilled (a config typo would otherwise ship a literal token)."""
+    html = open(os.path.join(TEMPLATES_DIR, name), encoding="utf-8").read()
+    for k, v in tokens.items():
+        html = html.replace(k, v)
+    leftover = re.findall(r"\{\{[a-z0-9_]+\}\}", html)
+    if leftover:
+        sys.exit(f"Unfilled template token(s) in {name}: {sorted(set(leftover))} "
+                 f"— check clients/<client>/client.json.")
+    return html
+
+
 if __name__ == "__main__":
-    arg = sys.argv[1] if len(sys.argv) > 1 else ""
-    source = arg or GOOGLE_SHEET
+    client_id, source_override = parse_args(sys.argv[1:])
+    cfg = load_client(client_id)
+
+    # Point the module globals the helpers read at this client's config.
+    out = os.path.join(REPO, *cfg["output_dir"].split("/"))
+    PAGE = os.path.join(out, "index.html")
+    FINAL_PAGE = os.path.join(out, "final", "index.html")
+    IMG_DIR = os.path.join(REPO, *cfg["image_dir"].split("/"))
+    SHEET_NAME = cfg["source"]["sheet_name"]
+    GOOGLE_SHEET = cfg["source"].get("google_sheet", "")
+    CATEGORY_ORDER = cfg.get("category_order", [])
+    LAST_CATEGORIES = cfg.get("last_categories", [])
+
+    source = source_override or GOOGLE_SHEET
     if source and looks_like_google(source):
         path = fetch_google_sheet(source)            # Google Sheet → cached .xlsx
         label = "Google Sheet"
@@ -462,6 +526,13 @@ if __name__ == "__main__":
         sys.exit("No item rows found — check the sheet name and columns (and the STATUS column — only 'Show' rows render).")
     print("  Fetching product photos from the IMAGE column…")
     pulled, failed = download_images(estimate, final)   # union — one fetch per photo
+    # Regenerate both pages from the shared templates (client bits from
+    # client.json), then inject the CART data. Output is fully generated —
+    # never hand-edited.
+    tokens = build_tokens(cfg)
+    for page, tmpl in ((PAGE, "estimate.html"), (FINAL_PAGE, "final.html")):
+        os.makedirs(os.path.dirname(page), exist_ok=True)
+        open(page, "w", encoding="utf-8").write(render_template(tmpl, tokens))
     inject(PAGE, START, END, generate_js(estimate))
     inject(FINAL_PAGE, FINAL_START, FINAL_END, generate_js(final))
     print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")

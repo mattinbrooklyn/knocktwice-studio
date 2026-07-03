@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#F7F2EC">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
-  <title>Room for Two — Your Estimate · Knock Twice</title>
+  <title>{{project_short}} — Your Estimate · Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -451,10 +451,10 @@
     <!-- Masthead ------------------------------------------------- -->
     <p class="eyebrow">
       <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
-      Knock Twice × Hannah Rich
+      {{eyebrow}}
     </p>
-    <h1 class="title">A Room<br>for Two</h1>
-    <p class="lede">Ambrose &amp; Gigi’s room — your cart to review.</p>
+    <h1 class="title">{{h1_html}}</h1>
+    <p class="lede">{{lede_estimate}}</p>
     <p class="intro">
       This is a working cart, not a final commitment. Look through each piece, tell us
       how it lands, and we’ll refine together from there.
@@ -470,7 +470,7 @@
     <!-- Status card — where we are, what's next ------------------ -->
     <div class="status-card">
       <div class="status-top">
-        <span class="round-stamp" id="round-stamp">Round 1 · June 18, 2026</span>
+        <span class="round-stamp" id="round-stamp">{{round_label}} · {{round_date}}</span>
         <span class="status-now" id="status-now">Your review</span>
       </div>
       <ol class="stepper" id="stepper">
@@ -485,13 +485,13 @@
     </div>
 
     <!-- Identity is known — labels your inbox, no fields for her to fill. -->
-    <input type="hidden" name="Project" value="Room for Two — Hannah & Eugene">
-    <input type="hidden" name="Round" id="round-field" value="Round 1 · June 18, 2026">
+    <input type="hidden" name="Project" value="{{project}}">
+    <input type="hidden" name="Round" id="round-field" value="{{round_label}} · {{round_date}}">
 
     <!-- Categories render here ----------------------------------- -->
     <div id="categories"></div>
 
-    <p class="foot" id="foot">Knock Twice · Room for Two · Round 1 · June 18, 2026</p>
+    <p class="foot" id="foot">Knock Twice · {{project_short}} · {{round_label}} · {{round_date}}</p>
   </form>
 
   <div class="thank-you" id="thank-you">
@@ -527,47 +527,8 @@
   </div>
 
   <script>
-  /* ESTIMATE-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
-  const CART = [
-    { cat: "Furniture & Storage", items: [
-      { slug:"bunk-bed-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:"78\" L × 65.5\" W × 64\" H", color:"White/Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed", img:"bunk-bed-frame.png" },
-      { slug:"bunk-bed-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", img:"", flag:"to be discussed / no impact to design" },
-      { slug:"storage-trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:"15.8\"L × 29.9\"W × 18.9\"H", color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html", img:"storage-trunk.png" },
-      { slug:"grid-shelves", piece:"Grid Shelves", retailer:"Lucca House", size:"71.5 × 59.5\"x11.5\"", color:"W/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120&utm_source=Pinterest&utm_medium=organic", img:"grid-shelves.png" },
-      { slug:"crates-medium", piece:"Crates — Medium", retailer:"HAY", size:"", color:"Multi", qty:8, unit:13, total:104, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-medium.png", flag:"assorted colors (multiple)" },
-      { slug:"crates-small", piece:"Crates — Small", retailer:"HAY", size:"", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-small.png" },
-      { slug:"dresser-lime", piece:"Dresser — Lime", retailer:"Anthropologie", size:"52\"H × 32\"W × 19\"D", color:"", qty:1, unit:1198, total:1198, link:"https://www.anthropologie.com/shop/wright-lacquer-six-drawer-dresser2?color=034&searchparams=q=dresser&type=STANDARD&size=One+Size&quantity=1", img:"dresser-lime.png" },
-    ]},
-    { cat: "Lighting", items: [
-      { slug:"yellow-swivel-sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/?catalogId=71&sku=5081589&pickuplocation=ST:%7Bstore_code%7D&cm_ven=PLA&cm_cat=Google&cm_pla=Decor%20%3E%20All%20Lighting&cm_ite=5081589_14464445698_pla-1730208656294&gad_source=1&gad_campaignid=14464445698&gbraid=0AAAAABjYLmmN4N6yeFRkXJyfcORI33jdI&gclid=CjwKCAjwuanRBhBSEiwAY5y6V-2aVys04G_E5nylObQc2Ef_Lb3uOHHU217D9udo2JQlPNF4yCPmURoCKIIQAvD_BwE", img:"yellow-swivel-sconce.png" },
-      { slug:"puck-plug-in-pendant", piece:"Puck Plug-in Pendant", retailer:"Color Cord Company", size:"OSFA", color:"Ochre", qty:1, unit:130, total:130, link:"https://www.colorcord.com/products/boutique-aio-puck-plug-in-pendant?variant=40777408774246", img:"puck-plug-in-pendant.png" },
-    ]},
-    { cat: "Soft Goods", items: [
-      { slug:"duvet-cover-fitted-top-sheet-set", piece:"Duvet Cover, Fitted + Top sheet set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246", img:"duvet-cover-fitted-top-sheet-set.png" },
-      { slug:"star-shape-pillow", piece:"Star Shape Pillow", retailer:"Oeuf", size:"17\" × 17\"", color:"Yellow", qty:1, unit:120, total:120, link:"https://oeufnyc.com/products/star-face", img:"star-shape-pillow.png" },
-      { slug:"the-park-throw-pillow", piece:"The Park' Throw Pillow", retailer:"2 Modern", size:"23.6\" × 15.75\"", color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877&utm_source=google&campaign_id=20911467993&ad_id=&utm_medium=cpc&utm_campaign=HB%20%7C%20PMAX%20-%20Furniture%20-%20Group%20PMAX&utm_content=&utm_term=&gclid=Cj0KCQjww8rQBhDjARIsAE43KPNjO0yyi5CZ_Srp1QcW30MzbSuVgn4u7YswwOhHZfjN-YJEST1l4NIaAiSEEALw_wcB&gad_source=1&gad_campaignid=20918110013&gbraid=0AAAAAD_WqgmIOoRyWOi5mUEB0yjtEUP10", img:"the-park-throw-pillow.png" },
-      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:"36\" D × 12\" H", color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa", img:"beanbag.png" },
-      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8×10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html?piid=92279137", img:"rug.png" },
-      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:"15.8\" × 29.9\" × 3\"", color:"Boucle - 18", qty:2, unit:85.75, total:171.5, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom?ls=a&ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=35+x+20+bench+cushions&ref=sc_gallery-1-4&sr_prefetch=1&pro=1&frs=1&sts=1&nob=1&plkey=4e987bd410b80288d60817cef2fee85dfe445efc%3A1728489535&variation0=5369547128&variation1=5369547094&dd_referrer=https%3A%2F%2Fwww.google.com%2F", img:"bench-cushion.png" },
-      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072&type=REGULAR", img:"throw-blanket.png" },
-    ]},
-    { cat: "Finishes", items: [
-      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:4, unit:163, total:652, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues", img:"wallpaper.png" },
-      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:4, unit:89.95, total:359.8, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649", img:"curtains.jpg" },
-      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035&type=REGULAR", img:"switch-plate.png" },
-    ]},
-    { cat: "Art", items: [
-      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm — Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173", img:"animal-bus.png" },
-      { slug:"green-crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341", img:"green-crocodile.png" },
-      { slug:"blue-elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973", img:"blue-elephant.png" },
-      { slug:"yellow-frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765", img:"yellow-frog.png" },
-      { slug:"peek-a-boo-frame-cloud", piece:"Peek-a-boo Frame — Cloud", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-cloud.png" },
-      { slug:"peek-a-boo-frame-butter", piece:"Peek-a-boo Frame — Butter", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-butter.png" },
-    ]},
-    { cat: "Labor & Install", items: [
-      { slug:"wallpaper-installation-painters", piece:"Wallpaper Installation & Painters", retailer:"TBD", size:"-", color:"-", qty:1, unit:2500, total:2500, link:"https://wepaintny.com/", img:"" },
-    ]},
-  ];
+  /* ESTIMATE-DATA:START */
+  const CART = [];
   /* ESTIMATE-DATA:END */
 
   const CAT_ICON = {
@@ -587,17 +548,17 @@
   ];
 
   // ── Round config — bump this each time you republish the cart ──
-  const ROUND = { label: "Round 1", date: "June 18, 2026" };
+  const ROUND = { label: "{{round_label}}", date: "{{round_date}}" };
 
   // Fallback address: if a send ever fails (e.g. a locked-down network blocks
   // the form), she's offered a one-tap email to this address with her picks
   // pre-filled. Leave blank to just show a "saved — try again" message.
-  const CONTACT_EMAIL = "";
+  const CONTACT_EMAIL = "{{contact_email}}";
 
   // Where "Send" posts to — the Google Apps Script web app bound to the estimate
   // Sheet. It appends each submission as a row in the Responses tab (and can
   // email you). To repoint: redeploy the script and paste the new /exec URL here.
-  const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbzutK1aPWdfQ2sHXQLX_FImf9w_UNBg3CQKWXnJ0UXPct4oKuivsLSaYooBuv8owjkm/exec";
+  const SUBMIT_URL = "{{submit_url}}";
 
   // Autosave key — scoped to the round, so republishing a new round starts her
   // fresh rather than restoring last round's answers onto a different cart.
@@ -608,7 +569,7 @@
   // or broken, fall back to the category icon placeholder.
   const imgTag = (img, alt, icon, cls="") =>
     img
-      ? `<img class="${cls}" src="/assets/images/estimate/${img}" alt="${alt}" data-icon="${icon}"
+      ? `<img class="${cls}" src="{{img_base}}/${img}" alt="${alt}" data-icon="${icon}"
             onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`
       : `<img class="${cls} is-icon" src="${icon}" alt="${alt}">`;
 
@@ -657,7 +618,7 @@
     // so placeholder stickers never clutter the teaser. CSS caps it at 4.
     const peek = group.items
       .filter(it => it.img)
-      .map(it => `<span class="peek-thumb"><img src="/assets/images/estimate/${it.img}" alt="" onerror="this.closest('.peek-thumb').remove()"></span>`).join("");
+      .map(it => `<span class="peek-thumb"><img src="{{img_base}}/${it.img}" alt="" onerror="this.closest('.peek-thumb').remove()"></span>`).join("");
 
     const section = document.createElement("section");
     section.className = "category";
@@ -687,7 +648,7 @@
   const roundText = `${ROUND.label} · ${ROUND.date}`;
   document.getElementById("round-stamp").textContent = roundText;
   document.getElementById("round-field").value = roundText;
-  document.getElementById("foot").textContent = `Knock Twice · Room for Two · ${roundText}`;
+  document.getElementById("foot").textContent = `Knock Twice · {{project_short}} · ${roundText}`;
 
   // ── Live recalc ───────────────────────────────────────────────
   function recalc() {
@@ -870,11 +831,11 @@
 
     const p = buildPicks();
     const roundText = `${ROUND.label} · ${ROUND.date}`;
-    const subject = `Hannah · ${ROUND.label} · ${p.counts.inCart} in cart · ${p.counts.alternates} alt${p.counts.alternates === 1 ? "" : "s"} · ${p.counts.notReviewed} to review`;
+    const subject = `{{client_first_name}} · ${ROUND.label} · ${p.counts.inCart} in cart · ${p.counts.alternates} alt${p.counts.alternates === 1 ? "" : "s"} · ${p.counts.notReviewed} to review`;
     // Full payload → the Apps Script writes a per-submission detail tab + a log
     // row + emails you. It echoes {ok:true}, so we confirm a real success.
     const payload = {
-      project: "Room for Two — Hannah & Eugene",
+      project: "{{project}}",
       roundLabel: ROUND.label,
       round: roundText,
       subject,
