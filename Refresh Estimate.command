@@ -16,7 +16,7 @@ clear
 
 PREVIEW_BRANCH="staging"   # the working / preview branch
 LIVE_BRANCH="main"         # what knocktwice.studio serves
-ESTIMATE_PATHS=(estimate/roomfortwo/index.html assets/images/estimate)
+ESTIMATE_PATHS=(estimate/roomfortwo assets/images/estimate)   # whole folder → estimate + final page
 
 echo "▶  Refreshing the Room for Two estimate from the Google Sheet…"
 echo ""
