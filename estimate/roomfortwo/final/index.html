@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Room for Two — Final Selections · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       FINAL SELECTIONS — the confirmation document.
+       A static, print-first sibling of the estimate page. No choices,
+       no submit: just the approved pieces, itemized, with a grand
+       total — built to be opened, Cmd+P'd to PDF, and emailed for sign-off.
+
+       Same data pipeline as the estimate (sync-from-excel.py injects the
+       CART block below), filtered to APPROVED=Yes rows.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Brand tokens inlined so this page keeps its full styling even if the
+       shared /assets/styles.css is blocked (corporate filter, PDF engine, etc.). */
+    :root {
+      --color-bg: #F7F2EC;
+      --color-ink: #32261F;
+      --color-blue: #378CDA;
+      --color-green: #51B18C;
+      --color-khaki: #D1C3B6;
+      --color-white: #FFFFFF;
+      --color-yellow: #FADB4B;
+      --color-pink: #EC8EDF;
+      --color-red: #FF0004;
+      --color-caramel: #9A7555;
+      --font-display: 'Erica One', 'Arial Black', sans-serif;
+      --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --radius-pill: 2rem;
+      --radius-input: 0.25rem;
+      --shadow-stack: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    /* Neutralize the shared site's mobile "footer blue" reveal. */
+    body::after { display: none !important; content: none !important; }
+
+    html, body { background: var(--color-bg); }
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 3rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--color-blue);
+      display: flex; align-items: center; gap: 0.55rem;
+      margin-bottom: 0.9rem;
+    }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      line-height: 0.96;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin: 0 0 0.7rem;
+    }
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+      color: var(--color-blue);
+      margin: 0 0 1.1rem;
+    }
+    .intro { font-size: clamp(0.95rem, 1.5vw, 1.05rem); max-width: 40rem; margin: 0; }
+    .stamp {
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.92rem;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+      margin-top: 1rem;
+    }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Category block ───────────────────────────────────────── */
+    .category { margin-bottom: 1.9rem; }
+    .cat-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; padding-bottom: 0.5rem; margin-bottom: 0.35rem;
+      border-bottom: 1.5px solid var(--color-ink);
+    }
+    .cat-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.25rem, 3.4vw, 1.7rem);
+      text-transform: uppercase; line-height: 1; letter-spacing: 0.01em;
+    }
+    .cat-subtotal {
+      font-family: var(--font-body); font-weight: 600; font-size: 0.95rem;
+      color: var(--color-caramel); white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Item row ─────────────────────────────────────────────── */
+    .item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 0.35rem 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--color-khaki);
+      align-items: start;
+    }
+    .category .item:last-child { border-bottom: 0; }
+
+    .thumb {
+      grid-row: span 2;
+      width: 64px; height: 64px;
+      border-radius: 0.5rem; background: var(--color-white);
+      border: 1px solid var(--color-khaki);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb img.is-icon { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }
+
+    .info { min-width: 0; }
+    .piece { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+    .meta { font-size: 0.85rem; color: var(--color-caramel); margin-top: 0.15rem; }
+    .meta .dot { opacity: 0.55; margin: 0 0.35em; }
+    .qtyline { font-size: 0.82rem; color: var(--color-caramel); margin-top: 0.2rem; font-variant-numeric: tabular-nums; }
+
+    .price { text-align: right; white-space: nowrap; }
+    .price .total { font-weight: 700; font-size: 1rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+
+    /* ── Grand total ──────────────────────────────────────────── */
+    .grand {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; margin-top: 2rem; padding-top: 1.1rem;
+      border-top: 2.5px solid var(--color-ink);
+    }
+    .grand-label {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.4rem, 4vw, 1.9rem); text-transform: uppercase; letter-spacing: 0.01em;
+    }
+    .grand-amount {
+      font-family: var(--font-body); font-weight: 700;
+      font-size: clamp(1.5rem, 5vw, 2.1rem); color: var(--color-ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .grand-note {
+      font-family: var(--font-ui); font-size: 0.85rem; color: var(--color-caramel);
+      margin: 0.55rem 0 0;
+    }
+
+    .foot {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-caramel); text-align: center; padding: 2.25rem 1rem 0;
+    }
+
+    .setup-warning {
+      background: var(--color-yellow); color: var(--color-ink);
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: 0.9rem; margin-top: 1.5rem;
+    }
+
+    /* ── Mobile ───────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .item {
+        grid-template-columns: 56px 1fr;
+        gap: 0.35rem 0.8rem;
+      }
+      .thumb { grid-row: span 3; width: 56px; height: 56px; }
+      .price { grid-column: 2; text-align: left; margin-top: 0.1rem; }
+      .price .total::before { content: "Line total: "; color: var(--color-caramel); font-weight: 400; }
+    }
+
+    /* ── Print — the reason this page exists ──────────────────── */
+    @media print {
+      /* Force brand colors/backgrounds to render in the PDF. */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      @page { margin: 14mm 12mm; }
+      body { background: #fff; }
+      .wrap { max-width: none; margin: 0; padding: 0; }
+      .setup-warning { display: none !important; }
+      /* Keep a piece — photo, name, price — from splitting across a page break. */
+      .item { break-inside: avoid; }
+      /* Keep a category heading with at least its first rows. */
+      .cat-head { break-after: avoid; }
+      .category { break-inside: auto; }
+      .grand { break-inside: avoid; }
+      /* Slightly tighter for paper. */
+      .item { padding: 0.6rem 0; }
+      .foot { padding-top: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- Masthead ------------------------------------------------- -->
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      Knock Twice × Hannah Rich
+    </p>
+    <h1 class="title">A Room<br>for Two</h1>
+    <p class="lede">Final selections — Ambrose &amp; Gigi’s room.</p>
+    <p class="intro">
+      The selections below, for your final approval before procurement begins.
+    </p>
+    <p class="stamp" id="stamp">Prepared July 3, 2026</p>
+
+    <div class="setup-warning" id="setup-warning" hidden>
+      ⚙️ <strong>Heads up (only you see this):</strong> no approved items found.
+      Mark pieces <code>APPROVED = Yes</code> in the PRODUCT LIST tab, then re-run the sync.
+    </div>
+
+    <hr class="rule">
+
+    <!-- Categories render here ----------------------------------- -->
+    <div id="categories"></div>
+
+    <!-- Grand total ---------------------------------------------- -->
+    <div class="grand" id="grand" hidden>
+      <div>
+        <div class="grand-label">Total</div>
+        <p class="grand-note">Hard cost only — shipping, taxes, and install estimated separately.</p>
+      </div>
+      <div class="grand-amount" id="grand-amount">$0.00</div>
+    </div>
+
+    <p class="foot" id="foot">Knock Twice · Room for Two · Final selections</p>
+  </main>
+
+  <script>
+  /* FINAL-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
+  const CART = [
+    { cat: "Furniture & Storage", items: [
+      { slug:"bunk-bed-frame", piece:"Bunk Bed — Frame", retailer:"Oeuf", size:"78\" L × 65.5\" W × 64\" H", color:"White/Birch", qty:1, unit:2200, total:2200, link:"https://oeufnyc.com/products/perch-bunk-bed", img:"bunk-bed-frame.png" },
+      { slug:"bunk-bed-mattress", piece:"Bunk Bed — Mattress", retailer:"Oeuf", size:"Twin", color:"", qty:2, unit:430, total:860, link:"https://oeufnyc.com/products/dual-firm-mattress", img:"", flag:"to be discussed / no impact to design" },
+      { slug:"dresser-maroon", piece:"Dresser — Maroon", retailer:"Urban Outfitters", size:"26\"L × 18\"W × 44.5\"H", color:"", qty:1, unit:799, total:799, link:"https://www.urbanoutfitters.com/shop/kane-tall-4-drawer-dresser3?color=061&searchparams=q=dresser&type=REGULAR&size=ONE+SIZE&quantity=1", img:"dresser-maroon.png" },
+      { slug:"storage-trunk", piece:"Storage — Trunk", retailer:"Wayfair", size:"15.8\"L × 29.9\"W × 18.9\"H", color:"White", qty:2, unit:93.99, total:187.98, link:"https://www.wayfair.com/baby-kids/pdp/sand-stable-baby-kids-pawleys-toy-storage-bench-w002211543.html", img:"storage-trunk.png" },
+      { slug:"grid-shelves", piece:"Grid Shelves", retailer:"Lucca House", size:"71.5 × 59.5\"x11.5\"", color:"W/ Blue Trim", qty:1, unit:1792, total:1792, link:"https://luccahouse.com/products/6x5-1?variant=54414857470120&utm_source=Pinterest&utm_medium=organic", img:"grid-shelves.png" },
+      { slug:"crates-medium", piece:"Crates — Medium", retailer:"HAY", size:"", color:"Multi", qty:8, unit:13, total:104, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-medium.png", flag:"assorted colors (multiple)" },
+      { slug:"crates-small", piece:"Crates — Small", retailer:"HAY", size:"", color:"Multi", qty:4, unit:7, total:28, link:"https://reallywellmade.com/products/colour-crate?variant=40231029899300", img:"crates-small.png" },
+      { slug:"dresser-lime", piece:"Dresser — Lime", retailer:"Anthropologie", size:"52\"H × 32\"W × 19\"D", color:"", qty:1, unit:1198, total:1198, link:"https://www.anthropologie.com/shop/wright-lacquer-six-drawer-dresser2?color=034&searchparams=q=dresser&type=STANDARD&size=One+Size&quantity=1", img:"dresser-lime.png" },
+    ]},
+    { cat: "Lighting", items: [
+      { slug:"yellow-swivel-sconce", piece:"Yellow Swivel Sconce", retailer:"West Elm", size:"OSFA", color:"Yellow", qty:2, unit:99, total:198, link:"https://www.westelm.com/products/emerson-sconce-d18567/?catalogId=71&sku=5081589&pickuplocation=ST:%7Bstore_code%7D&cm_ven=PLA&cm_cat=Google&cm_pla=Decor%20%3E%20All%20Lighting&cm_ite=5081589_14464445698_pla-1730208656294&gad_source=1&gad_campaignid=14464445698&gbraid=0AAAAABjYLmmN4N6yeFRkXJyfcORI33jdI&gclid=CjwKCAjwuanRBhBSEiwAY5y6V-2aVys04G_E5nylObQc2Ef_Lb3uOHHU217D9udo2JQlPNF4yCPmURoCKIIQAvD_BwE", img:"yellow-swivel-sconce.png" },
+      { slug:"puck-plug-in-pendant", piece:"Puck Plug-in Pendant", retailer:"Color Cord Company", size:"OSFA", color:"Ochre", qty:1, unit:130, total:130, link:"https://www.colorcord.com/products/boutique-aio-puck-plug-in-pendant?variant=40777408774246", img:"puck-plug-in-pendant.png" },
+    ]},
+    { cat: "Soft Goods", items: [
+      { slug:"duvet-cover-fitted-top-sheet-set", piece:"Duvet Cover, Fitted + Top sheet set", retailer:"Hommey", size:"Twin", color:"Cloud / Capri", qty:2, unit:337, total:674, link:"https://us.gethommey.com/products/quilt-cover-cloud-capri?variant=45885615833246", img:"duvet-cover-fitted-top-sheet-set.png" },
+      { slug:"the-park-throw-pillow", piece:"The Park' Throw Pillow", retailer:"2 Modern", size:"23.6\" × 15.75\"", color:"Natural", qty:2, unit:95, total:190, link:"https://www.2modern.com/products/the-park-cushion?variant=35028330872877&utm_source=google&campaign_id=20911467993&ad_id=&utm_medium=cpc&utm_campaign=HB%20%7C%20PMAX%20-%20Furniture%20-%20Group%20PMAX&utm_content=&utm_term=&gclid=Cj0KCQjww8rQBhDjARIsAE43KPNjO0yyi5CZ_Srp1QcW30MzbSuVgn4u7YswwOhHZfjN-YJEST1l4NIaAiSEEALw_wcB&gad_source=1&gad_campaignid=20918110013&gbraid=0AAAAAD_WqgmIOoRyWOi5mUEB0yjtEUP10", img:"the-park-throw-pillow.png" },
+      { slug:"beanbag", piece:"Beanbag", retailer:"Jellybean", size:"36\" D × 12\" H", color:"Lucky Star", qty:1, unit:149.99, total:149.99, link:"https://www.jellybeaninteriors.com/products/lucky-star-superstar-crash-pad-usa", img:"beanbag.png" },
+      { slug:"rug", piece:"Rug", retailer:"AllModern", size:"8×10'", color:"Olive", qty:1, unit:400, total:400, link:"https://www.allmodern.com/rugs/pdp/lahjar-speckled-wool-blend-area-rug-olay1049.html?piid=92279137", img:"rug.png" },
+      { slug:"bench-cushion", piece:"Bench Cushion", retailer:"Etsy", size:"15.8\" × 29.9\" × 3\"", color:"Boucle - 18", qty:2, unit:85.75, total:171.5, link:"https://www.etsy.com/listing/1728489535/2-thick-bench-cushion-indoor-custom?ls=a&ga_order=most_relevant&ga_search_type=all&ga_view_type=gallery&ga_search_query=35+x+20+bench+cushions&ref=sc_gallery-1-4&sr_prefetch=1&pro=1&frs=1&sts=1&nob=1&plkey=4e987bd410b80288d60817cef2fee85dfe445efc%3A1728489535&variation0=5369547128&variation1=5369547094&dd_referrer=https%3A%2F%2Fwww.google.com%2F", img:"bench-cushion.png" },
+      { slug:"throw-blanket", piece:"Throw Blanket", retailer:"Urban Outfitters", size:"OSFA", color:"Pastel Yellow", qty:2, unit:19.99, total:39.98, link:"https://www.urbanoutfitters.com/shop/monroe-faux-mohair-scarf-throw-blanket?color=072&type=REGULAR", img:"throw-blanket.png" },
+    ]},
+    { cat: "Finishes", items: [
+      { slug:"wallpaper", piece:"Wallpaper", retailer:"Mathilde Cabanas", size:"192 × 288 cm, 4 strips", color:"Blue Tulips", qty:4, unit:163, total:652, link:"https://mathildecabanas.com/en-us/products/papier-peint-tulipes-bleues", img:"wallpaper.png" },
+      { slug:"curtains", piece:"Curtains", retailer:"Crate and Barrell", size:"", color:"Yellow", qty:1, unit:89.95, total:89.95, link:"https://www.crateandbarrel.com/yellow-100-organic-cotton-windowpane-plaid-curtain-panel-44x96/s215649", img:"curtains.jpg" },
+      { slug:"switch-plate", piece:"Switch Plate", retailer:"Urban Outfitters", size:"OSFA", color:"Chartreuse", qty:4, unit:16, total:64, link:"https://www.urbanoutfitters.com/shop/maura-squiggle-shape-light-switch-cover?color=035&type=REGULAR", img:"switch-plate.png" },
+    ]},
+    { cat: "Art", items: [
+      { slug:"animal-bus", piece:"Animal Bus", retailer:"PSTR Studio", size:"70 × 100 cm — Canvas", color:"Multi", qty:1, unit:228, total:228, link:"https://www.pstrstudio.com/products/olivia-holden-bus?variant=56785888674173", img:"animal-bus.png" },
+      { slug:"green-crocodile", piece:"Green Crocodile", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-crocodile?variant=56785906729341", img:"green-crocodile.png" },
+      { slug:"blue-elephant", piece:"Blue Elephant", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-elephant?variant=56785924718973", img:"blue-elephant.png" },
+      { slug:"yellow-frog", piece:"Yellow Frog", retailer:"PSTR Studio", size:"50 × 70 cm — Printed Frame", color:"Multi", qty:1, unit:109, total:109, link:"https://www.pstrstudio.com/products/olivia-holden-frog?variant=56785881104765", img:"yellow-frog.png" },
+      { slug:"peek-a-boo-frame-cloud", piece:"Peek-a-boo Frame — Cloud", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-cloud.png" },
+      { slug:"peek-a-boo-frame-butter", piece:"Peek-a-boo Frame — Butter", retailer:"KTS", size:"8 × 10 \"", color:"", qty:1, unit:0, total:0, link:"", img:"peek-a-boo-frame-butter.png" },
+    ]},
+    { cat: "Labor & Install", items: [
+      { slug:"wallpaper-installation-painters", piece:"Wallpaper Installation & Painters", retailer:"TBD", size:"-", color:"-", qty:1, unit:2500, total:2500, link:"https://wepaintny.com/", img:"" },
+    ]},
+  ];
+  /* FINAL-DATA:END */
+
+  const CAT_ICON = {
+    "Finishes": "/assets/sticker-star.svg",
+    "Furniture & Storage": "/assets/sticker-home.svg",
+    "Labor & Install": "/assets/render-paintbrush.png",
+    "Lighting": "/assets/sticker-star.svg",
+    "Soft Goods": "/assets/sticker-star.svg",
+    "Art": "/assets/sticker-star.svg",
+  };
+
+  // Stamp shown under the masthead and in the footer.
+  const FINAL = { prepared: "July 3, 2026" };
+
+  const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // img is a filename resolved by the sync; when absent/broken, fall back to the
+  // category icon placeholder (same pattern as the estimate page).
+  const imgTag = (img, alt, icon) =>
+    img
+      ? `<img src="/assets/images/estimate/${img}" alt="${alt}" data-icon="${icon}"
+            onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`
+      : `<img class="is-icon" src="${icon}" alt="${alt}">`;
+
+  const catWrap = document.getElementById("categories");
+  let grandTotal = 0;
+
+  CART.forEach(group => {
+    const subtotal = group.items.reduce((s, it) => s + it.total, 0);
+    grandTotal += subtotal;
+    const icon = CAT_ICON[group.cat] || "/assets/sticker-star.svg";
+
+    const section = document.createElement("section");
+    section.className = "category";
+    section.innerHTML = `
+      <div class="cat-head">
+        <span class="cat-name">${group.cat}</span>
+        <span class="cat-subtotal">${money(subtotal)}</span>
+      </div>`;
+
+    group.items.forEach(it => {
+      const meta = [it.retailer, it.size, it.color].filter(Boolean).join('<span class="dot">·</span>');
+      const qtyline = it.qty > 1
+        ? `Qty ${it.qty} × ${money(it.unit)}`
+        : `Qty ${it.qty}`;
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="thumb">${imgTag(it.img, it.piece, icon)}</div>
+        <div class="info">
+          <div class="piece">${it.piece}</div>
+          <div class="meta">${meta}</div>
+          <div class="qtyline">${qtyline}</div>
+        </div>
+        <div class="price"><span class="total">${money(it.total)}</span></div>`;
+      section.appendChild(row);
+    });
+
+    catWrap.appendChild(section);
+  });
+
+  // Reveal the grand total (or the setup warning if nothing's approved).
+  if (CART.length) {
+    document.getElementById("grand").hidden = false;
+    document.getElementById("grand-amount").textContent = money(grandTotal);
+  } else {
+    document.getElementById("setup-warning").hidden = false;
+  }
+
+  // Stamp the prepared date.
+  document.getElementById("stamp").textContent = "Prepared " + FINAL.prepared;
+  document.getElementById("foot").textContent =
+    "Knock Twice · Room for Two · Final selections · " + FINAL.prepared;
+  </script>
+</body>
+</html>
