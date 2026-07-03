@@ -193,8 +193,12 @@
     @media print {
       /* Force brand colors/backgrounds to render in the PDF. */
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      @page { margin: 10mm 12mm; }
-      body { background: #fff; font-size: 10pt; }
+      /* Full-bleed brand background — no white paper margin framing the page.
+         The inset comes from .wrap padding instead of an @page margin, so the
+         cream runs edge-to-edge like the site. */
+      @page { margin: 12mm 13mm; }
+      html, body { background: var(--color-bg); }
+      body { font-size: 10pt; }
       .wrap { max-width: none; margin: 0; padding: 0; }
       .setup-warning { display: none !important; }
 
