@@ -321,11 +321,19 @@
 
   const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+  // Image source: the live page uses the full-res photos. When rendered for the
+  // PDF (URL carries ?pdf), it points at downscaled copies in /estimate-pdf/ —
+  // same filenames, a fraction of the weight — so the emailed file stays small.
+  // Make Final PDF.command generates those copies before rendering.
+  const IMG_BASE = new URLSearchParams(location.search).has("pdf")
+    ? "/assets/images/estimate-pdf/"
+    : "/assets/images/estimate/";
+
   // img is a filename resolved by the sync; when absent/broken, fall back to the
   // category icon placeholder (same pattern as the estimate page).
   const imgTag = (img, alt, icon) =>
     img
-      ? `<img src="/assets/images/estimate/${img}" alt="${alt}" data-icon="${icon}"
+      ? `<img src="${IMG_BASE}${img}" alt="${alt}" data-icon="${icon}"
             onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`
       : `<img class="is-icon" src="${icon}" alt="${alt}">`;
 
