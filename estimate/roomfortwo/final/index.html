@@ -209,20 +209,12 @@
       .stamp { font-size: 0.8rem; margin-top: 0.3rem; }
       .rule { margin: 0.6rem 0; }
 
-      /* Two columns of items under each category; header spans the width. */
-      .category { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4rem;
-                  align-items: start; margin-bottom: 0.8rem; }
-      .cat-head { grid-column: 1 / -1; padding-bottom: 0.25rem; margin-bottom: 0.1rem; }
-
-      /* Denser rows: smaller photos, tighter padding. */
-      .item { grid-template-columns: 34px 1fr auto; gap: 0.1rem 0.5rem; padding: 0.28rem 0; }
-      .thumb { width: 34px; height: 34px; }
-      .piece { font-size: 0.88rem; line-height: 1.15; }
-      .meta { font-size: 0.72rem; margin-top: 0.05rem; }
-      .price .total { font-size: 0.9rem; }
-      /* Drop the divider under the last row in each column (both parities). */
-      .category .item:last-child,
-      .category .item:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+      /* Single column — tighter than screen, but one piece per row. */
+      .category { margin-bottom: 0.9rem; }
+      .cat-head { padding-bottom: 0.3rem; margin-bottom: 0.15rem; }
+      .item { grid-template-columns: 44px 1fr auto; gap: 0.15rem 0.85rem; padding: 0.4rem 0; }
+      .thumb { width: 44px; height: 44px; }
+      .meta { font-size: 0.8rem; margin-top: 0.1rem; }
 
       /* Keep a piece and the category header from splitting mid-break. */
       .item { break-inside: avoid; }
@@ -260,7 +252,8 @@
     <div class="grand" id="grand" hidden>
       <div>
         <div class="grand-label">Total</div>
-        <p class="grand-note">Hard cost only — shipping, taxes, and install estimated separately.</p>
+        <p class="grand-note">Prices reflect product cost only. Shipping, sales tax, and installation
+          are additional and billed at cost — approving these selections authorizes those costs as well.</p>
       </div>
       <div class="grand-amount" id="grand-amount">$0.00</div>
     </div>
