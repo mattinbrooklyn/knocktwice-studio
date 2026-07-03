@@ -140,7 +140,6 @@
     .piece { font-weight: 700; font-size: 1rem; line-height: 1.25; }
     .meta { font-size: 0.85rem; color: var(--color-caramel); margin-top: 0.15rem; }
     .meta .dot { opacity: 0.55; margin: 0 0.35em; }
-    .qtyline { font-size: 0.82rem; color: var(--color-caramel); margin-top: 0.2rem; font-variant-numeric: tabular-nums; }
 
     .price { text-align: right; white-space: nowrap; }
     .price .total { font-weight: 700; font-size: 1rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
@@ -187,23 +186,47 @@
       .price .total::before { content: "Line total: "; color: var(--color-caramel); font-weight: 400; }
     }
 
-    /* ── Print — the reason this page exists ──────────────────── */
+    /* ── Print — the reason this page exists ──────────────────────
+       Compressed to ~2 pages: trimmed masthead, smaller photos, and a
+       TWO-COLUMN item grid (the big lever — halves the vertical run).
+       Screen layout is untouched; every override here is print-only. */
     @media print {
       /* Force brand colors/backgrounds to render in the PDF. */
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      @page { margin: 14mm 12mm; }
-      body { background: #fff; }
+      @page { margin: 10mm 12mm; }
+      body { background: #fff; font-size: 10pt; }
       .wrap { max-width: none; margin: 0; padding: 0; }
       .setup-warning { display: none !important; }
-      /* Keep a piece — photo, name, price — from splitting across a page break. */
+
+      /* Trim the masthead — it doesn't need half a page on paper. */
+      .eyebrow { font-size: 0.85rem; margin-bottom: 0.3rem; }
+      h1.title { font-size: 1.9rem; line-height: 0.95; margin-bottom: 0.2rem; }
+      .lede { font-size: 0.95rem; margin-bottom: 0.3rem; }
+      .stamp { font-size: 0.8rem; margin-top: 0.3rem; }
+      .rule { margin: 0.6rem 0; }
+
+      /* Two columns of items under each category; header spans the width. */
+      .category { display: grid; grid-template-columns: 1fr 1fr; column-gap: 1.4rem;
+                  align-items: start; margin-bottom: 0.8rem; }
+      .cat-head { grid-column: 1 / -1; padding-bottom: 0.25rem; margin-bottom: 0.1rem; }
+
+      /* Denser rows: smaller photos, tighter padding. */
+      .item { grid-template-columns: 34px 1fr auto; gap: 0.1rem 0.5rem; padding: 0.28rem 0; }
+      .thumb { width: 34px; height: 34px; }
+      .piece { font-size: 0.88rem; line-height: 1.15; }
+      .meta { font-size: 0.72rem; margin-top: 0.05rem; }
+      .price .total { font-size: 0.9rem; }
+      /* Drop the divider under the last row in each column (both parities). */
+      .category .item:last-child,
+      .category .item:nth-last-child(2):nth-child(odd) { border-bottom: 0; }
+
+      /* Keep a piece and the category header from splitting mid-break. */
       .item { break-inside: avoid; }
-      /* Keep a category heading with at least its first rows. */
       .cat-head { break-after: avoid; }
       .category { break-inside: auto; }
-      .grand { break-inside: avoid; }
-      /* Slightly tighter for paper. */
-      .item { padding: 0.6rem 0; }
-      .foot { padding-top: 1.5rem; }
+      .grand { break-inside: avoid; margin-top: 0.9rem; padding-top: 0.6rem; }
+      .grand-note { margin-top: 0.3rem; }
+      .foot { padding-top: 0.8rem; }
     }
   </style>
 </head>
@@ -323,10 +346,10 @@
       </div>`;
 
     group.items.forEach(it => {
-      const meta = [it.retailer, it.size, it.color].filter(Boolean).join('<span class="dot">·</span>');
-      const qtyline = it.qty > 1
-        ? `Qty ${it.qty} × ${money(it.unit)}`
-        : `Qty ${it.qty}`;
+      // Qty folded into the meta line (one row per item instead of two).
+      const qty = it.qty > 1 ? `Qty ${it.qty} × ${money(it.unit)}` : `Qty ${it.qty}`;
+      const meta = [it.retailer, it.size, it.color, qty]
+        .filter(Boolean).join('<span class="dot">·</span>');
       const row = document.createElement("div");
       row.className = "item";
       row.innerHTML = `
@@ -334,7 +357,6 @@
         <div class="info">
           <div class="piece">${it.piece}</div>
           <div class="meta">${meta}</div>
-          <div class="qtyline">${qtyline}</div>
         </div>
         <div class="price"><span class="total">${money(it.total)}</span></div>`;
       section.appendChild(row);
