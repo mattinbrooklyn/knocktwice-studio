@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knock Twice — Sourcing & Procurement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- The real design system: every colour/font token below comes from here. -->
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* This is an internal tool, so it opts out of the site's hidden cursor
+       (styles.css sets `* { cursor: none !important }` for its custom JS cursor,
+       which this page doesn't use). Everything else uses the design-system vars. */
+    *, *::before, *::after { cursor: auto !important; }
+    button, select, .details-toggle, label { cursor: pointer !important; }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      padding: clamp(1.5rem, 5vw, 4rem) 1.25rem 5rem;
+    }
+    .panel { max-width: 46rem; margin: 0 auto; }
+
+    /* ── Header ─────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--color-blue);
+      margin-bottom: 0.25rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.25rem, 6vw, 3.25rem);
+      line-height: 1.05;
+      margin-bottom: 0.6rem;
+    }
+    .lede {
+      font-size: 1.0625rem;
+      line-height: 1.45;
+      color: var(--color-caramel);
+      max-width: 30rem;
+    }
+
+    /* ── Project bar ────────────────────────────────── */
+    .project-bar {
+      display: flex;
+      align-items: baseline;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+      margin: 2rem 0 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 2px solid var(--color-khaki);
+    }
+    .project-bar .kicker {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-ink);
+    }
+    .project-bar .project-name {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      line-height: 1.2;
+    }
+    select, input[type="text"] {
+      font-family: var(--font-ui);
+      font-weight: 400;
+      font-size: var(--type-field);
+      height: 3rem;
+      border-radius: var(--radius-button);
+      border: 2px solid var(--color-ink);
+      background: var(--color-bg);
+      color: var(--color-ink);
+      padding: 0 1.25rem;
+    }
+    select { min-width: 12rem; }
+
+    /* ── Stages ─────────────────────────────────────── */
+    .stage { margin-bottom: 2.75rem; }
+    .stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .stage-num {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--color-blue);
+      line-height: 1;
+    }
+    .stage-title {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .stage-freq {
+      font-size: 0.875rem;
+      color: var(--color-caramel);
+      font-style: italic;
+    }
+
+    /* ── Action rows ────────────────────────────────── */
+    .action {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.1rem 0;
+      border-top: 1px solid var(--color-khaki);
+      flex-wrap: wrap;
+    }
+    .stage .action:last-child { border-bottom: 1px solid var(--color-khaki); }
+    .action .text { flex: 1 1 15rem; }
+    .action .name {
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin-bottom: 0.15rem;
+    }
+    .action .explain {
+      font-size: 0.9375rem;
+      color: var(--color-caramel);
+      line-height: 1.4;
+    }
+    .action .new-name { margin-top: 0.7rem; }
+    .action .new-name input { height: 2.7rem; font-size: 0.9375rem; width: 100%; max-width: 22rem; }
+
+    /* ── Buttons — the site's pill button, per action colour ── */
+    button.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      font-size: var(--type-button);
+      height: var(--button-height);
+      min-width: 11rem;
+      padding: 0 1.75rem;
+      border: none;
+      border-radius: var(--radius-button);
+      color: var(--color-bg);
+      cursor: pointer;
+      white-space: nowrap;
+      flex: 0 0 auto;
+    }
+    button.btn:hover:not(:disabled) { opacity: 0.9; }
+    button.btn:disabled { opacity: 0.35; cursor: default; }
+    .btn-new     { background: var(--color-ink); }
+    .btn-refresh { background: var(--color-blue); }
+    .btn-publish { background: var(--color-red); }
+    .btn-pdf     { background: var(--color-green); }
+
+    /* ── Results ────────────────────────────────────── */
+    .results {
+      margin-top: 1rem;
+      border: 2px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      background: var(--color-white);
+      padding: 1.5rem 1.6rem;
+    }
+    .results .kicker {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-caramel);
+      margin-bottom: 0.6rem;
+    }
+    .status {
+      font-size: 1.125rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+    .status.ok   { color: var(--color-green); }
+    .status.err  { color: var(--color-red); }
+    .status.busy { color: var(--color-blue); }
+    .status.idle { color: var(--color-ink); font-weight: 400; }
+
+    .details-toggle {
+      display: inline-block;
+      margin-top: 1rem;
+      background: none;
+      border: none;
+      padding: 0;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-blue);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .details-toggle[hidden] { display: none; }
+    pre {
+      font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--color-bg);
+      border-radius: var(--radius-input);
+      padding: 1rem 1.15rem;
+      margin-top: 1rem;
+      color: var(--color-ink);
+      max-height: 24rem;
+      overflow: auto;
+    }
+    pre[hidden] { display: none; }
+
+    /* ── Publish confirm ────────────────────────────── */
+    .confirm {
+      margin-top: 1.25rem;
+      padding: 1.2rem 1.35rem;
+      border: 2px solid var(--color-red);
+      border-radius: var(--radius-input);
+      background: var(--color-bg);
+    }
+    .confirm[hidden] { display: none; }
+    .confirm p {
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .confirm strong { color: var(--color-red); }
+    .confirm .row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    button.btn-ghost {
+      background: none;
+      color: var(--color-ink);
+      border: 2px solid var(--color-ink);
+    }
+    button.btn-ghost:hover:not(:disabled) { background: var(--color-ink); color: var(--color-bg); opacity: 1; }
+
+    /* Narrow windows: let each action stack, button full-width under its text. */
+    @media (max-width: 34rem) {
+      .action .text { flex-basis: 100%; }
+      .action button.btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <p class="eyebrow">Knock Twice</p>
+    <h1>Sourcing &amp; Procurement</h1>
+    <p class="lede">Run a client from kickoff to final selections — source, share, and lock in
+      their picks, all in one place. No terminal.</p>
+
+    <!-- Which project you're working on -->
+    <div class="project-bar">
+      <span class="kicker">Project</span>
+      <select id="client"><option>Loading…</option></select>
+      <span class="project-name" id="projectName"></span>
+    </div>
+
+    <!-- 01 · START ─────────────────────────────────── -->
+    <section class="stage">
+      <div class="stage-head">
+        <span class="stage-num">01</span>
+        <span class="stage-title">Kick off</span>
+        <span class="stage-freq">once, at the start of a new engagement</span>
+      </div>
+      <div class="action">
+        <div class="text">
+          <div class="name">Set up a new client</div>
+          <div class="explain">Every sourcing &amp; procurement job begins here — this creates the
+            client's folder and starter files. You'll finish the Google Sheet side next; the
+            steps appear below.</div>
+          <div class="new-name">
+            <input type="text" id="newName" placeholder="short name — e.g. smithhouse"
+                   autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+        <button class="btn btn-new" data-command="new">Set up new client</button>
+      </div>
+    </section>
+
+    <!-- 02 · THE WORKING LOOP ───────────────────────── -->
+    <section class="stage">
+      <div class="stage-head">
+        <span class="stage-num">02</span>
+        <span class="stage-title">Source &amp; share</span>
+        <span class="stage-freq">your day-to-day as you source and price</span>
+      </div>
+      <div class="action">
+        <div class="text">
+          <div class="name">Update the estimate</div>
+          <div class="explain">Pull the latest products and pricing from the client's Google Sheet
+            and rebuild their live estimate. Do this whenever you've changed the Sheet.</div>
+        </div>
+        <button class="btn btn-refresh" data-command="refresh">Update estimate</button>
+      </div>
+      <div class="action">
+        <div class="text">
+          <div class="name">Put it live for the client</div>
+          <div class="explain">Publish the current estimate to the live site so the client can see
+            it. Shows you exactly what will change first, then asks you to confirm.</div>
+        </div>
+        <button class="btn btn-publish" data-command="publish">Put it live…</button>
+      </div>
+    </section>
+
+    <!-- 03 · FINISH ─────────────────────────────────── -->
+    <section class="stage">
+      <div class="stage-head">
+        <span class="stage-num">03</span>
+        <span class="stage-title">Final selections</span>
+        <span class="stage-freq">once the client has made their picks</span>
+      </div>
+      <div class="action">
+        <div class="text">
+          <div class="name">Make the final PDF</div>
+          <div class="explain">Turn the client's chosen items into a print-ready Final Selections
+            PDF on your Desktop — the procurement document, ready to send.</div>
+        </div>
+        <button class="btn btn-pdf" data-command="pdf">Make final PDF</button>
+      </div>
+    </section>
+
+    <!-- Results ─────────────────────────────────────── -->
+    <section class="results">
+      <div class="kicker">What happened</div>
+      <div class="status idle" id="status">Pick a project above, then choose what you'd like to do.</div>
+
+      <div class="confirm" id="confirm" hidden>
+        <p>This is a <strong>live deploy.</strong> The preview below is exactly what will change on
+           the real site — nothing else can slip through. Once you confirm, it goes live.</p>
+        <div class="row">
+          <button class="btn btn-publish" id="confirmPublish">Yes — put it live</button>
+          <button class="btn btn-ghost" id="cancelPublish">Cancel</button>
+        </div>
+      </div>
+
+      <button class="details-toggle" id="detailsToggle" hidden>Show technical details</button>
+      <pre id="output" hidden></pre>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const clientSel   = $("client");
+    const projectName = $("projectName");
+    const statusEl    = $("status");
+    const outputEl    = $("output");
+    const confirmEl   = $("confirm");
+    const detailsBtn  = $("detailsToggle");
+    const buttons     = [...document.querySelectorAll("button.btn[data-command]")];
+    // Actions that need an existing client (everything except "Set up new client").
+    const needsClient = buttons.filter(b => b.dataset.command !== "new");
+
+    let labels = {};  // client id → human project name
+
+    // Friendly, forward-looking lines the panel writes above ktw's own output.
+    const DONE = {
+      refresh: "Updated — the estimate pages now match the Sheet. Next: put it live so the client sees it.",
+      pdf:     "Done — the Final Selections PDF is on your Desktop (it should have opened for you).",
+      new:     "New client created. Open the details below for the Google Sheet setup steps, then come back and Update.",
+      publish: "It's live — the client's estimate is updating now. Give it a minute, then check the page.",
+    };
+
+    function setStatus(text, kind) {
+      statusEl.textContent = text;
+      statusEl.className = "status " + kind;
+    }
+    function lock(on) { buttons.forEach(b => b.disabled = on); }
+
+    // Details start collapsed; publish auto-opens them so the proof is visible.
+    function showDetails(text, { open = false } = {}) {
+      outputEl.textContent = text;
+      detailsBtn.hidden = false;
+      outputEl.hidden = !open;
+      detailsBtn.textContent = open ? "Hide technical details" : "Show technical details";
+    }
+    function clearDetails() {
+      outputEl.textContent = "";
+      outputEl.hidden = true;
+      detailsBtn.hidden = true;
+    }
+    detailsBtn.addEventListener("click", () => {
+      outputEl.hidden = !outputEl.hidden;
+      detailsBtn.textContent = outputEl.hidden ? "Show technical details" : "Hide technical details";
+    });
+
+    async function loadClients() {
+      try {
+        const { clients } = await (await fetch("/api/clients")).json();
+        clientSel.innerHTML = "";
+        labels = {};
+        if (!clients.length) {
+          clientSel.innerHTML = "<option value=''>No clients yet</option>";
+          needsClient.forEach(b => b.disabled = true);
+          projectName.textContent = "— set one up in step 01 to begin";
+          return;
+        }
+        for (const c of clients) {
+          labels[c.id] = c.label;
+          const o = document.createElement("option");
+          o.value = c.id; o.textContent = c.id;
+          clientSel.appendChild(o);
+        }
+        needsClient.forEach(b => b.disabled = false);
+        syncProjectName();
+      } catch {
+        clientSel.innerHTML = "<option value=''>Couldn't load clients</option>";
+      }
+    }
+    function syncProjectName() {
+      projectName.textContent = labels[clientSel.value] || "";
+    }
+    clientSel.addEventListener("change", syncProjectName);
+
+    async function run(command, { dryRun = false } = {}) {
+      let client = clientSel.value;
+      if (command === "new") client = $("newName").value.trim();
+
+      const busy = command === "publish"
+        ? (dryRun ? "Checking exactly what would change…" : "Putting it live…")
+        : "Working on it — this can take a moment…";
+      setStatus(busy, "busy");
+      confirmEl.hidden = true;
+      clearDetails();
+      lock(true);
+
+      try {
+        const r = await fetch("/api/run", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ command, client, dry_run: dryRun }),
+        });
+        const data = await r.json();
+
+        if (data.error) { setStatus(data.error, "err"); return; }
+
+        if (!data.ok) {
+          setStatus("That didn't finish — the details below explain what happened.", "err");
+          showDetails(data.output, { open: true });
+          return;
+        }
+        // Publish preview succeeded → show the proof and ask to confirm.
+        if (command === "publish" && dryRun) {
+          setStatus("Here's exactly what would go live. Review it, then confirm below.", "busy");
+          showDetails(data.output, { open: true });
+          confirmEl.hidden = false;
+          return;
+        }
+        setStatus(DONE[command], "ok");
+        // Publish (the proof) and New Client (its setup steps) matter enough to
+        // show straight away; the routine actions keep their details tucked away.
+        showDetails(data.output, { open: command === "publish" || command === "new" });
+        if (command === "new") loadClients();  // pick up the freshly-made folder
+      } catch {
+        setStatus("Couldn't reach the helper. Is the launcher window still open?", "err");
+      } finally {
+        lock(false);
+      }
+    }
+
+    // Wire up the buttons. Putting it live always previews first.
+    buttons.forEach(btn => btn.addEventListener("click", () => {
+      const command = btn.dataset.command;
+      if (command === "publish") run("publish", { dryRun: true });
+      else run(command);
+    }));
+    $("confirmPublish").addEventListener("click", () => run("publish", { dryRun: false }));
+    $("cancelPublish").addEventListener("click", () => {
+      confirmEl.hidden = true;
+      setStatus("Cancelled — nothing was published.", "idle");
+    });
+
+    loadClients();
+  </script>
+</body>
+</html>
