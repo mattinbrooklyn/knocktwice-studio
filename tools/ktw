@@ -12,17 +12,22 @@ the two pages are generated from templates/. Pure standard library — no instal
                            on your Desktop (headless Chrome).
     ktw new <client>       Scaffold a new client: client.json stub + a copy of the
                            Apps Script, then print the Google setup checklist.
-    ktw publish <client>   [coming next] Push to staging + promote live in isolation.
+    ktw publish <client>   Push the client's paths to staging + promote them to the
+                           live site in isolation (never a wholesale staging→main
+                           merge). Add --dry-run to prove the exact tree first.
 
 Run from anywhere; paths resolve relative to the repo.
 """
-import os, sys, json, time, shutil, subprocess, urllib.request
+import os, sys, json, time, shutil, tempfile, subprocess, urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CLIENTS_DIR = os.path.join(REPO, "clients")
 GENERATOR = os.path.join(REPO, "estimate", "sync-from-excel.py")
 GS_TEMPLATE = os.path.join(REPO, "estimate", "_source", "Responses.gs")
 CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+PREVIEW_BRANCH = "staging"   # working / preview branch (Vercel preview)
+LIVE_BRANCH = "main"         # what knocktwice.studio serves
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -43,6 +48,24 @@ def repo_path(rel):
     return os.path.join(REPO, *rel.split("/"))
 
 
+def git(args, index=None):
+    """Run a git command in the repo. Pass index= to point at an alternate
+    GIT_INDEX_FILE (used to build the live tree without touching the real index
+    or the working tree)."""
+    env = os.environ.copy()
+    if index:
+        env["GIT_INDEX_FILE"] = index
+    return subprocess.run(["git", *args], cwd=REPO, env=env,
+                          capture_output=True, text=True)
+
+
+def git_out(args, index=None):
+    r = git(args, index)
+    if r.returncode != 0:
+        die(f"git {' '.join(args)} failed:\n{r.stderr.strip()}")
+    return r.stdout.strip()
+
+
 # ── refresh ──────────────────────────────────────────────────────────────────
 def cmd_refresh(client):
     """Rebuild the pages from the Sheet. Thin wrapper over the generator so the
@@ -53,7 +76,7 @@ def cmd_refresh(client):
     if r.returncode != 0:
         die("Refresh failed (see above). Nothing was published.")
     print("  Next: preview the pages, then  ktw publish " + client +
-          "  (coming soon) to push live.")
+          "  to push staging + live (try --dry-run first).")
 
 
 # ── pdf ──────────────────────────────────────────────────────────────────────
@@ -173,18 +196,134 @@ def cmd_new(client):
     print(f"   5. Build it:   ktw refresh {client}")
 
 
+# ── publish ──────────────────────────────────────────────────────────────────
+def build_live_tree(cfg, index):
+    """Build, in the given throwaway index, the tree we'd push to live: the
+    current live (origin/main) tree with ONLY this client's two paths swapped in
+    from the working tree. Same isolation technique the old .command used
+    (read-tree/write-tree — never a branch switch), parameterized by client.
+
+    Returns (main_commit, main_tree, new_tree). Sourcing the client subtree from
+    the working tree (git add) rather than HEAD makes the dry-run honest — it
+    reflects an un-committed refresh — while yielding the identical tree a real
+    run produces (which commits first, so HEAD == working tree by then)."""
+    paths = [cfg["output_dir"], cfg["image_dir"]]
+    main_commit = git_out(["rev-parse", f"origin/{LIVE_BRANCH}"])
+    main_tree = git_out(["rev-parse", f"{main_commit}^{{tree}}"])
+
+    steps = [["read-tree", main_commit],
+             ["rm", "-rf", "--cached", "--quiet", "--ignore-unmatch", *paths],
+             ["add", "--", *paths]]
+    for s in steps:
+        r = git(s, index=index)
+        if r.returncode != 0:
+            die(f"Couldn't prepare the live tree (nothing was pushed):\n{r.stderr.strip()}")
+    new_tree = git_out(["write-tree"], index=index)
+    return main_commit, main_tree, new_tree
+
+
+def cmd_publish(client, dry_run=False):
+    """Push the client's paths to staging, then promote them to live in isolation.
+    In --dry-run, does everything read-only up to the proof and stops: it prints
+    the exact set of files the live promotion would change and refuses if any fall
+    outside the client's own dirs."""
+    cfg = load(client)
+    out, img = cfg["output_dir"], cfg["image_dir"]
+    paths = [out, img]
+
+    # Safety: this must run from the preview branch (same guard as the .command).
+    current = git_out(["rev-parse", "--abbrev-ref", "HEAD"])
+    if current != PREVIEW_BRANCH:
+        die(f"You're on '{current}', not '{PREVIEW_BRANCH}'. Switch branches "
+            f"(or ask Claude) and retry — nothing was published.")
+
+    tag = "DRY RUN — nothing will be pushed" if dry_run else "publishing"
+    print(f"▶  Publish '{client}'  ({tag})\n")
+
+    # 1) Staging preview. Commit+push the client's paths if the build changed them.
+    if dry_run:
+        stat = git_out(["diff", "--stat", "HEAD", "--", *paths])
+        if stat:
+            print("  Staging: would commit + push these changes:")
+            for line in stat.splitlines():
+                print("     " + line)
+        else:
+            print("  Staging: no changes — preview already current.")
+    else:
+        git(["add", *paths])
+        if git(["diff", "--cached", "--quiet"]).returncode == 0:
+            print("  Staging: no changes — preview already current.")
+        else:
+            git(["commit", "-m", f"Refresh estimate from Google Sheet ({client})"])
+            if git(["push", "origin", PREVIEW_BRANCH]).returncode != 0:
+                die("Couldn't push to staging — check your internet / GitHub access.")
+            print("  ✓  Updated the staging preview.")
+
+    # 2) Live promotion, read-only until the very last push.
+    print("\n  ⏳  Preparing the live promotion…")
+    if git(["fetch", "origin", "--quiet"]).returncode != 0:
+        die("Couldn't reach origin to read the live branch. Try again.")
+
+    fd, tmp_index = tempfile.mkstemp(prefix="ktw-index-")
+    os.close(fd)
+    try:
+        main_commit, main_tree, new_tree = build_live_tree(cfg, tmp_index)
+    finally:
+        os.remove(tmp_index)
+
+    if new_tree == main_tree:
+        print("  ✓  Live already matches — nothing to promote.")
+        return
+
+    # The proof: every file that differs between live and the promotion tree must
+    # sit under this client's own dirs. Anything else means the tree would carry
+    # unrelated staging work to live — refuse, in BOTH dry-run and real mode.
+    changed = git_out(["diff", "--name-only", main_tree, new_tree]).splitlines()
+    allowed = tuple(p + "/" for p in paths)
+    stray = [c for c in changed if not c.startswith(allowed)]
+
+    print("\n  Live promotion would change (vs current live):")
+    for line in git_out(["diff", "--stat", main_tree, new_tree]).splitlines():
+        print("     " + line)
+
+    if stray:
+        die("Refusing to publish — these paths fall OUTSIDE the client's dirs:\n     "
+            + "\n     ".join(stray) +
+            "\n   The live promotion must touch only per-client estimate + image paths.")
+
+    print(f"\n  ✓  Proof passed: promotion touches ONLY {out}/ and {img}/.")
+
+    if dry_run:
+        print(f"\n  DRY RUN complete — nothing pushed. Re-run without --dry-run "
+              f"to publish '{client}' live.")
+        return
+
+    new_commit = git_out(["commit-tree", new_tree, "-p", main_commit,
+                          "-m", f"Refresh estimate (live) — {client}"])
+    if git(["push", "origin", f"{new_commit}:refs/heads/{LIVE_BRANCH}"]).returncode != 0:
+        die("Couldn't publish live (staging is updated). Try again, or ask Claude.")
+    print("  ✓  Published to the live site. Give Vercel a minute, then check the page.")
+
+
 # ── dispatch ─────────────────────────────────────────────────────────────────
-COMMANDS = {"refresh": cmd_refresh, "pdf": cmd_pdf, "new": cmd_new}
+COMMANDS = {"refresh": cmd_refresh, "pdf": cmd_pdf, "new": cmd_new,
+            "publish": cmd_publish}
 
 
 def main(argv):
-    if len(argv) < 2 or argv[0] not in COMMANDS:
-        if argv[:1] == ["publish"]:
-            die("'publish' isn't wired yet — it's the next step. For now use the "
-                "existing Refresh Estimate.command to push live.")
+    if not argv or argv[0] not in COMMANDS:
         print(__doc__)
         sys.exit(0 if not argv else 2)
-    COMMANDS[argv[0]](argv[1])
+    cmd, rest = argv[0], argv[1:]
+    dry_run = "--dry-run" in rest
+    rest = [a for a in rest if a != "--dry-run"]
+    if not rest:
+        die(f"Usage: ktw {cmd} <client>" + ("  [--dry-run]" if cmd == "publish" else ""))
+    client = rest[0]
+    if cmd == "publish":
+        cmd_publish(client, dry_run=dry_run)
+    else:
+        COMMANDS[cmd](client)
 
 
 if __name__ == "__main__":
