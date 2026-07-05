@@ -134,8 +134,35 @@
       color: var(--color-caramel);
       line-height: 1.4;
     }
-    .action .new-name { margin-top: 0.7rem; }
-    .action .new-name input { height: 2.7rem; font-size: 0.9375rem; width: 100%; max-width: 22rem; }
+    /* The "set up a new client" action is a small form, so it stacks: intro,
+       fields, then the button underneath — not the side-by-side action layout. */
+    .action-setup { flex-direction: column; align-items: stretch; }
+    .action-setup .btn { align-self: flex-start; margin-top: 0.4rem; }
+    .setup-fields {
+      margin-top: 0.9rem;
+      display: grid;
+      gap: 0.85rem;
+      max-width: 26rem;
+    }
+    .field-label {
+      display: block;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--color-ink);
+      margin-bottom: 0.3rem;
+    }
+    /* the "· optional" hint rides along quietly, in body case */
+    .field-label em {
+      font-style: normal;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--color-caramel);
+    }
+    .setup-fields input { width: 100%; height: 2.7rem; font-size: 0.9375rem; }
 
     /* ── Buttons — the site's pill button, per action colour ── */
     button.btn {
@@ -272,15 +299,48 @@
         <span class="stage-title">Kick off</span>
         <span class="stage-freq">once, at the start of a new engagement</span>
       </div>
-      <div class="action">
+      <div class="action action-setup">
         <div class="text">
           <div class="name">Set up a new client</div>
-          <div class="explain">Every sourcing &amp; procurement job begins here — this creates the
-            client's folder and starter files. You'll finish the Google Sheet side next; the
-            steps appear below.</div>
-          <div class="new-name">
-            <input type="text" id="newName" placeholder="short name — e.g. smithhouse"
-                   autocomplete="off" spellcheck="false">
+          <div class="explain">Every sourcing &amp; procurement job begins here. Fill these in and
+            paste the client's Google Sheet link — this writes everything for you, no files to edit.
+            Only the first three are required; the rest have sensible defaults.</div>
+          <div class="setup-fields">
+            <label>
+              <span class="field-label">Short name <em>· folder id, lowercase</em></span>
+              <input type="text" id="f-id" placeholder="e.g. smithhouse"
+                     autocomplete="off" spellcheck="false">
+            </label>
+            <label>
+              <span class="field-label">Google Sheet link</span>
+              <input type="text" id="f-sheet" placeholder="paste the …/spreadsheets/d/… URL"
+                     autocomplete="off" spellcheck="false">
+            </label>
+            <label>
+              <span class="field-label">Project name</span>
+              <input type="text" id="f-projectShort" placeholder="e.g. Room for Two"
+                     autocomplete="off">
+            </label>
+            <label>
+              <span class="field-label">Full project label <em>· optional</em></span>
+              <input type="text" id="f-projectLabel" placeholder="e.g. Room for Two — Hannah &amp; Eugene"
+                     autocomplete="off">
+            </label>
+            <label>
+              <span class="field-label">Headline <em>· optional, defaults to the project name</em></span>
+              <input type="text" id="f-headline" placeholder="e.g. A Room for Two"
+                     autocomplete="off">
+            </label>
+            <label>
+              <span class="field-label">Eyebrow <em>· optional</em></span>
+              <input type="text" id="f-eyebrow" placeholder="Knock Twice × Client Name"
+                     autocomplete="off">
+            </label>
+            <label>
+              <span class="field-label">Client's first name <em>· optional</em></span>
+              <input type="text" id="f-firstName" placeholder="e.g. Hannah"
+                     autocomplete="off">
+            </label>
           </div>
         </div>
         <button class="btn btn-new" data-command="new">Set up new client</button>
@@ -366,9 +426,23 @@
     const DONE = {
       refresh: "Updated — the estimate pages now match the Sheet. Next: put it live so the client sees it.",
       pdf:     "Done — the Final Selections PDF is on your Desktop (it should have opened for you).",
-      new:     "New client created. Open the details below for the Google Sheet setup steps, then come back and Update.",
+      new:     "Client set up — the next steps are below. Then come back and Update the estimate.",
       publish: "It's live — the client's estimate is updating now. Give it a minute, then check the page.",
     };
+
+    // The setup form's inputs → the field names the server writes into client.json.
+    const setupFields = () => ({
+      sheet:        $("f-sheet").value.trim(),
+      projectShort: $("f-projectShort").value.trim(),
+      projectLabel: $("f-projectLabel").value.trim(),
+      headline:     $("f-headline").value.trim(),
+      eyebrow:      $("f-eyebrow").value.trim(),
+      firstName:    $("f-firstName").value.trim(),
+    });
+    function clearSetupForm() {
+      ["f-id","f-sheet","f-projectShort","f-projectLabel","f-headline","f-eyebrow","f-firstName"]
+        .forEach(id => $(id).value = "");
+    }
 
     function setStatus(text, kind) {
       statusEl.textContent = text;
@@ -423,7 +497,15 @@
 
     async function run(command, { dryRun = false } = {}) {
       let client = clientSel.value;
-      if (command === "new") client = $("newName").value.trim();
+      let fields;
+      if (command === "new") {
+        client = $("f-id").value.trim();
+        fields = setupFields();
+        // Catch the required three before bothering the server.
+        if (!client)             return setStatus("Give the client a short name first.", "err");
+        if (!fields.projectShort) return setStatus("Add a project name (e.g. \"Room for Two\").", "err");
+        if (!fields.sheet)       return setStatus("Paste the client's Google Sheet link.", "err");
+      }
 
       const busy = command === "publish"
         ? (dryRun ? "Checking exactly what would change…" : "Putting it live…")
@@ -437,7 +519,7 @@
         const r = await fetch("/api/run", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ command, client, dry_run: dryRun }),
+          body: JSON.stringify({ command, client, dry_run: dryRun, fields }),
         });
         const data = await r.json();
 
@@ -459,7 +541,12 @@
         // Publish (the proof) and New Client (its setup steps) matter enough to
         // show straight away; the routine actions keep their details tucked away.
         showDetails(data.output, { open: command === "publish" || command === "new" });
-        if (command === "new") loadClients();  // pick up the freshly-made folder
+        if (command === "new") {          // pick up the freshly-made folder + select it
+          clearSetupForm();
+          await loadClients();
+          clientSel.value = client;
+          syncProjectName();
+        }
       } catch {
         setStatus("Couldn't reach the helper. Is the launcher window still open?", "err");
       } finally {
