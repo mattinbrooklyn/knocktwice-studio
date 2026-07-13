@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>{{project_short}} — Final Selections · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       FINAL SELECTIONS — the confirmation document.
+       A static, print-first sibling of the estimate page. No choices,
+       no submit: just the approved pieces, itemized, with a grand
+       total — built to be opened, Cmd+P'd to PDF, and emailed for sign-off.
+
+       Same data pipeline as the estimate (sync-from-excel.py injects the
+       CART block below), filtered to APPROVED=Yes rows.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Brand tokens inlined so this page keeps its full styling even if the
+       shared /assets/styles.css is blocked (corporate filter, PDF engine, etc.). */
+    :root {
+      --color-bg: #F7F2EC;
+      --color-ink: #32261F;
+      --color-blue: #378CDA;
+      --color-green: #51B18C;
+      --color-khaki: #D1C3B6;
+      --color-white: #FFFFFF;
+      --color-yellow: #FADB4B;
+      --color-pink: #EC8EDF;
+      --color-red: #FF0004;
+      --color-caramel: #9A7555;
+      --font-display: 'Erica One', 'Arial Black', sans-serif;
+      --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --radius-pill: 2rem;
+      --radius-input: 0.25rem;
+      --shadow-stack: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    /* Neutralize the shared site's mobile "footer blue" reveal. */
+    body::after { display: none !important; content: none !important; }
+
+    html, body { background: var(--color-bg); }
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 3rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--color-blue);
+      display: flex; align-items: center; gap: 0.55rem;
+      margin-bottom: 0.9rem;
+    }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      line-height: 0.96;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin: 0 0 0.7rem;
+    }
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+      color: var(--color-blue);
+      margin: 0 0 1.1rem;
+    }
+    .intro { font-size: clamp(0.95rem, 1.5vw, 1.05rem); max-width: 40rem; margin: 0; }
+    .stamp {
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.92rem;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+      margin-top: 1rem;
+    }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Category block ───────────────────────────────────────── */
+    .category { margin-bottom: 1.9rem; }
+    .cat-head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; padding-bottom: 0.5rem; margin-bottom: 0.35rem;
+      border-bottom: 1.5px solid var(--color-ink);
+    }
+    .cat-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.25rem, 3.4vw, 1.7rem);
+      text-transform: uppercase; line-height: 1; letter-spacing: 0.01em;
+    }
+    .cat-subtotal {
+      font-family: var(--font-body); font-weight: 600; font-size: 0.95rem;
+      color: var(--color-caramel); white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Item row ─────────────────────────────────────────────── */
+    .item {
+      display: grid;
+      grid-template-columns: 64px 1fr auto;
+      gap: 0.35rem 1rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--color-khaki);
+      align-items: start;
+    }
+    .category .item:last-child { border-bottom: 0; }
+
+    .thumb {
+      grid-row: span 2;
+      width: 64px; height: 64px;
+      border-radius: 0.5rem; background: var(--color-white);
+      border: 1px solid var(--color-khaki);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .thumb img.is-icon { width: 56%; height: 56%; object-fit: contain; opacity: 0.85; }
+
+    .info { min-width: 0; }
+    .piece { font-weight: 700; font-size: 1rem; line-height: 1.25; }
+    .meta { font-size: 0.85rem; color: var(--color-caramel); margin-top: 0.15rem; }
+    .meta .dot { opacity: 0.55; margin: 0 0.35em; }
+
+    .price { text-align: right; white-space: nowrap; }
+    .price .total { font-weight: 700; font-size: 1rem; color: var(--color-ink); font-variant-numeric: tabular-nums; }
+
+    /* ── Grand total ──────────────────────────────────────────── */
+    .grand {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; margin-top: 2rem; padding-top: 1.1rem;
+      border-top: 2.5px solid var(--color-ink);
+    }
+    .grand-label {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.4rem, 4vw, 1.9rem); text-transform: uppercase; letter-spacing: 0.01em;
+    }
+    .grand-amount {
+      font-family: var(--font-body); font-weight: 700;
+      font-size: clamp(1.5rem, 5vw, 2.1rem); color: var(--color-ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .grand-note {
+      font-family: var(--font-ui); font-size: 0.85rem; color: var(--color-caramel);
+      margin: 0.55rem 0 0;
+    }
+
+    .foot {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-caramel); text-align: center; padding: 2.25rem 1rem 0;
+    }
+
+    .setup-warning {
+      background: var(--color-yellow); color: var(--color-ink);
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: 0.9rem; margin-top: 1.5rem;
+    }
+
+    /* ── Mobile ───────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .item {
+        grid-template-columns: 56px 1fr;
+        gap: 0.35rem 0.8rem;
+      }
+      .thumb { grid-row: span 3; width: 56px; height: 56px; }
+      .price { grid-column: 2; text-align: left; margin-top: 0.1rem; }
+      .price .total::before { content: "Line total: "; color: var(--color-caramel); font-weight: 400; }
+    }
+
+    /* ── Print — the reason this page exists ──────────────────────
+       Compressed to ~2 pages: trimmed masthead, smaller photos, and a
+       TWO-COLUMN item grid (the big lever — halves the vertical run).
+       Screen layout is untouched; every override here is print-only. */
+    @media print {
+      /* Force brand colors/backgrounds to render in the PDF. */
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* Full-bleed brand background. @page margin must be 0 — Chrome paints the
+         @page margin band as white paper (the root background does NOT fill it),
+         which is what caused the white frame. With no page margin the cream
+         bleeds to the paper edge; the content inset comes from .wrap padding. */
+      @page { margin: 0; }
+      html, body { background: var(--color-bg); }
+      body { font-size: 10pt; }
+      .wrap { max-width: none; margin: 0; padding: 13mm 14mm; }
+      .setup-warning { display: none !important; }
+
+      /* Trim the masthead — it doesn't need half a page on paper. */
+      .eyebrow { font-size: 0.85rem; margin-bottom: 0.3rem; }
+      h1.title { font-size: 1.9rem; line-height: 0.95; margin-bottom: 0.2rem; }
+      .lede { font-size: 0.95rem; margin-bottom: 0.3rem; }
+      .stamp { font-size: 0.8rem; margin-top: 0.3rem; }
+      .rule { margin: 0.6rem 0; }
+
+      /* Single column — tighter than screen, but one piece per row. */
+      .category { margin-bottom: 0.65rem; }
+      .cat-head { padding-bottom: 0.3rem; margin-bottom: 0.15rem; }
+      .item { grid-template-columns: 44px 1fr auto; gap: 0.15rem 0.85rem; padding: 0.32rem 0; }
+      .thumb { width: 44px; height: 44px; }
+      .meta { font-size: 0.8rem; margin-top: 0.1rem; }
+
+      /* Keep a piece and the category header from splitting mid-break. */
+      .item { break-inside: avoid; }
+      .cat-head { break-after: avoid; }
+      .category { break-inside: auto; }
+      .grand { break-inside: avoid; margin-top: 0.7rem; padding-top: 0.5rem; }
+      .grand-note { margin-top: 0.3rem; }
+      .foot { padding-top: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- Masthead ------------------------------------------------- -->
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      {{eyebrow}}
+    </p>
+    <h1 class="title">{{h1_html}}</h1>
+    <p class="lede">{{lede_final}}</p>
+    <p class="stamp" id="stamp">Prepared {{final_prepared}}</p>
+
+    <div class="setup-warning" id="setup-warning" hidden>
+      ⚙️ <strong>Heads up (only you see this):</strong> no approved items found.
+      Mark pieces <code>APPROVED = Yes</code> in the PRODUCT LIST tab, then re-run the sync.
+    </div>
+
+    <hr class="rule">
+
+    <!-- Categories render here ----------------------------------- -->
+    <div id="categories"></div>
+
+    <!-- Grand total ---------------------------------------------- -->
+    <div class="grand" id="grand" hidden>
+      <div>
+        <div class="grand-label">Total</div>
+        <p class="grand-note">Prices reflect product cost only. Shipping, sales tax, and installation will be
+          billed separately at cost. Approval of these selections constitutes authorization of those charges.</p>
+      </div>
+      <div class="grand-amount" id="grand-amount">$0.00</div>
+    </div>
+
+    <p class="foot" id="foot">Knock Twice · {{project_short}} · Final Selections</p>
+  </main>
+
+  <script>
+  /* FINAL-DATA:START */
+  const CART = [];
+  /* FINAL-DATA:END */
+
+  const CAT_ICON = {
+    "Finishes": "/assets/sticker-star.svg",
+    "Furniture & Storage": "/assets/sticker-home.svg",
+    "Labor & Install": "/assets/render-paintbrush.png",
+    "Lighting": "/assets/sticker-star.svg",
+    "Soft Goods": "/assets/sticker-star.svg",
+    "Art": "/assets/sticker-star.svg",
+  };
+
+  // Stamp shown under the masthead and in the footer.
+  const FINAL = { prepared: "{{final_prepared}}" };
+
+  const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // Image source: the live page uses the full-res photos. When rendered for the
+  // PDF (URL carries ?pdf), it points at downscaled copies in /estimate-pdf/ —
+  // same filenames, a fraction of the weight — so the emailed file stays small.
+  // Make Final PDF.command generates those copies before rendering.
+  const IMG_BASE = new URLSearchParams(location.search).has("pdf")
+    ? "{{img_base_pdf}}/"
+    : "{{img_base}}/";
+
+  // img is a filename resolved by the sync; when absent/broken, fall back to the
+  // category icon placeholder (same pattern as the estimate page).
+  const imgTag = (img, alt, icon) =>
+    img
+      ? `<img src="${IMG_BASE}${img}" alt="${alt}" data-icon="${icon}"
+            onerror="this.onerror=null;this.src=this.dataset.icon;this.classList.add('is-icon');">`
+      : `<img class="is-icon" src="${icon}" alt="${alt}">`;
+
+  const catWrap = document.getElementById("categories");
+  let grandTotal = 0;
+
+  CART.forEach(group => {
+    const subtotal = group.items.reduce((s, it) => s + it.total, 0);
+    grandTotal += subtotal;
+    const icon = CAT_ICON[group.cat] || "/assets/sticker-star.svg";
+
+    const section = document.createElement("section");
+    section.className = "category";
+    section.innerHTML = `
+      <div class="cat-head">
+        <span class="cat-name">${group.cat}</span>
+        <span class="cat-subtotal">${money(subtotal)}</span>
+      </div>`;
+
+    group.items.forEach(it => {
+      // Qty folded into the meta line (one row per item instead of two).
+      const qty = it.qty > 1 ? `Qty ${it.qty} × ${money(it.unit)}` : `Qty ${it.qty}`;
+      const meta = [it.retailer, it.size, it.color, qty]
+        .filter(Boolean).join('<span class="dot">·</span>');
+      const row = document.createElement("div");
+      row.className = "item";
+      row.innerHTML = `
+        <div class="thumb">${imgTag(it.img, it.piece, icon)}</div>
+        <div class="info">
+          <div class="piece">${it.piece}</div>
+          <div class="meta">${meta}</div>
+        </div>
+        <div class="price"><span class="total">${money(it.total)}</span></div>`;
+      section.appendChild(row);
+    });
+
+    catWrap.appendChild(section);
+  });
+
+  // Reveal the grand total (or the setup warning if nothing's approved).
+  if (CART.length) {
+    document.getElementById("grand").hidden = false;
+    document.getElementById("grand-amount").textContent = money(grandTotal);
+  } else {
+    document.getElementById("setup-warning").hidden = false;
+  }
+
+  // Stamp the prepared date.
+  document.getElementById("stamp").textContent = "Prepared " + FINAL.prepared;
+  document.getElementById("foot").textContent =
+    "Knock Twice · {{project_short}} · Final Selections · " + FINAL.prepared;
+  </script>
+</body>
+</html>

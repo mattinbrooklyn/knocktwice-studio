@@ -1,0 +1,540 @@
+#!/usr/bin/env python3
+"""
+sync-from-excel.py — rebuild the estimate page's data from the Excel.
+
+WHAT IT DOES
+    Reads the design-package spreadsheet and regenerates the line-item data
+    block inside estimate/roomfortwo/index.html (between the ESTIMATE-DATA markers).
+    Nothing else on the page is touched.
+
+HOW TO USE
+    1. Edit the spreadsheet: estimate/_source/design-package.xlsx
+       (or save your working copy over it).
+    2. From the repo root, run:
+           python3 estimate/sync-from-excel.py
+    3. Read the report it prints (totals, any missing product photos).
+    4. Preview, then commit & push to publish.
+
+NOTES
+    - Pure Python standard library — no pip installs, ever.
+    - The spreadsheet is the source of truth. Don't hand-edit the data in
+      index.html; your edits would be overwritten on the next sync.
+    - The round label/date is a deliberate "publish" choice, so it lives in
+      index.html (the ROUND constant), not in the Excel.
+    - Each row needs a SLUG (stable id → product photo filename). Existing
+      rows already have one. For a new row you can leave SLUG blank and the
+      tool will derive one from the piece name and tell you what to call its
+      image.
+    - The STATUS column controls visibility: only rows marked "Show" render.
+      "Hide" (or a blank cell) leaves the item off the page entirely. If the
+      column is missing, everything shows (so it can't accidentally blank out).
+    - Product photos come from the IMAGE column: paste a Google Drive share
+      link (the file must be shared "Anyone with the link: Viewer") or a plain
+      image URL. The tool downloads each into assets/images/estimate/ and the
+      page loads the local copy — so a photo never breaks if the source moves.
+      Leave IMAGE blank to fall back to any existing local photo / placeholder.
+"""
+
+import os, re, sys, json, zipfile, urllib.request
+import xml.etree.ElementTree as ET
+
+NS = "{http://schemas.openxmlformats.org/spreadsheetml/2006/main}"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CLIENTS_DIR = os.path.join(REPO, "clients")
+TEMPLATES_DIR = os.path.join(REPO, "templates")
+XLSX = os.path.join(REPO, "estimate", "_source", "design-package.xlsx")  # local fallback
+CACHE = os.path.join(REPO, "estimate", "_source", ".sheet-cache.xlsx")  # gitignored
+
+# Everything client-specific now lives in clients/<client>/client.json — the
+# single source of truth. These module globals are populated from that config
+# in __main__ (the helpers below read them at call time). The defaults here are
+# just neutral placeholders so the module imports cleanly.
+PAGE = FINAL_PAGE = IMG_DIR = None
+SHEET_NAME = "PRODUCT LIST"
+GOOGLE_SHEET = ""
+CATEGORY_ORDER = []    # explicit top-to-bottom order; unlisted keep sheet order after these
+LAST_CATEGORIES = []   # categories pinned to the very end, in this order
+
+START = "/* ESTIMATE-DATA:START"
+END = "/* ESTIMATE-DATA:END"
+FINAL_START = "/* FINAL-DATA:START"
+FINAL_END = "/* FINAL-DATA:END"
+
+
+# ── Minimal .xlsx reader (stdlib only) ─────────────────────────────────────
+def _col(ref):
+    """'B7' -> column number 2."""
+    letters = re.match(r"[A-Z]+", ref).group(0)
+    n = 0
+    for ch in letters:
+        n = n * 26 + (ord(ch) - 64)
+    return n
+
+
+def read_sheet(path, sheet_name):
+    """Return a list of row dicts keyed by header name, for the given sheet."""
+    z = zipfile.ZipFile(path)
+
+    # Shared-string table (real Excel/Numbers). May be absent if strings were
+    # written inline — handled per-cell below.
+    shared = []
+    try:
+        for si in ET.fromstring(z.read("xl/sharedStrings.xml")).findall(f"{NS}si"):
+            shared.append("".join(t.text or "" for t in si.iter(f"{NS}t")))
+    except KeyError:
+        pass
+
+    # Resolve sheet name -> worksheet xml file via workbook + rels.
+    # Falls back to the first sheet if the named tab isn't found.
+    RID = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+    wb = ET.fromstring(z.read("xl/workbook.xml"))
+    sheets = list(wb.find(f"{NS}sheets"))
+    rid = next((s.get(RID) for s in sheets if s.get("name") == sheet_name), None)
+    if rid is None and sheets:
+        print(f"  (No '{sheet_name}' tab — using first tab '{sheets[0].get('name')}'.)")
+        rid = sheets[0].get(RID)
+    rels = ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))
+    target = None
+    for rel in rels:
+        if rel.get("Id") == rid:
+            target = rel.get("Target")
+    if not target:
+        sys.exit(f"Could not find sheet '{sheet_name}' in {path}")
+    target = target.lstrip("/")                 # openpyxl writes absolute targets
+    if not target.startswith("xl/"):
+        target = "xl/" + target
+
+    sheet = ET.fromstring(z.read(target))
+    raw_rows = []
+    for row in sheet.iter(f"{NS}row"):
+        cells = {}
+        for c in row.findall(f"{NS}c"):
+            t = c.get("t")
+            if t == "inlineStr":                       # string written inline
+                is_el = c.find(f"{NS}is")
+                val = "".join(x.text or "" for x in is_el.iter(f"{NS}t")) if is_el is not None else ""
+            else:
+                v = c.find(f"{NS}v")
+                if v is None or v.text is None:
+                    continue
+                val = shared[int(v.text)] if t == "s" else v.text   # shared string or number/formula-result
+            cells[_col(c.get("r"))] = val
+        if cells:
+            raw_rows.append(cells)
+
+    if not raw_rows:
+        return []
+    header = {col: str(v).strip() for col, v in raw_rows[0].items()}
+    out = []
+    for cells in raw_rows[1:]:
+        out.append({header.get(col, col): val for col, val in cells.items()})
+    return out
+
+
+# ── Helpers ────────────────────────────────────────────────────────────────
+def num(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def slugify(s):
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", s.lower())).strip("-")
+
+
+def tidy(s):
+    """Light brand normalization: hyphen dividers -> em dash, x -> ×."""
+    s = (s or "").strip()
+    s = s.replace(" - ", " — ")
+    s = re.sub(r"(?<=\d)x(?=\d)", "×", s)        # 12x10  -> 12×10
+    s = re.sub(r"\s[xX]\s", " × ", s)            # 12 x 10 / L x 65 -> 12 × 10 / L × 65
+    return s
+
+
+def js(s):
+    """Escape a Python string for a double-quoted JS string literal.
+    (Sizes contain inch marks like 64" — the double quote must be escaped.)"""
+    return (s or "").replace("\\", "\\\\").replace('"', '\\"').replace("\n", " ")
+
+
+def _truthy(v):
+    """A cell that means 'yes' — tolerant of Yes/Y/TRUE/X/✓/1."""
+    return (v or "").strip().lower() in ("yes", "y", "true", "x", "✓", "1")
+
+
+# ── Build the CART structures from rows ────────────────────────────────────
+def build_cart(rows):
+    """Parse every valid row once, then derive two views that share the same
+    item objects (so one image download serves both):
+        • estimate  — rows the client sees (STATUS = Show)
+        • final     — rows approved for the confirmation doc (APPROVED = Yes),
+                      regardless of STATUS (extras can be Hidden yet Approved).
+    Returns (estimate_ordered, final_ordered, hidden)."""
+    groups = {}   # category -> list of item dicts (insertion-ordered), ALL rows
+    hidden = []   # pieces left off the estimate page via the STATUS column
+    # Only filter by STATUS if the column actually exists — otherwise an older
+    # sheet (no STATUS column) would hide everything.
+    has_status = any("STATUS" in r for r in rows)
+    for r in rows:
+        cat = (r.get("CATEGORY") or "").strip()
+        piece = (r.get("PIECE") or "").strip()
+        qty, price = num(r.get("QTY")), num(r.get("PRICE"))
+        if not (cat and piece and qty is not None and price is not None):
+            continue  # skips blanks and the summary block at the bottom
+        # STATUS drives the ESTIMATE view only (only "Show" rows render there).
+        # APPROVED drives the FINAL view. They're independent: a small add-on can
+        # be Hidden from the closed estimate yet Approved for the final doc.
+        show = (not has_status) or (r.get("STATUS") or "").strip().lower() == "show"
+        approved = _truthy(r.get("APPROVED"))
+        if not show:
+            hidden.append(tidy(piece))
+        link = (r.get("LINK") or "").strip()
+        if link.upper() in ("", "N/A", "TBD", "NONE"):
+            link = ""
+        item = {
+            "slug": (r.get("SLUG") or "").strip(),   # filled below from final piece if blank
+            "piece": tidy(piece),
+            "retailer": (r.get("RETAILER") or "").strip(),
+            "size": tidy(r.get("SIZE") or ""),
+            "color": (r.get("COLOR") or "").strip(),
+            "qty": int(qty) if qty == int(qty) else qty,
+            "unit": round(price, 2),
+            "total": round(qty * price, 2),
+            "link": link,
+            "flag": (r.get("NOTES") or "").strip(),   # your note to the client (the "↳" line)
+            "image_url": (r.get("IMAGE") or "").strip(),  # Drive share link / direct URL; pulled below
+            "img": "",                                    # local filename, resolved by download_images()
+            "show": show,          # in the estimate view
+            "approved": approved,  # in the final view
+        }
+        groups.setdefault(cat, []).append(item)
+
+    # Disambiguate duplicate piece names within a category (e.g. two "Crates")
+    # by folding the distinguishing field into the title, so radio groups and
+    # inbox labels stay unique — and drop that field from the meta to avoid
+    # repeating it.
+    for items in groups.values():
+        seen = {}
+        for it in items:
+            seen.setdefault(it["piece"], []).append(it)
+        for piece, dupes in seen.items():
+            if len(dupes) < 2:
+                continue
+            for field in ("color", "size"):   # prefer color ("Dresser — Lime"); fall back to size
+                vals = [d[field] for d in dupes]
+                if len(set(vals)) == len(vals) and all(vals):
+                    for d in dupes:
+                        d["piece"] = f"{piece} — {d[field]}"
+                        d[field] = ""   # avoid repeating it in the meta line
+                    break
+    # Fill any blank slug from the FINAL (disambiguated) piece name, so duplicate
+    # pieces get unique slugs (Crates — Medium → crates-medium). An explicit SLUG
+    # column always wins.
+    for items in groups.values():
+        for it in items:
+            if not it["slug"]:
+                it["slug"] = slugify(it["piece"])
+
+    # Order: CATEGORY_ORDER first (as listed), then any unlisted in spreadsheet
+    # order (sort is stable), then LAST_CATEGORIES pinned to the very end.
+    def cat_rank(cat):
+        if cat in LAST_CATEGORIES:
+            return (2, LAST_CATEGORIES.index(cat))
+        if cat in CATEGORY_ORDER:
+            return (0, CATEGORY_ORDER.index(cat))
+        return (1, 0)
+
+    def view(predicate):
+        """Ordered [(cat, items)] for items matching predicate; empty cats dropped."""
+        ordered = []
+        for cat, items in groups.items():
+            sel = [it for it in items if predicate(it)]
+            if sel:
+                ordered.append((cat, sel))
+        ordered.sort(key=lambda ci: cat_rank(ci[0]))
+        return ordered
+
+    estimate = view(lambda it: it["show"])
+    final = view(lambda it: it["approved"])
+    return estimate, final, hidden
+
+
+# ── Images: pull whatever's in the IMAGE column into the repo ───────────────
+# A Google Drive "share link" points at a viewer page, not the file — so we
+# pull the id out and hit the direct-download endpoint. Plain image URLs work
+# too. Each image lands as assets/images/estimate/<slug>.<ext> and the filename
+# is recorded on the item; the page just loads the local copy.
+DRIVE_ID_RE = re.compile(r"(?:/d/|[?&]id=)([a-zA-Z0-9_-]{20,})")
+EXT_BY_CT = {"image/png": ".png", "image/jpeg": ".jpg", "image/jpg": ".jpg",
+             "image/webp": ".webp", "image/gif": ".gif"}
+
+
+def _existing_local(slug):
+    """Any already-downloaded photo for this slug, so items without a sheet
+    image keep whatever was curated by hand before."""
+    for ext in (".webp", ".png", ".jpg", ".jpeg", ".gif"):
+        if os.path.exists(os.path.join(IMG_DIR, slug + ext)):
+            return slug + ext
+    return ""
+
+
+def _sniff_ext(data):
+    if data[:3] == b"\xff\xd8\xff": return ".jpg"
+    if data[:8] == b"\x89PNG\r\n\x1a\n": return ".png"
+    if data[:3] == b"GIF": return ".gif"
+    if data[8:12] == b"WEBP": return ".webp"
+    return None
+
+
+def download_images(*carts):
+    """Resolve every item's photo across one or more views. Views share item
+    objects, so we dedupe by identity to fetch each photo once.
+    Returns (pulled, failed) for the report."""
+    os.makedirs(IMG_DIR, exist_ok=True)
+    pulled, failed = [], []
+    seen = set()
+    for cart in carts:
+        for _cat, items in cart:
+            for it in items:
+                if id(it) in seen:
+                    continue
+                seen.add(id(it))
+                url = it.get("image_url", "")
+                if not url:
+                    it["img"] = _existing_local(it["slug"])     # keep hand-placed photo / placeholder
+                    continue
+                m = DRIVE_ID_RE.search(url)
+                dl = f"https://drive.google.com/uc?export=download&id={m.group(1)}" if m else url
+                try:
+                    req = urllib.request.Request(dl, headers={"User-Agent": "Mozilla/5.0"})
+                    resp = urllib.request.urlopen(req, timeout=60)
+                    data = resp.read()
+                    ct = (resp.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+                except Exception as e:
+                    it["img"] = _existing_local(it["slug"]); failed.append((it["piece"], str(e))); continue
+                ext = EXT_BY_CT.get(ct) or _sniff_ext(data)
+                if not ext:    # got an HTML page (file not public) rather than an image
+                    it["img"] = _existing_local(it["slug"])
+                    failed.append((it["piece"], "link isn’t a public image — share it ‘Anyone with the link’"))
+                    continue
+                fname = it["slug"] + ext
+                with open(os.path.join(IMG_DIR, fname), "wb") as f:
+                    f.write(data)
+                it["img"] = fname
+                pulled.append(it["piece"])
+    return pulled, failed
+
+
+def generate_js(cart):
+    lines = ["  const CART = ["]
+    for cat, items in cart:
+        lines.append(f"    {{ cat: \"{js(cat)}\", items: [")
+        for it in items:
+            qty = it["qty"]
+            flag = f', flag:"{js(it["flag"])}"' if it.get("flag") else ""
+            lines.append(
+                f"      {{ slug:\"{js(it['slug'])}\", piece:\"{js(it['piece'])}\", "
+                f"retailer:\"{js(it['retailer'])}\", size:\"{js(it['size'])}\", "
+                f"color:\"{js(it['color'])}\", qty:{qty}, unit:{it['unit']:g}, "
+                f"total:{it['total']:g}, link:\"{js(it['link'])}\", img:\"{js(it.get('img',''))}\"{flag} }},"
+            )
+        lines.append("    ]},")
+    lines.append("  ];")
+    return "\n".join(lines)
+
+
+# ── Inject a data block into a page ────────────────────────────────────────
+def inject(page, start, end, js_block):
+    """Replace the CART data between the start/end markers in `page`.
+    Idempotent — re-running never accumulates stray comment tails."""
+    html = open(page, encoding="utf-8").read()
+    if start not in html or end not in html:
+        sys.exit(f"Could not find the {start.split()[-1]} markers in {os.path.relpath(page, REPO)}.")
+    pre = html.split(start, 1)[0]
+    # Everything after the END marker's own closing "*/".
+    post = html.split(end, 1)[1].split("*/", 1)[1]
+    start_line = start + " — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */"
+    end_line = end + " */"
+    new = f"{pre}{start_line}\n{js_block}\n  {end_line}{post}"
+    open(page, "w", encoding="utf-8").write(new)
+
+
+# ── Report ─────────────────────────────────────────────────────────────────
+def report(cart, pulled=None, failed=None, hidden=None):
+    total = 0.0
+    missing = []
+    print("\n  Category                       Pieces      Subtotal")
+    print("  " + "-" * 52)
+    for cat, items in cart:
+        sub = sum(it["total"] for it in items)
+        total += sub
+        print(f"  {cat:<30} {len(items):>5}   ${sub:>11,.2f}")
+        for it in items:
+            if not it.get("img"):
+                missing.append(it["piece"])
+    print("  " + "-" * 52)
+    n = sum(len(i) for _, i in cart)
+    print(f"  {'TOTAL':<30} {n:>5}   ${total:>11,.2f}\n")
+
+    if pulled:
+        print(f"  ⬇  Pulled {len(pulled)} photo(s) from the sheet’s IMAGE links.")
+    if failed:
+        print(f"  ⚠  {len(failed)} image link(s) couldn’t be fetched:")
+        for piece, why in failed:
+            print(f"      • {piece}  —  {why}")
+    if missing:
+        print(f"  ⚠  {len(missing)} item(s) have no photo (a placeholder shows): {', '.join(missing)}")
+    if hidden:
+        print(f"  ◦  {len(hidden)} item(s) hidden via STATUS (not on the page): {', '.join(hidden)}")
+    print("\n  ✓ index.html updated. Preview, then commit & push to publish.\n")
+
+
+def final_report(final):
+    """Summarize the FINAL (approved) view — what lands on the confirmation page."""
+    if not final:
+        print("  ⚠  No APPROVED rows — the final page is empty. Mark pieces "
+              "APPROVED = Yes in PRODUCT LIST to populate it.\n")
+        return
+    total = sum(it["total"] for _cat, items in final for it in items)
+    n = sum(len(items) for _cat, items in final)
+    print("  FINAL PAGE (approved)")
+    print("  " + "-" * 52)
+    for cat, items in final:
+        sub = sum(it["total"] for it in items)
+        print(f"  {cat:<30} {len(items):>5}   ${sub:>11,.2f}")
+    print("  " + "-" * 52)
+    print(f"  {'APPROVED TOTAL':<30} {n:>5}   ${total:>11,.2f}")
+    print("  → estimate/roomfortwo/final/index.html\n")
+
+
+# ── Google Sheet fetch ─────────────────────────────────────────────────────
+def looks_like_google(s):
+    return "docs.google.com" in s or (s and "/" not in s and "." not in s and len(s) > 20)
+
+
+def fetch_google_sheet(url_or_id):
+    """Download a shared Google Sheet as .xlsx into the local source file.
+    The Sheet must be shared 'Anyone with the link: Viewer' (or published)."""
+    m = re.search(r"/spreadsheets/d/([a-zA-Z0-9-_]+)", url_or_id)
+    sheet_id = m.group(1) if m else url_or_id.strip()
+    export = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=xlsx"
+    print(f"\n  Pulling latest from Google Sheet…")
+    try:
+        req = urllib.request.Request(export, headers={"User-Agent": "Mozilla/5.0"})
+        data = urllib.request.urlopen(req, timeout=30).read()
+    except Exception as e:
+        sys.exit(f"  Could not reach the Google Sheet ({e}).\n"
+                 f"  Check the link, and that it's shared 'Anyone with the link: Viewer'.")
+    if data[:2] != b"PK":   # .xlsx files are zips; HTML login page is not
+        sys.exit("  Google returned a login page, not the spreadsheet.\n"
+                 "  Set sharing to 'Anyone with the link: Viewer' (or File → Share → Publish to web).")
+    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    with open(CACHE, "wb") as f:    # throwaway cache — keeps refreshes from churning git
+        f.write(data)
+    return CACHE
+
+
+# ── Client config ──────────────────────────────────────────────────────────
+def load_client(client_id):
+    """Load clients/<id>/client.json — the single source of truth for everything
+    client-specific (Sheet URL, output paths, category order, identity strings)."""
+    path = os.path.join(CLIENTS_DIR, client_id, "client.json")
+    if not os.path.exists(path):
+        sys.exit(f"No client config at {os.path.relpath(path, REPO)} — "
+                 f"check the client id (or scaffold it with 'ktw new {client_id}').")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def parse_args(argv):
+    """Split CLI args into (client_id, source_override). A path or Google-Sheet
+    URL is treated as a one-off source override; anything else is the client id.
+    Defaults to 'roomfortwo' so the existing double-click command keeps working."""
+    client, source_override = "roomfortwo", ""
+    for a in argv:
+        if looks_like_google(a) or "/" in a or a.lower().endswith((".xlsx", ".xls")):
+            source_override = a
+        else:
+            client = a
+    return client, source_override
+
+
+# ── Templates ──────────────────────────────────────────────────────────────
+def build_tokens(cfg):
+    """Flat {{token}} → value map from a client's config. The CART data is NOT a
+    token — it's injected between the DATA markers by inject()."""
+    idn = cfg["identity"]
+    img_base = "/" + cfg["image_dir"].strip("/")
+    return {
+        "{{eyebrow}}": idn["eyebrow"],
+        "{{h1_html}}": idn["h1_html"],
+        "{{lede_estimate}}": idn["lede_estimate"],
+        "{{lede_final}}": idn["lede_final"],
+        "{{project}}": idn["project"],
+        "{{project_short}}": idn["project_short"],
+        "{{client_first_name}}": idn["client_first_name"],
+        "{{round_label}}": cfg["round"]["label"],
+        "{{round_date}}": cfg["round"]["date"],
+        "{{final_prepared}}": cfg["final"]["prepared"],
+        "{{submit_url}}": cfg.get("submit_url", ""),
+        "{{contact_email}}": cfg.get("contact_email", ""),
+        "{{img_base}}": img_base,
+        "{{img_base_pdf}}": img_base + "-pdf",   # downscaled photos used for the PDF
+    }
+
+
+def render_template(name, tokens):
+    """Read templates/<name>, substitute every {{token}}, and fail loudly if any
+    token is left unfilled (a config typo would otherwise ship a literal token)."""
+    html = open(os.path.join(TEMPLATES_DIR, name), encoding="utf-8").read()
+    for k, v in tokens.items():
+        html = html.replace(k, v)
+    leftover = re.findall(r"\{\{[a-z0-9_]+\}\}", html)
+    if leftover:
+        sys.exit(f"Unfilled template token(s) in {name}: {sorted(set(leftover))} "
+                 f"— check clients/<client>/client.json.")
+    return html
+
+
+if __name__ == "__main__":
+    client_id, source_override = parse_args(sys.argv[1:])
+    cfg = load_client(client_id)
+
+    # Point the module globals the helpers read at this client's config.
+    out = os.path.join(REPO, *cfg["output_dir"].split("/"))
+    PAGE = os.path.join(out, "index.html")
+    FINAL_PAGE = os.path.join(out, "final", "index.html")
+    IMG_DIR = os.path.join(REPO, *cfg["image_dir"].split("/"))
+    SHEET_NAME = cfg["source"]["sheet_name"]
+    GOOGLE_SHEET = cfg["source"].get("google_sheet", "")
+    CATEGORY_ORDER = cfg.get("category_order", [])
+    LAST_CATEGORIES = cfg.get("last_categories", [])
+
+    source = source_override or GOOGLE_SHEET
+    if source and looks_like_google(source):
+        path = fetch_google_sheet(source)            # Google Sheet → cached .xlsx
+        label = "Google Sheet"
+    else:
+        path = source or XLSX                        # explicit path, or local file
+        label = os.path.relpath(path, REPO)
+    if not os.path.exists(path):
+        sys.exit(f"Spreadsheet not found: {path}")
+    rows = read_sheet(path, SHEET_NAME)
+    estimate, final, hidden = build_cart(rows)
+    if not estimate:
+        sys.exit("No item rows found — check the sheet name and columns (and the STATUS column — only 'Show' rows render).")
+    print("  Fetching product photos from the IMAGE column…")
+    pulled, failed = download_images(estimate, final)   # union — one fetch per photo
+    # Regenerate both pages from the shared templates (client bits from
+    # client.json), then inject the CART data. Output is fully generated —
+    # never hand-edited.
+    tokens = build_tokens(cfg)
+    for page, tmpl in ((PAGE, "estimate.html"), (FINAL_PAGE, "final.html")):
+        os.makedirs(os.path.dirname(page), exist_ok=True)
+        open(page, "w", encoding="utf-8").write(render_template(tmpl, tokens))
+    inject(PAGE, START, END, generate_js(estimate))
+    inject(FINAL_PAGE, FINAL_START, FINAL_END, generate_js(final))
+    print(f"\n  Synced from: {label}  (sheet: {SHEET_NAME})")
+    report(estimate, pulled, failed, hidden)
+    final_report(final)
