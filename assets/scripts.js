@@ -147,9 +147,16 @@
 // ── Swipe stack (mobile card deck) ────────────────────────────────
 /* KT.swipeStack(container, opts)
    Turns a .swipe-stack container of .swipe-card children into a touch-driven
-   card deck. Top card = last DOM child. On a committed horizontal swipe the
-   top card flies off, is re-inserted as the first child (bottom of pile),
-   and its transform resets — the deck loops forever.
+   card deck. Top card = last DOM child. Direction is meaningful:
+
+     swipe LEFT  → next: the top card flies off to the left and is re-inserted
+                   as the first child (bottom of the pile) — the deck loops.
+     swipe RIGHT → previous: the bottom card is promoted to the top and pulled
+                   back in from off-screen left, following the finger. Both
+                   directions move the photos the same way the finger moves.
+
+   A tap (press + release with no drag) opens the shared lightbox at that
+   card's original index — see KT.lightbox.
 
    Uses Pointer Events so the same code works for touch and for mouse when the
    mobile layout is active (e.g. desktop browser resized to ≤768px). Each
@@ -160,7 +167,8 @@
      velocityThreshold px/ms to commit              (default 0.4)
      duration          off-screen fly-out ms        (default 400)
      snapDuration      snap-back ms                 (default 280)
-     onChange(i)       fires after each recycle
+     lightbox          false to disable tap-to-open (default true)
+     onChange(i)       fires with the new top card's original index
 
    Returns { destroy } to remove listeners. */
 (function () {
@@ -185,10 +193,20 @@
     var velocityThreshold = opts.velocityThreshold != null ? opts.velocityThreshold : 0.4;
     var duration          = opts.duration          != null ? opts.duration          : 400;
     var snapDuration      = opts.snapDuration      != null ? opts.snapDuration      : 280;
+    var useLightbox       = opts.lightbox !== false;
     var onChange          = typeof opts.onChange === 'function' ? opts.onChange : null;
 
+    // Original DOM order is the slideshow order — the deck reorders itself as
+    // it loops, so freeze the sequence once at init and tag each card with it.
+    var ordered = [].slice.call(container.querySelectorAll('.swipe-card'));
+    ordered.forEach(function (card, i) { card.setAttribute('data-kt-index', i); });
+
     var top = null;
+    var incoming = null;  // card promoted to the top for a backwards (right) drag
+    var dirLock = 0;      // -1 = next (left), +1 = previous (right)
     var activePointerId = null;
+    var downCard = null;
+    var downT = 0;
     var startX = 0, startY = 0;
     var lastX = 0, lastT = 0;
     var prevX = 0, prevT = 0;
@@ -201,11 +219,134 @@
       return cards.length ? cards[cards.length - 1] : null;
     }
 
+    function getBottom() {
+      var cards = container.querySelectorAll('.swipe-card');
+      return cards.length ? cards[0] : null;
+    }
+
+    /** Off-screen distance for fly-out / pull-in. Viewport-based so a card
+        always clears the screen regardless of stack width. */
+    function fly() {
+      return (window.innerWidth || 800) * 1.2;
+    }
+
     function setTransform(el, dx, rot, withTransition, ms) {
       el.style.transition = withTransition
         ? 'transform ' + ms + 'ms ' + EASE
         : 'none';
       el.style.transform = 'translate3d(' + dx + 'px, 0, 0) rotate(' + rot + 'deg)';
+    }
+
+    function clearTransform(el) {
+      el.style.transition = 'none';
+      el.style.transform = '';
+      /* eslint-disable no-unused-expressions */
+      el.offsetHeight;   // reflow so the next drag starts clean
+      /* eslint-enable no-unused-expressions */
+      el.style.transition = '';
+    }
+
+    /** Run cb once the transition ends, with a timeout fallback for the cases
+        where the target transform equals the current one (no transitionend). */
+    function afterTransition(el, ms, cb) {
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        el.removeEventListener('transitionend', finish);
+        clearTimeout(timer);
+        cb();
+      }
+      var timer = setTimeout(finish, ms + 80);
+      el.addEventListener('transitionend', finish);
+    }
+
+    function announce() {
+      if (!onChange) return;
+      var t = getTop();
+      onChange(t ? parseInt(t.getAttribute('data-kt-index'), 10) : -1);
+    }
+
+    function hideHint() {
+      var hint = container.querySelector('.swipe-hint-overlay');
+      if (hint) hint.classList.add('is-hidden');
+    }
+
+    // ── Forward (swipe left): throw the top card off, recycle to bottom ──
+    function commitNext(card) {
+      animating = true;
+      setTransform(card, -fly(), -18, true, duration);
+      afterTransition(card, duration, function () {
+        container.insertBefore(card, container.firstChild);
+        clearTransform(card);
+        animating = false;
+        announce();
+      });
+    }
+
+    // ── Backward (swipe right): pull the bottom card back in from the left ──
+    function promotePrev() {
+      var card = getBottom();
+      if (!card || card === getTop()) return null;
+      container.appendChild(card);           // stickers keep their own z-index
+      setTransform(card, -fly(), -18, false, 0);
+      /* eslint-disable no-unused-expressions */
+      card.offsetHeight;
+      /* eslint-enable no-unused-expressions */
+      return card;
+    }
+
+    function commitPrev(card) {
+      animating = true;
+      setTransform(card, 0, 0, true, duration);
+      afterTransition(card, duration, function () {
+        clearTransform(card);
+        animating = false;
+        announce();
+      });
+    }
+
+    function cancelPrev(card) {
+      animating = true;
+      setTransform(card, -fly(), -18, true, snapDuration);
+      afterTransition(card, snapDuration, function () {
+        container.insertBefore(card, container.firstChild);
+        clearTransform(card);
+        animating = false;
+      });
+    }
+
+    function snapBack(card) {
+      setTransform(card, 0, 0, true, snapDuration);
+      afterTransition(card, snapDuration, function () { clearTransform(card); });
+    }
+
+    function openLightbox(card) {
+      if (!useLightbox || !window.KT.lightbox) return;
+      // Deck order is DOM order reversed (last child = top card), so the
+      // lightbox runs top-card-first: swiping it forward shows the same photo
+      // swiping the deck forward would reveal.
+      var deck = ordered.slice().reverse();
+      var sources = [];   // cards that actually carry a photo (skips placeholders)
+      var items = [];
+      deck.forEach(function (c) {
+        var img = c.querySelector('img');
+        if (!img) return;
+        sources.push(c);
+        items.push({
+          src: img.getAttribute('data-full') || img.currentSrc || img.src,
+          alt: img.getAttribute('alt') || ''
+        });
+      });
+      if (!items.length) return;
+      var i = sources.indexOf(card);
+      window.KT.lightbox.open(items, i < 0 ? 0 : i);
+    }
+
+    function releasePointer(id) {
+      try {
+        container.releasePointerCapture(id);
+      } catch (err) { /* ignore */ }
     }
 
     function onPointerDown(e) {
@@ -219,11 +360,14 @@
       try {
         container.setPointerCapture(e.pointerId);
       } catch (err) { /* ignore */ }
+      downCard = e.target && e.target.closest ? e.target.closest('.swipe-card') : null;
       startX = lastX = prevX = e.clientX;
       startY = e.clientY;
-      lastT = prevT = e.timeStamp || Date.now();
+      downT = lastT = prevT = e.timeStamp || Date.now();
       dragging = true;
       locked = false;
+      dirLock = 0;
+      incoming = null;
       top.style.transition = 'none';
     }
 
@@ -240,18 +384,20 @@
           // Vertical scroll wins — release the gesture.
           dragging = false;
           activePointerId = null;
-          try {
-            container.releasePointerCapture(e.pointerId);
-          } catch (err) { /* ignore */ }
+          releasePointer(e.pointerId);
           top.style.transition = '';
           top.style.transform = '';
           return;
         }
         locked = true;
+        hideHint();
 
-        // Hide swipe hint if present
-        var hint = container.querySelector('.swipe-hint-overlay');
-        if (hint) hint.classList.add('is-hidden');
+        // Direction is decided once, at lock, and holds for the whole gesture.
+        dirLock = dx > 0 ? 1 : -1;
+        if (dirLock === 1) {
+          incoming = promotePrev();
+          if (!incoming) dirLock = -1;   // single-card stack: fall back to a throw
+        }
       }
 
       e.preventDefault();
@@ -259,78 +405,62 @@
       lastX = e.clientX;
       lastT = e.timeStamp || Date.now();
 
-      setTransform(top, dx, dx * 0.04, false, 0);
-    }
-
-    function recycle(card) {
-      container.insertBefore(card, container.firstChild);
-      card.style.transition = 'none';
-      card.style.transform = '';
-      // Force reflow so the next drag starts from a clean transform.
-      /* eslint-disable no-unused-expressions */
-      card.offsetHeight;
-      /* eslint-enable no-unused-expressions */
-      if (onChange) {
-        var cards = container.querySelectorAll('.swipe-card');
-        onChange(cards.length - 1);
+      if (dirLock === 1 && incoming) {
+        // Pull-in: half the stack width of travel brings the card fully home.
+        var travel = Math.max(80, container.offsetWidth * 0.5);
+        var p = Math.min(Math.max(dx / travel, 0), 1);
+        setTransform(incoming, -fly() * (1 - p), -18 * (1 - p), false, 0);
+      } else {
+        setTransform(top, Math.min(dx, 0), Math.min(dx, 0) * 0.04, false, 0);
       }
-    }
-
-    function commit(card, dir) {
-      animating = true;
-      var offX = (window.innerWidth || 800) * 1.2 * dir;
-      var offRot = 18 * dir;
-      var onEnd = function () {
-        card.removeEventListener('transitionend', onEnd);
-        recycle(card);
-        animating = false;
-      };
-      card.addEventListener('transitionend', onEnd);
-      setTransform(card, offX, offRot, true, duration);
-    }
-
-    function snapBack(card) {
-      setTransform(card, 0, 0, true, snapDuration);
     }
 
     function onPointerUp(e) {
       if (e.pointerId !== activePointerId) return;
       activePointerId = null;
-      try {
-        container.releasePointerCapture(e.pointerId);
-      } catch (err) { /* ignore */ }
+      releasePointer(e.pointerId);
       if (!dragging || !top) { dragging = false; return; }
       dragging = false;
 
       var dx = lastX - startX;
       var dt = Math.max(1, lastT - prevT);
       var v = (lastX - prevX) / dt;
+      var elapsed = (e.timeStamp || Date.now()) - downT;
 
       if (!locked) {
         top.style.transition = '';
         top.style.transform = '';
+        // No horizontal claim + barely moved + quick = a tap, not a drag.
+        if (downCard && Math.abs(dx) < 6 && Math.abs(e.clientY - startY) < 6 && elapsed < 500) {
+          openLightbox(downCard);
+        }
         return;
       }
 
-      if (Math.abs(dx) > threshold || Math.abs(v) > velocityThreshold) {
-        var dir = (dx === 0 ? (v >= 0 ? 1 : -1) : (dx > 0 ? 1 : -1));
-        commit(top, dir);
-      } else {
-        snapBack(top);
+      if (dirLock === 1 && incoming) {
+        if (dx > threshold || v > velocityThreshold) commitPrev(incoming);
+        else cancelPrev(incoming);
+        incoming = null;
+        return;
       }
+
+      if (Math.abs(dx) > threshold || Math.abs(v) > velocityThreshold) commitNext(top);
+      else snapBack(top);
     }
 
     function onPointerCancel() {
       if (activePointerId !== null) {
-        try {
-          container.releasePointerCapture(activePointerId);
-        } catch (err) { /* ignore */ }
+        releasePointer(activePointerId);
         activePointerId = null;
       }
       if (!dragging || !top) { dragging = false; return; }
       dragging = false;
-      if (locked) snapBack(top);
-      else {
+      if (locked && dirLock === 1 && incoming) {
+        cancelPrev(incoming);
+        incoming = null;
+      } else if (locked) {
+        snapBack(top);
+      } else {
         top.style.transition = '';
         top.style.transform = '';
       }
@@ -352,4 +482,265 @@
       }
     };
   };
+}());
+
+// ── Lightbox (editorial slideshow) ────────────────────────────────
+/* KT.lightbox.open(items, index)
+     items — [{ src, alt }] in slideshow order
+     index — slide to open on (clamped)
+
+   One overlay is built lazily and reused by every stack on the page. Swipe or
+   drag horizontally to move between slides, arrow keys on desktop, Esc / the
+   X / a click on the backdrop to close. Clamped at both ends (not looped) so
+   the counter always tells you where you are.
+
+   KT.lightbox.close() closes it. */
+(function () {
+  window.KT = window.KT || {};
+
+  var EASE     = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  var SLIDE_MS = 380;
+
+  var root = null, track = null, counter = null, closeBtn = null;
+  var prevBtn = null, nextBtn = null;
+
+  var items = [];
+  var index = 0;
+  var width = 0;
+  var isOpen = false;
+  var lastFocus = null;
+
+  var pointerId = null;
+  var startX = 0, startY = 0;
+  var lastX = 0, lastT = 0, prevX = 0, prevT = 0;
+  var dragging = false, locked = false;
+
+  var X_SVG =
+    '<svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+      '<path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>' +
+      '<path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>' +
+    '</svg>';
+
+  function chevron(dir) {
+    var d = dir < 0 ? 'M11 1L1 10L11 19' : 'M1 1L11 10L1 19';
+    return '<svg viewBox="0 0 12 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
+             '<path d="' + d + '" stroke="currentColor" stroke-width="2"/>' +
+           '</svg>';
+  }
+
+  function build() {
+    root = document.createElement('div');
+    root.className = 'kt-lightbox';
+    root.setAttribute('role', 'dialog');
+    root.setAttribute('aria-modal', 'true');
+    root.setAttribute('aria-label', 'Image viewer');
+    root.setAttribute('aria-hidden', 'true');
+    root.setAttribute('tabindex', '-1');
+    root.innerHTML =
+      '<div class="kt-lightbox__track"></div>' +
+      '<button class="kt-lightbox__close" type="button" aria-label="Close image viewer">' + X_SVG + '</button>' +
+      '<button class="kt-lightbox__nav kt-lightbox__nav--prev" type="button" aria-label="Previous image">' + chevron(-1) + '</button>' +
+      '<button class="kt-lightbox__nav kt-lightbox__nav--next" type="button" aria-label="Next image">' + chevron(1) + '</button>' +
+      '<p class="kt-lightbox__counter" aria-live="polite"></p>';
+    document.body.appendChild(root);
+
+    track    = root.querySelector('.kt-lightbox__track');
+    closeBtn = root.querySelector('.kt-lightbox__close');
+    prevBtn  = root.querySelector('.kt-lightbox__nav--prev');
+    nextBtn  = root.querySelector('.kt-lightbox__nav--next');
+    counter  = root.querySelector('.kt-lightbox__counter');
+
+    closeBtn.addEventListener('click', close);
+    prevBtn.addEventListener('click', function () { go(index - 1, true); });
+    nextBtn.addEventListener('click', function () { go(index + 1, true); });
+
+    // Backdrop / letterbox gutter click closes; the photo itself does not.
+    track.addEventListener('click', function (e) {
+      if (!locked && e.target.tagName !== 'IMG') close();
+    });
+
+    track.addEventListener('pointerdown', onPointerDown, { passive: true });
+    track.addEventListener('pointermove', onPointerMove, { passive: false });
+    track.addEventListener('pointerup', onPointerUp, { passive: true });
+    track.addEventListener('pointercancel', onPointerCancel, { passive: true });
+    track.addEventListener('lostpointercapture', onPointerCancel, { passive: true });
+
+    window.addEventListener('resize', function () {
+      if (!isOpen) return;
+      width = root.clientWidth;
+      position(-index * width, false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (!isOpen) return;
+      if (e.key === 'Escape')     { close(); }
+      else if (e.key === 'ArrowLeft')  { go(index - 1, true); }
+      else if (e.key === 'ArrowRight') { go(index + 1, true); }
+      else if (e.key === 'Tab')   { trapFocus(e); }
+    });
+  }
+
+  /** Keep Tab inside the dialog while it is open. */
+  function trapFocus(e) {
+    var focusable = root.querySelectorAll('button:not([disabled])');
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last  = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  function render() {
+    track.innerHTML = items.map(function (item) {
+      return '<div class="kt-lightbox__slide"><img src="' + item.src + '" alt="' +
+             String(item.alt || '').replace(/"/g, '&quot;') + '"></div>';
+    }).join('');
+  }
+
+  function position(x, animate) {
+    track.style.transition = animate ? 'transform ' + SLIDE_MS + 'ms ' + EASE : 'none';
+    track.style.transform  = 'translate3d(' + x + 'px, 0, 0)';
+  }
+
+  function go(i, animate) {
+    index = Math.min(Math.max(i, 0), items.length - 1);
+    width = root.clientWidth;
+    position(-index * width, animate);
+    counter.textContent = (index + 1) + ' / ' + items.length;
+    prevBtn.disabled = index === 0;
+    nextBtn.disabled = index === items.length - 1;
+  }
+
+  function onPointerDown(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (pointerId !== null) return;
+    pointerId = e.pointerId;
+    try {
+      track.setPointerCapture(e.pointerId);
+    } catch (err) { /* ignore */ }
+    width = root.clientWidth;
+    startX = lastX = prevX = e.clientX;
+    startY = e.clientY;
+    lastT = prevT = e.timeStamp || Date.now();
+    dragging = true;
+    locked = false;
+  }
+
+  function onPointerMove(e) {
+    if (e.pointerId !== pointerId || !dragging) return;
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+
+    if (!locked) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        dragging = false;
+        pointerId = null;
+        try {
+          track.releasePointerCapture(e.pointerId);
+        } catch (err) { /* ignore */ }
+        return;
+      }
+      locked = true;
+    }
+
+    e.preventDefault();
+    prevX = lastX; prevT = lastT;
+    lastX = e.clientX;
+    lastT = e.timeStamp || Date.now();
+
+    // Resistance past the first / last slide.
+    if ((index === 0 && dx > 0) || (index === items.length - 1 && dx < 0)) dx *= 0.35;
+    position(-index * width + dx, false);
+  }
+
+  function onPointerUp(e) {
+    if (e.pointerId !== pointerId) return;
+    pointerId = null;
+    try {
+      track.releasePointerCapture(e.pointerId);
+    } catch (err) { /* ignore */ }
+    if (!dragging) return;
+    dragging = false;
+    if (!locked) return;
+
+    var dx = lastX - startX;
+    var dt = Math.max(1, lastT - prevT);
+    var v  = (lastX - prevX) / dt;
+
+    if (dx < -width * 0.18 || v < -0.4)      go(index + 1, true);
+    else if (dx > width * 0.18 || v > 0.4)   go(index - 1, true);
+    else                                     go(index, true);
+
+    // Let the click handler see the drag, then clear it.
+    setTimeout(function () { locked = false; }, 0);
+  }
+
+  function onPointerCancel() {
+    if (pointerId !== null) {
+      try {
+        track.releasePointerCapture(pointerId);
+      } catch (err) { /* ignore */ }
+      pointerId = null;
+    }
+    if (!dragging) return;
+    dragging = false;
+    if (locked) go(index, true);
+    locked = false;
+  }
+
+  function open(list, i) {
+    if (!list || !list.length) return;
+    if (!root) build();
+
+    items = list;
+    lastFocus = document.activeElement;
+    render();
+
+    root.style.display = 'block';
+    root.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('kt-lightbox-open');
+    document.body.classList.add('kt-lightbox-open');
+    isOpen = true;
+
+    width = root.clientWidth;
+    go(i || 0, false);
+
+    requestAnimationFrame(function () { root.classList.add('is-open'); });
+    // Focus the dialog itself, not the X — a programmatic focus ring on the
+    // close button reads as a stray box over the photo.
+    root.focus({ preventScroll: true });
+  }
+
+  function close() {
+    if (!isOpen) return;
+    isOpen = false;
+
+    // Move focus out first — aria-hidden over a focused subtree is an a11y error.
+    if (root.contains(document.activeElement) && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
+    if (lastFocus && lastFocus !== document.body && lastFocus.focus) {
+      lastFocus.focus({ preventScroll: true });
+    }
+    lastFocus = null;
+
+    root.classList.remove('is-open');
+    root.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('kt-lightbox-open');
+    document.body.classList.remove('kt-lightbox-open');
+
+    setTimeout(function () {
+      if (isOpen) return;          // reopened during the fade
+      root.style.display = 'none';
+      track.innerHTML = '';
+    }, 240);
+  }
+
+  window.KT.lightbox = { open: open, close: close };
 }());
