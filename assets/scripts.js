@@ -147,16 +147,12 @@
 // ── Swipe stack (mobile card deck) ────────────────────────────────
 /* KT.swipeStack(container, opts)
    Turns a .swipe-stack container of .swipe-card children into a touch-driven
-   card deck. Top card = last DOM child. Direction is meaningful:
-
-     swipe LEFT  → next: the top card flies off to the left and is re-inserted
-                   as the first child (bottom of the pile) — the deck loops.
-     swipe RIGHT → previous: the bottom card is promoted to the top and pulled
-                   back in from off-screen left, following the finger. Both
-                   directions move the photos the same way the finger moves.
+   card deck. Top card = last DOM child. Swipe either way: the top card flies
+   off in the direction it was thrown, is re-inserted as the first child
+   (bottom of the pile) and its transform resets — the deck loops forever.
 
    A tap (press + release with no drag) opens the shared lightbox at that
-   card's original index — see KT.lightbox.
+   card's position in the deck — see KT.lightbox.
 
    Uses Pointer Events so the same code works for touch and for mouse when the
    mobile layout is active (e.g. desktop browser resized to ≤768px). Each
@@ -202,8 +198,6 @@
     ordered.forEach(function (card, i) { card.setAttribute('data-kt-index', i); });
 
     var top = null;
-    var incoming = null;  // card promoted to the top for a backwards (right) drag
-    var dirLock = 0;      // -1 = next (left), +1 = previous (right)
     var activePointerId = null;
     var downCard = null;
     var downT = 0;
@@ -219,13 +213,8 @@
       return cards.length ? cards[cards.length - 1] : null;
     }
 
-    function getBottom() {
-      var cards = container.querySelectorAll('.swipe-card');
-      return cards.length ? cards[0] : null;
-    }
-
-    /** Off-screen distance for fly-out / pull-in. Viewport-based so a card
-        always clears the screen regardless of stack width. */
+    /** Off-screen distance for the fly-out. Viewport-based so a card always
+        clears the screen regardless of stack width. */
     function fly() {
       return (window.innerWidth || 800) * 1.2;
     }
@@ -272,47 +261,16 @@
       if (hint) hint.classList.add('is-hidden');
     }
 
-    // ── Forward (swipe left): throw the top card off, recycle to bottom ──
-    function commitNext(card) {
+    /** Throw the top card off in the direction it was swiped (dir: -1 left,
+        +1 right), then drop it to the bottom of the pile. */
+    function commit(card, dir) {
       animating = true;
-      setTransform(card, -fly(), -18, true, duration);
+      setTransform(card, fly() * dir, 18 * dir, true, duration);
       afterTransition(card, duration, function () {
         container.insertBefore(card, container.firstChild);
         clearTransform(card);
         animating = false;
         announce();
-      });
-    }
-
-    // ── Backward (swipe right): pull the bottom card back in from the left ──
-    function promotePrev() {
-      var card = getBottom();
-      if (!card || card === getTop()) return null;
-      container.appendChild(card);           // stickers keep their own z-index
-      setTransform(card, -fly(), -18, false, 0);
-      /* eslint-disable no-unused-expressions */
-      card.offsetHeight;
-      /* eslint-enable no-unused-expressions */
-      return card;
-    }
-
-    function commitPrev(card) {
-      animating = true;
-      setTransform(card, 0, 0, true, duration);
-      afterTransition(card, duration, function () {
-        clearTransform(card);
-        animating = false;
-        announce();
-      });
-    }
-
-    function cancelPrev(card) {
-      animating = true;
-      setTransform(card, -fly(), -18, true, snapDuration);
-      afterTransition(card, snapDuration, function () {
-        container.insertBefore(card, container.firstChild);
-        clearTransform(card);
-        animating = false;
       });
     }
 
@@ -366,8 +324,6 @@
       downT = lastT = prevT = e.timeStamp || Date.now();
       dragging = true;
       locked = false;
-      dirLock = 0;
-      incoming = null;
       top.style.transition = 'none';
     }
 
@@ -391,13 +347,6 @@
         }
         locked = true;
         hideHint();
-
-        // Direction is decided once, at lock, and holds for the whole gesture.
-        dirLock = dx > 0 ? 1 : -1;
-        if (dirLock === 1) {
-          incoming = promotePrev();
-          if (!incoming) dirLock = -1;   // single-card stack: fall back to a throw
-        }
       }
 
       e.preventDefault();
@@ -405,14 +354,8 @@
       lastX = e.clientX;
       lastT = e.timeStamp || Date.now();
 
-      if (dirLock === 1 && incoming) {
-        // Pull-in: half the stack width of travel brings the card fully home.
-        var travel = Math.max(80, container.offsetWidth * 0.5);
-        var p = Math.min(Math.max(dx / travel, 0), 1);
-        setTransform(incoming, -fly() * (1 - p), -18 * (1 - p), false, 0);
-      } else {
-        setTransform(top, Math.min(dx, 0), Math.min(dx, 0) * 0.04, false, 0);
-      }
+      // The card tracks the finger either way.
+      setTransform(top, dx, dx * 0.04, false, 0);
     }
 
     function onPointerUp(e) {
@@ -437,15 +380,11 @@
         return;
       }
 
-      if (dirLock === 1 && incoming) {
-        if (dx > threshold || v > velocityThreshold) commitPrev(incoming);
-        else cancelPrev(incoming);
-        incoming = null;
-        return;
+      if (Math.abs(dx) > threshold || Math.abs(v) > velocityThreshold) {
+        commit(top, (dx === 0 ? (v >= 0 ? 1 : -1) : (dx > 0 ? 1 : -1)));
+      } else {
+        snapBack(top);
       }
-
-      if (Math.abs(dx) > threshold || Math.abs(v) > velocityThreshold) commitNext(top);
-      else snapBack(top);
     }
 
     function onPointerCancel() {
@@ -455,10 +394,7 @@
       }
       if (!dragging || !top) { dragging = false; return; }
       dragging = false;
-      if (locked && dirLock === 1 && incoming) {
-        cancelPrev(incoming);
-        incoming = null;
-      } else if (locked) {
+      if (locked) {
         snapBack(top);
       } else {
         top.style.transition = '';
@@ -491,8 +427,12 @@
 
    One overlay is built lazily and reused by every stack on the page. Swipe or
    drag horizontally to move between slides, arrow keys on desktop, Esc / the
-   X / a click on the backdrop to close. Clamped at both ends (not looped) so
-   the counter always tells you where you are.
+   X / a click on the backdrop to close.
+
+   The slideshow loops in both directions: the track carries a clone of the
+   last slide before the first and a clone of the first after the last, so a
+   wrap glides like any other step and then snaps silently onto the real
+   slide once the glide lands.
 
    KT.lightbox.close() closes it. */
 (function () {
@@ -514,6 +454,9 @@
   var startX = 0, startY = 0;
   var lastX = 0, lastT = 0, prevX = 0, prevT = 0;
   var dragging = false, locked = false;
+
+  // Pending clone→real snap after a wrap step.
+  var wrapTimer = 0, pendingWrap = null;
 
   var X_SVG =
     '<svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
@@ -567,8 +510,9 @@
 
     window.addEventListener('resize', function () {
       if (!isOpen) return;
+      finalizeWrap();
       width = root.clientWidth;
-      position(-index * width, false);
+      position(offsetFor(index), false);
     });
 
     document.addEventListener('keydown', function (e) {
@@ -595,11 +539,23 @@
     }
   }
 
+  function slide(item, clone) {
+    return '<div class="kt-lightbox__slide"' + (clone ? ' aria-hidden="true"' : '') +
+           '><img src="' + item.src + '" alt="' +
+           String(item.alt || '').replace(/"/g, '&quot;') + '"></div>';
+  }
+
   function render() {
-    track.innerHTML = items.map(function (item) {
-      return '<div class="kt-lightbox__slide"><img src="' + item.src + '" alt="' +
-             String(item.alt || '').replace(/"/g, '&quot;') + '"></div>';
-    }).join('');
+    // [clone of last] [0 … n-1] [clone of first] — the loop's seam.
+    var last = items[items.length - 1];
+    track.innerHTML = slide(last, true) +
+      items.map(function (item) { return slide(item, false); }).join('') +
+      slide(items[0], true);
+  }
+
+  /** Track offset for a logical slide index; +1 skips the leading clone. */
+  function offsetFor(i) {
+    return -(i + 1) * width;
   }
 
   function position(x, animate) {
@@ -607,13 +563,34 @@
     track.style.transform  = 'translate3d(' + x + 'px, 0, 0)';
   }
 
+  /** Apply a queued clone→real snap immediately (on resize, or when a new
+      gesture starts before the previous wrap has settled). */
+  function finalizeWrap() {
+    if (!pendingWrap) return;
+    clearTimeout(wrapTimer);
+    wrapTimer = 0;
+    var snap = pendingWrap;
+    pendingWrap = null;
+    snap();
+  }
+
+  /** i may be -1 or items.length — one step past either end. The track glides
+      onto the matching clone, then jumps to the real slide, invisibly. */
   function go(i, animate) {
-    index = Math.min(Math.max(i, 0), items.length - 1);
+    var n = items.length;
+    var wrapped = ((i % n) + n) % n;
+
+    finalizeWrap();
     width = root.clientWidth;
-    position(-index * width, animate);
-    counter.textContent = (index + 1) + ' / ' + items.length;
-    prevBtn.disabled = index === 0;
-    nextBtn.disabled = index === items.length - 1;
+    position(offsetFor(i), animate);
+
+    index = wrapped;
+    counter.textContent = (wrapped + 1) + ' / ' + n;
+
+    if (i !== wrapped) {
+      pendingWrap = function () { position(offsetFor(wrapped), false); };
+      wrapTimer = setTimeout(finalizeWrap, animate ? SLIDE_MS + 20 : 0);
+    }
   }
 
   function onPointerDown(e) {
@@ -623,6 +600,8 @@
     try {
       track.setPointerCapture(e.pointerId);
     } catch (err) { /* ignore */ }
+    // Settle any wrap still in flight so this drag starts from the real slide.
+    finalizeWrap();
     width = root.clientWidth;
     startX = lastX = prevX = e.clientX;
     startY = e.clientY;
@@ -654,9 +633,8 @@
     lastX = e.clientX;
     lastT = e.timeStamp || Date.now();
 
-    // Resistance past the first / last slide.
-    if ((index === 0 && dx > 0) || (index === items.length - 1 && dx < 0)) dx *= 0.35;
-    position(-index * width + dx, false);
+    // No end resistance — the clones mean there is always a slide either way.
+    position(offsetFor(index) + dx, false);
   }
 
   function onPointerUp(e) {
@@ -720,6 +698,10 @@
   function close() {
     if (!isOpen) return;
     isOpen = false;
+
+    clearTimeout(wrapTimer);
+    wrapTimer = 0;
+    pendingWrap = null;
 
     // Move focus out first — aria-hidden over a focused subtree is an a11y error.
     if (root.contains(document.activeElement) && document.activeElement.blur) {

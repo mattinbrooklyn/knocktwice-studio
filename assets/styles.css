@@ -1226,7 +1226,6 @@ body.kt-lightbox-open {
   transition: opacity 160ms ease;
 }
 .kt-lightbox__nav:hover { opacity: 1; }
-.kt-lightbox__nav[disabled] { opacity: 0.18; }
 .kt-lightbox__nav--prev { left: 0.75rem; }
 .kt-lightbox__nav--next { right: 0.75rem; }
 .kt-lightbox__nav svg {
