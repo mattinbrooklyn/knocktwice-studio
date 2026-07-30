@@ -15,6 +15,8 @@
   --color-red:             #FF0004;
   /* Figma: mobile stack / Field chips (7097:1941–1942) */
   --color-caramel:         #9A7555;
+  /* Lightbox backdrop — --color-ink at 96% */
+  --scrim-ink:             rgba(50, 38, 31, 0.96);
 
   /* Fonts */
   --font-display:          'Erica One', serif;
@@ -1112,5 +1114,150 @@ html.kt-home-monster-open body {
      since their .page is position:absolute/transform:scale. */
   .page {
     padding-top: 6.0625rem;
+  }
+}
+
+/* ── Lightbox (editorial slideshow) ─────────────── */
+/* Built + driven by KT.lightbox in scripts.js; opened by tapping any
+   .swipe-card. Single shared overlay for every stack on the page. */
+html.kt-lightbox-open,
+body.kt-lightbox-open {
+  overflow: hidden;
+}
+
+.kt-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  /* Above page chrome, below #custom-cursor (9999) so the pixel cursor stays visible. */
+  z-index: 9500;
+  background: var(--scrim-ink);
+  opacity: 0;
+  transition: opacity 220ms ease;
+  overscroll-behavior: contain;
+}
+.kt-lightbox.is-open {
+  opacity: 1;
+}
+.kt-lightbox:focus { outline: none; }
+.kt-lightbox button:focus-visible {
+  outline: 2px solid var(--color-bg);
+  outline-offset: 0.25rem;
+}
+
+.kt-lightbox__track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  /* Horizontal panning is ours; pinch-to-zoom stays native. */
+  touch-action: pinch-zoom;
+}
+
+.kt-lightbox__slide {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /* Clear the close control above and the counter below. */
+  padding: calc(4.5rem + env(safe-area-inset-top, 0px))
+           calc(1.25rem + env(safe-area-inset-right, 0px))
+           calc(4.25rem + env(safe-area-inset-bottom, 0px))
+           calc(1.25rem + env(safe-area-inset-left, 0px));
+}
+.kt-lightbox__slide img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border-radius: 0.25rem;          /* matches .swipe-card */
+  box-shadow: var(--shadow-stack);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Close control — mirrors .nav-mobile-close geometry. */
+.kt-lightbox__close {
+  position: absolute;
+  top: calc(1.875rem + env(safe-area-inset-top, 0px));
+  right: calc(1.625rem + env(safe-area-inset-right, 0px));
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-bg);
+  cursor: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.kt-lightbox__close svg {
+  width: 0.9375rem;
+  height: 0.9375rem;
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Arrows — pointer devices only; touch uses the swipe. */
+.kt-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 3.5rem;
+  height: 3.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-bg);
+  cursor: none;
+  opacity: 0.7;
+  transition: opacity 160ms ease;
+}
+.kt-lightbox__nav:hover { opacity: 1; }
+.kt-lightbox__nav--prev { left: 0.75rem; }
+.kt-lightbox__nav--next { right: 0.75rem; }
+.kt-lightbox__nav svg {
+  width: 0.75rem;
+  height: 1.25rem;
+  display: block;
+}
+@media (min-width: 769px) {
+  .kt-lightbox__nav { display: flex; }
+}
+
+.kt-lightbox__counter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: var(--type-chip-mobile-stack);
+  line-height: var(--leading-chip-mobile-stack);
+  font-weight: var(--wght-chip-mobile-stack);
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' var(--wght-chip-mobile-stack);
+  letter-spacing: 0.08em;
+  color: var(--color-bg);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kt-lightbox,
+  .kt-lightbox__track {
+    transition: none !important;
   }
 }

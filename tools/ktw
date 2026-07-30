@@ -1,0 +1,191 @@
+#!/usr/bin/env python3
+"""
+ktw — Knock Twice client estimate CLI.
+
+One tool to run the whole client flow (interactive estimate → final approval PDF)
+for any client. Everything client-specific lives in clients/<client>/client.json;
+the two pages are generated from templates/. Pure standard library — no installs.
+
+    ktw refresh <client>   Rebuild the estimate + final pages from the client's
+                           Google Sheet (pulls the latest, downloads photos).
+    ktw pdf <client>       Render the Final Selections page to a print-ready PDF
+                           on your Desktop (headless Chrome).
+    ktw new <client>       Scaffold a new client: client.json stub + a copy of the
+                           Apps Script, then print the Google setup checklist.
+    ktw publish <client>   [coming next] Push to staging + promote live in isolation.
+
+Run from anywhere; paths resolve relative to the repo.
+"""
+import os, sys, json, time, shutil, subprocess, urllib.request
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CLIENTS_DIR = os.path.join(REPO, "clients")
+GENERATOR = os.path.join(REPO, "estimate", "sync-from-excel.py")
+GS_TEMPLATE = os.path.join(REPO, "estimate", "_source", "Responses.gs")
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+
+# ── helpers ──────────────────────────────────────────────────────────────────
+def die(msg):
+    sys.exit(f"✗  {msg}")
+
+
+def load(client):
+    path = os.path.join(CLIENTS_DIR, client, "client.json")
+    if not os.path.exists(path):
+        die(f"No client '{client}' — expected {os.path.relpath(path, REPO)}. "
+            f"Scaffold it with:  ktw new {client}")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def repo_path(rel):
+    return os.path.join(REPO, *rel.split("/"))
+
+
+# ── refresh ──────────────────────────────────────────────────────────────────
+def cmd_refresh(client):
+    """Rebuild the pages from the Sheet. Thin wrapper over the generator so the
+    build logic lives in exactly one place."""
+    load(client)  # validate config exists before shelling out
+    print(f"▶  Refreshing '{client}' from its Google Sheet…\n")
+    r = subprocess.run([sys.executable, GENERATOR, client])
+    if r.returncode != 0:
+        die("Refresh failed (see above). Nothing was published.")
+    print("  Next: preview the pages, then  ktw publish " + client +
+          "  (coming soon) to push live.")
+
+
+# ── pdf ──────────────────────────────────────────────────────────────────────
+def cmd_pdf(client):
+    """Render the client's Final Selections page to a print-ready PDF, matching
+    the old Make Final PDF.command but parameterized by the client's config."""
+    cfg = load(client)
+    out_dir = cfg["output_dir"]                     # estimate/<client>
+    src_img = repo_path(cfg["image_dir"])           # full-res photos
+    pdf_img = repo_path(cfg["image_dir"] + "-pdf")  # downscaled copies (gitignored)
+    short = cfg["identity"]["project_short"] or client
+    out_pdf = os.path.expanduser(f"~/Desktop/{short.replace(' ', '-')}-Final.pdf")
+    page_url_path = f"{out_dir}/final/?pdf=1"
+    port, max_px = 8799, 260
+
+    if not os.path.exists(CHROME):
+        die(f"Google Chrome isn't at {CHROME}. Install it (or tell Claude where it lives).")
+    if not os.path.isdir(src_img):
+        die(f"No image folder at {os.path.relpath(src_img, REPO)} — run 'ktw refresh {client}' first.")
+
+    print(f"▶  Building the Final Selections PDF for '{client}'…\n")
+
+    # 1) Downscale product photos so the emailed file stays small.
+    print("  ⬇  Preparing lightweight photo copies…")
+    os.makedirs(pdf_img, exist_ok=True)
+    exts = (".png", ".jpg", ".jpeg", ".gif", ".webp")
+    for name in sorted(os.listdir(src_img)):
+        if name.lower().endswith(exts):
+            subprocess.run(["sips", "-Z", str(max_px), os.path.join(src_img, name),
+                            "--out", os.path.join(pdf_img, name)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    # 2) Serve the repo so the page's absolute /assets paths resolve.
+    server = subprocess.Popen([sys.executable, "-m", "http.server", str(port)],
+                              cwd=REPO, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        for _ in range(25):                         # wait up to ~5s for the server
+            try:
+                urllib.request.urlopen(f"http://localhost:{port}/", timeout=1); break
+            except Exception:
+                time.sleep(0.2)
+
+        # 3) Render to PDF (no browser headers/footers).
+        print("  🖨  Rendering the PDF…")
+        if os.path.exists(out_pdf):
+            os.remove(out_pdf)
+        subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-pdf-header-footer",
+                        "--virtual-time-budget=20000", f"--print-to-pdf={out_pdf}",
+                        f"http://localhost:{port}/{page_url_path}"],
+                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    finally:
+        server.terminate()
+
+    # 4) Report + open.
+    if os.path.exists(out_pdf):
+        size = subprocess.run(["du", "-h", out_pdf], capture_output=True, text=True
+                              ).stdout.split("\t")[0].strip()
+        print(f"\n  ✓  Saved to your Desktop:  {os.path.basename(out_pdf)}  ({size})")
+        subprocess.run(["open", out_pdf])
+    else:
+        die("The PDF wasn't created. Try again, or ask Claude.")
+
+
+# ── new ──────────────────────────────────────────────────────────────────────
+STUB = {
+    "id": "",
+    "source": {"google_sheet": "", "sheet_name": "PRODUCT LIST"},
+    "output_dir": "",
+    "image_dir": "",
+    "category_order": ["Furniture & Storage", "Lighting", "Soft Goods", "Finishes", "Art"],
+    "last_categories": ["Labor & Install"],
+    "identity": {
+        "eyebrow": "Knock Twice × <Client Name>",
+        "h1_html": "<Project<br>Title>",
+        "lede_estimate": "<one line> — your cart to review.",
+        "lede_final": "Final selections — <one line>.",
+        "project": "<Project — Client & Client>",
+        "project_short": "<Project>",
+        "client_first_name": "<Name>",
+    },
+    "round": {"label": "Round 1", "date": "<Month D, YYYY>"},
+    "final": {"prepared": "<Month D, YYYY>"},
+    "submit_url": "",
+    "contact_email": "",
+}
+
+
+def cmd_new(client):
+    dest_dir = os.path.join(CLIENTS_DIR, client)
+    cfg_path = os.path.join(dest_dir, "client.json")
+    if os.path.exists(cfg_path):
+        die(f"Client '{client}' already exists ({os.path.relpath(cfg_path, REPO)}).")
+    os.makedirs(dest_dir, exist_ok=True)
+
+    cfg = json.loads(json.dumps(STUB))              # deep copy
+    cfg["id"] = client
+    cfg["output_dir"] = f"estimate/{client}"
+    cfg["image_dir"] = f"assets/images/{client}"
+    with open(cfg_path, "w", encoding="utf-8") as f:
+        json.dump(cfg, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+    if os.path.exists(GS_TEMPLATE):                 # a copy to paste into the client's Sheet
+        shutil.copy(GS_TEMPLATE, os.path.join(dest_dir, "Responses.gs"))
+
+    rel = os.path.relpath(cfg_path, REPO)
+    print(f"✓  Scaffolded client '{client}'.\n")
+    print(f"   Next steps (the Google side is manual — one-time per client):\n")
+    print(f"   1. Make the client's shopping-cart Sheet: import")
+    print(f"      templates/product-list-template.xlsx into a new Google Sheet.")
+    print(f"      Share it 'Anyone with the link: Viewer'.")
+    print(f"   2. Paste that Sheet's URL into {rel}  →  source.google_sheet")
+    print(f"   3. In the Sheet: Extensions → Apps Script, paste")
+    print(f"      clients/{client}/Responses.gs, Deploy → web app, and paste the")
+    print(f"      /exec URL into {rel}  →  submit_url")
+    print(f"   4. Fill the identity / round / final fields in {rel}")
+    print(f"   5. Build it:   ktw refresh {client}")
+
+
+# ── dispatch ─────────────────────────────────────────────────────────────────
+COMMANDS = {"refresh": cmd_refresh, "pdf": cmd_pdf, "new": cmd_new}
+
+
+def main(argv):
+    if len(argv) < 2 or argv[0] not in COMMANDS:
+        if argv[:1] == ["publish"]:
+            die("'publish' isn't wired yet — it's the next step. For now use the "
+                "existing Refresh Estimate.command to push live.")
+        print(__doc__)
+        sys.exit(0 if not argv else 2)
+    COMMANDS[argv[0]](argv[1])
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

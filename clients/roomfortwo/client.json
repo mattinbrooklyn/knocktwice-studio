@@ -1,0 +1,30 @@
+{
+  "id": "roomfortwo",
+
+  "source": {
+    "google_sheet": "https://docs.google.com/spreadsheets/d/1EpT8bsdPsnBvxHSF_FMZiubE-9elqon6iZt97bzGJ1E/edit",
+    "sheet_name": "PRODUCT LIST"
+  },
+
+  "output_dir": "estimate/roomfortwo",
+  "image_dir": "assets/images/estimate",
+
+  "category_order": ["Furniture & Storage", "Lighting", "Soft Goods", "Finishes", "Art"],
+  "last_categories": ["Labor & Install"],
+
+  "identity": {
+    "eyebrow": "Knock Twice × Hannah Rich",
+    "h1_html": "A Room<br>for Two",
+    "lede_estimate": "Ambrose &amp; Gigi’s room — your cart to review.",
+    "lede_final": "Final selections — Ambrose &amp; Gigi’s room.",
+    "project": "Room for Two — Hannah & Eugene",
+    "project_short": "Room for Two",
+    "client_first_name": "Hannah"
+  },
+
+  "round": { "label": "Round 1", "date": "June 18, 2026" },
+  "final": { "prepared": "July 3, 2026" },
+
+  "submit_url": "https://script.google.com/macros/s/AKfycbzutK1aPWdfQ2sHXQLX_FImf9w_UNBg3CQKWXnJ0UXPct4oKuivsLSaYooBuv8owjkm/exec",
+  "contact_email": ""
+}

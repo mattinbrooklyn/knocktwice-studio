@@ -1,0 +1,5 @@
+# Keep estimate tooling + source data out of the deployed site (not served publicly).
+# The page itself has its data baked in, so it doesn't need these at runtime.
+estimate/_source
+estimate/sync-from-excel.py
+*.command
