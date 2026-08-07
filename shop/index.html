@@ -1,1147 +1,333 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#F7F2EC" media="(max-width: 768px)" />
-    <link
-      rel="icon"
-      type="image/webp"
-      href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp"
-    />
-    <title>Shop — Knock Twice</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/assets/styles.css" />
-    <style>
-      html,
-      body {
-        overflow-x: hidden;
-        overflow-y: auto;
-        scrollbar-width: none;
-        background: var(--color-bg);
-      }
-      body::-webkit-scrollbar {
-        display: none;
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/assets/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.png">
+  <title>Shop — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+  html, body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    background: var(--color-blue);
+  }
+  body::-webkit-scrollbar { display: none; }
 
-      #page-scaler {
-        position: relative;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        min-height: calc(100vh + var(--footer-height));
-        overflow: hidden;
-      }
+  /* ── Monster wave — shop-specific timing and rise behavior ───────── */
+  /* z-index 16: above modal-backdrop (14) so the wave is visible over it */
+  #monster-group {
+    position: absolute;
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    z-index: 16;
+    transform: translateY(250px);
+    will-change: transform;
+  }
+  /* 900ms, no delay — monster lands at rest before modal opens at 1500ms */
+  #monster-group.popped-up {
+    transform: translateY(0);
+    transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  /* Wave-risen state: triggered when mailing list modal opens */
+  #monster-group.wave-risen {
+    transform: translateY(-55vh);
+    transition: transform 600ms ease-out;
+  }
 
-      /* ── Page canvas ────────────────────────────────────────────────
-       Fixed 1440×1024 (exact Figma frame), centered and uniformly
-       scaled by JS to fit the viewport. */
-      .page {
-        position: relative;
-        width: 100%;
-        max-width: 1440px;
-        margin: 0 auto;
-        background: var(--color-bg);
-        display: flex;
-        flex-direction: column;
-        padding-top: 4.375rem;
-        padding-left: var(--content-left);
-        padding-right: var(--content-left);
-        flex: 1;
-      }
+  .monster-area {
+    position: relative;
+    width: 100%;
+    height: var(--wave-height-desktop);
+  }
+  .monster-area img.wave {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    pointer-events: none;
+  }
+  .monster-eyes-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
 
-      .page {
-        max-width: 90rem;
-        padding-bottom: calc(
-          var(--wave-height-desktop) + var(--footer-height) + 2rem
-        );
-      }
+  /* Blue fill below the wave — always present, comes up with the monster on rise */
+  #modal-blue-body {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    width: 100%;
+    height: 2000px;
+    background: var(--color-blue);
+  }
 
-      .shop-shell {
-        position: relative;
-        width: 76rem;
-        max-width: 100%;
-        margin: 0 auto;
-        padding-top: 0;
-      }
+  /* ── Modal position ─────────────────────────────────────────────── */
+  #ml-modal.modal-card {
+    top: 61%;
+  }
 
-      .shop-hero {
-        position: relative;
-        z-index: 2;
-        margin-bottom: 4.5rem;
-        width: 100%;
-        /* min-height: 15rem; */
-      }
+  /* ── Page content ────────────────────────────────────────────────── */
+  .h1 {
+    width: min(var(--content-width), 100%);
+    margin-bottom: var(--space-sm);
+  }
+  .intro {
+    width: min(var(--content-width), 100%);
+    margin-top: var(--space-sm);
+  }
 
-      .h1 {
-        width: 48rem;
-        font-family: var(--font-display);
-        font-size: 4rem;
-        line-height: 0.88;
-        font-weight: 400;
-        color: var(--color-ink);
-        text-transform: uppercase;
-        margin: 0;
-      }
+  /* ── Mobile ──────────────────────────────────────────────────────── */
+  /* .ml-submit carries a fixed 4.5rem side padding globally, which starves
+     the email input below ~500px. Stack the row instead. */
+  @media (max-width: 768px) {
+    .ml-form-row {
+      flex-direction: column;
+    }
+    .ml-form-row input,
+    .ml-submit {
+      width: 100%;
+    }
+    .ml-submit {
+      padding: 0;
+      height: var(--button-height);
+    }
+    .h1,
+    .intro {
+      width: min(var(--content-width-mobile), 100%);
+    }
+  }
+  </style>
+</head>
+<body>
 
-      .shop-grid {
-        position: relative;
-        z-index: 2;
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
-        border: 2px solid var(--color-ink);
-        background: var(--color-bg);
-      }
+  <a href="/home/" class="logo">
+    <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
+      <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+      <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+    </svg>
+  </a>
 
-      .shop-grid.is-loading {
-        opacity: 0.88;
-      }
+  <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/" class="active">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
 
-      .shop-status {
-        display: none;
-        margin-top: 1rem;
-        font-family: var(--font-ui);
-        font-size: 1.125rem;
-        line-height: 1.1;
-        color: var(--color-ink);
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 400;
-      }
+  <button
+    class="nav-mobile-trigger"
+    id="nav-mobile-trigger"
+    aria-label="Open menu"
+    aria-expanded="false"
+    aria-controls="nav-mobile-overlay"
+  >
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2" />
+      <line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2" />
+      <line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2" />
+    </svg>
+  </button>
 
-      .shop-status.is-visible {
-        display: block;
-      }
-
-      .shop-card-link {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-height: 100%;
-        color: inherit;
-        text-decoration: none;
-      }
-
-      .shop-card {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-height: 16.5rem;
-        border-right: 2px solid var(--color-ink);
-        border-bottom: 2px solid var(--color-ink);
-        background: var(--color-bg);
-      }
-
-      .shop-card:nth-child(2n) {
-        border-right: none;
-      }
-
-      .shop-card:nth-last-child(-n + 2) {
-        border-bottom: none;
-      }
-
-      .shop-card-media {
-        position: relative;
-        min-height: 24rem;
-        flex: 1;
-        overflow: hidden;
-        background-color: var(--color-bg);
-        background-image:
-          linear-gradient(45deg, rgba(209, 195, 182, 0.9) 25%, transparent 25%),
-          linear-gradient(
-            -45deg,
-            rgba(209, 195, 182, 0.9) 25%,
-            transparent 25%
-          ),
-          linear-gradient(45deg, transparent 75%, rgba(209, 195, 182, 0.9) 75%),
-          linear-gradient(-45deg, transparent 75%, rgba(209, 195, 182, 0.9) 75%);
-        background-size: 4.5rem 4.5rem;
-        background-position:
-          0 0,
-          0 2.25rem,
-          2.25rem -2.25rem,
-          -2.25rem 0;
-      }
-
-      .shop-card-media.has-image {
-        background-image: none;
-      }
-
-      .shop-card-image {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .shop-card-nav {
-        position: absolute;
-        inset: 50% 1.125rem auto 1.125rem;
-        transform: translateY(-50%);
-        display: flex;
-        justify-content: space-between;
-        pointer-events: none;
-      }
-
-      .shop-card-arrow {
-        width: 2rem;
-        height: 2rem;
-        border: none;
-        background: transparent;
-        color: var(--color-ink);
-        font-family: var(--font-ui);
-        font-size: 2.25rem;
-        line-height: 1;
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 400;
-        pointer-events: none;
-      }
-
-      .shop-card-meta {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 0.75rem;
-        align-items: end;
-        min-height: 2.25rem;
-        padding: 0.375rem 0.625rem 0.4375rem;
-        background: var(--color-bg);
-      }
-
-      .shop-card-copy {
-        min-width: 0;
-      }
-
-      .shop-card-title,
-      .shop-card-price {
-        display: block;
-        color: var(--color-ink);
-        white-space: nowrap;
-      }
-
-      .shop-card-title {
-        font-family: var(--font-ui);
-        font-size: 0.9375rem;
-        line-height: 0.92;
-        font-weight: 400;
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 400;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .shop-card-price {
-        font-family: var(--font-ui);
-        font-size: 0.9375rem;
-        line-height: 0.95;
-        font-weight: 700;
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 700;
-        align-self: end;
-      }
-
-      .shop-card-add {
-        position: relative;
-        width: 1.625rem;
-        height: 1.625rem;
-        border: 2px solid var(--color-ink);
-        border-radius: 999px;
-        background: var(--color-green);
-        flex-shrink: 0;
-        align-self: center;
-      }
-
-      .shop-card-add,
-      .shop-card-nav {
-        display: none;
-      }
-
-      .shop-card-add::before,
-      .shop-card-add::after {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        background: var(--color-ink);
-        transform: translate(-50%, -50%);
-      }
-
-      .shop-card-add::before {
-        width: 0.625rem;
-        height: 0.125rem;
-      }
-
-      .shop-card-add::after {
-        width: 0.125rem;
-        height: 0.625rem;
-      }
-
-      .shop-trolley {
-        position: absolute;
-        right: -120px;
-        top: -30px;
-        width: 15rem;
-        z-index: 4;
-        pointer-events: none;
-      }
-
-      .shop-trolley img {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      /* ── Monster footer wave ───────────────────────────────────────
-       Blue wave SVG + SVG overlay with eye whites + iris circles. */
-      #monster-group {
-        position: absolute;
-        bottom: var(--footer-height);
-        left: 0;
-        width: 100%;
-        z-index: 16;
-        transform: translateY(250px);
-        will-change: transform;
-      }
-      #monster-group.popped-up {
-        transform: translateY(0);
-        transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
-        transition-delay: 1.1s;
-      }
-      #monster-group.wave-risen {
-        transform: translateY(-55vh);
-        transition: transform 1800ms cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 1020;
-      }
-      .monster-area {
-        position: relative;
-        width: 100%;
-        height: var(--wave-height-desktop);
-      }
-      .monster-area img.wave {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: block;
-        pointer-events: none;
-      }
-      .monster-eyes-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        overflow: visible;
-      }
-      /* Blue body below the wave — first in #monster-group so wave/eyes paint on top (same as About). */
-      #modal-blue-body {
-        display: none;
-        position: absolute;
-        left: 0;
-        top: calc(var(--wave-height-desktop) - 0px);
-        width: 100%;
-        height: 300vh;
-        background: var(--color-blue);
-      }
-
-      .footer {
-        position: relative;
-        z-index: 100;
-      }
-
-      /* ── Newsletter modal — match About: backdrop + card above nav (z-index 1000).
-       #ml-modal is a sibling of #monster-group (NOT inside it): parent transforms
-       break position:fixed for descendants. */
-      #modal-backdrop {
-        z-index: 1010;
-      }
-      /* Match About #newsletter-window: centered card, z above risen wave so layout clears crest. */
-      #ml-modal.modal-card {
-        position: fixed;
-        left: 50%;
-        top: 65%;
-        transform: translate(-50%, -50%);
-        width: min(929px, calc(100vw - 4rem));
-        height: auto;
-        min-height: 326px;
-        padding: clamp(1.75rem, 4.167vw, 3.75rem);
-        z-index: 1025;
-      }
-      #ml-modal.modal-card.ml-success {
-        min-height: auto;
-      }
-
-      /* ── Mobile (<=768px) ──────────────────────────── */
-      @media (max-width: 768px) {
-        .page {
-          padding-top: 6.0625rem; /* ~97px matches Figma */
-          padding-right: var(--content-left);
-          padding-bottom: calc(
-            var(--wave-height-mobile) + var(--footer-height) + 4.5rem
-          );
-        }
-        .shop-shell {
-          width: 100%;
-          padding-top: 0;
-          max-width: none;
-          margin: 0;
-        }
-        .shop-hero {
-          margin-bottom: 1.5rem;
-          min-height: 0;
-        }
-        .h1 {
-          width: min(30rem, 100%);
-          font-size: clamp(3.25rem, 14vw, 4rem);
-          line-height: 0.86;
-        }
-        .shop-grid {
-          grid-template-columns: 1fr;
-        }
-        .shop-card {
-          min-height: 14.25rem;
-          border-right: none;
-        }
-        .shop-card:nth-last-child(-n + 2) {
-          border-bottom: 2px solid var(--color-ink);
-        }
-        .shop-card:last-child {
-          border-bottom: none;
-        }
-        .shop-card-media {
-          min-height: 35rem;
-          background-size: 3.5rem 3.5rem;
-          background-position:
-            0 0,
-            0 1.75rem,
-            1.75rem -1.75rem,
-            -1.75rem 0;
-        }
-        .shop-card-nav {
-          inset-inline: 0.75rem;
-        }
-        .shop-card-arrow {
-          font-size: 2rem;
-        }
-        .shop-card-meta {
-          min-height: 3.25rem;
-          padding: 0.5rem 0.75rem 0.625rem;
-        }
-        .shop-card-nav,
-        .shop-card-add {
-          /* display: flex; */
-        }
-        .shop-card-title {
-          font-size: 1.3125rem;
-        }
-        .shop-card-price {
-          margin-top: 0.1875rem;
-          font-size: 1.125rem;
-          align-self: auto;
-        }
-        .shop-trolley {
-          right: 0.25rem;
-          bottom: -4.875rem;
-          top: auto;
-          width: 11rem;
-        }
-        /* Lift wave + blue a touch vs idle (-60vh): client devices / Safari chrome vary fold position */
-        #monster-group.wave-risen {
-          transform: translateY(-66vh);
-        }
-        /* Idle: less downward offset than desktop (250px) so crest sits higher before modal opens */
-        #monster-group:not(.wave-risen) {
-          transform: translateY(205px);
-        }
-        #modal-blue-body {
-          top: calc(var(--wave-height-mobile) - 0px);
-        }
-        #ml-modal.modal-card {
-          top: 66%;
-          width: min(24rem, calc(100vw - 2rem));
-          padding: 1.5rem 1.25rem;
-        }
-        .ml-form-row {
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-        .ml-form-row input {
-          flex: none;
-          width: 100%;
-        }
-        .ml-form-row .ml-submit {
-          width: 100%;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
-    <a href="/home/" class="logo">
-      <svg
-        preserveAspectRatio="none"
-        width="100%"
-        height="100%"
-        overflow="visible"
-        style="display: block"
-        viewBox="0 0 51.7794 99.3243"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          class="logo-eye-sclera"
-          d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z"
-          fill="#F7F2EC"
-        />
-        <circle
-          id="logo-iris"
-          cx="27.325"
-          cy="19.055"
-          r="6.127"
-          fill="#32261F"
-        />
-        <path
-          d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z"
-          fill="#378CDA"
-        />
-      </svg>
-    </a>
-
-    <nav class="nav">
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2" />
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </button>
       <a href="/about/">About</a>
       <a href="/interiors/">Interiors</a>
       <a href="/experiences/">Experiences</a>
       <a href="/shop/" class="active">Shop</a>
       <a href="/contact/">Contact</a>
-    </nav>
-
-    <button
-      class="nav-mobile-trigger"
-      id="nav-mobile-trigger"
-      aria-label="Open menu"
-      aria-expanded="false"
-      aria-controls="nav-mobile-overlay"
-    >
-      <svg
-        viewBox="0 0 34 22"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2" />
-        <line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2" />
-        <line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2" />
-      </svg>
-    </button>
-
-    <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
-      <div class="nav-mobile-menu">
-        <button class="nav-mobile-close" type="button" aria-label="Close menu">
-          <svg
-            viewBox="0 0 16.4142 16.4142"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-          >
-            <path
-              d="M15.7071 0.707107L0.707107 15.7071"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-            <path
-              d="M0.707107 0.707107L15.7071 15.7071"
-              stroke="currentColor"
-              stroke-width="2"
-            />
-          </svg>
-        </button>
-        <a href="/about/">About</a>
-        <a href="/interiors/">Interiors</a>
-        <a href="/experiences/">Experiences</a>
-        <a href="/shop/" class="active">Shop</a>
-        <a href="/contact/">Contact</a>
-      </div>
-    </nav>
-
-    <div id="page-scaler">
-      <!-- ── Page canvas ─────────────────────────────────────────────── -->
-      <div class="page">
-        <section class="shop-shell" aria-label="Shop product grid">
-          <div class="shop-hero">
-            <h1 class="h1">TAKE US HOME<br />WITH YOU</h1>
-          </div>
-
-          <div class="shop-grid">
-            <article class="shop-card">
-              <div class="shop-card-media">
-                <div class="shop-card-nav" aria-hidden="true">
-                  <span class="shop-card-arrow">&lt;</span>
-                  <span class="shop-card-arrow">&gt;</span>
-                </div>
-              </div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-
-            <article class="shop-card">
-              <div class="shop-card-media"></div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-
-            <article class="shop-card">
-              <div class="shop-card-media"></div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-
-            <article class="shop-card">
-              <div class="shop-card-media"></div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-
-            <article class="shop-card">
-              <div class="shop-card-media"></div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-
-            <article class="shop-card">
-              <div class="shop-card-media"></div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">Peek-a-boo Frame</span>
-                </div>
-                <span class="shop-card-price">$39.99</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </article>
-          </div>
-          <p
-            class="shop-status"
-            id="shop-status"
-            role="status"
-            aria-live="polite"
-          ></p>
-
-          <div class="shop-trolley" aria-hidden="true">
-            <img src="/assets/shopingcart.png" alt="" />
-          </div>
-        </section>
-      </div>
-      <!-- /page -->
-
-      <div class="modal-backdrop" id="modal-backdrop"></div>
-      <div class="modal-card" id="ml-modal">
-        <button class="ml-close" id="ml-close" aria-label="Close">
-          &times;
-        </button>
-        <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
-        <p class="ml-body" id="ml-body">
-          We may be one thing now, but who knows what Knock Twice will become --
-          we'd love for you to stick around.
-        </p>
-        <div class="ml-form-row">
-          <input
-            type="email"
-            id="ml-email"
-            class="field"
-            placeholder="Email*"
-            autocomplete="off"
-          />
-          <button class="ml-submit" id="ml-submit">Sign Up</button>
-        </div>
-        <p class="error-msg" id="ml-error">
-          Hmm. That email doesn't look right. Try again?
-        </p>
-        <p class="ml-disclaimer">
-          We promise to never get offended if you decide to unsubscribe. In
-          fact, we'll make it easy.
-        </p>
-        <p class="ml-success-body">
-          We'll be knocking at your door (email) sometime soon! As promised,
-          we'll never get offended if you decide to unsubscribe.
-        </p>
-      </div>
-
-      <!-- ── Monster footer wave ─────────────────────────────────────
-       Same wave SVG as about page. Eye whites + iris circles match about. -->
-      <div id="monster-group" class="has-mobile-monster-eyes">
-        <div id="modal-blue-body"></div>
-        <div class="monster-area" id="monster-area">
-          <img class="wave" src="/assets/monster-wave-shop.svg" alt="" />
-          <svg
-            class="monster-eyes-overlay"
-            id="monster-eyes-svg"
-            viewBox="0 0 1440 116.154"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <clipPath id="mon-eye-r-clip">
-                <path
-                  transform="translate(593.13 32.7)"
-                  d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"
-                />
-              </clipPath>
-              <clipPath id="mon-eye-l-clip">
-                <path
-                  transform="translate(431.49 31.57)"
-                  d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"
-                />
-              </clipPath>
-            </defs>
-            <g class="eye-blink-group">
-              <path
-                fill="#F7F2EC"
-                transform="translate(593.13 32.7)"
-                d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"
-              />
-              <circle
-                id="mon-iris-r"
-                clip-path="url(#mon-eye-r-clip)"
-                cx="652.9"
-                cy="49.45"
-                r="30"
-                fill="#32261F"
-              />
-            </g>
-            <g class="eye-blink-group">
-              <path
-                fill="#F7F2EC"
-                transform="translate(431.49 31.57)"
-                d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"
-              />
-              <circle
-                id="mon-iris-l"
-                clip-path="url(#mon-eye-l-clip)"
-                cx="495.41"
-                cy="49.46"
-                r="30"
-                fill="#32261F"
-              />
-            </g>
-          </svg>
-          <svg
-            class="monster-eyes-overlay-mobile"
-            id="monster-eyes-svg-mobile"
-            viewBox="0 0 440 64"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <clipPath id="mon-eye-r-clip-m">
-                <path
-                  transform="translate(197.14 30.76)"
-                  d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"
-                />
-              </clipPath>
-              <clipPath id="mon-eye-l-clip-m">
-                <path
-                  transform="translate(88 30)"
-                  d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"
-                />
-              </clipPath>
-            </defs>
-            <g class="eye-blink-group">
-              <path
-                fill="#F7F2EC"
-                transform="translate(197.14 30.76)"
-                d="M0 17.6111C29.5302 -7.34075 56.0366 -4.35248 80.8595 17.6111C51.2543 23.7628 24.008 24.4369 0 17.6111Z"
-              />
-              <circle
-                id="mon-iris-r-m"
-                clip-path="url(#mon-eye-r-clip-m)"
-                cx="248.5"
-                cy="62.5"
-                r="27.5"
-                fill="#32261F"
-              />
-            </g>
-            <g class="eye-blink-group">
-              <path
-                fill="#F7F2EC"
-                transform="translate(88 30)"
-                d="M0 18.7993C30.8812 -8.57287 59.2856 -3.84896 86.3281 18.7993C54.7231 25.3703 25.6325 26.0869 0 18.7993Z"
-              />
-              <circle
-                id="mon-iris-l-m"
-                clip-path="url(#mon-eye-l-clip-m)"
-                cx="142"
-                cy="64"
-                r="29"
-                fill="#32261F"
-              />
-            </g>
-          </svg>
-        </div>
-      </div>
-      <!-- /#monster-group -->
-
-      <footer class="footer">
-        <div class="footer-icons">
-          <a
-            href="https://www.instagram.com/knocktwice.studio"
-            aria-label="Instagram"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><img src="/assets/icon-instagram.svg" alt="Instagram"
-          /></a>
-          <a
-            href="https://www.tiktok.com/@knocktwice.studio"
-            aria-label="TikTok"
-            target="_blank"
-            rel="noopener noreferrer"
-            ><img src="/assets/icon-tiktok.svg" alt="TikTok"
-          /></a>
-        </div>
-        <span class="footer-copyright"
-          >© 2026 Knock Twice Studio. All rights reserved.</span
-        >
-      </footer>
     </div>
-    <!-- /#page-scaler -->
+  </nav>
 
-    <script src="/assets/scripts.js" defer></script>
-    <script>
-      // ── Scale page ─────────────────────────────────────────────────
-      // 1440×1024 canvas (exact Figma frame). Uniform scale keeps all
-      // pixel coordinates correct at any viewport size.
-      const page = document.querySelector(".page");
-      const scaler = document.getElementById("page-scaler");
-      const monsterArea = document.getElementById("monster-area");
-      const monsterGroup = document.getElementById("monster-group");
-      const footer = document.querySelector(".footer");
-      const shopGrid = document.querySelector(".shop-grid");
-      const shopStatus = document.getElementById("shop-status");
-      let scale = 1;
-      let waveTop = 910; // updated each resize
+  <div id="page-scaler">
+  <div class="page">
 
-      const SHOPIFY_STORE_DOMAIN = "dxkhwk-ve.myshopify.com";
-      const SHOPIFY_COLLECTION_HANDLE = "knock-twice-shop";
-      const SHOPIFY_STOREFRONT_TOKEN = "8fbb774bc6396f6cdaf972d86ab53ea5";
-      const SHOPIFY_API_VERSION = "2026-07";
-      const SHOP_PRODUCTS_QUERY = `
-        query ShopProducts($handle: String!, $first: Int!) {
-          collection(handle: $handle) {
-            products(first: $first) {
-              nodes {
-                title
-                handle
-                featuredImage {
-                  url
-                  altText
-                }
-                priceRange {
-                  minVariantPrice {
-                    amount
-                    currencyCode
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
+    <h1 class="h1">NOT QUITE READY</h1>
+    <p class="body-text intro">Nothing to see here. (There will be soon though.) ⌛️</p>
 
-      function formatPrice(price) {
-        const amount = Number(price.amount);
-        if (!Number.isFinite(amount)) return "";
-        try {
-          return new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: price.currencyCode || "USD",
-          }).format(amount);
-        } catch (error) {
-          return `$${amount.toFixed(2)}`;
-        }
-      }
+  </div><!-- /.page -->
 
-      function getProductUrl(handle) {
-        return `https://${SHOPIFY_STORE_DOMAIN}/products/${handle}`;
-      }
+  <!-- Backdrop and modal use shared styles from styles.css -->
+  <div class="modal-backdrop" id="modal-backdrop"></div>
 
-      function escapeHtml(value) {
-        return String(value)
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/\"/g, "&quot;")
-          .replace(/'/g, "&#39;");
-      }
+  <div class="modal-card" id="ml-modal">
+    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
+    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
+    <p class="ml-body">Nothing to take home just yet. Leave your email and we'll let you know when that changes.</p>
+    <div class="ml-form-row">
+      <input type="email" id="ml-email" class="field" placeholder="Email*" autocomplete="off">
+      <button class="ml-submit" id="ml-submit">Sign Up</button>
+    </div>
+    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
+    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
+    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
+  </div>
 
-      function getProductCardMarkup(product, index) {
-        const image = product.featuredImage;
-        const title = product.title || "Untitled product";
-        const price = formatPrice(product.priceRange.minVariantPrice);
-        const productUrl = getProductUrl(product.handle);
-        const showMobileArrows = index === 0;
-        const safeTitle = escapeHtml(title);
-        const safePrice = escapeHtml(price);
-        const safeUrl = escapeHtml(productUrl);
-        const safeAlt = escapeHtml((image && image.altText) || title);
+  <!-- ── Monster footer wave ──────────────────────────────────────── -->
+  <div id="monster-group">
+    <div class="monster-area" id="monster-area">
+      <img class="wave" src="/assets/monster-wave.svg" alt="">
+      <svg class="monster-eyes-overlay" id="monster-eyes-svg"
+           viewBox="0 0 1440 116" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="mon-eye-r-clip">
+            <path transform="translate(593.13 32.7)"
+              d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+          </clipPath>
+          <clipPath id="mon-eye-l-clip">
+            <path transform="translate(431.49 31.57)"
+              d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+          </clipPath>
+        </defs>
+        <path fill="#F7F2EC" transform="translate(593.13 32.7)"
+          d="M0 26.2514C43.7331 -10.9423 82.9881 -6.48788 119.75 26.2514C75.9056 35.4212 35.555 36.426 0 26.2514Z"/>
+        <path fill="#F7F2EC" transform="translate(431.49 31.57)"
+          d="M0 28.0226C45.7339 -12.7789 87.7997 -5.73732 127.849 28.0226C81.0428 37.8174 37.9608 38.8855 0 28.0226Z"/>
+        <circle id="mon-iris-r" clip-path="url(#mon-eye-r-clip)"
+          cx="652.9" cy="49.45" r="30" fill="#32261F"/>
+        <circle id="mon-iris-l" clip-path="url(#mon-eye-l-clip)"
+          cx="495.41" cy="49.46" r="30" fill="#32261F"/>
+      </svg>
+      <div id="modal-blue-body"></div>
+    </div>
+  </div><!-- /#monster-group -->
 
-        return `
-          <article class="shop-card">
-            <a class="shop-card-link" href="${safeUrl}">
-              <div class="shop-card-media${image ? " has-image" : ""}">
-                ${image ? `<img class="shop-card-image" src="${escapeHtml(image.url)}" alt="${safeAlt}" loading="lazy">` : ""}
-                ${showMobileArrows ? `<div class="shop-card-nav" aria-hidden="true"><span class="shop-card-arrow">&lt;</span><span class="shop-card-arrow">&gt;</span></div>` : ""}
-              </div>
-              <div class="shop-card-meta">
-                <div class="shop-card-copy">
-                  <span class="shop-card-title">${safeTitle}</span>
-                </div>
-                <span class="shop-card-price">${safePrice}</span>
-                <span class="shop-card-add" aria-hidden="true"></span>
-              </div>
-            </a>
-          </article>
-        `;
-      }
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
 
-      function setShopStatus(message) {
-        if (!message) {
-          shopStatus.textContent = "";
-          shopStatus.classList.remove("is-visible");
-          return;
-        }
-        shopStatus.textContent = message;
-        shopStatus.classList.add("is-visible");
-      }
+  </div><!-- /#page-scaler -->
 
-      async function loadShopProducts() {
-        if (!shopGrid) return;
-        shopGrid.classList.add("is-loading");
-        setShopStatus("");
+  <script src="/assets/scripts.js"></script>
+  <script>
+    // ── Skeleton constants ─────────────────────────────────────────
+    const page         = document.querySelector('.page');
+    const monsterGroup = document.getElementById('monster-group');
+    const monsterArea  = document.getElementById('monster-area');
+    const monIrisR     = document.getElementById('mon-iris-r');
+    const monIrisL     = document.getElementById('mon-iris-l');
 
-        try {
-          const response = await fetch(
-            `https://${SHOPIFY_STORE_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Shopify-Storefront-Access-Token": SHOPIFY_STOREFRONT_TOKEN,
-              },
-              body: JSON.stringify({
-                query: SHOP_PRODUCTS_QUERY,
-                variables: {
-                  handle: SHOPIFY_COLLECTION_HANDLE,
-                  first: 12,
-                },
-              }),
-            },
-          );
-
-          if (!response.ok) {
-            throw new Error(`Shopify request failed: ${response.status}`);
-          }
-
-          const payload = await response.json();
-          const products = payload?.data?.collection?.products?.nodes || [];
-
-          if (!products.length) {
-            setShopStatus("No products are in this collection yet.");
-            return;
-          }
-
-          shopGrid.innerHTML = products
-            .map(function (product, index) {
-              return getProductCardMarkup(product, index);
-            })
-            .join("");
-        } catch (error) {
-          console.error("Failed to load Shopify products", error);
-          setShopStatus("Products could not load right now.");
-        } finally {
-          shopGrid.classList.remove("is-loading");
-        }
-      }
-
-      function scalePage() {
-        scale = window.innerWidth / 1440;
-        page.style.transform = "";
-        // Wave bottom sits at the fold; only the 60px footer scrolls into view
-        const viewportCanvas = Math.ceil(window.innerHeight / scale);
-        waveTop = viewportCanvas - 116;
-        monsterArea.style.top = "";
-        footer.style.top = "";
-        page.style.height = viewportCanvas + 60 + "px";
-        scaler.style.height = "";
-      }
-      scalePage();
-      // Debounced resize
-      var resizeTimer = 0;
-      window.addEventListener("resize", function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(scalePage, 100);
+    // Pop the monster up on load — 900ms, no delay, lands before modal opens.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        monsterGroup.classList.add('popped-up');
       });
+    });
 
-      // rAF-throttled monster eye tracking
-      var monRaf = 0,
-        monMX = 0,
-        monMY = 0;
-      function updateMonsterFrame() {
-        monRaf = 0;
-        updateMonsterEyes(monMX, monMY);
+    // Dynamic waveTop — measured live so it works regardless of page content height.
+    function getWaveTop() {
+      const pageRect = page.getBoundingClientRect();
+      const waveRect = monsterArea.getBoundingClientRect();
+      return waveRect.top - pageRect.top;
+    }
+
+    // Moves an SVG circle toward the cursor within an elliptical movement envelope.
+    function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
+      const dx = localX - restX;
+      const dy = localY - restY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 1) {
+        el.setAttribute('cx', restX);
+        el.setAttribute('cy', restY);
+        return;
       }
-      document.addEventListener(
-        "mousemove",
-        function (e) {
-          monMX = e.clientX;
-          monMY = e.clientY;
-          if (!monRaf) monRaf = requestAnimationFrame(updateMonsterFrame);
-        },
-        { passive: true },
-      );
-      document.addEventListener(
-        "touchmove",
-        function (e) {
-          if (!e.touches.length) return;
-          monMX = e.touches[0].clientX;
-          monMY = e.touches[0].clientY;
-          if (!monRaf) monRaf = requestAnimationFrame(updateMonsterFrame);
-        },
-        { passive: true },
-      );
+      const nx = dx / dist;
+      const ny = dy / dist;
+      const strength = Math.min(dist / 200, 1);
+      const kx = 0.55, ky = 0.28;
+      el.setAttribute('cx', restX + nx * maxX * kx * strength);
+      el.setAttribute('cy', restY + ny * maxY * ky * strength);
+    }
 
-      // ── Eye tracking ───────────────────────────────────────────────
-      // Converts viewport coords → canvas coords (undoes scale + centering).
-      function toCanvas(vx, vy) {
-        const r = page.getBoundingClientRect();
-        return { x: (vx - r.left) / scale, y: (vy - r.top) / scale };
+    document.addEventListener('mousemove', e => {
+      const waveTop  = getWaveTop();
+      const pageRect = page.getBoundingClientRect();
+      // Map viewport x to SVG viewBox x (0–1440) based on actual element width.
+      const x = ((e.clientX - pageRect.left) / monsterArea.getBoundingClientRect().width) * 1440;
+      const y = e.clientY - pageRect.top;
+      trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
+      trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
+    });
+
+
+    // ── Mailing list modal ─────────────────────────────────────────
+    var mlModal    = document.getElementById('ml-modal');
+    var mlBackdrop = document.getElementById('modal-backdrop');
+    var mlClose    = document.getElementById('ml-close');
+    var mlEmail    = document.getElementById('ml-email');
+    var mlError    = document.getElementById('ml-error');
+    var mlSubmit   = document.getElementById('ml-submit');
+    var mlHeading  = document.getElementById('ml-heading');
+
+    function openMailingList() {
+      mlBackdrop.style.display = 'block';
+      mlModal.style.display    = 'block';
+      monsterGroup.classList.add('wave-risen');
+    }
+
+    function closeMailingList() {
+      mlBackdrop.style.display = 'none';
+      mlModal.style.display    = 'none';
+      mlModal.classList.remove('ml-error', 'ml-success');
+      mlEmail.value = '';
+      mlEmail.classList.remove('has-error');
+      mlError.classList.remove('is-visible');
+      mlHeading.textContent = 'JOIN OUR MAILING LIST 📒';
+      // Set inline transition before removing wave-risen so the return animates smoothly.
+      monsterGroup.style.transition = 'transform 600ms ease-out';
+      monsterGroup.classList.remove('wave-risen');
+      // Clear inline transition once the animation settles.
+      setTimeout(function() { monsterGroup.style.transition = ''; }, 650);
+    }
+
+    mlClose.addEventListener('click', closeMailingList);
+
+    // Auto-open after monster has landed (900ms pop-up + buffer).
+    setTimeout(openMailingList, 1500);
+
+    mlSubmit.addEventListener('click', function() {
+      var email = mlEmail.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!valid) {
+        mlModal.classList.add('ml-error');
+        mlModal.classList.remove('ml-success');
+        mlError.classList.add('is-visible');
+        mlSubmit.classList.add('is-disabled');
+        mlEmail.classList.add('has-error');
+        return;
       }
+      mlModal.classList.remove('ml-error');
+      mlModal.classList.add('ml-success');
+      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
+    });
 
-      // Moves an SVG circle toward the cursor within an elliptical envelope.
-      function trackIris(el, localX, localY, restX, restY, maxX, maxY) {
-        const dx = localX - restX;
-        const dy = localY - restY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 1) {
-          el.setAttribute("cx", restX);
-          el.setAttribute("cy", restY);
-          return;
-        }
-        const nx = dx / dist;
-        const ny = dy / dist;
-        const strength = Math.min(dist / 200, 1);
-        const kx = 0.55,
-          ky = 0.28;
-        el.setAttribute("cx", restX + nx * maxX * kx * strength);
-        el.setAttribute("cy", restY + ny * maxY * ky * strength);
-      }
+    mlEmail.addEventListener('input', function() {
+      mlModal.classList.remove('ml-error');
+      mlError.classList.remove('is-visible');
+      mlSubmit.classList.remove('is-disabled');
+      mlEmail.classList.remove('has-error');
+    });
+  </script>
 
-      // Monster wave — SVG viewBox 0 0 1440 116.154, wave div top at canvas y:910
-      const monIrisR = document.getElementById("mon-iris-r");
-      const monIrisL = document.getElementById("mon-iris-l");
-      const monIrisRM = document.getElementById("mon-iris-r-m");
-      const monIrisLM = document.getElementById("mon-iris-l-m");
-
-      function isMonsterMobileLayout() {
-        return window.innerWidth <= 768;
-      }
-
-      function moveMobileMonsterEyes(vx, vy) {
-        if (!monIrisRM || !monIrisLM) return;
-        var wr = monsterArea.getBoundingClientRect();
-        var svgX = ((vx - wr.left) / wr.width) * 440;
-        var svgY = ((vy - wr.top) / wr.height) * 64;
-        trackIris(monIrisRM, svgX, svgY, 248.5, 62.5, 10, 3);
-        trackIris(monIrisLM, svgX, svgY, 142, 64, 10, 3);
-      }
-
-      var monsterBlinkGroups = document.querySelectorAll(
-        "#monster-area .eye-blink-group",
-      );
-      function footerMonsterBlink() {
-        monsterBlinkGroups.forEach(function (g) {
-          g.classList.add("closing");
-        });
-        setTimeout(function () {
-          monsterBlinkGroups.forEach(function (g) {
-            g.classList.remove("closing");
-            g.classList.add("opening");
-          });
-          setTimeout(function () {
-            monsterBlinkGroups.forEach(function (g) {
-              g.classList.remove("opening");
-            });
-          }, 110);
-        }, 65);
-      }
-      function scheduleFooterMonsterBlink() {
-        setTimeout(
-          function () {
-            footerMonsterBlink();
-            scheduleFooterMonsterBlink();
-          },
-          2000 + Math.random() * 5000,
-        );
-      }
-      scheduleFooterMonsterBlink();
-
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          monsterGroup.classList.add("popped-up");
-        });
-      });
-
-      loadShopProducts();
-
-      function updateMonsterEyes(vx, vy) {
-        if (isMonsterMobileLayout()) {
-          moveMobileMonsterEyes(vx, vy);
-          return;
-        }
-        const { x, y } = toCanvas(vx, vy);
-        trackIris(monIrisR, x, y - waveTop, 652.9, 49.45, 20, 5);
-        trackIris(monIrisL, x, y - waveTop, 495.41, 49.46, 20, 5);
-      }
-    </script>
-  </body>
+</body>
 </html>
