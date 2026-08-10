@@ -6,8 +6,9 @@
 # Claude Code — local only
 .claude/
 
-# Estimate — throwaway Google Sheet fetch cache
+# Estimate — throwaway Google Sheet fetch caches
 estimate/_source/.sheet-cache.xlsx
+estimate/_source/.expenses-cache.xlsx
 
 # Python bytecode cache
 __pycache__/

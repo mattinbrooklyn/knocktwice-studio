@@ -25,6 +25,13 @@
   "round": { "label": "Round 1", "date": "June 18, 2026" },
   "final": { "prepared": "July 3, 2026" },
 
+  "expenses": {
+    "google_sheet": "https://docs.google.com/spreadsheets/d/1kU0YqLs4XIM2x-fOPL3962kbTXaRUTBeP4lRqLeEa-Q/edit",
+    "sheet_name": "Sheet1",
+    "lede": "Expense reconciliation — Ambrose &amp; Gigi’s room.",
+    "prepared": "August 10, 2026"
+  },
+
   "submit_url": "https://script.google.com/macros/s/AKfycbzutK1aPWdfQ2sHXQLX_FImf9w_UNBg3CQKWXnJ0UXPct4oKuivsLSaYooBuv8owjkm/exec",
   "contact_email": ""
 }

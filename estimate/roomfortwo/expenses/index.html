@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Room for Two — Expenses · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       EXPENSE RECONCILIATION — the closing document.
+       A category-level summary of what was actually spent: every order
+       placed for the room, totaled by category, with one order total.
+       No line items, no choices — a statement, not a cart.
+
+       Data comes from the expenses Sheet via sync-expenses.py, which
+       injects the SUMMARY block below. Amounts are the per-order
+       charges (product + shipping + tax), not the estimate prices.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Brand tokens inlined so this page keeps its full styling even if the
+       shared /assets/styles.css is blocked (corporate filter, PDF engine, etc.). */
+    :root {
+      --color-bg: #F7F2EC;
+      --color-ink: #32261F;
+      --color-blue: #378CDA;
+      --color-green: #51B18C;
+      --color-khaki: #D1C3B6;
+      --color-white: #FFFFFF;
+      --color-yellow: #FADB4B;
+      --color-pink: #EC8EDF;
+      --color-red: #FF0004;
+      --color-caramel: #9A7555;
+      --font-display: 'Erica One', 'Arial Black', sans-serif;
+      --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --radius-input: 0.25rem;
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    /* Neutralize the shared site's mobile "footer blue" reveal. */
+    body::after { display: none !important; content: none !important; }
+
+    html, body { background: var(--color-bg); }
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 3rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: clamp(0.95rem, 2vw, 1.15rem);
+      color: var(--color-blue);
+      display: flex; align-items: center; gap: 0.55rem;
+      margin-bottom: 0.9rem;
+    }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.5rem, 8vw, 4.25rem);
+      line-height: 0.96;
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin: 0 0 0.7rem;
+    }
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: clamp(1.1rem, 2.4vw, 1.4rem);
+      color: var(--color-blue);
+      margin: 0 0 1.1rem;
+    }
+    .stamp {
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.92rem;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+      margin-top: 1rem;
+    }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Category rows ────────────────────────────────────────── */
+    .cat-row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; padding: 1rem 0;
+      border-bottom: 1px solid var(--color-khaki);
+    }
+    .cat-row:first-child { padding-top: 0; }
+    .cat-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.25rem, 3.6vw, 1.7rem);
+      text-transform: uppercase; line-height: 1.05; letter-spacing: 0.01em;
+    }
+    .cat-amount {
+      font-family: var(--font-body); font-weight: 600;
+      font-size: clamp(1rem, 2.4vw, 1.15rem);
+      white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Order total ──────────────────────────────────────────── */
+    .grand {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 1rem; margin-top: 1.4rem; padding-top: 1.2rem;
+      border-top: 2.5px solid var(--color-ink);
+    }
+    .grand-label {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(1.4rem, 4vw, 1.9rem); text-transform: uppercase; letter-spacing: 0.01em;
+    }
+    .grand-amount {
+      font-family: var(--font-body); font-weight: 700;
+      font-size: clamp(1.5rem, 5vw, 2.1rem); color: var(--color-ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .grand-note {
+      font-family: var(--font-ui); font-size: 0.9rem; color: var(--color-caramel);
+      margin: 0.9rem 0 0; max-width: 34rem;
+    }
+
+    .foot {
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.82rem;
+      color: var(--color-caramel); text-align: center; padding: 2.25rem 1rem 0;
+    }
+
+    .setup-warning {
+      background: var(--color-yellow); color: var(--color-ink);
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: 0.9rem; margin-top: 1.5rem;
+    }
+
+    /* ── Print — fits on one page as a clean statement ────────── */
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      /* @page margin must be 0 — Chrome paints the margin band white; the
+         content inset comes from .wrap padding instead. */
+      @page { margin: 0; }
+      html, body { background: var(--color-bg); }
+      body { font-size: 11pt; }
+      .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
+      .setup-warning { display: none !important; }
+      .cat-row { break-inside: avoid; }
+      .grand { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- Masthead ------------------------------------------------- -->
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      Knock Twice × Hannah Rich
+    </p>
+    <h1 class="title">A Room<br>for Two</h1>
+    <p class="lede">Expense reconciliation — Ambrose &amp; Gigi’s room.</p>
+    <p class="stamp">Prepared August 10, 2026</p>
+
+    <div class="setup-warning" id="setup-warning" hidden>
+      ⚙️ <strong>Heads up (only you see this):</strong> no expense rows found.
+      Check the expenses Sheet, then re-run sync-expenses.py.
+    </div>
+
+    <hr class="rule">
+
+    <!-- Category rows render here -------------------------------- -->
+    <div id="categories"></div>
+
+    <!-- Order total ---------------------------------------------- -->
+    <div class="grand" id="grand" hidden>
+      <div>
+        <div class="grand-label">Order total</div>
+        <p class="grand-note">Amounts are what was actually charged at order time —
+          product, shipping, and sales tax included.</p>
+      </div>
+      <div class="grand-amount" id="grand-amount">$0.00</div>
+    </div>
+
+    <p class="foot" id="foot">Knock Twice · Room for Two · Expenses</p>
+  </main>
+
+  <script>
+  /* EXPENSES-DATA:START — auto-generated from the Excel by sync-from-excel.py. Do not edit by hand. */
+  const SUMMARY = [
+    { cat: "Furniture & Storage", amount: 7583.80 },
+    { cat: "Lighting", amount: 825.09 },
+    { cat: "Soft Goods", amount: 2929.96 },
+    { cat: "Finishes", amount: 1295.25 },
+    { cat: "Art", amount: 600.00 },
+    { cat: "Labor & Install", amount: 737.54 },
+  ];
+  /* EXPENSES-DATA:END */
+
+  const money = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const catWrap = document.getElementById("categories");
+  let grandTotal = 0;
+
+  SUMMARY.forEach(group => {
+    grandTotal += group.amount;
+    const row = document.createElement("div");
+    row.className = "cat-row";
+    row.innerHTML = `
+      <span class="cat-name">${group.cat}</span>
+      <span class="cat-amount">${money(group.amount)}</span>`;
+    catWrap.appendChild(row);
+  });
+
+  if (SUMMARY.length) {
+    document.getElementById("grand").hidden = false;
+    document.getElementById("grand-amount").textContent = money(grandTotal);
+  } else {
+    document.getElementById("setup-warning").hidden = false;
+  }
+
+  document.getElementById("foot").textContent =
+    "Knock Twice · Room for Two · Expenses · Prepared August 10, 2026";
+  </script>
+</body>
+</html>
