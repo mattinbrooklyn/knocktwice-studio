@@ -28,7 +28,9 @@
   "expenses": {
     "google_sheet": "https://docs.google.com/spreadsheets/d/1kU0YqLs4XIM2x-fOPL3962kbTXaRUTBeP4lRqLeEa-Q/edit",
     "sheet_name": "Sheet1",
-    "lede": "Expense reconciliation — Ambrose &amp; Gigi’s room.",
+    "lede": "Part 1 installation — final cost reconciliation.",
+    "intro": "Every cost incurred to date for Ambrose &amp; Gigi’s room, totaled by category and reconciled against your deposit. This closes out Part 1 of installation — an invoice for the balance will follow.",
+    "deposit": 10000.00,
     "prepared": "August 10, 2026"
   },
 

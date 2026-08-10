@@ -111,11 +111,12 @@ def build_summary(rows, category_order, last_categories):
     return ordered, uncharged, orphans
 
 
-def generate_js(summary):
+def generate_js(summary, deposit):
     lines = ["  const SUMMARY = ["]
     for cat, amount, _n in summary:
         lines.append(f"    {{ cat: \"{engine.js(cat)}\", amount: {amount:.2f} }},")
     lines.append("  ];")
+    lines.append(f"  const DEPOSIT = {deposit:.2f};")
     return "\n".join(lines)
 
 
@@ -135,17 +136,21 @@ if __name__ == "__main__":
         sys.exit("No expense rows found — check the sheet's CATEGORY/PIECE/ORDER TOTAL columns.")
 
     idn = cfg["identity"]
+    deposit = float(exp.get("deposit", 0))
     tokens = {
         "{{eyebrow}}": idn["eyebrow"],
         "{{h1_html}}": idn["h1_html"],
         "{{lede_expenses}}": exp["lede"],
+        "{{intro_expenses}}": exp.get("intro", ""),
+        "{{sheet_url}}": exp["google_sheet"],
         "{{project_short}}": idn["project_short"],
         "{{expenses_prepared}}": exp["prepared"],
     }
     page = os.path.join(REPO, *cfg["output_dir"].split("/"), "expenses", "index.html")
     os.makedirs(os.path.dirname(page), exist_ok=True)
     open(page, "w", encoding="utf-8").write(engine.render_template("expenses.html", tokens))
-    engine.inject(page, "/* EXPENSES-DATA:START", "/* EXPENSES-DATA:END", generate_js(summary))
+    engine.inject(page, "/* EXPENSES-DATA:START", "/* EXPENSES-DATA:END",
+                  generate_js(summary, deposit))
 
     total = sum(amt for _c, amt, _n in summary)
     print(f"\n  {'Category':<28}{'Items':>6}{'Charged':>14}")
@@ -153,7 +158,10 @@ if __name__ == "__main__":
     for cat, amt, n in summary:
         print(f"  {cat:<28}{n:>6}{amt:>14,.2f}")
     print("  " + "-" * 48)
-    print(f"  {'ORDER TOTAL':<28}{'':>6}{total:>14,.2f}")
+    print(f"  {'COSTS TO DATE':<28}{'':>6}{total:>14,.2f}")
+    print(f"  {'DEPOSIT PAID':<28}{'':>6}{-deposit:>14,.2f}")
+    label = "BALANCE DUE" if total >= deposit else "CREDIT REMAINING"
+    print(f"  {label:<28}{'':>6}{abs(total - deposit):>14,.2f}")
     if uncharged:
         print(f"\n  ⚠  {len(uncharged)} receipt(s) have NO row with an ORDER TOTAL — that money")
         print("     is missing from the page. Put the order's charge on one of its rows:")
