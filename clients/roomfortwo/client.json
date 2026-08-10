@@ -30,7 +30,7 @@
     "sheet_name": "Sheet1",
     "output_dir": "procurement/roomfortwo/phase1reconciliation",
     "lede": "Part 1 installation: final cost reconciliation.",
-    "intro": "All costs to date for Ambrose &amp; Gigi’s room, totaled by category and set against your deposit. This closes out Part 1. An invoice for the balance follows.",
+    "intro": "All costs to date for Ambrose &amp; Gigi’s room, set against your deposit.",
     "deposit": 10000.00,
     "prepared": "August 10, 2026"
   },
