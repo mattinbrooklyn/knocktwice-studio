@@ -146,7 +146,10 @@ if __name__ == "__main__":
         "{{project_short}}": idn["project_short"],
         "{{expenses_prepared}}": exp["prepared"],
     }
-    page = os.path.join(REPO, *cfg["output_dir"].split("/"), "expenses", "index.html")
+    # The reconciliation gets its own URL (expenses.output_dir); without one it
+    # nests under the client's estimate directory.
+    out_dir = exp.get("output_dir") or cfg["output_dir"] + "/expenses"
+    page = os.path.join(REPO, *out_dir.split("/"), "index.html")
     os.makedirs(os.path.dirname(page), exist_ok=True)
     open(page, "w", encoding="utf-8").write(engine.render_template("expenses.html", tokens))
     engine.inject(page, "/* EXPENSES-DATA:START", "/* EXPENSES-DATA:END",

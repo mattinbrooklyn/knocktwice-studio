@@ -28,6 +28,7 @@
   "expenses": {
     "google_sheet": "https://docs.google.com/spreadsheets/d/1kU0YqLs4XIM2x-fOPL3962kbTXaRUTBeP4lRqLeEa-Q/edit",
     "sheet_name": "Sheet1",
+    "output_dir": "procurement/roomfortwo/phase1reconciliation",
     "lede": "Part 1 installation — final cost reconciliation.",
     "intro": "Every cost incurred to date for Ambrose &amp; Gigi’s room, totaled by category and reconciled against your deposit. This closes out Part 1 of installation — an invoice for the balance will follow.",
     "deposit": 10000.00,
