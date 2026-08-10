@@ -46,6 +46,12 @@
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
     /* Neutralize the shared site's mobile "footer blue" reveal. */
     body::after { display: none !important; content: none !important; }
+    /* Restore the native cursor — the shared stylesheet hides it (cursor: none)
+       in favor of the main site's JS-drawn custom cursor, which this page
+       doesn't load. Same override the estimate page uses. */
+    html, body { cursor: auto !important; }
+    *, *::before, *::after { cursor: auto !important; }
+    a { cursor: pointer !important; }
 
     html, body { background: var(--color-bg); }
     body {
