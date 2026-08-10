@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#F7F2EC">
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
-  <title>{{project_short}} — Part 1 Reconciliation · Knock Twice</title>
+  <title>{{project_short}} · Part 1 Reconciliation · Knock Twice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -96,8 +96,8 @@
       margin: 0 0 1.1rem;
     }
     .intro {
-      font-size: clamp(0.95rem, 1.5vw, 1.05rem);
-      max-width: 36rem; margin: 0;
+      font-size: clamp(0.85rem, 1.3vw, 0.95rem);
+      max-width: 32rem; margin: 0;
     }
     .intro a { color: var(--color-ink); text-decoration-color: var(--color-blue); text-underline-offset: 2px; }
     .stamp {
@@ -200,8 +200,8 @@
     </p>
     <h1 class="title">{{h1_html}}</h1>
     <p class="lede">{{lede_expenses}}</p>
-    <p class="intro">{{intro_expenses}} For line-by-line detail and receipts,
-      <a href="{{sheet_url}}" target="_blank" rel="noopener">see the full ledger</a>.</p>
+    <p class="intro">{{intro_expenses}} Item-by-item detail lives in the
+      <a href="{{sheet_url}}" target="_blank" rel="noopener">receipts</a>.</p>
     <p class="stamp">Prepared {{expenses_prepared}}</p>
 
     <div class="setup-warning" id="setup-warning" hidden>
@@ -227,8 +227,8 @@
       <div class="balance">
         <div>
           <div class="balance-label" id="balance-label">Balance due</div>
-          <p class="balance-note">Amounts are what was actually charged at order time —
-            product, shipping, and sales tax included.</p>
+          <p class="balance-note">Amounts are what was actually charged at order time,
+            including product, shipping, and sales tax.</p>
         </div>
         <div class="balance-amount" id="balance-amount">$0.00</div>
       </div>
