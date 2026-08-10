@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knock Twice — Copy Desk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- The real design system: every colour/font token below comes from here. -->
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* Internal tool — opt out of the site's hidden custom-JS cursor. */
+    *, *::before, *::after { cursor: auto !important; }
+    button, label { cursor: pointer !important; }
+
+    body {
+      background: var(--color-bg);
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      padding: clamp(1.5rem, 5vw, 4rem) 1.25rem 5rem;
+    }
+    .panel { max-width: 46rem; margin: 0 auto; }
+
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--color-blue);
+      margin-bottom: 0.25rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(2.25rem, 6vw, 3.25rem);
+      line-height: 1.05;
+      margin-bottom: 0.6rem;
+    }
+    .lede {
+      font-size: 1.0625rem;
+      line-height: 1.45;
+      color: var(--color-caramel);
+      max-width: 32rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .cd-field { margin-bottom: 1.5rem; }
+    .field-label {
+      display: block;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0.35rem;
+    }
+    .field-label em {
+      font-style: normal;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--color-caramel);
+    }
+    textarea {
+      width: 100%;
+      min-height: 6.5rem;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.5;
+      border: 2px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      background: var(--color-white);
+      color: var(--color-ink);
+      padding: 0.85rem 1rem;
+      resize: vertical;
+    }
+    textarea:focus { outline: 3px solid var(--color-blue); outline-offset: 1px; }
+
+    button.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      font-size: var(--type-button);
+      height: var(--button-height);
+      min-width: 11rem;
+      padding: 0 1.75rem;
+      border: none;
+      border-radius: var(--radius-button);
+      color: var(--color-bg);
+      white-space: nowrap;
+    }
+    button.btn:hover:not(:disabled) { opacity: 0.9; }
+    button.btn:disabled { opacity: 0.35; cursor: default !important; }
+    .btn-find    { background: var(--color-blue); }
+    .btn-publish { background: var(--color-red); }
+    .buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin: 0.5rem 0 1.5rem; }
+
+    /* ── Preview / result card ───────────────────────── */
+    .card {
+      border: 2px solid var(--color-ink);
+      border-radius: var(--radius-input);
+      background: var(--color-white);
+      padding: 1.5rem 1.6rem;
+      margin-bottom: 1.5rem;
+    }
+    .card .kicker {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-caramel);
+      margin-bottom: 0.6rem;
+    }
+    .card .where { font-weight: 600; margin-bottom: 1rem; }
+    .card .where a { color: var(--color-blue); }
+    .compare { display: grid; gap: 1rem; }
+    .compare .label {
+      font-family: var(--font-ui);
+      font-weight: 700;
+      font-size: 0.8125rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .copy-block {
+      border-left: 4px solid var(--color-khaki);
+      padding: 0.15rem 0 0.15rem 0.9rem;
+      line-height: 1.5;
+    }
+    .copy-block.new { border-left-color: var(--color-green); }
+    .copy-block.old { border-left-color: var(--color-red); color: var(--color-caramel); }
+    .copy-block p + p { margin-top: 0.6rem; }
+
+    .status {
+      font-size: 1.0625rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+    .status.ok   { color: var(--color-green); }
+    .status.err  { color: var(--color-red); }
+    .status.busy { color: var(--color-blue); }
+
+    .steps { list-style: none; display: grid; gap: 0.45rem; }
+    .steps li { display: flex; gap: 0.6rem; line-height: 1.45; }
+    .steps .mark { font-weight: 700; flex: 0 0 auto; }
+    .steps li.ok .mark  { color: var(--color-green); }
+    .steps li.bad .mark { color: var(--color-red); }
+    .steps .note { color: var(--color-caramel); font-size: 0.9375rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <p class="eyebrow">Knock Twice — internal</p>
+    <h1>COPY DESK</h1>
+    <p class="lede">
+      Swap one piece of copy on the live site — and nothing else. Paste what it
+      says now, write what it should say, check the preview, hit publish.
+    </p>
+
+    <div class="cd-field">
+      <label class="field-label" for="current">Current copy
+        <em>· exactly as it reads on the live site</em></label>
+      <textarea id="current" spellcheck="false"
+        placeholder="We design for spaces and the people inside them."></textarea>
+    </div>
+    <div class="cd-field">
+      <label class="field-label" for="new">New copy
+        <em>· press Return to start a new paragraph</em></label>
+      <textarea id="new"
+        placeholder="What it should say instead."></textarea>
+    </div>
+
+    <div class="buttons">
+      <button class="btn btn-find" id="find">Find &amp; preview</button>
+      <button class="btn btn-publish" id="publish" disabled>Publish live</button>
+    </div>
+
+    <div class="status hidden" id="status"></div>
+
+    <div class="card hidden" id="preview">
+      <p class="kicker">Preview</p>
+      <p class="where">Found on <a id="where-link" target="_blank"></a></p>
+      <div class="compare">
+        <div>
+          <p class="label">Currently reads</p>
+          <div class="copy-block old" id="show-old"></div>
+        </div>
+        <div>
+          <p class="label">Will read</p>
+          <div class="copy-block new" id="show-new"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="result">
+      <p class="kicker">Publish</p>
+      <ul class="steps" id="steps"></ul>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const LIVE = "https://www.knocktwice.studio";
+    let previewed = null;   // {current, new} the preview (and publish) is armed for
+    let lastFind = null;    // server's answer for that preview
+
+    function setStatus(kind, text) {
+      const el = $("status");
+      el.className = "status " + kind;
+      el.textContent = text;
+    }
+    function clearStatus() { $("status").className = "status hidden"; }
+
+    // Any edit after a preview disarms publish until the preview is re-run —
+    // what you publish is always exactly what you last saw.
+    for (const id of ["current", "new"]) {
+      $(id).addEventListener("input", () => {
+        previewed = null;
+        $("publish").disabled = true;
+      });
+    }
+
+    function fillParagraphs(el, lines) {
+      el.textContent = "";
+      for (const line of lines) {
+        const p = document.createElement("p");
+        p.textContent = line;
+        el.appendChild(p);
+      }
+    }
+
+    $("find").addEventListener("click", async () => {
+      const current = $("current").value.trim();
+      const newCopy = $("new").value.trim();
+      $("preview").classList.add("hidden");
+      $("result").classList.add("hidden");
+      setStatus("busy", "Checking the live site…");
+      $("find").disabled = true;
+      try {
+        const r = await fetch("/api/find", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ current, new: newCopy }),
+        });
+        const data = await r.json();
+        if (!data.ok) { setStatus("err", data.error); return; }
+        lastFind = data;
+        previewed = { current, new: newCopy };
+        const link = $("where-link");
+        link.textContent = LIVE.replace("https://", "") + data.url;
+        link.href = LIVE + data.url;
+        fillParagraphs($("show-old"), [ $("current").value.trim() ]);
+        fillParagraphs($("show-new"), data.preview_new);
+        $("preview").classList.remove("hidden");
+        $("publish").disabled = false;
+        setStatus("ok", "One match, ready to go. Read the preview, then publish.");
+      } catch (e) {
+        setStatus("err", "The helper didn't answer — is the launcher window still open?");
+      } finally {
+        $("find").disabled = false;
+      }
+    });
+
+    $("publish").addEventListener("click", async () => {
+      if (!previewed) return;
+      $("publish").disabled = true;
+      $("find").disabled = true;
+      setStatus("busy", "Publishing — this takes a few seconds…");
+      try {
+        const r = await fetch("/api/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(previewed),
+        });
+        const data = await r.json();
+        renderSteps(data.steps || []);
+        $("result").classList.remove("hidden");
+        if (!data.ok) {
+          setStatus("err", "Stopped — nothing went live. See the notes below.");
+          return;
+        }
+        setStatus("busy", "Pushed. Waiting for the site to rebuild…");
+        awaitLive(data.url, data.needle);
+      } catch (e) {
+        setStatus("err", "The helper didn't answer — is the launcher window still open?");
+      } finally {
+        $("find").disabled = false;
+      }
+    });
+
+    function renderSteps(steps) {
+      const ul = $("steps");
+      ul.textContent = "";
+      for (const s of steps) {
+        const li = document.createElement("li");
+        li.className = s.ok ? "ok" : "bad";
+        const mark = document.createElement("span");
+        mark.className = "mark";
+        mark.textContent = s.ok ? "✓" : "✗";
+        const text = document.createElement("span");
+        text.textContent = s.label + (s.note ? " — " : "");
+        if (s.note) {
+          const note = document.createElement("span");
+          note.className = "note";
+          note.textContent = s.note;
+          text.appendChild(note);
+        }
+        li.append(mark, text);
+        ul.appendChild(li);
+      }
+    }
+
+    // Poll the live page (via the helper — the browser can't cross-origin)
+    // until the new copy shows up, for up to five minutes.
+    async function awaitLive(url, needle) {
+      const deadline = Date.now() + 5 * 60 * 1000;
+      const q = "/api/verify?url=" + encodeURIComponent(url) +
+                "&needle=" + encodeURIComponent(needle);
+      while (Date.now() < deadline) {
+        try {
+          const r = await fetch(q);
+          const data = await r.json();
+          if (data.live) {
+            setStatus("ok", "Live — the new copy is on the site. ✓");
+            return;
+          }
+        } catch (e) { /* helper briefly busy — keep polling */ }
+        await new Promise((res) => setTimeout(res, 10000));
+      }
+      setStatus("err",
+        "Pushed fine, but the live page hasn't shown the change after five " +
+        "minutes. Check the page yourself — Vercel may just be slow.");
+    }
+  </script>
+</body>
+</html>
