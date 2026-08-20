@@ -367,25 +367,6 @@
       }
     }
 
-    /* ── Wide-tablet band (961–1360px): bucket clears the copy ────
-       The intro's right edge is parked at a fixed 1124px while the
-       bucket's left edge (70vw) slides under it as the window
-       narrows, so the two collide anywhere in this band. Move the
-       bucket down onto the lower-right corner of Matt's headshot --
-       mirrors the mobile design, where it deliberately overlaps his
-       photo from the right. Vertical position is set by placeBucket()
-       in JS (the photo's y-position isn't expressible in CSS here);
-       the top value below is only a no-JS fallback.                 */
-    @media (min-width: 961px) and (max-width: 1360px) {
-      .paint-bucket-outer {
-        left: auto;
-        right: 1vw;
-        top: calc(50rem - 21vw);
-        width: 20vw;
-        height: 21vw;
-      }
-    }
-
     /* ── Narrow tablet (<=960px): stack people vertically early ───
        Prevents cramped headshots. Paintbrush and paint bucket
        reposition to flow with the stacked layout.                   */
@@ -875,7 +856,7 @@
     var resizeTimer = 0;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() { scalePage(); applyMonsterLayout(); if (window.placeBucket) placeBucket(); }, 100);
+      resizeTimer = setTimeout(function() { scalePage(); applyMonsterLayout(); }, 100);
     });
 
 
@@ -1132,33 +1113,6 @@
     document.querySelectorAll('.obj img').forEach(img => {
       img.addEventListener('dragstart', e => e.preventDefault());
     });
-
-    // ── Bucket placement, 961–1360px band ──────────────────────────
-    // The CSS band rule handles the horizontal position (right: 1vw);
-    // the vertical target is the lower-right corner of Matt's photo,
-    // which only layout can know. Stops once the user drags the bucket.
-    const bucketOuter = document.getElementById('obj-bucket');
-    const mattPhoto = document.querySelector('.headshot-matt');
-    let bucketDragged = false;
-    bucketOuter.addEventListener('pointerdown', () => { bucketDragged = true; }, { once: true });
-
-    function placeBucket() {
-      if (bucketDragged || !mattPhoto) return;
-      const vw = window.innerWidth;
-      if (vw <= 960 || vw > 1360) {
-        bucketOuter.style.removeProperty('top');
-        return;
-      }
-      const pageRect = page.getBoundingClientRect();
-      const photoRect = mattPhoto.getBoundingClientRect();
-      const bucketHeight = bucketOuter.getBoundingClientRect().height;
-      // Dip 36px past the photo's bottom edge: enough to sit "on" the
-      // corner, small enough to stay clear of the name and bio text.
-      const top = (photoRect.bottom - pageRect.top) - bucketHeight + 36;
-      bucketOuter.style.setProperty('top', top + 'px');
-    }
-    placeBucket();
-    window.addEventListener('load', placeBucket);
   </script>
 
   <script>
