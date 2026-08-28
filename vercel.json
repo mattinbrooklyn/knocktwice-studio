@@ -25,6 +25,9 @@
     { "source": "/interiors-preview/", "destination": "/interiors/", "permanent": true },
     { "source": "/experiences-preview.html", "destination": "/experiences/", "permanent": true },
     { "source": "/experiences-preview/", "destination": "/experiences/", "permanent": true },
-    { "source": "/skeleton.html", "destination": "/skeleton/", "permanent": true }
+    { "source": "/skeleton.html", "destination": "/skeleton/", "permanent": true },
+    { "source": "/privacy", "destination": "/fine-print/#privacy-policy", "permanent": false },
+    { "source": "/terms", "destination": "/fine-print/#tcs", "permanent": false },
+    { "source": "/returns", "destination": "/fine-print/#shipping-returns", "permanent": false }
   ]
 }
