@@ -182,7 +182,7 @@
       position: absolute;
       left: 0;
       /* Matches ticker band height from `--about-ml-ticker-height`; −1px kills subpixel cream between wave and green strip. */
-      bottom: calc(var(--footer-height) + var(--about-ml-ticker-height) - 1px);
+      bottom: calc(var(--footer-panel-height) + var(--about-ml-ticker-height) - 1px);
       width: 100%;
       /* Above #monster-linear-ticker for edge cases / scroll — geometry keeps the marquee readable. */
       z-index: 15;
@@ -212,7 +212,7 @@
     #monster-linear-ticker {
       position: absolute;
       left: 0;
-      bottom: var(--footer-height);
+      bottom: var(--footer-panel-height);
       width: 100%;
       box-sizing: border-box;
       /* Below #monster-group idle (15) / risen (1020); stacked lower so lip rarely covers copy. */

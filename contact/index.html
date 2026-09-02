@@ -41,7 +41,7 @@
     flex-direction: column;
     padding-top: 4.375rem;
     padding-left: var(--content-left);
-    padding-bottom: 0;
+    padding-bottom: calc(var(--wave-height-desktop) + var(--button-height) + 2rem);
   }
 
   .h1 {
@@ -184,7 +184,7 @@
   /* ── Monster wave ──────────────────────────────── */
   #monster-group {
     position: absolute;
-    bottom: var(--footer-height);
+    bottom: var(--footer-panel-height);
     left: 0;
     width: 100%;
     z-index: 5;
@@ -284,6 +284,7 @@
     .page {
       padding-top: 6.25rem;
       padding-right: var(--content-left);
+      padding-bottom: calc(var(--wave-height-mobile) + var(--button-height) + 2rem);
     }
     .h1 {
       font-size: clamp(2.25rem, 11vw, 3rem);
