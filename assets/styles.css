@@ -1096,6 +1096,7 @@ html.kt-home-monster-open body {
     --content-left: var(--content-left-mobile);
     --content-width: var(--content-width-mobile);
     --footer-height: var(--footer-height-mobile);
+    --footer-panel-height: 26.875rem;
     --footer-pad-x:  var(--content-left-mobile);
     /* Total depth from viewport bottom reserved for footer + home-indicator inset. */
     --footer-stack-height: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
@@ -1103,10 +1104,13 @@ html.kt-home-monster-open body {
   /* Wave / modal stack: anchor to footer + safe-area (overrides weaker per-page rules).
      About mounts `#monster-linear-ticker` beneath the wave — taller bottom offset wins below. */
   #monster-group {
-    bottom: var(--footer-stack-height) !important;
+    bottom: var(--footer-panel-height) !important;
   }
   #page-scaler:has(#monster-linear-ticker) #monster-group {
-    bottom: calc(var(--footer-stack-height) + var(--about-ml-ticker-height) - 1px) !important;
+    bottom: var(--footer-panel-height) !important;
+  }
+  #monster-linear-ticker {
+    display: none !important;
   }
 
   /* Footer grid + safe-area: fills home-indicator row with brand blue. Bottom
@@ -1114,20 +1118,20 @@ html.kt-home-monster-open body {
   .footer {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto auto env(safe-area-inset-bottom, 0px);
+    grid-template-rows: auto auto auto env(safe-area-inset-bottom, 0px);
     gap: 1.75rem;
     justify-content: unset;
     align-items: stretch;
-    height: auto;
-    min-height: var(--footer-stack-height);
-    padding-top: 2rem;
+    height: var(--footer-panel-height);
+    min-height: calc(var(--footer-panel-height) + env(safe-area-inset-bottom, 0px));
+    padding-top: 1.875rem;
     padding-bottom: 1.5rem;
     box-sizing: border-box;
   }
   .footer-panel {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.75rem;
+    gap: 1rem;
   }
   .footer-links,
   .footer-links--support,
@@ -1135,18 +1139,35 @@ html.kt-home-monster-open body {
     justify-self: stretch;
     width: 100%;
   }
+  .footer-links {
+    order: 1;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+  }
+  .footer-links--support {
+    order: 2;
+  }
+  .footer-heading {
+    margin-bottom: 0;
+    font-size: 0.75rem;
+  }
   .footer-newsletter {
-    order: -1;
+    order: 3;
+    margin-top: 1.375rem;
+  }
+  .footer-newsletter .footer-heading {
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
   }
   .footer-icons {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 2;
     align-self: center;
     justify-self: center;
   }
   .footer-copyright {
     grid-column: 1;
-    grid-row: 5;
+    grid-row: 3;
     align-self: center;
     justify-self: center;
   }
