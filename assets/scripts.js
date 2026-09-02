@@ -726,3 +726,39 @@
 
   window.KT.lightbox = { open: open, close: close };
 }());
+
+// ── Footer mailing-list form ───────────────────────────────────────
+(function () {
+  var forms = document.querySelectorAll('[data-footer-newsletter]');
+  if (!forms.length) return;
+
+  var sheetUrl = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
+  var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  forms.forEach(function (form) {
+    var input = form.querySelector('.footer-newsletter-input');
+    if (!input) return;
+
+    input.addEventListener('input', function () {
+      form.classList.remove('is-error');
+      input.classList.remove('has-error');
+    });
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      var email = input.value.trim();
+      if (!emailRe.test(email)) {
+        form.classList.add('is-error');
+        form.classList.remove('is-success');
+        input.classList.add('has-error');
+        return;
+      }
+
+      form.classList.remove('is-error');
+      input.classList.remove('has-error');
+      form.classList.add('is-success');
+      fetch(sheetUrl + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
+        .catch(function () {});
+    });
+  });
+}());

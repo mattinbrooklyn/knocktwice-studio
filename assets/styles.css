@@ -84,8 +84,8 @@
   --radius-pill:           2rem;
   --radius-button:         6.25rem;
   --radius-input:          0.25rem;
-  /* Footer blue band — Figma: 90px desktop, 56px mobile (fixed rem; no vw). */
-  --footer-height:         5.625rem;
+  /* Footer blue panel: desktop carries links + newsletter; mobile stacks content. */
+  --footer-height:         20.625rem;
   --footer-height-mobile:  3.5rem;
   /* Horizontal inset: desktop matches nav (40px); mobile matches Figma page margin (20px). */
   --footer-pad-x:          var(--nav-left);
@@ -652,15 +652,104 @@ body.nav-open {
   height: var(--footer-height);
   margin-top: -2px;
   background: var(--color-blue);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--footer-pad-x);
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) minmax(20rem, 33.125rem) minmax(10rem, 1fr);
+  grid-template-rows: 1fr auto auto;
+  column-gap: clamp(2rem, 6vw, 6.5rem);
+  row-gap: 2.375rem;
+  align-items: start;
+  padding: 4.25rem var(--footer-pad-x) 2rem;
   z-index: 100;
 }
+.footer-panel {
+  display: contents;
+}
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8125rem;
+  font-family: var(--font-ui);
+  font-size: var(--type-field);
+  line-height: 1;
+  font-weight: 400;
+  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+}
+.footer-links--support {
+  justify-self: end;
+  min-width: 10rem;
+}
+.footer-heading {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--color-bg);
+  text-transform: uppercase;
+}
+.footer-links a {
+  color: var(--color-bg);
+  text-decoration: none;
+}
+.footer-links a:hover {
+  text-decoration: underline;
+}
+.footer-newsletter {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-self: center;
+  width: 100%;
+}
+.footer-newsletter .footer-heading {
+  align-self: center;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1;
+  font-weight: 400;
+  text-align: center;
+}
+.footer-newsletter-input {
+  background: var(--color-bg);
+}
+.footer-newsletter-input.has-error {
+  color: var(--color-red);
+}
+.footer-newsletter-error,
+.footer-newsletter-success {
+  min-height: 1rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-body);
+  font-size: var(--type-error);
+  line-height: 1rem;
+  color: var(--color-bg);
+}
+.footer-newsletter-error {
+  display: none;
+}
+.footer-newsletter.is-error .footer-newsletter-error {
+  display: block;
+}
+.footer-newsletter.is-success .footer-newsletter-error {
+  display: none;
+}
+.footer-newsletter-success {
+  display: none;
+}
+.footer-newsletter.is-success .footer-newsletter-success {
+  display: block;
+}
+.footer-newsletter-submit {
+  margin-top: 0.5rem;
+  width: 100%;
+}
 .footer-icons {
+  grid-column: 2;
+  grid-row: 2;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1.25rem;
   flex-shrink: 0;
 }
@@ -676,9 +765,13 @@ body.nav-open {
   display: block;
 }
 .footer-copyright {
+  grid-column: 2;
+  grid-row: 3;
+  justify-self: center;
   flex-shrink: 0;
   font-family: var(--font-ui);
-  font-size: var(--type-field);
+  font-size: 0.75rem;
+  line-height: 1;
   font-weight: 400;
   color: var(--color-bg);
   font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
@@ -1019,25 +1112,42 @@ html.kt-home-monster-open body {
      rubber-band pulls use `body::after` (see mobile base block), not global blue `body`. */
   .footer {
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: var(--footer-height) env(safe-area-inset-bottom, 0px);
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto env(safe-area-inset-bottom, 0px);
+    gap: 1.75rem;
     justify-content: unset;
-    align-items: center;
+    align-items: stretch;
     height: auto;
     min-height: var(--footer-stack-height);
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
     box-sizing: border-box;
+  }
+  .footer-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .footer-links,
+  .footer-links--support,
+  .footer-newsletter {
+    justify-self: stretch;
+    width: 100%;
+  }
+  .footer-newsletter {
+    order: -1;
   }
   .footer-icons {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 4;
     align-self: center;
-    justify-self: start;
+    justify-self: center;
   }
   .footer-copyright {
-    grid-column: 2;
-    grid-row: 1;
+    grid-column: 1;
+    grid-row: 5;
     align-self: center;
-    justify-self: end;
+    justify-self: center;
   }
 
   .nav { display: none; }
