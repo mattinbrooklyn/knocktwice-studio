@@ -48,9 +48,9 @@ export default async function middleware(request) {
         },
       });
     }
-    return html(loginPage('That is not it. Try again.'), 401);
+    return html(loginPage('That is not it. Try again.', url.search), 401);
   }
-  return html(loginPage(), 401);
+  return html(loginPage('', url.search), 401);
 }
 
 function isCron(request) {
@@ -101,7 +101,8 @@ function escape(s) {
 }
 
 /** The login screen: one field, one button, on the site's design system. */
-function loginPage(message = '') {
+/** `search` is the query string to carry through the login, so a shared link still lands on its results. */
+function loginPage(message = '', search = '') {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,7 +151,7 @@ function loginPage(message = '') {
     <section class="gate">
       <p class="gate-kicker">Product search · studio only</p>
       <h1 class="gate-title">Knock twice.</h1>
-      <form class="gate-form" method="post" action="${PAGE}">
+      <form class="gate-form" method="post" action="${PAGE}${escape(search)}">
         <input class="field" type="password" name="password" placeholder="Password" autocomplete="current-password" autofocus required>
         <button class="btn" type="submit">Enter</button>
       </form>
