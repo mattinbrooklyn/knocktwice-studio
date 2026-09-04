@@ -63,14 +63,18 @@ async function batch(req, res) {
   const { db, log } = ctx;
   const started = Date.now();
   const deadline = started + BATCH_BUDGET_MS;
+  // Never-tried brands first, then the ones with the fewest recent failures, then the most stale.
+  // Brands that failed three times in the last day are left for a manual run with a bigger budget.
   const brands = await db.query(
     `SELECT b.*,
        (SELECT max(r.finished_at) FROM ingest_runs r WHERE r.brand_id = b.id AND r.status = 'ok') AS last_ok,
-       (SELECT max(r.started_at) FROM ingest_runs r WHERE r.brand_id = b.id) AS last_try
+       (SELECT max(r.started_at) FROM ingest_runs r WHERE r.brand_id = b.id) AS last_try,
+       (SELECT count(*) FROM ingest_runs r WHERE r.brand_id = b.id AND r.status = 'error' AND r.started_at > now() - interval '1 day') AS recent_failures
      FROM brands b WHERE b.enabled
        AND NOT EXISTS (SELECT 1 FROM ingest_runs r WHERE r.brand_id = b.id AND r.status IN ('ok', 'running')
                          AND r.started_at > now() - ($1 || ' minutes')::interval)
-     ORDER BY last_ok NULLS FIRST, last_try NULLS FIRST, b.id`,
+       AND (SELECT count(*) FROM ingest_runs r WHERE r.brand_id = b.id AND r.status = 'error' AND r.started_at > now() - interval '1 day') < 3
+     ORDER BY last_ok NULLS FIRST, recent_failures ASC, last_try NULLS FIRST, b.id`,
     [String(THROTTLE_MINUTES)],
   );
   const ran = [];
