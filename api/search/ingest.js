@@ -88,7 +88,8 @@ async function batch(req, res) {
   if (chain > 0 && chain <= 40 && ran.length > 0 && brands.length > ran.length) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     next = `https://${host}/api/search/ingest?brand=batch&chain=${chain + 1}`;
-    waitUntil(fetch(next, { signal: AbortSignal.timeout(3_000) }).catch(() => {}));
+    // Keep this invocation alive until the next hop has answered, so the hand-off cannot be cut short.
+    waitUntil(fetch(next, { signal: AbortSignal.timeout(58_000) }).catch(() => {}));
   }
   return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran, next });
 }
