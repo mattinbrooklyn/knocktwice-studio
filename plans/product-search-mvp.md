@@ -106,6 +106,27 @@ approved.
 A variable saved for Production only is invisible to this branch's preview
 deployments. `GET /api/search/status` reports which names are present.
 
+## First live runs (Sept 4, 2026)
+
+What the first sweep of the core list found. The registry notes carry the
+per-brand detail; `GET /api/search/status?report=1` shows the live state.
+
+- Roughly half the core brands are Shopify and ingest cleanly through the
+  product feed in a few seconds each. Dimension coverage there depends on
+  whether the brand writes sizes into the product description (PSTR: all of
+  them; In Common With and Sundays: none, their specs live elsewhere on the page).
+- The JSON-LD path works on real sites (Lucca House, Schoolhouse, Smeg,
+  Tappan) but is slow: one request per product, so it is capped by the run
+  budget and fills in over successive runs.
+- Four brands changed under us before we started: Hay's US store folded into
+  DWR, Poketo redirects to Pattern Brands, Areaware's store lists nothing, and
+  two domains no longer resolve (Chen Chen & Kai Williams, Hasami Porcelain).
+  A static list needs this kind of check on a schedule; the run log is it.
+- Big European brands with country-split sites (Kartell, Muuto, Normann,
+  Marimekko, Flos, Louis Poulsen) need per-brand adapters. Their pages carry
+  little or no schema.org data and their feeds are blocked or absent.
+  Deferred until the search page exists and shows which gaps matter.
+
 ## Environment note
 
 The Claude Code cloud environment blocks outbound requests to arbitrary domains,

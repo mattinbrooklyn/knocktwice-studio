@@ -24,6 +24,15 @@ export default async function handler(req, res) {
     const brandsSynced = await syncBrands(db);
     const s = await summary(db);
     res.setHeader('Cache-Control', 'no-store');
+    if (req.query?.report) {
+      // Compact, one line per brand: id status strategy products/dims/embedded error
+      const lines = s.brandReport.map((b) => [
+        b.enabled ? ' ' : '-', b.id.padEnd(28), (b.last_status || 'never').padEnd(6), (b.strategy || '').padEnd(8),
+        `${b.products}/${b.with_dimensions}/${b.embedded}`.padEnd(14), b.last_error ? b.last_error.slice(0, 90) : '',
+      ].join(' '));
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      return res.status(200).send([`products ${s.products.total} (dims ${s.products.with_dimensions}) across ${s.products.brands} brands`, 'en id status strategy products/dims/embedded error', ...lines].join('\n'));
+    }
     return res.status(200).json({ ok: true, env: envReport(), statementsApplied, brandsSynced, ...s });
   } catch (err) {
     console.error('status failed', err);
