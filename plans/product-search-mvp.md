@@ -1,0 +1,94 @@
+# Plan: Interior Product Search — MVP
+
+**Status:** Step 1 (brand universe proposal) delivered, awaiting Matt's approval.
+No application code exists yet. Nothing here is deployed.
+
+**Brand list to approve:** [`product-search-brands.md`](product-search-brands.md)
+
+---
+
+## The brief, as understood
+
+- A private, password-protected search page at `/tools/search` on knocktwice.studio.
+  For Matt and Rodrigo only. Ships to staging first through the existing
+  GitHub → Vercel pipeline.
+- One text box. Type a plain-English description ("small rounded terracotta side
+  table"), get a ranked grid of products from ~50 curated brands (expandable to
+  100). Each card: image, brand + name, price, dimensions, material/color when
+  known, stock when scrapable, link out. Sort by relevance / price / size. Filter
+  by brand / price range / category.
+- Product data is scraped weekly (and on demand) from the brands' own sites,
+  stored in Neon Postgres with pgvector, searched with a hybrid of OpenAI
+  embeddings and Postgres full-text. Images cached to Vercel Blob.
+- Not client-facing, not a store, not visual search, not real-time, not in the nav.
+- Done = Matt uses it on a real project instead of tab-juggling, and a broken
+  brand site fails loudly and alone.
+
+## Architecture decision: Option A (serverless functions in this repo)
+
+Confirmed. Reasons: the site stays static, nothing on the existing pages changes,
+and the whole feature is additive (`/tools/search/`, `/api/search/*`,
+`middleware.js`, `vercel.json` cron entry). Vercel project `knocktwice-studio` is
+on the Pro plan, so weekly crons and long-running functions are available.
+
+## Things to know before build (flagged now so they don't compound)
+
+1. **URL.** The brief says `/search` in one place and `/tools/search` elsewhere.
+   Going with `/tools/search`. Note the repo already has a `tools/` folder holding
+   the `ktw` CLI script; the page will live at `tools/search/index.html` and
+   Vercel serves it as a static route. The `ktw` script is not web-served today
+   and will be excluded explicitly so it stays that way.
+2. **Password middleware on a static site.** Vercel Edge Middleware works without
+   a framework (a root `middleware.js`). It will guard `/tools/search` and
+   `/api/search/*` with a cookie set after a correct password. Everything else on
+   the site is untouched. Password lives in a Vercel env var.
+3. **Scrape fan-out.** One serverless function cannot crawl 50 sites in one
+   invocation. The cron will kick off one invocation per brand (queue-style), so
+   each brand gets its own timeout, its own log row, and its own failure. That is
+   also what gives "tell me which brand broke, the rest keep working."
+4. **Shopify shortcut.** Roughly half the proposed brands run on Shopify, which
+   exposes a public `/products.json` feed with title, price, images, variants, and
+   body text. That is far more reliable than HTML scraping and will be the first
+   adapter. Schema.org JSON-LD is the second. Per-brand HTML adapters are the last
+   resort and will be written only where the first two fail.
+5. **Dimensions are the hard field.** Most sites put W × D × H in free text or
+   a spec table, in inches or centimeters, sometimes both. Extraction will be
+   best-effort with a normalization pass (always store cm, display inches). Expect
+   gaps on the first run; the run log will report per-brand dimension coverage so
+   we know where to write adapters.
+6. **Big catalogs.** DWR, Vitra, and Jonathan Adler each have thousands of SKUs.
+   Ingest will be capped per brand by category so the index stays on-aesthetic
+   and embedding cost stays trivial.
+7. **Paint and wallpaper** (Farrow & Ball, Backdrop, Clare, Hygge & West) have
+   no dimensions and behave differently in results. They will be ingested with
+   `category = finish` and shown with a swatch-style card.
+8. **Configurable products** (USM, Vitsoe, String, Montana) are systems, not
+   SKUs. They will be indexed at the product-family level with a "from" price.
+9. **Scraping etiquette.** Weekly, low volume, respects `robots.txt`, identifies
+   itself with a real user agent, and caches images once. Internal use only.
+
+## Steps
+
+1. **Brand universe proposal** — this deliverable. Matt approves or edits the list.
+2. **Brand registry** — approved list as a JSON file in the repo (name, URL,
+   platform, categories, ingest strategy, enabled flag).
+3. **Data layer** — Neon schema (brands, products, product_images, ingest_runs),
+   pgvector index, full-text index.
+4. **Ingest pipeline** — Shopify adapter, JSON-LD adapter, per-brand fallback
+   adapters, image caching to Blob, run logging, on-demand + weekly cron.
+5. **Search API** — hybrid ranking (embedding + full-text), filters, sort.
+6. **Search page** — `/tools/search`, built on the existing design system.
+7. **Password middleware** and staging deploy.
+
+Each step is its own session. Steps 2 and 3 can start as soon as the list is
+approved.
+
+## Open questions for Matt (answer alongside the list)
+
+- Should the reference stores' own online shops (Coming Soon, Lichen, The
+  Primary Essentials, MoMA Design Store, The Future Perfect) also be sources,
+  tagged as retailer rather than brand? Recommendation: yes, as a second tier
+  after brand sites are working, because they carry small makers that have no
+  DTC site of their own.
+- Is one shared password enough, or should Rodrigo have his own? One shared
+  password is what the brief says and what will be built unless told otherwise.
