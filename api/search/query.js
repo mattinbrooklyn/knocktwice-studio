@@ -11,7 +11,7 @@ import { getDb } from '../../search/db.js';
 import { makeEmbedder, toVectorLiteral } from '../../search/embeddings.js';
 
 const PER_PAGE = 48;
-const VECTOR_CANDIDATES = 150; // top-N by embedding that always make the result set
+const VECTOR_CANDIDATES = 150; // top-N by embedding, and top-N by full-text, make the result set
 const RRF_K = 60;
 const EMBED_TIMEOUT_MS = 6000;
 const MAX_QUERY_CHARS = 300;
@@ -130,7 +130,7 @@ async function search(db, params) {
         ),
         c AS (
           SELECT id, 1.0 / (${RRF_K} + vec_rank) + COALESCE(1.0 / (${RRF_K} + txt_rank), 0) AS score
-          FROM ranked WHERE vec_rank <= $${topIdx} OR txt_rank IS NOT NULL
+          FROM ranked WHERE vec_rank <= $${topIdx} OR txt_rank <= $${topIdx}
         )`;
     } else {
       mode = 'fulltext';
