@@ -968,11 +968,19 @@ html.kt-home-monster-open body {
   color: var(--color-green);
   border-color: var(--color-green);
 }
+/* Footer only: the green outline hover reads as invisible against the blue
+   footer, so the button goes white-on-blue there instead. */
+.footer .ml-submit:hover {
+  background: transparent;
+  color: var(--color-white);
+  border-color: var(--color-white);
+}
 .ml-submit.is-disabled {
   opacity: 0.5;
   cursor: default;
 }
-.ml-submit.is-disabled:hover {
+.ml-submit.is-disabled:hover,
+.footer .ml-submit.is-disabled:hover {
   background: var(--color-green);
   color: var(--color-bg);
   border-color: transparent;

@@ -22,8 +22,6 @@
       flex-direction: column;
       min-height: calc(100vh + var(--footer-height));
       overflow: hidden;
-      /* Mailing marquee band height — offsets wave stack bottom by exactly this (+ 1px overlap for hairlines). */
-      --about-ml-ticker-height: clamp(38px, 5.75vw, 52px);
     }
 
     /* ── Page canvas ────────────────────────────────────────────────
@@ -37,7 +35,7 @@
       flex-direction: column;
       padding-top: 4.375rem;
       padding-left: var(--content-left);
-      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 2rem);
+      padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 2rem);
       flex: 1;
       min-height: calc(100vh - var(--footer-height));
     }
@@ -181,19 +179,11 @@
     #monster-group {
       position: absolute;
       left: 0;
-      /* Matches ticker band height from `--about-ml-ticker-height`; −1px kills subpixel cream between wave and green strip. */
-      bottom: calc(var(--footer-panel-height) + var(--about-ml-ticker-height) - 1px);
+      bottom: var(--footer-panel-height);
       width: 100%;
-      /* Above #monster-linear-ticker for edge cases / scroll — geometry keeps the marquee readable. */
       z-index: 15;
       transition: transform 600ms ease-out;
       will-change: transform;
-    }
-    /* Wave-risen: translateY pulls wave up. z-index above the backdrop (1010)
-       so eyes and wave render on top of the cream overlay. */
-    #monster-group.wave-risen {
-      transform: translateY(-55vh);
-      z-index: 1020;
     }
     .monster-area {
       position: relative;
@@ -207,95 +197,6 @@
       display: block;
       pointer-events: none;
     }
-    /* Linear mailing-list marquee — sibling of #monster-group (must NOT stay inside the
-       transformed monster band: fixed/viewport docking breaks when ancestor has transform). */
-    #monster-linear-ticker {
-      position: absolute;
-      left: 0;
-      bottom: var(--footer-panel-height);
-      width: 100%;
-      box-sizing: border-box;
-      /* Below #monster-group idle (15) / risen (1020); stacked lower so lip rarely covers copy. */
-      z-index: 12;
-    }
-    html.kt-monster-modal-open #monster-linear-ticker {
-      position: fixed;
-      left: 0;
-      right: 0;
-      width: 100%;
-      max-width: 100vw;
-      bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: none;
-      /* Stay below modal card while invisible so nothing steals focus. */
-      z-index: 1023;
-    }
-    .monster-linear-ticker {
-      height: var(--about-ml-ticker-height);
-      background: var(--color-green);
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      pointer-events: auto;
-      box-sizing: border-box;
-    }
-    .monster-linear-ticker .kt-linear-ticker__track {
-      display: flex;
-      flex-wrap: nowrap;
-      width: max-content;
-      will-change: transform;
-      animation: kt-monster-linear-ticker-scroll 40s linear infinite;
-      animation-play-state: paused;
-    }
-    .monster-linear-ticker .kt-linear-ticker__sequence {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-      gap: 0;
-      white-space: nowrap;
-      font-family: var(--font-ui), sans-serif;
-      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
-      font-weight: 400;
-      font-size: clamp(0.875rem, 3.95vw, 1.375rem);
-      letter-spacing: -0.14px;
-      text-transform: uppercase;
-      color: var(--color-white);
-    }
-    @media (min-width: 769px) {
-      .monster-linear-ticker .kt-linear-ticker__sequence {
-        letter-spacing: -0.22px;
-      }
-    }
-    /* Repeat unit = phrase + symmetrical space–📒–space (fixes LIST📒LIST collisions). */
-    .monster-linear-ticker .kt-linear-ticker__chunk {
-      display: inline-flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-    .monster-linear-ticker .kt-linear-ticker__text {
-      display: inline-block;
-    }
-    .monster-linear-ticker .kt-linear-ticker__ico {
-      font-family: inherit;
-      font-style: normal;
-      line-height: 1;
-      display: inline-block;
-      flex-shrink: 0;
-      font-variation-settings: inherit;
-      transform: translateY(0.02em);
-      margin-inline: clamp(0.28rem, 1.05vw, 0.5625rem);
-    }
-    @keyframes kt-monster-linear-ticker-scroll {
-      to { transform: translateX(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .monster-linear-ticker .kt-linear-ticker__track {
-        animation: none;
-      }
-    }
     /* Eyes overlay: MUST use preserveAspectRatio=none so it stretches
        to fill the wave area at every viewport width */
     .monster-eyes-overlay {
@@ -305,18 +206,6 @@
       pointer-events: none;
       overflow: visible;
     }
-    /* Blue body below the wave crest — follows monster-group transform.
-       height:300vh guarantees it fills below the wave on all screens. */
-    #modal-blue-body {
-      display: none;
-      position: absolute;
-      left: 0;
-      top: calc(var(--wave-height-desktop) - 0px);
-      width: 100%;
-      height: 300vh;
-      background: var(--color-blue);
-    }
-
     .footer { position: relative; z-index: 100; }
 
     /* ── Object eye animation ──────────────────────────────────────── */
@@ -325,41 +214,12 @@
       transition: cx 200ms ease-out, cy 200ms ease-out;
     }
 
-    /* ── Newsletter modal ───────────────────────────────────────────
-       #newsletter-window is a sibling of #monster-group (NOT inside it).
-       CSS transforms on a parent break position:fixed for children. */
-    #modal-backdrop {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(247, 242, 236, 0.88);
-      z-index: 1010;
-      pointer-events: all;
-    }
-    /* Card sits above the monster-group (1020) — z-index 1025.
-       Wave crest + eyes are at top of viewport; card is in the middle.
-       No vertical overlap between them so card doesn’t hide eyes. */
-    #newsletter-window.modal-card {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: min(929px, calc(100vw - 4rem));
-      height: auto;
-      min-height: 326px;
-      padding: clamp(1.75rem, 4.167vw, 3.75rem);
-      z-index: 1025;
-    }
-    #newsletter-window.modal-card.ml-success {
-      min-height: auto;
-    }
-
     /* ── Tablet transition (1140→769) ─────────────────────────────
        Smooths scaling of text, people row, and objects between the
        desktop layout and the fully-stacked mobile layout.           */
     @media (max-width: 1140px) {
       .page {
-        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
+        padding-bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 1rem);
       }
       .person-name {
         font-size: clamp(1.125rem, 1.528vw, 1.375rem);
@@ -390,7 +250,7 @@
         left: auto !important;
         right: 1vw !important;
         top: auto !important;
-        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + var(--about-ml-ticker-height) + 3rem) !important;
+        bottom: calc(var(--wave-height-desktop) + var(--footer-height) + 3rem) !important;
         width: 20vw !important;
         height: 21vw !important;
       }
@@ -405,7 +265,7 @@
       .page {
         padding-top: 6.0625rem;
         padding-right: var(--content-left);
-        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + var(--about-ml-ticker-height) + 1rem);
+        padding-bottom: calc(var(--wave-height-mobile) + var(--footer-height) + 1rem);
         /* Reserve space for absolute-positioned paint bucket below the
            Matt headshot (Figma: bucket bottom at y=1241, footer wave at
            y=1365). */
@@ -466,41 +326,6 @@
         height: 100% !important;
       }
 
-      /* Mobile marquee + wave: ticker uses footer+safe-area; wave bottom offset lives in globals
-         `#page-scaler:has(#monster-linear-ticker) #monster-group` (beats old single-selector !important). */
-      #monster-linear-ticker {
-        bottom: var(--footer-stack-height);
-      }
-
-      html.kt-monster-modal-open #monster-linear-ticker {
-        bottom: var(--footer-stack-height);
-      }
-
-      /* Mobile: wave rises near top of viewport (eyes + crest). Linear mailing-list
-         ticker is a #page-scaler sibling with its own bottom anchor (see #monster-linear-ticker). */
-      #monster-group.wave-risen {
-        transform: translateY(-60vh);
-      }
-
-      /* Blue body top aligns with mobile wave bottom */
-      #modal-blue-body {
-        top: calc(var(--wave-height-mobile) - 0px);
-      }
-
-      /* Card position: Figma shows card center at ~66% of 956px frame.
-         Input stacks above button per Figma. */
-      #newsletter-window.modal-card {
-        top: 60%;
-        width: min(24rem, calc(100vw - 2rem));
-        padding: 1.5rem 1.25rem;
-      }
-
-      /* Vertical form layout on mobile */
-      .ml-form-row {
-        flex-direction: column;
-        gap: 0.625rem;
-      }
-      .ml-submit { width: 100%; }
     }
   </style>
 </head>
@@ -664,30 +489,7 @@
          Iris centers: right (652.9, 49.45), left (495.41, 49.46) -->
   </div><!-- /page -->
 
-  <!-- ── Newsletter risen state ──────────────────────────────────── -->
-  <!-- Backdrop: fixed overlay that dims everything behind the modal -->
-  <div id="modal-backdrop"></div>
-
-  <!-- Newsletter card: sibling of monster-group (NOT inside it).
-       position:fixed is broken by CSS transforms on ancestor elements.
-       Keeping it outside ensures it stays truly fixed while the wave animates. -->
-  <div id="newsletter-window" class="modal-card">
-    <button class="ml-close" id="ml-close" aria-label="Close">&times;</button>
-    <h2 class="ml-heading" id="ml-heading">JOIN OUR MAILING LIST 📒</h2>
-    <p class="ml-body" id="ml-body">We may be one thing now, but who knows what Knock Twice will become — we'd love for you to stick around.</p>
-    <div class="ml-form-row">
-      <input class="field" type="email" id="ml-email" placeholder="Email*" autocomplete="email">
-      <button class="ml-submit" id="ml-submit">Sign Up</button>
-    </div>
-    <p class="error-msg" id="ml-error">Hmm. That email doesn't look right. Try again?</p>
-    <p class="ml-disclaimer">We promise to never get offended if you decide to unsubscribe. In fact, we'll make it easy.</p>
-    <p class="ml-success-body">We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.</p>
-  </div>
-
   <div id="monster-group" class="has-mobile-monster-eyes">
-      <!-- Blue body first in DOM so wave renders on top -->
-      <div id="modal-blue-body"></div>
-
       <div class="monster-area" id="monster-area">
         <img class="wave" src="/assets/monster-wave.svg" alt="">
 
@@ -753,33 +555,6 @@
 
   </div><!-- /#monster-group -->
 
-  <!-- Sibling of #monster-group — docked above footer normally; viewport-fixed when mailing modal opens. -->
-  <div class="monster-linear-ticker" id="monster-linear-ticker" role="button" tabindex="0" aria-label="Open mailing list signup">
-    <div class="kt-linear-ticker__track" id="monster-linear-ticker-track">
-      <div class="kt-linear-ticker__sequence" aria-hidden="true">
-        <!-- Duplicated strips for seamless loop (same chunk markup / width in both). -->
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-      </div>
-      <div class="kt-linear-ticker__sequence" aria-hidden="true">
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-        <span class="kt-linear-ticker__chunk"><span class="kt-linear-ticker__text">JOIN OUR MAILING LIST</span><span class="kt-linear-ticker__ico">📒</span></span>
-      </div>
-    </div>
-  </div>
-
   <footer class="footer">
     <div class="footer-panel">
       <nav class="footer-links" aria-label="Information">
@@ -827,47 +602,11 @@
     }
     scalePage();
 
-    // ── Linear marquee: pause CSS animation unless visible (cheap vs SVG textPath). ─────
-    var tickerEl = document.getElementById('monster-linear-ticker');
-    var tickerTrack = document.getElementById('monster-linear-ticker-track');
-    var tickerMonsterGroup = document.getElementById('monster-group');
-    function isFullyOffscreen(el) {
-      if (!el) return true;
-      var r = el.getBoundingClientRect();
-      if (!r.width || !r.height) return true;
-      return r.bottom <= 0 || r.top >= window.innerHeight || r.right <= 0 || r.left >= window.innerWidth;
-    }
-    function syncTickerAnimations() {
-      if (!tickerTrack || !tickerEl) return;
-      var isMobile = window.innerWidth <= 768;
-      var waveRising = tickerMonsterGroup && tickerMonsterGroup.classList.contains('wave-risen');
-      var runDesktop = !document.hidden && !isMobile && (waveRising || !isFullyOffscreen(tickerEl));
-      var runMobile  = !document.hidden && isMobile  && (waveRising || !isFullyOffscreen(tickerEl));
-      tickerTrack.style.animationPlayState = (runDesktop || runMobile) ? 'running' : 'paused';
-    }
-    var tickerSyncRaf = 0;
-    function requestTickerSync() {
-      if (tickerSyncRaf) return;
-      tickerSyncRaf = requestAnimationFrame(function () {
-        tickerSyncRaf = 0;
-        syncTickerAnimations();
-      });
-    }
-    function applyMonsterLayout() {
-      syncTickerAnimations();
-    }
-    applyMonsterLayout();
-
-    document.addEventListener('visibilitychange', function () {
-      syncTickerAnimations();
-    });
-    window.addEventListener('scroll', requestTickerSync, { passive: true });
-
     // Debounced resize
     var resizeTimer = 0;
     window.addEventListener('resize', function () {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(function() { scalePage(); applyMonsterLayout(); }, 100);
+      resizeTimer = setTimeout(scalePage, 100);
     });
 
 
@@ -1128,82 +867,5 @@
       img.addEventListener('dragstart', e => e.preventDefault());
     });
   </script>
-
-  <script>
-    var monsterGroup     = document.getElementById('monster-group');
-    var modalBackdrop    = document.getElementById('modal-backdrop');
-    var modalBlueBody    = document.getElementById('modal-blue-body');
-    var mlModal          = document.getElementById('newsletter-window');
-    var mlClose          = document.getElementById('ml-close');
-    var mlHeading        = document.getElementById('ml-heading');
-    var mlEmail          = document.getElementById('ml-email');
-    var mlSubmit         = document.getElementById('ml-submit');
-    var mlError          = document.getElementById('ml-error');
-
-    var SHEET_URL = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
-
-    function openMailingList() {
-      document.documentElement.classList.add('kt-monster-modal-open');
-      modalBackdrop.style.display = 'block';
-      modalBlueBody.style.display = 'block';
-      mlModal.style.display = 'block';
-      monsterGroup.classList.add('wave-risen');
-      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
-    }
-
-    function closeMailingList() {
-      document.documentElement.classList.remove('kt-monster-modal-open');
-      monsterGroup.style.transition = 'none';
-      monsterGroup.classList.remove('wave-risen');
-      modalBackdrop.style.display = 'none';
-      modalBlueBody.style.display = 'none';
-      mlModal.style.display = 'none';
-      mlModal.classList.remove('ml-error', 'ml-success');
-      mlHeading.textContent = 'JOIN OUR MAILING LIST 📒';
-      mlEmail.value = '';
-      mlEmail.classList.remove('has-error');
-      mlError.classList.remove('is-visible');
-      requestAnimationFrame(function() {
-        monsterGroup.style.transition = '';
-      });
-      if (typeof syncTickerAnimations === 'function') syncTickerAnimations();
-    }
-
-    var monsterLinearTicker = document.getElementById('monster-linear-ticker');
-    monsterLinearTicker.addEventListener('click', openMailingList);
-    monsterLinearTicker.addEventListener('keydown', function(e) {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      e.preventDefault();
-      openMailingList();
-    });
-    mlClose.addEventListener('click', closeMailingList);
-    modalBackdrop.addEventListener('click', closeMailingList);
-
-    mlEmail.addEventListener('input', function() {
-      mlModal.classList.remove('ml-error');
-      mlError.classList.remove('is-visible');
-      mlSubmit.classList.remove('is-disabled');
-      mlEmail.classList.remove('has-error');
-    });
-
-    mlSubmit.addEventListener('click', function() {
-      var email = mlEmail.value.trim();
-      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      if (!valid) {
-        mlModal.classList.add('ml-error');
-        mlModal.classList.remove('ml-success');
-        mlError.classList.add('is-visible');
-        mlSubmit.classList.add('is-disabled');
-        mlEmail.classList.add('has-error');
-        return;
-      }
-      mlModal.classList.remove('ml-error');
-      mlModal.classList.add('ml-success');
-      mlHeading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
-      fetch(SHEET_URL + '?email=' + encodeURIComponent(email), { mode: 'no-cors' })
-        .catch(function() {});
-    });
-  </script>
-
 </body>
 </html>
