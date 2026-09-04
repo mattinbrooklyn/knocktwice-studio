@@ -1,6 +1,6 @@
 # Plan: Interior Product Search — MVP
 
-**Status:** Step 1 (brand universe proposal) delivered, awaiting Matt's approval.
+**Status:** Step 1 approved. Step 2 (brand registry) done: `search/brands.json`.
 No application code exists yet. Nothing here is deployed.
 
 **Brand list to approve:** [`product-search-brands.md`](product-search-brands.md)
@@ -83,12 +83,25 @@ on the Pro plan, so weekly crons and long-running functions are available.
 Each step is its own session. Steps 2 and 3 can start as soon as the list is
 approved.
 
-## Open questions for Matt (answer alongside the list)
+## Decisions made (Sept 4, 2026)
 
-- Should the reference stores' own online shops (Coming Soon, Lichen, The
-  Primary Essentials, MoMA Design Store, The Future Perfect) also be sources,
-  tagged as retailer rather than brand? Recommendation: yes, as a second tier
-  after brand sites are working, because they carry small makers that have no
-  DTC site of their own.
-- Is one shared password enough, or should Rodrigo have his own? One shared
-  password is what the brief says and what will be built unless told otherwise.
+- Brand list approved with Lucca House (luccahouse.com) and Interior Define added.
+- Reference stores are a second source tier tagged `retailer`, enabled after the
+  brand-site adapters work.
+- One shared password, per the brief.
+
+## Environment note
+
+The Claude Code cloud environment blocks outbound requests to arbitrary domains,
+so brand sites cannot be probed from a session. Platform guesses in the registry
+are marked `verified: false` and get confirmed by the first ingest run on Vercel
+(Step 4), which writes what it found back into the run log. If you want sessions
+to be able to probe sites directly, loosen the environment's network policy.
+
+## Repo layout for this feature
+
+- `search/` — registry (`brands.json`), adapters, database helpers. Shared code.
+- `api/search/` — Vercel serverless functions (query, ingest, cron). Location is
+  fixed by Vercel.
+- `tools/search/` — the static page. Location is the URL.
+- `middleware.js` — password gate. Root location is fixed by Vercel.

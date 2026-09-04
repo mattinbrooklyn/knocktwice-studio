@@ -1,7 +1,10 @@
 # Product Search — Proposed Brand Universe
 
-**Status:** Proposal. Nothing is scraped until Matt approves or edits this list.
-**Target:** 50 core brands to launch, 50 more staged for expansion.
+**Status:** Approved by Matt (Sept 4, 2026) with three edits: Lucca House URL
+confirmed as luccahouse.com, Interior Define added to core, retailer tier approved.
+The machine-readable version is [`../search/brands.json`](../search/brands.json);
+edit that file from now on, this document is the rationale.
+**Target:** 51 core brands to launch, 50 more staged for expansion, 7 retailers.
 
 How to read this: every row is a brand that sells direct online with real product
 pages, ships to the US, and would look at home on the shelves of Coming Soon,
@@ -15,7 +18,7 @@ rule is that a brand needs its own online store with product pages we can link t
 
 ---
 
-## Core 50 (launch set)
+## Core 51 (launch set)
 
 | # | Brand | HQ | Categories | Why it fits | Ingest |
 |---|---|---|---|---|---|
@@ -35,7 +38,7 @@ rule is that a brand needs its own online store with product pages we can link t
 | 14 | PSTR Studio | Amsterdam | Wall art | Anchor. Graphic posters, easy to spec in multiples. | Shopify |
 | 15 | Design Within Reach | US | Furniture, lighting | Anchor. The deep established catalog (Eames, Noguchi, Bertoia). Capped by category on ingest. | Custom, large |
 | 16 | Farrow & Ball | UK / US | Paint, wallpaper | Anchor. Finishes need their own card style (no dimensions). | Custom |
-| 17 | Lucca House | (verify) | (verify) | Anchor as seeded. I could not confirm the store URL or catalog with confidence; verify during Step 2. | Unknown |
+| 17 | Lucca House | (verify) | (verify) | Anchor as seeded. Store is luccahouse.com; categories and platform get confirmed on the first ingest run. | Unknown |
 | 18 | Blu Dot | Minneapolis | Furniture, lighting | American modern with a real design POV at mid price; sold direct. | Custom |
 | 19 | Dims. | Los Angeles | Furniture | Sculptural, affordable, color options; exactly what a real client buys. | Shopify |
 | 20 | Kalon Studios | Los Angeles | Furniture, kids | Solid wood and honest joinery; the material story in one brand. | Shopify |
@@ -69,6 +72,7 @@ rule is that a brand needs its own online store with product pages we can link t
 | 48 | Fellow | San Francisco | Small appliances | Kettles and grinders with sculptural form. | Shopify |
 | 49 | Tappan Collective | Los Angeles | Wall art | Original art and prints with real curation. | Custom |
 | 50 | Backdrop | Los Angeles | Paint, wallpaper | The modern counterpart to Farrow & Ball. | Shopify |
+| 51 | Interior Define | Chicago | Upholstery | Added by Matt. Made-to-order sofas and chairs with deep fabric and color options; family-level index with "from" price. | Custom (configurator) |
 
 ---
 
@@ -138,14 +142,16 @@ rule is that a brand needs its own online store with product pages we can link t
   Egg Collective, Lindsey Adelman): great pieces, no product page a client can
   buy from.
 - **Excluded by the brief** (West Elm, CB2, Crate & Barrel, Pottery Barn, Room &
-  Board, Wayfair, Article, Burrow, Floyd, Interior Define, Etsy, 1stDibs,
+  Board, Wayfair, Article, Burrow, Floyd, Etsy, 1stDibs,
   Chairish, Lulu & Georgia, Rejuvenation as part of Williams-Sonoma).
 - **Mass without a POV** (Umbra, Muji, IKEA).
 
-## Reference stores as a second tier (open question)
+## Reference stores as a second tier (approved)
 
 Coming Soon, Lichen, The Primary Essentials, MoMA Design Store, and The Future
 Perfect all run online shops. They are curated, not marketplaces, and they carry
 small makers with no store of their own. Recommendation: add them as a separate
 source tier tagged `retailer` after the brand sites are working, so results can
-say "via Coming Soon" and dedupe against the brand's own listing.
+say "via Coming Soon" and dedupe against the brand's own listing. Big Night and
+ABC Carpet & Home are in the registry too; ABC starts disabled because only a few
+of its departments fit and it needs collection scoping first.

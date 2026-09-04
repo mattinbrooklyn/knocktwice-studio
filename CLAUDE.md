@@ -12,7 +12,7 @@ Figma MCP connected via figma-desktop at localhost:3845.
 
 ## Development scope
 
-Do **not** modify [`archive/`](archive/) (preserved legacy / stubs). Active work stays in repo root [`index.html`](index.html), [`about/`](about/), [`contact/`](contact/), [`experiences/`](experiences/), [`home/`](home/), [`interiors/`](interiors/), [`shop/`](shop/), [`skeleton/`](skeleton/), and [`assets/`](assets/) when global CSS/JS or shared assets are required. See [`docs/todo/00-README.md`](docs/todo/00-README.md).
+Do **not** modify [`archive/`](archive/) (preserved legacy / stubs). Active work stays in repo root [`index.html`](index.html), [`about/`](about/), [`contact/`](contact/), [`experiences/`](experiences/), [`home/`](home/), [`interiors/`](interiors/), [`shop/`](shop/), [`skeleton/`](skeleton/), and [`assets/`](assets/) when global CSS/JS or shared assets are required. The product search tool adds [`search/`](search/) (registry, adapters), `api/search/` (serverless functions), and `tools/search/` (the page); see [`plans/product-search-mvp.md`](plans/product-search-mvp.md). See [`docs/todo/00-README.md`](docs/todo/00-README.md).
 
 ## The person you're working with
 

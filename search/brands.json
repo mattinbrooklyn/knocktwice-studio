@@ -1,0 +1,2030 @@
+{
+  "$schema": "./brands.schema.json",
+  "version": 1,
+  "updated": "2026-09-04",
+  "brands": [
+    {
+      "id": "hay",
+      "name": "Hay",
+      "url": "https://us.hay.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "muuto",
+      "name": "Muuto",
+      "url": "https://www.muuto.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "ferm-living",
+      "name": "Ferm Living",
+      "url": "https://fermliving.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "textiles",
+        "decor",
+        "kids"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "hkliving",
+      "name": "HKliving",
+      "url": "https://hkliving.com",
+      "hq": "Netherlands",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "decor",
+        "lighting",
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "normann-copenhagen",
+      "name": "Normann Copenhagen",
+      "url": "https://www.normann-copenhagen.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting",
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "hem",
+      "name": "Hem",
+      "url": "https://hem.com",
+      "hq": "Stockholm / Los Angeles",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting",
+        "rugs"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "dusen-dusen",
+      "name": "Dusen Dusen",
+      "url": "https://dusendusen.com",
+      "hq": "Brooklyn",
+      "tier": "core",
+      "categories": [
+        "textiles",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "areaware",
+      "name": "Areaware",
+      "url": "https://www.areaware.com",
+      "hq": "Brooklyn",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "in-common-with",
+      "name": "In Common With",
+      "url": "https://www.incommonwith.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "gantri",
+      "name": "Gantri",
+      "url": "https://www.gantri.com",
+      "hq": "San Francisco",
+      "tier": "core",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "oeuf",
+      "name": "Oeuf",
+      "url": "https://www.oeufnyc.com",
+      "hq": "Brooklyn",
+      "tier": "core",
+      "categories": [
+        "kids",
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "poketo",
+      "name": "Poketo",
+      "url": "https://www.poketo.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "sundays",
+      "name": "Sundays",
+      "url": "https://sundays-company.com",
+      "hq": "Vancouver",
+      "tier": "core",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "pstr-studio",
+      "name": "PSTR Studio",
+      "url": "https://pstrstudio.com",
+      "hq": "Amsterdam",
+      "tier": "core",
+      "categories": [
+        "wall-art"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor"
+    },
+    {
+      "id": "design-within-reach",
+      "name": "Design Within Reach",
+      "url": "https://www.dwr.com",
+      "hq": "United States",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor. Large catalog; cap by category."
+    },
+    {
+      "id": "farrow-and-ball",
+      "name": "Farrow & Ball",
+      "url": "https://www.farrow-ball.com",
+      "hq": "United Kingdom",
+      "tier": "core",
+      "categories": [
+        "finish"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor. Paint and wallpaper; finish card, no dimensions."
+    },
+    {
+      "id": "lucca-house",
+      "name": "Lucca House",
+      "url": "https://luccahouse.com",
+      "hq": "unknown",
+      "tier": "core",
+      "categories": [
+        "unknown"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Anchor. Confirm categories and platform on first run."
+    },
+    {
+      "id": "blu-dot",
+      "name": "Blu Dot",
+      "url": "https://www.bludot.com",
+      "hq": "Minneapolis",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "dims",
+      "name": "Dims.",
+      "url": "https://www.dimshome.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "kalon-studios",
+      "name": "Kalon Studios",
+      "url": "https://kalonstudios.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "kids"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "bend-goods",
+      "name": "Bend Goods",
+      "url": "https://www.bendgoods.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "fermob",
+      "name": "Fermob",
+      "url": "https://www.fermob.com",
+      "hq": "France",
+      "tier": "core",
+      "categories": [
+        "outdoor",
+        "furniture"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "usm-modular-furniture",
+      "name": "USM Modular Furniture",
+      "url": "https://www.usm.com",
+      "hq": "Switzerland",
+      "tier": "core",
+      "categories": [
+        "storage"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Configurator; index families with \"from\" price."
+    },
+    {
+      "id": "kartell",
+      "name": "Kartell",
+      "url": "https://www.kartell.com",
+      "hq": "Italy",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "tom-dixon",
+      "name": "Tom Dixon",
+      "url": "https://www.tomdixon.net",
+      "hq": "London",
+      "tier": "core",
+      "categories": [
+        "lighting",
+        "furniture",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "jonathan-adler",
+      "name": "Jonathan Adler",
+      "url": "https://www.jonathanadler.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "furniture",
+        "decor",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Large catalog; cap by category."
+    },
+    {
+      "id": "schoolhouse",
+      "name": "Schoolhouse",
+      "url": "https://www.schoolhouse.com",
+      "hq": "Portland",
+      "tier": "core",
+      "categories": [
+        "lighting",
+        "hardware",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "louis-poulsen",
+      "name": "Louis Poulsen",
+      "url": "https://www.louispoulsen.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "flos",
+      "name": "Flos",
+      "url": "https://flos.com",
+      "hq": "Italy",
+      "tier": "core",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "coil-drift",
+      "name": "Coil + Drift",
+      "url": "https://www.coilanddrift.com",
+      "hq": "Brooklyn",
+      "tier": "core",
+      "categories": [
+        "lighting",
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "bower-studios",
+      "name": "Bower Studios",
+      "url": "https://www.bower-studios.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "mirrors",
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "chen-chen-and-kai-williams",
+      "name": "Chen Chen & Kai Williams",
+      "url": "https://www.chenandkai.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "lighting"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "fredericks-and-mae",
+      "name": "Fredericks and Mae",
+      "url": "https://www.fredericksandmae.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "sophie-lou-jacobsen",
+      "name": "Sophie Lou Jacobsen",
+      "url": "https://sophieloujacobsen.com",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "gohar-world",
+      "name": "Gohar World",
+      "url": "https://gohar.world",
+      "hq": "New York",
+      "tier": "core",
+      "categories": [
+        "tabletop",
+        "textiles"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "studio-arhoj",
+      "name": "Studio Arhoj",
+      "url": "https://www.arhoj.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "raawii",
+      "name": "Raawii",
+      "url": "https://raawii.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "bzippy-and-co",
+      "name": "Bzippy & Co.",
+      "url": "https://www.bzippy.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "decor",
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "east-fork",
+      "name": "East Fork",
+      "url": "https://www.eastfork.com",
+      "hq": "Asheville",
+      "tier": "core",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "heath-ceramics",
+      "name": "Heath Ceramics",
+      "url": "https://www.heathceramics.com",
+      "hq": "Sausalito",
+      "tier": "core",
+      "categories": [
+        "tabletop",
+        "tile"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "hasami-porcelain",
+      "name": "Hasami Porcelain",
+      "url": "https://www.hasamiporcelain.com",
+      "hq": "Japan / Los Angeles",
+      "tier": "core",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "marimekko",
+      "name": "Marimekko",
+      "url": "https://www.marimekko.com",
+      "hq": "Helsinki",
+      "tier": "core",
+      "categories": [
+        "textiles",
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "cold-picnic",
+      "name": "Cold Picnic",
+      "url": "https://www.coldpicnic.com",
+      "hq": "Brooklyn",
+      "tier": "core",
+      "categories": [
+        "rugs",
+        "textiles"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "nordic-knots",
+      "name": "Nordic Knots",
+      "url": "https://www.nordicknots.com",
+      "hq": "Stockholm / New York",
+      "tier": "core",
+      "categories": [
+        "rugs"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "tekla",
+      "name": "Tekla",
+      "url": "https://teklafabrics.com",
+      "hq": "Copenhagen",
+      "tier": "core",
+      "categories": [
+        "textiles"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "slowdown-studio",
+      "name": "Slowdown Studio",
+      "url": "https://slowdownstudio.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "textiles",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "smeg",
+      "name": "Smeg",
+      "url": "https://www.smeg.com/us",
+      "hq": "Italy",
+      "tier": "core",
+      "categories": [
+        "appliances"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "fellow",
+      "name": "Fellow",
+      "url": "https://fellowproducts.com",
+      "hq": "San Francisco",
+      "tier": "core",
+      "categories": [
+        "appliances"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "tappan-collective",
+      "name": "Tappan Collective",
+      "url": "https://www.tappancollective.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "wall-art"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": ""
+    },
+    {
+      "id": "backdrop",
+      "name": "Backdrop",
+      "url": "https://www.backdrophome.com",
+      "hq": "Los Angeles",
+      "tier": "core",
+      "categories": [
+        "finish"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Paint and wallpaper; finish card."
+    },
+    {
+      "id": "interior-define",
+      "name": "Interior Define",
+      "url": "https://www.interiordefine.com",
+      "hq": "Chicago",
+      "tier": "core",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": true,
+      "notes": "Added by Matt. Configurator; index families with \"from\" price."
+    },
+    {
+      "id": "vitsoe",
+      "name": "Vitsoe",
+      "url": "https://www.vitsoe.com",
+      "hq": "London",
+      "tier": "expansion",
+      "categories": [
+        "storage"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Configurator."
+    },
+    {
+      "id": "artemide",
+      "name": "Artemide",
+      "url": "https://www.artemide.com",
+      "hq": "Italy",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "workstead",
+      "name": "Workstead",
+      "url": "https://www.workstead.com",
+      "hq": "Brooklyn",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "hawkins-new-york",
+      "name": "Hawkins New York",
+      "url": "https://www.hawkinsnewyork.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "tabletop",
+        "textiles",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "iittala",
+      "name": "Iittala",
+      "url": "https://www.iittala.com",
+      "hq": "Finland",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "concrete-cat",
+      "name": "Concrete Cat",
+      "url": "https://www.concretecat.com",
+      "hq": "Edmonton",
+      "tier": "expansion",
+      "categories": [
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "fort-standard",
+      "name": "Fort Standard",
+      "url": "https://www.fortstandard.com",
+      "hq": "Brooklyn",
+      "tier": "expansion",
+      "categories": [
+        "decor",
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "alessi",
+      "name": "Alessi",
+      "url": "https://www.alessi.com",
+      "hq": "Italy",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "andtradition",
+      "name": "&Tradition",
+      "url": "https://www.andtradition.com",
+      "hq": "Copenhagen",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Verify US direct sales."
+    },
+    {
+      "id": "string-furniture",
+      "name": "String Furniture",
+      "url": "https://www.stringfurniture.com",
+      "hq": "Sweden",
+      "tier": "expansion",
+      "categories": [
+        "storage"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Configurator. Verify US shop."
+    },
+    {
+      "id": "montana-furniture",
+      "name": "Montana Furniture",
+      "url": "https://www.montanafurniture.com",
+      "hq": "Denmark",
+      "tier": "expansion",
+      "categories": [
+        "storage"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Configurator. Verify US direct sales."
+    },
+    {
+      "id": "vitra",
+      "name": "Vitra",
+      "url": "https://www.vitra.com",
+      "hq": "Switzerland",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Large catalog; overlaps DWR; cap by category."
+    },
+    {
+      "id": "artek",
+      "name": "Artek",
+      "url": "https://www.artek.fi",
+      "hq": "Finland",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Verify US direct sales."
+    },
+    {
+      "id": "emeco",
+      "name": "Emeco",
+      "url": "https://www.emeco.net",
+      "hq": "Pennsylvania",
+      "tier": "expansion",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "moebe",
+      "name": "Moebe",
+      "url": "https://moebe.dk",
+      "hq": "Copenhagen",
+      "tier": "expansion",
+      "categories": [
+        "storage",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Verify US shipping."
+    },
+    {
+      "id": "frama",
+      "name": "Frama",
+      "url": "https://framacph.com",
+      "hq": "Copenhagen",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "audo-copenhagen",
+      "name": "Audo Copenhagen",
+      "url": "https://audocph.com",
+      "hq": "Copenhagen",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Formerly Menu."
+    },
+    {
+      "id": "gus-modern",
+      "name": "Gus* Modern",
+      "url": "https://gusmodern.com",
+      "hq": "Toronto",
+      "tier": "expansion",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "eq3",
+      "name": "EQ3",
+      "url": "https://www.eq3.com",
+      "hq": "Winnipeg",
+      "tier": "expansion",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "sabai",
+      "name": "Sabai",
+      "url": "https://www.sabai.design",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "lawson-fenning",
+      "name": "Lawson-Fenning",
+      "url": "https://www.lawsonfenning.com",
+      "hq": "Los Angeles",
+      "tier": "expansion",
+      "categories": [
+        "furniture",
+        "lighting"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "tiptoe",
+      "name": "Tiptoe",
+      "url": "https://www.tiptoe.fr",
+      "hq": "Paris",
+      "tier": "expansion",
+      "categories": [
+        "furniture"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "loll-designs",
+      "name": "Loll Designs",
+      "url": "https://lolldesigns.com",
+      "hq": "Duluth",
+      "tier": "expansion",
+      "categories": [
+        "outdoor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "yamazaki-home",
+      "name": "Yamazaki Home",
+      "url": "https://theyamazakihome.com",
+      "hq": "Japan",
+      "tier": "expansion",
+      "categories": [
+        "storage",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "allied-maker",
+      "name": "Allied Maker",
+      "url": "https://alliedmaker.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "rbw",
+      "name": "RBW",
+      "url": "https://rbw.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "marset",
+      "name": "Marset",
+      "url": "https://www.marset.com",
+      "hq": "Barcelona",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Verify US shop."
+    },
+    {
+      "id": "tala",
+      "name": "Tala",
+      "url": "https://www.tala.co.uk",
+      "hq": "London",
+      "tier": "expansion",
+      "categories": [
+        "lighting"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "pat-kim",
+      "name": "Pat Kim",
+      "url": "https://www.patkimdesign.com",
+      "hq": "Brooklyn",
+      "tier": "expansion",
+      "categories": [
+        "decor",
+        "lighting"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "ladies-and-gentlemen-studio",
+      "name": "Ladies & Gentlemen Studio",
+      "url": "https://ladiesandgentlemenstudio.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "lighting",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "yield",
+      "name": "Yield",
+      "url": "https://yielddesign.co",
+      "hq": "Florida",
+      "tier": "expansion",
+      "categories": [
+        "tabletop",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "seletti",
+      "name": "Seletti",
+      "url": "https://www.seletti.it",
+      "hq": "Italy",
+      "tier": "expansion",
+      "categories": [
+        "lighting",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "bitossi-home",
+      "name": "Bitossi Home",
+      "url": "https://www.bitossihome.it",
+      "hq": "Italy",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "mud-australia",
+      "name": "Mud Australia",
+      "url": "https://mudaustralia.com",
+      "hq": "Sydney / New York",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "sheldon-ceramics",
+      "name": "Sheldon Ceramics",
+      "url": "https://sheldonceramics.com",
+      "hq": "Los Angeles",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "fazeek",
+      "name": "Fazeek",
+      "url": "https://fazeek.com.au",
+      "hq": "Melbourne",
+      "tier": "expansion",
+      "categories": [
+        "tabletop",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "our-place",
+      "name": "Our Place",
+      "url": "https://fromourplace.com",
+      "hq": "Los Angeles",
+      "tier": "expansion",
+      "categories": [
+        "appliances",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "balmuda",
+      "name": "Balmuda",
+      "url": "https://us.balmuda.com",
+      "hq": "Japan",
+      "tier": "expansion",
+      "categories": [
+        "appliances"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "teenage-engineering",
+      "name": "Teenage Engineering",
+      "url": "https://teenage.engineering",
+      "hq": "Stockholm",
+      "tier": "expansion",
+      "categories": [
+        "appliances",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "aelfie",
+      "name": "Aelfie",
+      "url": "https://aelfie.com",
+      "hq": "Brooklyn",
+      "tier": "expansion",
+      "categories": [
+        "rugs",
+        "textiles"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "beni-rugs",
+      "name": "Beni Rugs",
+      "url": "https://benirugs.com",
+      "hq": "Morocco / New York",
+      "tier": "expansion",
+      "categories": [
+        "rugs"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "armadillo",
+      "name": "Armadillo",
+      "url": "https://armadillo-co.com",
+      "hq": "Australia / United States",
+      "tier": "expansion",
+      "categories": [
+        "rugs"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Verify US direct sales."
+    },
+    {
+      "id": "tantuvi",
+      "name": "Tantuvi",
+      "url": "https://www.tantuvi.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "rugs"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "lorena-canals",
+      "name": "Lorena Canals",
+      "url": "https://lorenacanals.com",
+      "hq": "Spain",
+      "tier": "expansion",
+      "categories": [
+        "rugs",
+        "kids"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "block-shop-textiles",
+      "name": "Block Shop Textiles",
+      "url": "https://www.blockshoptextiles.com",
+      "hq": "Los Angeles",
+      "tier": "expansion",
+      "categories": [
+        "textiles",
+        "wall-art"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "morrow-soft-goods",
+      "name": "Morrow Soft Goods",
+      "url": "https://www.morrowsoftgoods.com",
+      "hq": "Los Angeles",
+      "tier": "expansion",
+      "categories": [
+        "textiles"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "hygge-and-west",
+      "name": "Hygge & West",
+      "url": "https://www.hyggeandwest.com",
+      "hq": "United States",
+      "tier": "expansion",
+      "categories": [
+        "finish"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Wallpaper; finish card."
+    },
+    {
+      "id": "clare",
+      "name": "Clare",
+      "url": "https://www.clare.com",
+      "hq": "New York",
+      "tier": "expansion",
+      "categories": [
+        "finish"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Paint; finish card."
+    },
+    {
+      "id": "the-poster-club",
+      "name": "The Poster Club",
+      "url": "https://theposterclub.com",
+      "hq": "Copenhagen",
+      "tier": "expansion",
+      "categories": [
+        "wall-art"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "kinto",
+      "name": "Kinto",
+      "url": "https://kinto-usa.com",
+      "hq": "Japan",
+      "tier": "expansion",
+      "categories": [
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": ""
+    },
+    {
+      "id": "coming-soon",
+      "name": "Coming Soon",
+      "url": "https://comingsoonnewyork.com",
+      "hq": "New York",
+      "tier": "retailer",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor",
+        "tabletop"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store."
+    },
+    {
+      "id": "lichen",
+      "name": "Lichen",
+      "url": "https://www.lichennyc.com",
+      "hq": "Brooklyn",
+      "tier": "retailer",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store. Vintage mixed in."
+    },
+    {
+      "id": "the-primary-essentials",
+      "name": "The Primary Essentials",
+      "url": "https://theprimaryessentials.com",
+      "hq": "Brooklyn",
+      "tier": "retailer",
+      "categories": [
+        "tabletop",
+        "decor",
+        "textiles"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store."
+    },
+    {
+      "id": "moma-design-store",
+      "name": "MoMA Design Store",
+      "url": "https://store.moma.org",
+      "hq": "New York",
+      "tier": "retailer",
+      "categories": [
+        "decor",
+        "tabletop",
+        "furniture",
+        "lighting"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store."
+    },
+    {
+      "id": "the-future-perfect",
+      "name": "The Future Perfect",
+      "url": "https://www.thefutureperfect.com",
+      "hq": "New York",
+      "tier": "retailer",
+      "categories": [
+        "furniture",
+        "lighting",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "jsonld",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store. Aspirational tier."
+    },
+    {
+      "id": "big-night",
+      "name": "Big Night",
+      "url": "https://bignightbk.com",
+      "hq": "Brooklyn",
+      "tier": "retailer",
+      "categories": [
+        "tabletop",
+        "decor"
+      ],
+      "platform": "shopify",
+      "ingest": {
+        "strategy": "shopify",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store."
+    },
+    {
+      "id": "abc-carpet-and-home",
+      "name": "ABC Carpet & Home",
+      "url": "https://www.abchome.com",
+      "hq": "New York",
+      "tier": "retailer",
+      "categories": [
+        "furniture",
+        "rugs",
+        "decor"
+      ],
+      "platform": "unknown",
+      "ingest": {
+        "strategy": "custom",
+        "verified": false,
+        "maxProducts": 400
+      },
+      "enabled": false,
+      "notes": "Reference store. Curated corners only; needs collection scoping before enabling."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Knock Twice product search brand registry",
+  "type": "object",
+  "required": ["version", "updated", "brands"],
+  "properties": {
+    "version": { "type": "integer" },
+    "updated": { "type": "string", "description": "YYYY-MM-DD of the last hand edit" },
+    "brands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "url", "tier", "categories", "platform", "ingest", "enabled"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$", "description": "Stable key. Never change once products exist." },
+          "name": { "type": "string" },
+          "url": { "type": "string", "format": "uri", "description": "Store home page for the US market." },
+          "hq": { "type": "string" },
+          "tier": { "enum": ["core", "expansion", "retailer"] },
+          "categories": {
+            "type": "array",
+            "items": { "enum": ["furniture", "storage", "outdoor", "lighting", "rugs", "textiles", "wall-art", "decor", "mirrors", "tabletop", "tile", "hardware", "appliances", "kids", "finish", "unknown"] }
+          },
+          "platform": { "enum": ["shopify", "unknown", "squarespace", "woocommerce", "magento", "salesforce", "custom"], "description": "Best guess until ingest.verified is true." },
+          "ingest": {
+            "type": "object",
+            "required": ["strategy", "verified", "maxProducts"],
+            "additionalProperties": false,
+            "properties": {
+              "strategy": { "enum": ["shopify", "jsonld", "custom"], "description": "shopify = /products.json feed; jsonld = crawl product pages for schema.org Product; custom = per-brand adapter in search/adapters/<id>.js" },
+              "verified": { "type": "boolean", "description": "Set true once an ingest run confirms the strategy works." },
+              "maxProducts": { "type": "integer", "minimum": 1 },
+              "collections": { "type": "array", "items": { "type": "string" }, "description": "Optional: limit ingest to these collection handles or category URLs." }
+            }
+          },
+          "enabled": { "type": "boolean", "description": "Only enabled brands are ingested and searchable." },
+          "notes": { "type": "string" }
+        }
+      }
+    }
+  }
+}
