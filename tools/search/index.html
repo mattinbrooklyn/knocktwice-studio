@@ -260,6 +260,21 @@
     .pager[hidden] { display: none; }
     .pager button.control:disabled { opacity: 0.35; }
 
+    /* Brands that are enabled but not indexed yet: hand the query to their own site search. */
+    .hard-brands { margin-top: var(--space-lg); }
+    .hard-brands[hidden] { display: none; }
+    .hard-brands-title {
+      font-family: var(--font-ui);
+      font-size: var(--type-field);
+      font-weight: 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      color: var(--color-caramel);
+      margin-bottom: var(--space-xs);
+    }
+    .hard-brands-links { display: flex; flex-wrap: wrap; gap: var(--chip-gap); }
+    .hard-brands-links .card-tag { text-decoration: none; transition: background 0.18s ease; }
+    .hard-brands-links .card-tag:hover { background: var(--color-yellow); }
+
     /* ── Mobile ─────────────────────────────────────────────────── */
     @media (max-width: 768px) {
       .search-form { flex-direction: column; }
@@ -387,6 +402,11 @@
       <button class="control" type="button" id="next">Next</button>
     </nav>
 
+    <section class="hard-brands" id="hard-brands" hidden>
+      <p class="hard-brands-title" id="hard-brands-title"></p>
+      <div class="hard-brands-links" id="hard-brands-links"></div>
+    </section>
+
   </main>
 
   <footer class="footer">
@@ -407,9 +427,11 @@
       form: $('search-form'), q: $('q'), brand: $('brand'), category: $('category'), min: $('min'), max: $('max'),
       stock: $('stock'), sort: $('sort'), meta: $('results-meta'), notice: $('notice'), grid: $('grid'),
       idle: $('state-idle'), empty: $('state-empty'), error: $('state-error'), errorBody: $('error-body'), retry: $('retry'),
-      pager: $('pager'), prev: $('prev'), next: $('next'), pageLabel: $('page-label'), kicker: $('kicker')
+      pager: $('pager'), prev: $('prev'), next: $('next'), pageLabel: $('page-label'), kicker: $('kicker'),
+      hardBrands: $('hard-brands'), hardBrandsTitle: $('hard-brands-title'), hardBrandsLinks: $('hard-brands-links')
     };
     var brandsById = {};
+    var hardBrands = []; // enabled in the registry, zero products in the index
     var state = readUrl();
     var inflight = null;
 
@@ -519,6 +541,17 @@
         '</a>';
     }
 
+    // Under the results: one link per un-indexed brand, opening that brand's own search with the same words.
+    function renderHardBrands(q) {
+      if (!q || !hardBrands.length) { els.hardBrands.hidden = true; return; }
+      els.hardBrandsTitle.textContent = 'Not indexed yet. Search these directly for \u201c' + q + '\u201d:';
+      els.hardBrandsLinks.innerHTML = hardBrands.map(function (b) {
+        var href = b.url.replace(/\/$/, '') + '/search?q=' + encodeURIComponent(q);
+        return '<a class="card-tag" href="' + esc(href) + '" target="_blank" rel="noopener noreferrer">' + esc(b.name) + '</a>';
+      }).join('');
+      els.hardBrands.hidden = false;
+    }
+
     function show(which) {
       els.idle.hidden = which !== 'idle';
       els.empty.hidden = which !== 'empty';
@@ -537,6 +570,7 @@
         els.notice.hidden = true;
       }
       show(data.total === 0 ? 'empty' : null);
+      renderHardBrands(data.q);
       els.pager.hidden = data.pages <= 1;
       els.pageLabel.textContent = 'Page ' + data.page + ' of ' + data.pages;
       els.prev.disabled = data.page <= 1;
@@ -552,6 +586,7 @@
         els.meta.innerHTML = '';
         els.notice.hidden = true;
         els.pager.hidden = true;
+        els.hardBrands.hidden = true;
         show('idle');
         return;
       }
@@ -589,6 +624,7 @@
           els.grid.innerHTML = '';
           els.meta.innerHTML = '';
           els.pager.hidden = true;
+          els.hardBrands.hidden = true;
           els.errorBody.textContent = err.message;
           show('error');
         })
@@ -603,6 +639,7 @@
           var indexed = 0, brandCount = 0;
           m.brands.forEach(function (b) {
             brandsById[b.id] = b;
+            if (b.products === 0) hardBrands.push(b);
             if (b.products > 0) {
               brandCount += 1;
               indexed += b.products;
