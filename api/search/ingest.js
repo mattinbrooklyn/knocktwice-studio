@@ -9,6 +9,11 @@ import { makeContext, isCronRequest } from '../../search/context.js';
 import { ingestBrand, embedPending } from '../../search/ingest.js';
 
 const THROTTLE_MINUTES = 30;
+
+/** Chained hops call this endpoint without a browser cookie, so they carry the cron secret through the password gate. */
+function cronAuth() {
+  return process.env.CRON_SECRET ? { authorization: `Bearer ${process.env.CRON_SECRET}` } : {};
+}
 const BUDGET_MS = 280_000;
 
 const BATCH_BUDGET_MS = 45_000;
@@ -94,7 +99,7 @@ async function batch(req, res) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     next = `https://${host}/api/search/ingest?brand=batch&chain=${chain + 1}`;
     // Keep this invocation alive until the next hop has answered, so the hand-off cannot be cut short.
-    waitUntil(fetch(next, { signal: AbortSignal.timeout(58_000) }).catch(() => {}));
+    waitUntil(fetch(next, { headers: cronAuth(), signal: AbortSignal.timeout(58_000) }).catch(() => {}));
   }
   return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran, next });
 }
@@ -118,7 +123,7 @@ async function embedOnly(req, res) {
   if (chain > 0 && chain <= 40 && r.embedded > 0 && r.remaining > 0 && r.errors.length === 0) {
     const host = req.headers['x-forwarded-host'] || req.headers.host;
     next = `https://${host}/api/search/ingest?brand=embed&chain=${chain + 1}`;
-    waitUntil(fetch(next, { signal: AbortSignal.timeout(58_000) }).catch(() => {}));
+    waitUntil(fetch(next, { headers: cronAuth(), signal: AbortSignal.timeout(58_000) }).catch(() => {}));
   }
   return res.status(r.errors.length ? 502 : 200).json({ ok: r.errors.length === 0, elapsedMs: Date.now() - started, ...r, next });
 }

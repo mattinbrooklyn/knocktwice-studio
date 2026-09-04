@@ -54,5 +54,14 @@ Endpoints:
 - `GET /api/search/cron` — daily at 06:00 UTC on production, refreshes the most
   stale enabled brands within a 5-minute budget. Needs `CRON_SECRET`.
 
+## Password gate
+
+`middleware.js` at the repo root guards `/tools/search` and `/api/search/*`
+with `SEARCH_PASSWORD`. The login form is served by the middleware itself; a
+correct password sets an `ktw_search` cookie for 30 days. The cookie is an HMAC
+keyed by the password, so changing the password signs everyone out. Requests
+carrying `Authorization: Bearer CRON_SECRET` pass on the API paths (Vercel's
+cron and the chained batch hops use it). Nothing else on the site is touched.
+
 Tests: `npm test` runs unit tests; set `DATABASE_URL` to a local Postgres with
 pgvector to include the end-to-end ingest test.
