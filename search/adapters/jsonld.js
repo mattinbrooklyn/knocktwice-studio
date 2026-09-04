@@ -93,8 +93,15 @@ export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
       }
     }
   }
-  // No conventional /products/ paths: fall back to deeper URLs and let the JSON-LD parser decide.
-  return productUrls.length ? productUrls : otherUrls.slice(0, max);
+  // No conventional /products/ paths: fall back to the deepest, most product-looking URLs
+  // (many segments, hyphenated or numbered last segment) and let the JSON-LD parser decide.
+  if (productUrls.length) return productUrls;
+  const rank = (u) => {
+    const segs = new URL(u).pathname.split('/').filter(Boolean);
+    const last = segs[segs.length - 1] || '';
+    return segs.length * 2 + (/-/.test(last) ? 2 : 0) + (/\d/.test(last) ? 1 : 0);
+  };
+  return otherUrls.sort((a, b) => rank(b) - rank(a)).slice(0, max);
 }
 
 async function sitemapsFromRobots(http, origin) {
