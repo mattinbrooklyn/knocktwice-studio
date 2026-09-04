@@ -1,8 +1,10 @@
 # Plan: Interior Product Search — MVP
 
-**Status:** Steps 1 to 4 built. Ingest pipeline is in `search/` with endpoints under
-`api/search/` (see `search/README.md`). Next: run real brands through it on the preview
-and fix what breaks, then Step 5 (search API).
+**Status:** Steps 1 to 4 done and exercised against the live registry. 27 brands ingest
+cleanly: 5,109 products, 1,334 with dimensions, none embedded yet (OpenAI account has no
+credits; the next run embeds everything pending). Next: Step 5, the search API, built on
+what is already in the database. Coverage of the remaining brands is deliberately
+deferred until the search page shows which gaps matter.
 
 **Brand list to approve:** [`product-search-brands.md`](product-search-brands.md)
 
@@ -123,9 +125,18 @@ per-brand detail; `GET /api/search/status?report=1` shows the live state.
   two domains no longer resolve (Chen Chen & Kai Williams, Hasami Porcelain).
   A static list needs this kind of check on a schedule; the run log is it.
 - Big European brands with country-split sites (Kartell, Muuto, Normann,
-  Marimekko, Flos, Louis Poulsen) need per-brand adapters. Their pages carry
+  Marimekko, Louis Poulsen, HKliving) need per-brand adapters. Their pages carry
   little or no schema.org data and their feeds are blocked or absent.
-  Deferred until the search page exists and shows which gaps matter.
+  Deferred until the search page exists and shows which gaps matter. Flos,
+  Fermob, Ferm Living and DWR did come through JSON-LD once discovery read
+  country sitemaps in the right order.
+- Still failing after the sweep and worth a look later: Bower, Bzippy, Dims,
+  Gantri, Gohar World, Heath, Hem, Interior Define, Jonathan Adler, Kalon,
+  Nordic Knots, Raawii, Tom Dixon. Most answer but publish no feed and no
+  schema.org Product block; a few block non-browser clients.
+- Decision (Matt, Sept 4): stop expanding coverage. Ship search on the brands
+  that work, use it on a real project, and add adapters only for brands that
+  prove they matter. Hard brands get a "search this brand" deep link instead.
 
 ## Environment note
 
