@@ -20,6 +20,8 @@ export function getDb() {
   const sql = neon(connectionString());
   return {
     query: (text, params = []) => sql.query(text, params),
+    /** Run several statements in one transaction (one HTTP round trip on Neon). */
+    batch: (statements) => (statements.length ? sql.transaction(statements.map(([text, params = []]) => sql.query(text, params))) : Promise.resolve([])),
   };
 }
 
@@ -48,14 +50,14 @@ export async function syncBrands(db) {
          hq = EXCLUDED.hq,
          tier = EXCLUDED.tier,
          categories = EXCLUDED.categories,
-         platform = EXCLUDED.platform,
-         ingest_strategy = EXCLUDED.ingest_strategy,
+         platform = CASE WHEN brands.ingest_verified THEN brands.platform ELSE EXCLUDED.platform END,
+         ingest_strategy = CASE WHEN brands.ingest_verified THEN brands.ingest_strategy ELSE EXCLUDED.ingest_strategy END,
          max_products = EXCLUDED.max_products,
          collections = EXCLUDED.collections,
          enabled = EXCLUDED.enabled,
          notes = EXCLUDED.notes,
          updated_at = now()`,
-      // ingest_verified is deliberately not overwritten: the ingest run owns it.
+      // ingest_verified, and platform/strategy once verified, belong to the ingest run, not the JSON.
       [b.id, b.name, b.url, b.hq ?? null, b.tier, b.categories, b.platform ?? null,
        b.ingest.strategy, b.ingest.verified, b.ingest.maxProducts, b.ingest.collections ?? null,
        b.enabled, b.notes ?? null],
@@ -77,9 +79,12 @@ export async function summary(db) {
      FROM products`,
   );
   const runs = await db.query(
-    `SELECT brand_id, status, strategy, started_at, finished_at, products_found, products_upserted,
-            jsonb_array_length(errors) AS error_count
-     FROM ingest_runs ORDER BY started_at DESC LIMIT 10`,
+    `SELECT id, brand_id, status, trigger, strategy, started_at, finished_at, urls_attempted, products_found,
+            products_upserted, with_dimensions, errors, notes
+     FROM ingest_runs ORDER BY started_at DESC LIMIT 15`,
   );
-  return { brands, products, recentRuns: runs };
+  const verified = await db.query(
+    `SELECT id, platform, ingest_strategy FROM brands WHERE ingest_verified ORDER BY id`,
+  );
+  return { brands, products, verifiedBrands: verified, recentRuns: runs };
 }

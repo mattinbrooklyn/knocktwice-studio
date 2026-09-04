@@ -1,0 +1,31 @@
+{
+  "products": [
+    {
+      "id": 101, "title": "Palissade Cone Table", "handle": "palissade-cone-table", "vendor": "Hay",
+      "product_type": "Outdoor Tables", "tags": ["outdoor", "table", "Bouroullec"],
+      "body_html": "<p>A sculptural steel table for terraces and gardens.</p><p>Dimensions: Ø 60 cm, H 74 cm.</p><p>Powder coated steel.</p>",
+      "variants": [
+        { "id": 1, "title": "Anthracite", "price": "445.00", "available": true },
+        { "id": 2, "title": "Sky Grey", "price": "445.00", "available": false }
+      ],
+      "options": [{ "name": "Color", "values": ["Anthracite", "Sky Grey"] }],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/1/0001/palissade.jpg?v=1", "width": 2000, "height": 2000 }]
+    },
+    {
+      "id": 102, "title": "Rice Paper Shade Oval", "handle": "rice-paper-shade", "vendor": "Hay",
+      "product_type": "Pendant Lamps", "tags": "lighting, paper",
+      "body_html": "<p>Hand-made rice paper shade.</p><p>Size: 17.7\"W x 23.6\"H</p>",
+      "variants": [{ "id": 3, "title": "Default Title", "price": "95.00", "available": true }],
+      "options": [{ "name": "Title", "values": ["Default Title"] }],
+      "images": [{ "src": "https://cdn.shopify.com/s/files/1/0001/shade.jpg?v=2", "width": 1600, "height": 1600 }]
+    },
+    {
+      "id": 103, "title": "Colour Crate Small", "handle": "colour-crate", "vendor": "Hay",
+      "product_type": "Storage", "tags": [],
+      "body_html": "<p>Stackable crate in recycled polypropylene. 26.5 x 17 x 10.5 cm.</p>",
+      "variants": [{ "id": 4, "title": "Terracotta", "price": "12.00", "available": true }, { "id": 5, "title": "Sage", "price": "14.00", "available": true }],
+      "options": [{ "name": "Color", "values": ["Terracotta", "Sage"] }],
+      "images": []
+    }
+  ]
+}

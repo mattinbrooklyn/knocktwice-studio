@@ -7,10 +7,12 @@
     "node": ">=22"
   },
   "scripts": {
+    "test": "node --test search/test/*.test.js",
     "check:search": "node search/check.js"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.1"
+    "@neondatabase/serverless": "^1.0.1",
+    "@vercel/blob": "^2.8.0"
   },
   "devDependencies": {
     "pg": "^8.23.0"

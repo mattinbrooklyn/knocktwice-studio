@@ -59,6 +59,7 @@ export const SCHEMA = [
   )` },
 
   { vector: true, sql: `ALTER TABLE products ADD COLUMN IF NOT EXISTS embedding vector(${EMBEDDING_DIMENSIONS})` },
+  { sql: `ALTER TABLE products ADD COLUMN IF NOT EXISTS search_hash text` },
 
   { sql: `CREATE INDEX IF NOT EXISTS products_fts_idx ON products USING gin (fts)` },
   { sql: `CREATE INDEX IF NOT EXISTS products_brand_idx ON products (brand_id)` },

@@ -6,7 +6,24 @@ import { ensureSchema, syncBrands, summary } from './db.js';
 
 const vector = !process.argv.includes('--no-vector');
 const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
-const db = { query: async (text, params = []) => (await pool.query(text, params)).rows };
+const db = {
+  query: async (text, params = []) => (await pool.query(text, params)).rows,
+  batch: async (statements) => {
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      const out = [];
+      for (const [text, params = []] of statements) out.push((await client.query(text, params)).rows);
+      await client.query('COMMIT');
+      return out;
+    } catch (err) {
+      await client.query('ROLLBACK');
+      throw err;
+    } finally {
+      client.release();
+    }
+  },
+};
 
 try {
   const applied = await ensureSchema(db, { vector });

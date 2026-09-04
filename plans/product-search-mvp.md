@@ -1,8 +1,8 @@
 # Plan: Interior Product Search — MVP
 
-**Status:** Steps 1 to 3 done. Schema lives in `search/schema.js`; `GET /api/search/status`
-applies it and syncs the registry. Neon, OpenAI key, and password are set on the Vercel
-project. Next: Step 4, the ingest pipeline.
+**Status:** Steps 1 to 4 built. Ingest pipeline is in `search/` with endpoints under
+`api/search/` (see `search/README.md`). Next: run real brands through it on the preview
+and fix what breaks, then Step 5 (search API).
 
 **Brand list to approve:** [`product-search-brands.md`](product-search-brands.md)
 
@@ -44,9 +44,11 @@ on the Pro plan, so weekly crons and long-running functions are available.
    `/api/search/*` with a cookie set after a correct password. Everything else on
    the site is untouched. Password lives in a Vercel env var.
 3. **Scrape fan-out.** One serverless function cannot crawl 50 sites in one
-   invocation. The cron will kick off one invocation per brand (queue-style), so
-   each brand gets its own timeout, its own log row, and its own failure. That is
-   also what gives "tell me which brand broke, the rest keep working."
+   invocation. The cron runs daily instead of weekly and refreshes the most
+   stale brands until its 5-minute budget is spent, so every brand is refreshed
+   at least weekly and each gets its own log row and its own failure. Vercel
+   crons only run on production, so the schedule starts once this merges to
+   `main`; on staging, ingest is triggered per brand by hand.
 4. **Shopify shortcut.** Roughly half the proposed brands run on Shopify, which
    exposes a public `/products.json` feed with title, price, images, variants, and
    body text. That is far more reliable than HTML scraping and will be the first
