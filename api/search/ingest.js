@@ -6,7 +6,7 @@
 // middleware (Step 7) closes this to logged-in users only.
 import { waitUntil } from '@vercel/functions';
 import { makeContext, isCronRequest } from '../../search/context.js';
-import { ingestBrand } from '../../search/ingest.js';
+import { ingestBrand, embedPending } from '../../search/ingest.js';
 
 const THROTTLE_MINUTES = 30;
 const BUDGET_MS = 280_000;
@@ -18,6 +18,7 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const brandId = String(req.query?.brand || '').trim();
   if (brandId === 'batch') return batch(req, res);
+  if (brandId === 'embed') return embedOnly(req, res);
   if (!brandId) return res.status(400).json({ ok: false, error: 'brand query parameter required' });
 
   let ctx;
@@ -96,4 +97,28 @@ async function batch(req, res) {
     waitUntil(fetch(next, { signal: AbortSignal.timeout(58_000) }).catch(() => {}));
   }
   return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran, next });
+}
+
+/**
+ * GET /api/search/ingest?brand=embed[&chain=1]
+ * Embeds products that are missing an embedding, without touching brand sites.
+ * Used after a run where the OpenAI call failed (for example, no credits).
+ */
+async function embedOnly(req, res) {
+  let ctx;
+  try {
+    ctx = makeContext();
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+  const started = Date.now();
+  const r = await embedPending(ctx, { deadline: started + 40_000 });
+  const chain = Number(req.query?.chain) || 0;
+  let next = null;
+  if (chain > 0 && chain <= 40 && r.embedded > 0 && r.remaining > 0 && r.errors.length === 0) {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    next = `https://${host}/api/search/ingest?brand=embed&chain=${chain + 1}`;
+    waitUntil(fetch(next, { signal: AbortSignal.timeout(58_000) }).catch(() => {}));
+  }
+  return res.status(r.errors.length ? 502 : 200).json({ ok: r.errors.length === 0, elapsedMs: Date.now() - started, ...r, next });
 }

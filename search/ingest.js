@@ -185,6 +185,30 @@ export async function ingestBrand(ctx, brandRow, { trigger = 'manual', deadline 
   }
 }
 
+/** Embed products that have none yet, newest brands first, until the deadline. No site fetches. */
+export async function embedPending(ctx, { deadline = Date.now() + 40_000 } = {}) {
+  const { db, embed } = ctx;
+  const [{ pending }] = await db.query(`SELECT count(*)::int AS pending FROM products WHERE embedding IS NULL`);
+  let embedded = 0;
+  const errors = [];
+  while (Date.now() < deadline) {
+    const rows = await db.query(
+      `SELECT id, search_text FROM products WHERE embedding IS NULL ORDER BY brand_id, id LIMIT $1`, [EMBED_BATCH],
+    );
+    if (rows.length === 0) break;
+    let vectors;
+    try {
+      vectors = await embed(rows.map((r) => r.search_text));
+    } catch (err) {
+      errors.push(String(err.message || err).slice(0, 300));
+      break;
+    }
+    await db.batch(rows.map((r, j) => [`UPDATE products SET embedding = $1::vector WHERE id = $2`, [toVectorLiteral(vectors[j]), r.id]]));
+    embedded += rows.length;
+  }
+  return { pendingBefore: pending, embedded, remaining: pending - embedded, errors };
+}
+
 /** Try the URL as registered, then with www added or removed. Returns the first that answers. */
 export async function resolveBase(http, url) {
   const u = new URL(url);
