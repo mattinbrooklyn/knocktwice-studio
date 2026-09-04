@@ -1,8 +1,7 @@
 # Plan: Interior Product Search — MVP
 
 **Status:** Steps 1 to 4 done and exercised against the live registry. 27 brands ingest
-cleanly: 5,109 products, 1,334 with dimensions, none embedded yet (OpenAI account has no
-credits; the next run embeds everything pending). Next: Step 5, the search API, built on
+cleanly: 5,109 products, 1,334 with dimensions, all embedded. Next: Step 5, the search API, built on
 what is already in the database. Coverage of the remaining brands is deliberately
 deferred until the search page shows which gaps matter.
 
