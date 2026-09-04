@@ -41,6 +41,12 @@ Rules for `brands.json`:
 
 Endpoints:
 
+- `GET /api/search/query?q=<text>` — hybrid search: embedding rank fused with
+  full-text rank (reciprocal rank fusion), filters `brand` (comma list),
+  `category`, `min`/`max` (USD), `stock=1`; `sort` = relevance | price_asc |
+  price_desc | size; `page` (48 per page). `mode` in the response is `hybrid`,
+  or `fulltext` with `fallbackReason` when the embedding call failed.
+  `?meta=1` returns enabled brands with counts, categories, and price bounds.
 - `GET /api/search/status` — applies schema, syncs registry, reports counts,
   verified brands, and the last 15 runs.
 - `GET /api/search/ingest?brand=<id>` — runs one brand now. Trusted when called

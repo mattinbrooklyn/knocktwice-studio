@@ -140,6 +140,9 @@
     },
     "api/search/status.js": {
       "maxDuration": 60
+    },
+    "api/search/query.js": {
+      "maxDuration": 30
     }
   },
   "crons": [
