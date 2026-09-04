@@ -476,11 +476,6 @@
         bottom: var(--footer-stack-height);
       }
 
-      .monster-area {
-        pointer-events: auto;
-        cursor: pointer;
-      }
-
       /* Mobile: wave rises near top of viewport (eyes + crest). Linear mailing-list
          ticker is a #page-scaler sibling with its own bottom anchor (see #monster-linear-ticker). */
       #monster-group.wave-risen {
@@ -1181,7 +1176,6 @@
       e.preventDefault();
       openMailingList();
     });
-    document.getElementById('monster-area').addEventListener('click', openMailingList);
     mlClose.addEventListener('click', closeMailingList);
     modalBackdrop.addEventListener('click', closeMailingList);
 
