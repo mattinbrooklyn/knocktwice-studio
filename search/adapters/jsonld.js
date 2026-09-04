@@ -37,15 +37,18 @@ const PRODUCT_PATH = /\/(products?|shop|item|p)\//i;
 export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
   const base = brand.url.replace(/\/+$/, '');
   const origin = new URL(base).origin;
-  const roots = [`${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`, `${origin}/sitemap-index.xml`];
+  const roots = [...await sitemapsFromRobots(http, origin), `${origin}/sitemap.xml`, `${origin}/sitemap_index.xml`, `${origin}/sitemap-index.xml`];
 
   const productUrls = [];
   const seen = new Set();
   const queue = [];
   for (const root of roots) {
     try {
-      queue.push(await http.text(root, { retries: 0 }));
-      break;
+      const xml = await http.text(root, { retries: 0 });
+      if (/<(urlset|sitemapindex)/i.test(xml)) {
+        queue.push(xml);
+        break;
+      }
     } catch {
       // try next root
     }
@@ -74,6 +77,15 @@ export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
     }
   }
   return productUrls;
+}
+
+async function sitemapsFromRobots(http, origin) {
+  try {
+    const body = await http.text(`${origin}/robots.txt`, { retries: 0 });
+    return [...body.matchAll(/^\s*sitemap\s*:\s*(\S+)/gim)].map((m) => m[1]);
+  } catch {
+    return [];
+  }
 }
 
 function decodeXml(s) {

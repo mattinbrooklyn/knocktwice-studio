@@ -33,10 +33,13 @@ test('ingestBrand end to end', { skip: !url && 'DATABASE_URL not set' }, async (
     if (reqUrl.startsWith('https://us.hay.com/products.json')) return new Response(JSON.stringify(currentFeed), { headers: { 'content-type': 'application/json' } });
     if (reqUrl.startsWith('https://us.hay.com/products/')) return new Response('<meta property="og:price:currency" content="USD">', { headers: { 'content-type': 'text/html' } });
     if (reqUrl === 'https://us.hay.com/robots.txt') return new Response('User-agent: *\nDisallow: /cart\n');
+    if (reqUrl === 'https://us.hay.com/') return new Response('<html>home</html>');
+    if (reqUrl === 'https://www.muuto.com/') return new Response('<html>home</html>');
     if (reqUrl.startsWith('https://www.muuto.com/products.json')) return new Response('<html>', { status: 404 });
     if (reqUrl === 'https://www.muuto.com/sitemap.xml') return new Response('<urlset><url><loc>https://www.muuto.com/products/kink-vase</loc></url></urlset>');
     if (reqUrl === 'https://www.muuto.com/products/kink-vase') return new Response(jsonldHtml, { headers: { 'content-type': 'text/html' } });
     if (reqUrl === 'https://www.muuto.com/robots.txt') return new Response('', { status: 404 });
+    if (reqUrl.includes('flos.com')) throw new TypeError('fetch failed');
     return new Response('nope', { status: 404 });
   };
   const http = makeHttp({ fetchImpl: async (u) => routes(u) });
@@ -111,7 +114,7 @@ test('ingestBrand end to end', { skip: !url && 'DATABASE_URL not set' }, async (
   const [dead] = await db.query(`SELECT * FROM brands WHERE id = 'flos'`);
   const r5 = await ingestBrand(ctx, dead, { trigger: 'cron' });
   assert.equal(r5.ok, false);
-  assert.ok(r5.errors.length >= 2);
+  assert.match(r5.errors[0].message, /unreachable/);
   const [{ n: total }] = await db.query(`SELECT count(*)::int AS n FROM products`);
   assert.equal(total, 3);
 });

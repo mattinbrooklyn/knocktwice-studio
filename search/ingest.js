@@ -27,7 +27,8 @@ function strategyOrder(brand) {
  * @param brand row from the brands table
  * @param opts { trigger: 'cron'|'manual', deadline: epoch ms }
  */
-export async function ingestBrand(ctx, brand, { trigger = 'manual', deadline = Date.now() + 240_000 } = {}) {
+export async function ingestBrand(ctx, brandRow, { trigger = 'manual', deadline = Date.now() + 240_000 } = {}) {
+  let brand = brandRow;
   const { db, http, embed, cacheImage } = ctx;
   const log = ctx.log || (() => {});
   const errors = [];
@@ -39,6 +40,15 @@ export async function ingestBrand(ctx, brand, { trigger = 'manual', deadline = D
   const stats = { runId: run.id, brand: brand.id, strategy: null, urlsAttempted: 0, productsFound: 0, productsUpserted: 0, withDimensions: 0, embedded: 0, imagesCached: 0, deleted: 0 };
 
   try {
+    // 0. Make sure the registered URL answers; fall back to the www / bare variant if not.
+    const resolved = await resolveBase(http, brand.url);
+    if (resolved.error) throw new Error(`site unreachable: ${resolved.error}`);
+    if (resolved.url !== brand.url) {
+      notes.push(`using ${resolved.url} instead of ${brand.url}`);
+      brand = { ...brand, url: resolved.url };
+      await db.query(`UPDATE brands SET url = $2, updated_at = now() WHERE id = $1`, [brand.id, resolved.url]);
+    }
+
     // 1. Fetch with the first strategy that yields products.
     let raws = null;
     for (const strategy of strategyOrder(brand)) {
@@ -88,7 +98,7 @@ export async function ingestBrand(ctx, brand, { trigger = 'manual', deadline = D
       await db.batch(chunk.map((r) => [UPSERT_SQL, [
         r.brand_id, r.source_url, r.external_id, r.name, r.description, r.category, r.price_cents, r.price_max_cents,
         r.currency, r.width_cm, r.depth_cm, r.height_cm, r.diameter_cm, r.dimensions_raw, r.materials, r.colors,
-        r.in_stock, r.image_url, r.search_text, r.search_hash,
+        r.in_stock, r.image_url, r.search_text, r.search_hash, r.vendor,
       ]]));
       stats.productsUpserted += chunk.length;
     }
@@ -173,6 +183,29 @@ export async function ingestBrand(ctx, brand, { trigger = 'manual', deadline = D
   }
 }
 
+/** Try the URL as registered, then with www added or removed. Returns the first that answers. */
+export async function resolveBase(http, url) {
+  const u = new URL(url);
+  const alt = new URL(url);
+  alt.hostname = u.hostname.startsWith('www.') ? u.hostname.slice(4) : `www.${u.hostname}`;
+  let firstError = null;
+  for (const candidate of [u, alt]) {
+    try {
+      const res = await http.request(candidate.toString(), { retries: 0 });
+      if (res.status < 500) {
+        // Follow a same-domain redirect to the canonical host (e.g. bare -> www).
+        const finalUrl = res.url ? new URL(res.url) : candidate;
+        const canonical = finalUrl.hostname.endsWith(u.hostname.replace(/^www\./, '')) ? `${finalUrl.protocol}//${finalUrl.hostname}` : `${candidate.protocol}//${candidate.hostname}`;
+        return { url: canonical };
+      }
+      firstError = firstError || `HTTP ${res.status}`;
+    } catch (err) {
+      firstError = firstError || err.message;
+    }
+  }
+  return { error: firstError };
+}
+
 async function finishRun(db, runId, status, stats, errors, notes) {
   await db.query(
     `UPDATE ingest_runs SET status = $2, strategy = $3, finished_at = now(), urls_attempted = $4, products_found = $5,
@@ -185,8 +218,8 @@ async function finishRun(db, runId, status, stats, errors, notes) {
 const UPSERT_SQL = `
   INSERT INTO products (brand_id, source_url, external_id, name, description, category, price_cents, price_max_cents,
     currency, width_cm, depth_cm, height_cm, diameter_cm, dimensions_raw, materials, colors, in_stock, image_url,
-    search_text, search_hash, last_seen_at, updated_at)
-  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, now(), now())
+    search_text, search_hash, vendor, last_seen_at, updated_at)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, now(), now())
   ON CONFLICT (source_url) DO UPDATE SET
     external_id = EXCLUDED.external_id, name = EXCLUDED.name, description = EXCLUDED.description,
     category = EXCLUDED.category, price_cents = EXCLUDED.price_cents, price_max_cents = EXCLUDED.price_max_cents,
@@ -195,7 +228,7 @@ const UPSERT_SQL = `
     materials = EXCLUDED.materials, colors = EXCLUDED.colors, in_stock = EXCLUDED.in_stock,
     image_url = EXCLUDED.image_url,
     image_blob_url = CASE WHEN products.image_url IS DISTINCT FROM EXCLUDED.image_url THEN NULL ELSE products.image_blob_url END,
-    search_text = EXCLUDED.search_text, search_hash = EXCLUDED.search_hash,
+    search_text = EXCLUDED.search_text, search_hash = EXCLUDED.search_hash, vendor = EXCLUDED.vendor,
     last_seen_at = now(),
     updated_at = CASE WHEN products.search_hash IS DISTINCT FROM EXCLUDED.search_hash THEN now() ELSE products.updated_at END`;
 

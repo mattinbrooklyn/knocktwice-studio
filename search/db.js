@@ -46,7 +46,7 @@ export async function syncBrands(db) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now())
        ON CONFLICT (id) DO UPDATE SET
          name = EXCLUDED.name,
-         url = EXCLUDED.url,
+         url = CASE WHEN brands.ingest_verified THEN brands.url ELSE EXCLUDED.url END,
          hq = EXCLUDED.hq,
          tier = EXCLUDED.tier,
          categories = EXCLUDED.categories,

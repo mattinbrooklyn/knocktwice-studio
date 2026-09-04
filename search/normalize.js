@@ -221,7 +221,7 @@ export function normalizeProduct(raw, brand) {
 
   const dimText = dims.raw ? `Dimensions: ${dims.raw}.` : '';
   const searchText = [
-    `${brand.name} ${raw.name}.`,
+    `${raw.vendor && raw.vendor.toLowerCase() !== brand.name.toLowerCase() ? `${raw.vendor} ` : ''}${brand.name} ${raw.name}.`,
     category ? `Category: ${category}.` : '',
     raw.productType ? `Type: ${raw.productType}.` : '',
     materials.length ? `Materials: ${materials.join(', ')}.` : '',
@@ -235,6 +235,7 @@ export function normalizeProduct(raw, brand) {
     source_url: raw.sourceUrl,
     external_id: raw.externalId ?? null,
     name: raw.name.trim().slice(0, 300),
+    vendor: (raw.vendor || '').trim().slice(0, 120) || null,
     description: description || null,
     category,
     price_cents: cents(raw.priceMin),

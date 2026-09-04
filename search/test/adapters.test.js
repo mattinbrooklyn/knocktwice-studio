@@ -43,6 +43,16 @@ test('parseRobots picks our group, else *', () => {
   assert.ok(!mine[0].test('/products/x'));
 });
 
+test('discoverProductUrls reads Sitemap: from robots.txt when /sitemap.xml is missing', async () => {
+  const pages = {
+    'https://example-brand.test/robots.txt': 'User-agent: *\nDisallow: /cart\nSitemap: https://example-brand.test/sm/products.xml\n',
+    'https://example-brand.test/sm/products.xml': '<urlset><url><loc>https://example-brand.test/products/a</loc></url></urlset>',
+  };
+  const fetchImpl = async (url) => new Response(pages[url] ?? '{"error":404}', { status: pages[url] ? 200 : 404 });
+  const urls = await discoverProductUrls(makeHttp({ fetchImpl }), { url: 'https://example-brand.test' }, { max: 10 });
+  assert.deepEqual(urls, ['https://example-brand.test/products/a']);
+});
+
 test('discoverProductUrls follows a sitemap index and filters product paths', async () => {
   const pages = {
     'https://example-brand.test/sitemap.xml': '<sitemapindex><sitemap><loc>https://example-brand.test/sitemap_products_1.xml</loc></sitemap><sitemap><loc>https://example-brand.test/sitemap_pages_1.xml</loc></sitemap></sitemapindex>',
