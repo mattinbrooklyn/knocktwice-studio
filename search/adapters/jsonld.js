@@ -64,7 +64,12 @@ export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
     if (isIndex) {
       // Product-named child sitemaps first, then the rest (skipping obvious non-product ones).
       const children = locs.filter((l) => !/blog|news|journal|page|collection|categor|image|video|stories|press/i.test(l));
-      const ranked = [...children.filter((l) => /product|shop|catalog|item/i.test(l)), ...children.filter((l) => !/product|shop|catalog|item/i.test(l))];
+      // Country and language sitemaps: US English first, any English next, everything else last.
+      const score = (l) => (/product|shop|catalog|item/i.test(l) ? -1
+        : /(^|[-_/.])(us|en-us|usa|en_us)([-_/.]|$)/i.test(l) ? 0
+        : /(^|[-_/.])(en|gb|uk|international|global)([-_/.]|$)/i.test(l) ? 1
+        : /sitemap[-_][a-z]{2}(-[a-z]{2})?/i.test(l) ? 3 : 2);
+      const ranked = [...children].sort((a, b) => score(a) - score(b));
       for (const loc of ranked.slice(0, 25)) {
         try {
           queue.push(await http.text(loc, { retries: 0 }));
