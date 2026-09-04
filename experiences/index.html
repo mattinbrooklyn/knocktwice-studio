@@ -1232,12 +1232,15 @@
 
     const draggableSelector = '.obj, .photo, .photo-rotated, .placeholder, .photo-card';
 
+    // Open-hand cursor is resolved by the shared script hit-testing under
+    // the pointer every frame — no per-element mouseenter/mouseleave.
+    // scripts.js is deferred, so KT does not exist while this inline script
+    // parses — register once the deferred script has run.
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.KT && window.KT.isDesktop) KT.setHoverSelector(draggableSelector);
+    });
+
     document.querySelectorAll(draggableSelector).forEach(el => {
-      if (window.KT && window.KT.isDesktop) {
-        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
-        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
-      }
-      
       // Ensure element doesn't scroll the page on touch
       el.style.touchAction = 'none';
 
@@ -1248,7 +1251,7 @@
         offsetY = e.clientY - rect.top;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
-        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
+        if (window.KT && window.KT.isDesktop) KT.lockCursor('drag');
         el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
@@ -1273,10 +1276,7 @@
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
-        if (window.KT && window.KT.isDesktop) {
-          const under = document.elementFromPoint(e.clientX, e.clientY);
-          KT.setCursor(under && under.closest(draggableSelector) ? 'hover' : 'default');
-        }
+        if (window.KT && window.KT.isDesktop) KT.unlockCursor();
       }
     });
 
@@ -1284,6 +1284,7 @@
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
+        if (window.KT && window.KT.isDesktop) KT.unlockCursor();
       }
     });
 

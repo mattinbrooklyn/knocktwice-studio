@@ -844,12 +844,18 @@
     let offsetY  = 0;
     let topZ     = 10;
 
-    document.querySelectorAll('.furniture').forEach(el => {
+    // Open-hand cursor is resolved by the shared script hit-testing under
+    // the pointer every frame — no per-element mouseenter/mouseleave.
+    // The monster is included because clicking it resets the furniture.
+    // scripts.js is deferred, so KT does not exist while this inline script
+    // parses — register once the deferred script has run.
+    document.addEventListener('DOMContentLoaded', function () {
       if (window.KT && window.KT.isDesktop) {
-        el.addEventListener('mouseenter', () => KT.setCursor('hover'));
-        el.addEventListener('mouseleave', () => { if (!dragging) KT.setCursor('default'); });
+        KT.setHoverSelector('.furniture, #home-monster.is-visible');
       }
-      
+    });
+
+    document.querySelectorAll('.furniture').forEach(el => {
       // Ensure element doesn't scroll the page on touch
       el.style.touchAction = 'none';
       
@@ -861,7 +867,7 @@
         offsetY = (e.clientY - rect.top)  / scale;
         el.classList.add('is-dragging');
         el.style.zIndex = ++topZ;
-        if (window.KT && window.KT.isDesktop) KT.setCursor('drag');
+        if (window.KT && window.KT.isDesktop) KT.lockCursor('drag');
         el.setPointerCapture(e.pointerId);
         e.preventDefault();
       });
@@ -889,8 +895,7 @@
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
-        const under = document.elementFromPoint(e.clientX, e.clientY);
-        if (window.KT && window.KT.isDesktop) KT.setCursor(under && under.closest('.furniture') ? 'hover' : 'default');
+        if (window.KT && window.KT.isDesktop) KT.unlockCursor();
       }
     });
     
@@ -898,6 +903,7 @@
       if (dragging) {
         dragging.classList.remove('is-dragging');
         dragging = null;
+        if (window.KT && window.KT.isDesktop) KT.unlockCursor();
       }
     });
 
@@ -1022,16 +1028,8 @@
 
     // Hand cursor over the monster (desktop custom-cursor system).
     // `cursor: pointer` in CSS does nothing here because global `cursor: none`
-    // hides the native cursor on desktop — so we swap to the 'hover' state
-    // of the custom cursor overlay.
-    if (window.KT && window.KT.isDesktop) {
-      homeMonster.addEventListener('mouseenter', function () {
-        if (homeMonster.classList.contains('is-visible')) KT.setCursor('hover');
-      });
-      homeMonster.addEventListener('mouseleave', function () {
-        if (!dragging) KT.setCursor('default');
-      });
-    }
+    // hides the native cursor on desktop. `#home-monster.is-visible` is part
+    // of the shared hover selector above, so the open hand shows automatically.
 
     // Monster eye tracking — convert clientX/Y to wave SVG coords
     function trackMonsterIris(el, svgX, svgY, restX, restY, maxX, maxY) {

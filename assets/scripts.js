@@ -1,15 +1,20 @@
 /* Knock Twice — Shared cursor system
-   Injects the 3-state pixel cursor and exposes window.KT.setCursor(state).
+   Injects the 3-state pixel cursor and resolves its state on every move.
 
    States:
-     'default' — pixel pointer hand (always on)
-     'hover'   — open hand (hovering over a draggable element)
+     'default' — pixel pointer hand (nothing draggable under the cursor)
+     'hover'   — open hand (cursor is over something draggable)
      'drag'    — closed hand (actively dragging)
 
+   Hover state is resolved by hit-testing under the cursor on every move,
+   NOT by mouseenter/mouseleave on each element. Boundary events are
+   suppressed while a drag holds pointer capture, which left the cursor
+   stuck in the wrong state after a drag ended.
+
    Usage in page JS:
-     KT.setCursor('hover');   // mouseenter on draggable
-     KT.setCursor('default'); // mouseleave from draggable
-     KT.setCursor('drag');    // mousedown on draggable
+     KT.setHoverSelector('.obj, .photo-card');  // what counts as draggable
+     KT.lockCursor('drag');    // pointerdown — freeze state while dragging
+     KT.unlockCursor();        // pointerup / pointercancel — resume hit-test
 */
 
 (function () {
@@ -24,7 +29,10 @@
   if (!window.KT.isDesktop) {
     // Touch device: expose a no-op setCursor and add body class
     document.documentElement.classList.add('is-touch');
-    window.KT.setCursor = function () {};
+    window.KT.setCursor        = function () {};
+    window.KT.setHoverSelector = function () {};
+    window.KT.lockCursor       = function () {};
+    window.KT.unlockCursor     = function () {};
     return;
   }
 
@@ -47,9 +55,44 @@
     drag:    [24, 0]
   };
 
-  // ── Public API ────────────────────────────────────────────────────
-  window.KT.setCursor = function (state) {
+  // ── State resolution ──────────────────────────────────────────────
+  // hoverSelector: anything matching it (or containing what's under the
+  // cursor) shows the open hand. locked: held during a drag so the closed
+  // hand survives the element moving out from under the pointer.
+  var hoverSelector = '';
+  var locked        = null;
+
+  function applyState(state) {
     document.body.dataset.cursor = (state === 'default') ? '' : state;
+  }
+
+  function resolveState() {
+    if (locked) return locked;
+    if (!hoverSelector) return 'default';
+    var el = document.elementFromPoint(cursorX, cursorY);
+    return (el && el.closest(hoverSelector)) ? 'hover' : 'default';
+  }
+
+  // ── Public API ────────────────────────────────────────────────────
+  window.KT.setHoverSelector = function (selector) {
+    hoverSelector = selector || '';
+    applyState(resolveState());
+  };
+
+  window.KT.lockCursor = function (state) {
+    locked = state || 'drag';
+    applyState(locked);
+  };
+
+  window.KT.unlockCursor = function () {
+    locked = null;
+    applyState(resolveState());
+  };
+
+  // Kept for one-off overrides (and pages not on the hover selector).
+  window.KT.setCursor = function (state) {
+    if (locked) return;
+    applyState(state);
   };
 
   // ── Position tracking (rAF-throttled) ─────────────────────────────
@@ -58,7 +101,8 @@
 
   function updateCursor() {
     cursorRaf = 0;
-    var state = document.body.dataset.cursor || 'default';
+    var state = resolveState();
+    applyState(state);
     var off   = hotspot[state] || hotspot.default;
     div.style.transform = 'translate(' + (cursorX - off[0]) + 'px,' + (cursorY - off[1]) + 'px)';
   }
@@ -66,6 +110,11 @@
   document.addEventListener('pointermove', function (e) {
     cursorX = e.clientX;
     cursorY = e.clientY;
+    if (!cursorRaf) cursorRaf = requestAnimationFrame(updateCursor);
+  }, { passive: true });
+
+  // Scrolling moves content under a stationary cursor — re-resolve.
+  window.addEventListener('scroll', function () {
     if (!cursorRaf) cursorRaf = requestAnimationFrame(updateCursor);
   }, { passive: true });
 }());
