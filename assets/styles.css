@@ -23,29 +23,37 @@
   --font-body:             'Instrument Sans', sans-serif;
   --font-ui:               'Handjet', sans-serif;
 
-  /* Type scale — clamp(mobile, fluid, desktop) */
-  --type-h1:               clamp(2.625rem, 5vw, 4.0625rem);
-  --type-h2:               clamp(1.25rem, 2.5vw, 1.5rem);
-  --type-b1:               clamp(0.75rem, 1.2vw, 0.875rem);
-  --type-b2:               0.75rem;
-  --type-b3:               0.875rem;
-  --type-nav:              clamp(1.125rem, 1.8vw, 1.375rem);
+  /* Type scale — clamp(mobile, fluid, desktop)
+     Mobile figure = clamp min (root is pinned to 16px ≤768px), desktop
+     figure = clamp max. Values per the Global Font Edit spec (No. 10). */
+  --type-h1:               clamp(2.875rem, 5.23vw, 4.25rem);    /* 46 → 68 */
+  --type-h2:               clamp(1.625rem, 3.13vw, 1.875rem);   /* 26 → 30 */
+  --type-b1:               clamp(1rem, 1.54vw, 1.125rem);       /* 16 → 18 */
+  --type-b2:               0.75rem;                             /* 12, desktop only */
+  --type-b3:               clamp(1rem, 1.54vw, 1.125rem);       /* 16 → 18 */
+  --type-nav:              clamp(1.375rem, 2.13vw, 1.625rem);   /* 22 → 26 */
   /* Full-screen mobile overlay menu (Figma: Handjet 34 — Regular like Nav/Unselected) */
   --type-nav-mobile-menu:  2.125rem;
   --leading-nav-mobile-menu: 1.12;
   --wght-nav-mobile-menu:  400;
   --wght-nav-mobile-menu-active: 700;
   --tracking-nav-mobile-menu: -0.02125rem; /* -0.34px @ 16px root — Figma 7531:2089 */
-  --type-field:            1rem;
-  --type-button:           1rem;
-  --type-error:            0.75rem;
-  --type-anim:             clamp(1.125rem, 1.8vw, 1.375rem);
+  --type-field:            clamp(1rem, 1.3vw, 1.125rem);       /* 16 → 18 */
+  --type-button:           clamp(1rem, 1.3vw, 1.125rem);       /* 16 → 18 */
+  --type-error:            clamp(0.75rem, 1vw, 0.875rem);      /* 12 → 14 */
+  --type-anim:             clamp(1.125rem, 1.8vw, 1.375rem);   /* 18 → 22, unchanged */
 
-  /* Line heights */
-  --leading-h1:            clamp(2.875rem, 5.2vw, 4.25rem);
-  --leading-h2:            clamp(1.5625rem, 2.6vw, 1.6875rem);
-  --leading-b1:            clamp(1.0625rem, 1.8vw, 1.375rem);
-  --leading-nav:           clamp(1.5rem, 2vw, 1.6875rem);
+  /* Line heights — same mobile/desktop pairing as the sizes above */
+  --leading-h1:            clamp(3rem, 5.35vw, 4.375rem);        /* 48 → 70 */
+  --leading-h2:            clamp(1.8125rem, 3.18vw, 2.0625rem);  /* 29 → 33 */
+  --leading-b1:            clamp(1.375rem, 1.96vw, 1.5rem);      /* 22 → 24 */
+  --leading-b2:            1.375rem;                             /* 22, desktop only */
+  --leading-b3:            clamp(1.375rem, 1.96vw, 1.5rem);      /* 22 → 24 */
+  --leading-nav:           clamp(1.6875rem, 2.22vw, 1.875rem);   /* 27 → 30 */
+  --leading-field:         clamp(1.375rem, 1.6vw, 1.4375rem);    /* 22 → 23 */
+  --leading-button:        clamp(1.375rem, 1.6vw, 1.4375rem);    /* 22 → 23 */
+  --leading-error:         clamp(1.0625rem, 1.39vw, 1.25rem);    /* 17 → 20 */
+  --leading-anim:          clamp(1.6875rem, 1.9vw, 1.6875rem);   /* 27, unchanged */
 
   /* Letter spacing */
   --tracking-nav:          -0.01375rem;
@@ -723,7 +731,7 @@ body.nav-open {
   margin-top: 0.5rem;
   font-family: var(--font-body);
   font-size: var(--type-error);
-  line-height: 1rem;
+  line-height: var(--leading-error);
   color: var(--color-bg);
 }
 .footer-newsletter-error {
@@ -828,7 +836,7 @@ body.nav-open {
   font-family: var(--font-body);
   font-size: var(--type-error);
   color: var(--color-red);
-  line-height: 1rem;
+  line-height: var(--leading-error);
 }
 
 /* Replaces .error-text going forward — toggled by JS adding .is-visible */
@@ -836,7 +844,7 @@ body.nav-open {
   font-family: var(--font-body);
   font-size: var(--type-error);
   color: var(--color-red);
-  line-height: 1rem;
+  line-height: var(--leading-error);
   display: none;
   margin-top: 0.25rem;
 }
