@@ -160,8 +160,8 @@
         "verified": false,
         "maxProducts": 400
       },
-      "enabled": true,
-      "notes": "Anchor"
+      "enabled": false,
+      "notes": "Anchor. Found on first run: Shopify store answers but publishes zero products (empty feed, no product sitemap, empty /collections/all). Looks paused; re-check later. Disabled."
     },
     {
       "id": "in-common-with",
@@ -179,7 +179,7 @@
         "maxProducts": 400
       },
       "enabled": true,
-      "notes": "Anchor"
+      "notes": "Anchor. Shopify feed works (400+ products) but dimensions are not in the product body; needs a page-level spec adapter for W x D x H."
     },
     {
       "id": "gantri",
@@ -221,7 +221,7 @@
     {
       "id": "poketo",
       "name": "Poketo",
-      "url": "https://www.poketo.com",
+      "url": "https://www.patternbrands.com",
       "hq": "Los Angeles",
       "tier": "core",
       "categories": [
@@ -234,8 +234,8 @@
         "verified": false,
         "maxProducts": 400
       },
-      "enabled": true,
-      "notes": "Anchor"
+      "enabled": false,
+      "notes": "Found on first run: poketo.com redirects to patternbrands.com (Webflow holding page, no shop). Needs a decision from Matt; disabled."
     },
     {
       "id": "sundays",
@@ -727,7 +727,7 @@
     {
       "id": "east-fork",
       "name": "East Fork",
-      "url": "https://www.eastfork.com",
+      "url": "https://eastfork.com",
       "hq": "Asheville",
       "tier": "core",
       "categories": [

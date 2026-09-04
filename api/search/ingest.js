@@ -10,9 +10,13 @@ import { ingestBrand } from '../../search/ingest.js';
 const THROTTLE_MINUTES = 30;
 const BUDGET_MS = 280_000;
 
+const BATCH_BUDGET_MS = 110_000;
+const BATCH_PER_BRAND_MS = 60_000;
+
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const brandId = String(req.query?.brand || '').trim();
+  if (brandId === 'batch') return batch(req, res);
   if (!brandId) return res.status(400).json({ ok: false, error: 'brand query parameter required' });
 
   let ctx;
@@ -40,4 +44,42 @@ export default async function handler(req, res) {
 
   const result = await ingestBrand(ctx, brand, { trigger: trusted ? 'cron' : 'manual', deadline: Date.now() + BUDGET_MS });
   return res.status(result.ok ? 200 : 502).json(result);
+}
+
+/**
+ * GET /api/search/ingest?brand=batch
+ * Runs enabled brands that have never succeeded (then the most stale) for
+ * about two minutes and returns what happened. Call repeatedly to sweep the
+ * registry without waiting for the production cron.
+ */
+async function batch(req, res) {
+  let ctx;
+  try {
+    ctx = makeContext();
+  } catch (err) {
+    return res.status(500).json({ ok: false, error: err.message });
+  }
+  const { db, log } = ctx;
+  const started = Date.now();
+  const deadline = started + BATCH_BUDGET_MS;
+  const brands = await db.query(
+    `SELECT b.*,
+       (SELECT max(r.finished_at) FROM ingest_runs r WHERE r.brand_id = b.id AND r.status = 'ok') AS last_ok,
+       (SELECT max(r.started_at) FROM ingest_runs r WHERE r.brand_id = b.id) AS last_try
+     FROM brands b WHERE b.enabled
+       AND NOT EXISTS (SELECT 1 FROM ingest_runs r WHERE r.brand_id = b.id AND r.status IN ('ok', 'running')
+                         AND r.started_at > now() - ($1 || ' minutes')::interval)
+     ORDER BY last_ok NULLS FIRST, last_try NULLS FIRST, b.id`,
+    [String(THROTTLE_MINUTES)],
+  );
+  const ran = [];
+  for (const brand of brands) {
+    const remaining = deadline - Date.now();
+    if (remaining < 15_000) break;
+    log(`batch: ${brand.id}`);
+    const r = await ingestBrand(ctx, brand, { trigger: 'manual', deadline: Date.now() + Math.min(BATCH_PER_BRAND_MS, remaining - 5_000) });
+    ran.push({ brand: brand.id, ok: r.ok, strategy: r.strategy, found: r.productsFound, dims: r.withDimensions,
+      firstError: r.errors.find((e) => e.stage !== 'embed')?.message || null, notes: r.notes.filter((n) => !n.includes('BLOB')) });
+  }
+  return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran });
 }
