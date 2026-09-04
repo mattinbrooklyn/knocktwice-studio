@@ -32,8 +32,10 @@ export function makeHttp({ fetchImpl = globalThis.fetch, timeoutMs = 15000 } = {
         }
         return res;
       } catch (err) {
-        lastErr = err;
-        if (attempt >= retries) throw err;
+        // undici hides DNS and TLS failures behind "fetch failed"; surface the cause.
+        const cause = err?.cause;
+        lastErr = cause ? new Error(`${err.message}: ${cause.code || cause.name || ''} ${cause.message || ''}`.trim()) : err;
+        if (attempt >= retries) throw lastErr;
       } finally {
         clearTimeout(timer);
       }
