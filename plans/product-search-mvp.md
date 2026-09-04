@@ -1,7 +1,8 @@
 # Plan: Interior Product Search — MVP
 
-**Status:** Step 1 approved. Step 2 (brand registry) done: `search/brands.json`.
-No application code exists yet. Nothing here is deployed.
+**Status:** Steps 1 to 3 done. Schema lives in `search/schema.js`; `GET /api/search/status`
+applies it and syncs the registry. Neon, OpenAI key, and password are set on the Vercel
+project. Next: Step 4, the ingest pipeline.
 
 **Brand list to approve:** [`product-search-brands.md`](product-search-brands.md)
 
