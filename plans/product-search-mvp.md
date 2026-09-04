@@ -93,6 +93,19 @@ approved.
   brand-site adapters work.
 - One shared password, per the brief.
 
+## Environment variables (Vercel project, Production and Preview)
+
+| Name | Set by | Purpose |
+|---|---|---|
+| `DATABASE_URL` | Neon integration | Postgres connection |
+| `OPENAI_API_KEY` | Matt | Embeddings |
+| `SEARCH_PASSWORD` | Matt | The gate on the search page |
+| `CRON_SECRET` | Matt | Lets Vercel's scheduler call the ingest cron |
+| `BLOB_READ_WRITE_TOKEN` | Blob store (optional) | Image caching; without it product images hotlink the brand |
+
+A variable saved for Production only is invisible to this branch's preview
+deployments. `GET /api/search/status` reports which names are present.
+
 ## Environment note
 
 The Claude Code cloud environment blocks outbound requests to arbitrary domains,
