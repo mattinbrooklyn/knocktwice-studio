@@ -608,8 +608,8 @@
         "verified": false,
         "maxProducts": 400
       },
-      "enabled": true,
-      "notes": ""
+      "enabled": false,
+      "notes": "Found on first run: chenandkai.com does not resolve (www or bare). Verify the current store URL; disabled."
     },
     {
       "id": "fredericks-and-mae",
@@ -776,8 +776,8 @@
         "verified": false,
         "maxProducts": 400
       },
-      "enabled": true,
-      "notes": ""
+      "enabled": false,
+      "notes": "Found on first run: hasamiporcelain.com does not resolve (www or bare). Verify the current store URL; disabled."
     },
     {
       "id": "marimekko",

@@ -4,6 +4,7 @@
 // Auth today: Vercel cron (Authorization: Bearer CRON_SECRET) is trusted.
 // Anyone else is throttled to one successful run per brand per 30 minutes (failed runs can be retried). The password
 // middleware (Step 7) closes this to logged-in users only.
+import { waitUntil } from '@vercel/functions';
 import { makeContext, isCronRequest } from '../../search/context.js';
 import { ingestBrand } from '../../search/ingest.js';
 
@@ -81,5 +82,13 @@ async function batch(req, res) {
     ran.push({ brand: brand.id, ok: r.ok, strategy: r.strategy, found: r.productsFound, dims: r.withDimensions,
       firstError: r.errors.find((e) => e.stage !== 'embed')?.message || null, notes: r.notes.filter((n) => !n.includes('BLOB')) });
   }
-  return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran });
+  // ?chain=N keeps sweeping: each call fires the next one until nothing is queued (max 40 hops).
+  const chain = Number(req.query?.chain) || 0;
+  let next = null;
+  if (chain > 0 && chain <= 40 && ran.length > 0 && brands.length > ran.length) {
+    const host = req.headers['x-forwarded-host'] || req.headers.host;
+    next = `https://${host}/api/search/ingest?brand=batch&chain=${chain + 1}`;
+    waitUntil(fetch(next, { signal: AbortSignal.timeout(3_000) }).catch(() => {}));
+  }
+  return res.status(200).json({ ok: true, elapsedMs: Date.now() - started, queued: brands.length, ran, next });
 }

@@ -55,8 +55,10 @@ export async function ingestBrand(ctx, brandRow, { trigger = 'manual', deadline 
       if (Date.now() > deadline) break;
       try {
         log(`${brand.id}: trying ${strategy}`);
+        // Leave the tail of the budget for upserts and embeddings: 30% of what is left, at most 60 s.
+        const fetchDeadline = deadline - Math.min(60_000, Math.max(3_000, (deadline - Date.now()) * 0.3));
         const result = await ADAPTERS[strategy](http, brand, {
-          max: brand.max_products, deadline: deadline - 60_000, log,
+          max: brand.max_products, deadline: fetchDeadline, log,
         });
         stats.urlsAttempted += result.urlsAttempted || 0;
         if (result.truncated) notes.push(`${strategy}: stopped at time budget`);

@@ -32,7 +32,8 @@ export async function fetchJsonLd(http, brand, { max = 400, deadline = Infinity,
   return { products: raws, urlsAttempted: fetched, blocked, truncated: Date.now() > deadline };
 }
 
-const PRODUCT_PATH = /\/(products?|shop|item|p)\//i;
+const PRODUCT_PATH = /\/(products?|produkte|produits|shop|item|p|dp)\//i;
+const NOT_PRODUCT_PATH = /\/(collections?|categor(y|ies)|pages?|blogs?|journal|news|stories|press|about|contact|policies|account|cart|checkout|search|login|faq|help|support|careers|showrooms?|stores?|locations?|projects?|designers?|brands?|inspiration|lookbook|catalog(ue)?s?)(\/|$)|\.(pdf|jpg|png)$/i;
 
 export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
   const base = brand.url.replace(/\/+$/, '');
@@ -54,29 +55,41 @@ export async function discoverProductUrls(http, brand, { max = 400 } = {}) {
     }
   }
   let sitemapsRead = 0;
-  while (queue.length && productUrls.length < max && sitemapsRead < 30) {
+  const otherUrls = [];
+  while (queue.length && productUrls.length < max && sitemapsRead < 40) {
     const xml = queue.shift();
     sitemapsRead += 1;
     const locs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((m) => decodeXml(m[1]));
     const isIndex = /<sitemapindex/i.test(xml);
-    for (const loc of locs) {
-      if (isIndex) {
-        // Prefer child sitemaps that look product-related; still read others if nothing else.
-        if (/product|shop|catalog/i.test(loc) || locs.length <= 5) {
-          try {
-            queue.push(await http.text(loc, { retries: 0 }));
-          } catch {
-            // ignore broken child sitemap
-          }
+    if (isIndex) {
+      // Product-named child sitemaps first, then the rest (skipping obvious non-product ones).
+      const children = locs.filter((l) => !/blog|news|journal|page|collection|categor|image|video|stories|press/i.test(l));
+      const ranked = [...children.filter((l) => /product|shop|catalog|item/i.test(l)), ...children.filter((l) => !/product|shop|catalog|item/i.test(l))];
+      for (const loc of ranked.slice(0, 25)) {
+        try {
+          queue.push(await http.text(loc, { retries: 0 }));
+        } catch {
+          // ignore broken child sitemap
         }
-      } else if (PRODUCT_PATH.test(new URL(loc).pathname) && !seen.has(loc)) {
-        seen.add(loc);
+      }
+      continue;
+    }
+    for (const loc of locs) {
+      if (seen.has(loc)) continue;
+      let path;
+      try { path = new URL(loc).pathname; } catch { continue; }
+      if (NOT_PRODUCT_PATH.test(path)) continue;
+      seen.add(loc);
+      if (PRODUCT_PATH.test(path)) {
         productUrls.push(loc);
         if (productUrls.length >= max) break;
+      } else if (path.split('/').filter(Boolean).length >= 2) {
+        otherUrls.push(loc);
       }
     }
   }
-  return productUrls;
+  // No conventional /products/ paths: fall back to deeper URLs and let the JSON-LD parser decide.
+  return productUrls.length ? productUrls : otherUrls.slice(0, max);
 }
 
 async function sitemapsFromRobots(http, origin) {

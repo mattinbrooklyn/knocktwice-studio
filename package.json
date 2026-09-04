@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.1",
-    "@vercel/blob": "^2.8.0"
+    "@vercel/blob": "^2.8.0",
+    "@vercel/functions": "^3.9.5"
   },
   "devDependencies": {
     "pg": "^8.23.0"

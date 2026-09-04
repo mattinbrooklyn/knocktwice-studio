@@ -86,5 +86,18 @@ export async function summary(db) {
   const verified = await db.query(
     `SELECT id, platform, ingest_strategy FROM brands WHERE ingest_verified ORDER BY id`,
   );
-  return { brands, products, verifiedBrands: verified, recentRuns: runs };
+  const report = await db.query(
+    `SELECT b.id, b.enabled, b.ingest_verified AS verified, b.ingest_strategy AS strategy,
+            (SELECT count(*)::int FROM products p WHERE p.brand_id = b.id) AS products,
+            (SELECT count(*)::int FROM products p WHERE p.brand_id = b.id AND (p.width_cm IS NOT NULL OR p.height_cm IS NOT NULL OR p.diameter_cm IS NOT NULL)) AS with_dimensions,
+            (SELECT count(*)::int FROM products p WHERE p.brand_id = b.id AND p.embedding IS NOT NULL) AS embedded,
+            r.status AS last_status, r.started_at AS last_run,
+            (SELECT e->>'message' FROM jsonb_array_elements(r.errors) e WHERE e->>'stage' <> 'embed' LIMIT 1) AS last_error,
+            r.notes AS last_notes
+     FROM brands b
+     LEFT JOIN LATERAL (SELECT * FROM ingest_runs r WHERE r.brand_id = b.id ORDER BY started_at DESC LIMIT 1) r ON true
+     WHERE b.enabled OR r.id IS NOT NULL
+     ORDER BY b.tier, b.id`,
+  );
+  return { brands, products, verifiedBrands: verified, brandReport: report, recentRuns: runs };
 }
