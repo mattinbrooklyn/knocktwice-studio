@@ -10,8 +10,8 @@ import { ingestBrand } from '../../search/ingest.js';
 const THROTTLE_MINUTES = 30;
 const BUDGET_MS = 280_000;
 
-const BATCH_BUDGET_MS = 110_000;
-const BATCH_PER_BRAND_MS = 60_000;
+const BATCH_BUDGET_MS = 45_000;
+const BATCH_PER_BRAND_MS = 40_000;
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
