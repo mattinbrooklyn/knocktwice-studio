@@ -486,7 +486,7 @@
       return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 0 }).format(cents / 100);
     }
     function price(r) {
-      if (r.price_cents == null) return null;
+      if (r.price_cents == null || Number(r.price_cents) === 0) return null; // $0 is a swatch or a placeholder, not a price
       var from = r.price_max_cents != null && Number(r.price_max_cents) > Number(r.price_cents);
       return (from ? 'from ' : '') + money(Number(r.price_cents), r.currency);
     }

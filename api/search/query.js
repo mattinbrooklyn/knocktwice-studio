@@ -18,8 +18,8 @@ const MAX_QUERY_CHARS = 300;
 
 const SORTS = {
   relevance: 'c.score DESC, p.id',
-  price_asc: 'p.price_cents ASC NULLS LAST, c.score DESC, p.id',
-  price_desc: 'p.price_cents DESC NULLS LAST, c.score DESC, p.id',
+  price_asc: 'NULLIF(p.price_cents, 0) ASC NULLS LAST, c.score DESC, p.id',
+  price_desc: 'NULLIF(p.price_cents, 0) DESC NULLS LAST, c.score DESC, p.id',
   // "Size" reads width first (diameter stands in for round pieces), then height.
   size: 'COALESCE(p.width_cm, p.diameter_cm) ASC NULLS LAST, p.height_cm ASC NULLS LAST, c.score DESC, p.id',
 };
