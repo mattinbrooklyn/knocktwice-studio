@@ -2,7 +2,7 @@
 // Runs ingest for one brand and returns the run summary.
 //
 // Auth today: Vercel cron (Authorization: Bearer CRON_SECRET) is trusted.
-// Anyone else is throttled to one run per brand per 30 minutes. The password
+// Anyone else is throttled to one successful run per brand per 30 minutes (failed runs can be retried). The password
 // middleware (Step 7) closes this to logged-in users only.
 import { makeContext, isCronRequest } from '../../search/context.js';
 import { ingestBrand } from '../../search/ingest.js';
@@ -29,7 +29,8 @@ export default async function handler(req, res) {
 
   if (!trusted) {
     const [recent] = await db.query(
-      `SELECT id, started_at FROM ingest_runs WHERE brand_id = $1 AND started_at > now() - ($2 || ' minutes')::interval ORDER BY started_at DESC LIMIT 1`,
+      `SELECT id, started_at FROM ingest_runs WHERE brand_id = $1 AND status IN ('ok', 'running')
+         AND started_at > now() - ($2 || ' minutes')::interval ORDER BY started_at DESC LIMIT 1`,
       [brandId, String(THROTTLE_MINUTES)],
     );
     if (recent) {

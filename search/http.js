@@ -98,11 +98,12 @@ export function parseRobots(body) {
       current.closed = true;
     }
   }
-  const mine = groups.find((g) => g.agents.some((a) => a.includes(AGENT_TOKEN)));
-  const star = groups.find((g) => g.agents.includes('*'));
-  const group = mine || star;
-  if (!group) return [];
-  return group.disallow.map((rule) => {
+  // Merge every group that names the same agent (some files repeat "User-agent: *").
+  const mine = groups.filter((g) => g.agents.some((a) => a.includes(AGENT_TOKEN)));
+  const star = groups.filter((g) => g.agents.includes('*'));
+  const chosen = mine.length ? mine : star;
+  if (!chosen.length) return [];
+  return chosen.flatMap((g) => g.disallow).map((rule) => {
     const escaped = rule.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
     return new RegExp(`^${escaped.endsWith('\\$') ? escaped.slice(0, -2) + '$' : escaped}`);
   });

@@ -6,7 +6,7 @@
     {
       "id": "hay",
       "name": "Hay",
-      "url": "https://us.hay.com",
+      "url": "https://www.dwr.com/brands-hay",
       "hq": "Copenhagen",
       "tier": "core",
       "categories": [
@@ -15,14 +15,14 @@
         "decor",
         "tabletop"
       ],
-      "platform": "shopify",
+      "platform": "custom",
       "ingest": {
-        "strategy": "shopify",
+        "strategy": "custom",
         "verified": false,
         "maxProducts": 400
       },
-      "enabled": true,
-      "notes": ""
+      "enabled": false,
+      "notes": "US store (us.hay.com) now redirects to DWR. Hay products arrive through the design-within-reach ingest with vendor = HAY. Keep disabled."
     },
     {
       "id": "muuto",
@@ -128,7 +128,7 @@
     {
       "id": "dusen-dusen",
       "name": "Dusen Dusen",
-      "url": "https://dusendusen.com",
+      "url": "https://www.dusendusen.com",
       "hq": "Brooklyn",
       "tier": "core",
       "categories": [
@@ -285,12 +285,12 @@
       ],
       "platform": "unknown",
       "ingest": {
-        "strategy": "custom",
+        "strategy": "jsonld",
         "verified": false,
         "maxProducts": 400
       },
       "enabled": true,
-      "notes": "Anchor. Large catalog; cap by category."
+      "notes": "Anchor. Large catalog; cap by category. Sitemap via robots.txt. Carries Hay in the US."
     },
     {
       "id": "farrow-and-ball",

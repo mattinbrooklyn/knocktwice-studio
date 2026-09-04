@@ -22,7 +22,7 @@ rule is that a brand needs its own online store with product pages we can link t
 
 | # | Brand | HQ | Categories | Why it fits | Ingest |
 |---|---|---|---|---|---|
-| 1 | Hay | Copenhagen | Furniture, lighting, accessories | The center of gravity for the whole aesthetic: playful color, sculptural forms, honest materials, accessible-to-mid pricing. | Shopify (US store) |
+| 1 | Hay | Copenhagen | Furniture, lighting, accessories | The center of gravity for the whole aesthetic: playful color, sculptural forms, honest materials, accessible-to-mid pricing. Found on first run: us.hay.com now redirects to DWR, so Hay comes in through the DWR ingest tagged with maker HAY. | via DWR |
 | 2 | Muuto | Copenhagen | Furniture, lighting | Scandinavian with soft color and rounded silhouettes; the sensible neighbor to Hay. | JSON-LD / custom |
 | 3 | Ferm Living | Copenhagen | Furniture, textiles, decor, kids | Color-forward and material-honest across almost every category we spec. | Custom |
 | 4 | HKliving | Netherlands | Furniture, ceramics, lighting | Retro-sculptural shapes, lots of glazed ceramic and rattan; strong on side tables and vessels. | Custom |

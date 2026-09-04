@@ -38,6 +38,9 @@ test('parseRobots picks our group, else *', () => {
   assert.ok(rules[0].test('/cart'));
   assert.ok(rules[1].test('/account/orders'));
   assert.ok(!rules[0].test('/products/x'));
+  const merged = parseRobots('User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n\nUser-Agent: *\r\nDisallow: */cart\r\n');
+  assert.equal(merged.length, 1);
+  assert.ok(merged[0].test('/en/cart'));
   const mine = parseRobots('User-agent: *\nDisallow: /\n\nUser-agent: KnockTwiceSearch\nDisallow: /private\n');
   assert.equal(mine.length, 1);
   assert.ok(!mine[0].test('/products/x'));
