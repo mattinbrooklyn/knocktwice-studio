@@ -1,0 +1,18 @@
+{
+  "name": "knocktwice-studio",
+  "private": true,
+  "type": "module",
+  "description": "Knock Twice Studio site. Static HTML/CSS/JS plus serverless functions for the product search tool.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "check:search": "node search/check.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.1"
+  },
+  "devDependencies": {
+    "pg": "^8.23.0"
+  }
+}
