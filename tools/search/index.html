@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F7F2EC" media="(max-width: 768px)">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>Search — Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans&display=optional" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ── Product search (internal tool) ─────────────────────────────
+       Everything here layers on assets/styles.css. Variables only. */
+    html, body { overflow-x: hidden; overflow-y: auto; background: var(--color-bg); }
+
+    .page {
+      padding-bottom: var(--space-xl);
+      min-height: calc(100vh - var(--footer-height));
+    }
+
+    /* Head: kicker, title, search field. Held to the site's reading column. */
+    .search-head { max-width: var(--content-width); }
+    .search-kicker {
+      font-family: var(--font-ui);
+      font-size: var(--type-field);
+      font-weight: 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      color: var(--color-caramel);
+      margin-bottom: var(--space-xs);
+    }
+    .search-title {
+      font-family: var(--font-display);
+      font-size: var(--type-h1);
+      line-height: var(--leading-h1);
+      font-weight: 400;
+      color: var(--color-ink);
+    }
+    .search-form {
+      display: flex;
+      gap: 0.625rem;
+      margin-top: var(--space-sm);
+    }
+    .search-form .field { flex: 1; min-width: 0; }
+    .search-form .btn { flex: none; padding: 0 2.5rem; }
+
+    /* Filter row: pill controls, one step smaller than the search field. */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--chip-gap);
+      margin-top: var(--space-xs);
+    }
+    .control {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 2.5rem;
+      padding: 0 1rem;
+      border: 2px solid var(--color-ink);
+      border-radius: var(--radius-pill);
+      background: transparent;
+      color: var(--color-ink);
+      font-family: var(--font-ui);
+      font-size: var(--type-chip);
+      font-weight: 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      line-height: 1;
+    }
+    .control:focus { outline: none; border-color: var(--color-green); }
+    select.control {
+      padding-right: 2.25rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2332261F' stroke-width='2'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+    }
+    /* A filter that is doing something is highlighted, same yellow as the active nav state. */
+    .control.is-set { background-color: var(--color-yellow); font-weight: 700; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
+    .price-range { display: inline-flex; align-items: center; gap: 0.375rem; }
+    .price-range .control { width: 6.5rem; padding: 0 0.875rem; }
+    .price-range span {
+      font-family: var(--font-ui);
+      font-size: var(--type-chip);
+      color: var(--color-caramel);
+    }
+    input[type="number"].control::-webkit-outer-spin-button,
+    input[type="number"].control::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"].control { -moz-appearance: textfield; }
+    .toggle { position: relative; display: inline-flex; }
+    .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .toggle .control { display: inline-flex; align-items: center; }
+    .toggle input:checked + .control { background-color: var(--color-yellow); font-weight: 700; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
+    .toggle input:focus-visible + .control { border-color: var(--color-green); }
+    .filters .spacer { flex: 1; }
+    .sort-label {
+      font-family: var(--font-ui);
+      font-size: var(--type-chip);
+      color: var(--color-caramel);
+      margin-right: -0.25rem;
+    }
+
+    /* Results */
+    .results-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: var(--space-sm);
+      margin-top: var(--space-md);
+      font-family: var(--font-ui);
+      font-size: var(--type-field);
+      font-weight: 400;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;
+      color: var(--color-ink);
+      min-height: 1.5rem;
+    }
+    .results-meta em { font-style: normal; font-weight: 700; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700; }
+    .results-meta .timing { color: var(--color-caramel); white-space: nowrap; }
+    .notice {
+      font-family: var(--font-body);
+      font-size: var(--type-b2);
+      line-height: 1rem;
+      color: var(--color-caramel);
+      margin-top: 0.5rem;
+    }
+    .notice[hidden] { display: none; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+      column-gap: var(--grid-gutter);
+      row-gap: var(--space-md);
+      margin-top: var(--space-sm);
+      transition: opacity 160ms ease;
+    }
+    .grid.is-loading { opacity: 0.4; pointer-events: none; }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      color: var(--color-ink);
+      text-decoration: none;
+      min-width: 0;
+    }
+    .card-image {
+      aspect-ratio: 1 / 1;
+      background: var(--color-white);
+      border-radius: var(--radius-input);
+      overflow: hidden;
+      box-shadow: var(--shadow-stack);
+      margin-bottom: 0.375rem;
+    }
+    .card-image img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    .card:hover .card-image img { transform: scale(1.03); }
+    .card-image.is-empty {
+      background-image: url('/assets/interior-placeholder.png');
+      background-size: 87.68px 87.68px;
+      background-repeat: repeat;
+    }
+    .card-maker {
+      font-family: var(--font-ui);
+      font-size: var(--type-chip-mobile-stack);
+      line-height: var(--leading-chip-mobile-stack);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      color: var(--color-caramel);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .card-name {
+      font-family: var(--font-body);
+      font-size: var(--type-b3);
+      line-height: 1.3;
+      color: var(--color-ink);
+    }
+    .card-price {
+      font-family: var(--font-ui);
+      font-size: var(--type-field);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      color: var(--color-ink);
+    }
+    .card-price.is-missing { color: var(--color-khaki); font-weight: 400; font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400; }
+    .card-dims {
+      font-family: var(--font-body);
+      font-size: var(--type-b2);
+      line-height: 1rem;
+      color: var(--color-ink);
+    }
+    .card-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-top: 0.25rem;
+    }
+    /* Same recipe as the mobile project-stack tags: small, caramel, 2px stroke. */
+    .card-chips .card-tag {
+      min-height: 1.5rem;
+      padding: 0 0.5rem;
+      font-size: var(--type-chip-mobile-stack);
+      line-height: var(--leading-chip-mobile-stack);
+      font-weight: var(--wght-chip-mobile-stack);
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' var(--wght-chip-mobile-stack);
+      color: var(--color-caramel);
+      border-color: var(--color-caramel);
+    }
+    .card-chips .card-tag.is-color { color: var(--color-ink); border-color: var(--color-ink); }
+    .card-stock {
+      font-family: var(--font-ui);
+      font-size: var(--type-chip-mobile-stack);
+      line-height: var(--leading-chip-mobile-stack);
+      font-weight: 700;
+      font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;
+      margin-top: 0.125rem;
+    }
+    .card-stock.in { color: var(--color-green); }
+    .card-stock.out { color: var(--color-red); }
+
+    /* Empty / error / loading states share one block. */
+    .state {
+      padding: var(--space-lg) 0;
+      max-width: var(--content-width);
+    }
+    .state[hidden] { display: none; }
+    .state-title {
+      font-family: var(--font-display);
+      font-size: var(--type-h2);
+      line-height: var(--leading-h2);
+      font-weight: 400;
+      color: var(--color-ink);
+      margin-bottom: var(--space-xs);
+    }
+    .state-body {
+      font-family: var(--font-body);
+      font-size: var(--type-b1);
+      line-height: var(--leading-b1);
+      color: var(--color-ink);
+    }
+    .state.is-error .state-title { color: var(--color-red); }
+    .state .btn { margin-top: var(--space-sm); }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: var(--chip-gap);
+      margin-top: var(--space-lg);
+      font-family: var(--font-ui);
+      font-size: var(--type-chip);
+      color: var(--color-ink);
+    }
+    .pager[hidden] { display: none; }
+    .pager button.control:disabled { opacity: 0.35; }
+
+    /* ── Mobile ─────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .search-form { flex-direction: column; }
+      .search-form .btn { width: 100%; }
+      .filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        margin-right: calc(-1 * var(--grid-margin));
+        padding-right: var(--grid-margin);
+      }
+      .filters::-webkit-scrollbar { display: none; }
+      .filters .spacer { display: none; }
+      .control { flex: none; }
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: var(--grid-gutter-mobile);
+        row-gap: var(--space-sm);
+      }
+      .results-meta { flex-direction: column; gap: 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Logo and nav live outside #page-scaler so position:fixed works correctly -->
+  <a href="/home/" class="logo">
+      <svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display:block;" viewBox="0 0 51.7794 99.3243" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path class="logo-eye-sclera" d="M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#F7F2EC"/>
+        <circle id="logo-iris" cx="27.325" cy="19.055" r="6.127" fill="#32261F"/>
+        <path d="M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z" fill="#378CDA"/>
+      </svg>
+  </a>
+
+  <nav class="nav">
+    <a href="/about/">About</a>
+    <a href="/interiors/">Interiors</a>
+    <a href="/experiences/">Experiences</a>
+    <a href="/shop/">Shop</a>
+    <a href="/contact/">Contact</a>
+  </nav>
+
+  <button class="nav-mobile-trigger" id="nav-mobile-trigger" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-overlay">
+    <svg viewBox="0 0 34 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <line y1="1" x2="34" y2="1" stroke="currentColor" stroke-width="2"/><line y1="11" x2="34" y2="11" stroke="currentColor" stroke-width="2"/><line y1="21" x2="34" y2="21" stroke="currentColor" stroke-width="2"/>
+    </svg>
+  </button>
+
+  <nav class="nav-mobile-overlay" id="nav-mobile-overlay" aria-hidden="true">
+    <div class="nav-mobile-menu">
+      <button class="nav-mobile-close" type="button" aria-label="Close menu">
+        <svg viewBox="0 0 16.4142 16.4142" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M15.7071 0.707107L0.707107 15.7071" stroke="currentColor" stroke-width="2"/>
+          <path d="M0.707107 0.707107L15.7071 15.7071" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+      <a href="/about/">About</a>
+      <a href="/interiors/">Interiors</a>
+      <a href="/experiences/">Experiences</a>
+      <a href="/shop/">Shop</a>
+      <a href="/contact/">Contact</a>
+    </div>
+  </nav>
+
+  <div id="page-scaler">
+  <main class="page">
+
+    <header class="search-head">
+      <p class="search-kicker" id="kicker">Product search</p>
+      <h1 class="search-title">Find the piece.</h1>
+      <form class="search-form" id="search-form" role="search">
+        <input class="field" type="search" id="q" name="q" placeholder="Describe it. Small rounded terracotta side table." autocomplete="off" autofocus>
+        <button class="btn" type="submit">Search</button>
+      </form>
+    </header>
+
+    <div class="filters" id="filters">
+      <select class="control" id="brand" aria-label="Brand">
+        <option value="">All brands</option>
+      </select>
+      <select class="control" id="category" aria-label="Category">
+        <option value="">All categories</option>
+      </select>
+      <div class="price-range">
+        <input class="control" type="number" id="min" min="0" step="1" placeholder="$ min" aria-label="Minimum price">
+        <span>to</span>
+        <input class="control" type="number" id="max" min="0" step="1" placeholder="$ max" aria-label="Maximum price">
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="stock">
+        <span class="control">In stock</span>
+      </label>
+      <span class="spacer"></span>
+      <span class="sort-label">Sort</span>
+      <select class="control" id="sort" aria-label="Sort">
+        <option value="relevance">Relevance</option>
+        <option value="price_asc">Price, low to high</option>
+        <option value="price_desc">Price, high to low</option>
+        <option value="size">Size, small to large</option>
+      </select>
+    </div>
+
+    <div class="results-meta" id="results-meta"></div>
+    <p class="notice" id="notice" hidden></p>
+
+    <section class="state" id="state-idle">
+      <p class="state-title">Plain English works.</p>
+      <p class="state-body">Describe what the room needs and the index does the rest. Sizes come back in inches, prices as listed by the brand, and every card links to the source.</p>
+    </section>
+    <section class="state" id="state-empty" hidden>
+      <p class="state-title">Nothing matched.</p>
+      <p class="state-body">Try fewer words, or drop a filter.</p>
+    </section>
+    <section class="state is-error" id="state-error" hidden>
+      <p class="state-title">Search is not answering.</p>
+      <p class="state-body" id="error-body"></p>
+      <button class="btn" type="button" id="retry">Try again</button>
+    </section>
+
+    <div class="grid" id="grid"></div>
+
+    <nav class="pager" id="pager" hidden aria-label="Pages">
+      <button class="control" type="button" id="prev">Previous</button>
+      <span id="page-label"></span>
+      <button class="control" type="button" id="next">Next</button>
+    </nav>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-icons">
+      <a href="https://www.instagram.com/knocktwice.studio" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-instagram.svg" alt="Instagram"></a>
+      <a href="https://www.tiktok.com/@knocktwice.studio" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><img src="/assets/icon-tiktok.svg" alt="TikTok"></a>
+    </div>
+    <span class="footer-copyright">© 2026 Knock Twice Studio. All rights reserved.</span>
+  </footer>
+  </div><!-- /#page-scaler -->
+
+  <script src="/assets/scripts.js" defer></script>
+  <script>
+  (function () {
+    var API = '/api/search/query';
+    var $ = function (id) { return document.getElementById(id); };
+    var els = {
+      form: $('search-form'), q: $('q'), brand: $('brand'), category: $('category'), min: $('min'), max: $('max'),
+      stock: $('stock'), sort: $('sort'), meta: $('results-meta'), notice: $('notice'), grid: $('grid'),
+      idle: $('state-idle'), empty: $('state-empty'), error: $('state-error'), errorBody: $('error-body'), retry: $('retry'),
+      pager: $('pager'), prev: $('prev'), next: $('next'), pageLabel: $('page-label'), kicker: $('kicker')
+    };
+    var brandsById = {};
+    var state = readUrl();
+    var inflight = null;
+
+    // ── State <-> URL ─────────────────────────────────────────────
+    // The address bar is the single source of truth, so a search can be
+    // bookmarked or sent to Rodrigo and the back button works.
+    function readUrl() {
+      var p = new URLSearchParams(location.search);
+      return {
+        q: p.get('q') || '', brand: p.get('brand') || '', category: p.get('category') || '',
+        min: p.get('min') || '', max: p.get('max') || '', stock: p.get('stock') === '1',
+        sort: p.get('sort') || 'relevance', page: parseInt(p.get('page'), 10) || 1
+      };
+    }
+    function writeUrl() {
+      var p = new URLSearchParams();
+      if (state.q) p.set('q', state.q);
+      if (state.brand) p.set('brand', state.brand);
+      if (state.category) p.set('category', state.category);
+      if (state.min) p.set('min', state.min);
+      if (state.max) p.set('max', state.max);
+      if (state.stock) p.set('stock', '1');
+      if (state.sort !== 'relevance') p.set('sort', state.sort);
+      if (state.page > 1) p.set('page', String(state.page));
+      var qs = p.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+    }
+    function hasCriteria() {
+      return Boolean(state.q || state.brand || state.category || state.min || state.max || state.stock);
+    }
+    function syncControls() {
+      els.q.value = state.q;
+      els.brand.value = state.brand;
+      els.category.value = state.category;
+      els.min.value = state.min;
+      els.max.value = state.max;
+      els.stock.checked = state.stock;
+      els.sort.value = state.sort;
+      [els.brand, els.category, els.min, els.max].forEach(function (el) { el.classList.toggle('is-set', Boolean(el.value)); });
+    }
+    function readControls() {
+      state.q = els.q.value.trim();
+      state.brand = els.brand.value;
+      state.category = els.category.value;
+      state.min = els.min.value;
+      state.max = els.max.value;
+      state.stock = els.stock.checked;
+      state.sort = els.sort.value;
+    }
+
+    // ── Formatting ────────────────────────────────────────────────
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function inches(cm) {
+      var n = Number(cm);
+      if (!cm || !isFinite(n)) return null;
+      var v = Math.round((n / 2.54) * 10) / 10;
+      return String(v).replace(/\.0$/, '');
+    }
+    // Stored in cm, shown in inches: W × D × H, or Ø × H for round pieces.
+    function dims(r) {
+      var parts = [];
+      var w = inches(r.width_cm), d = inches(r.depth_cm), h = inches(r.height_cm), dia = inches(r.diameter_cm);
+      if (w) parts.push('W ' + w);
+      if (d) parts.push('D ' + d);
+      if (dia && !w) parts.push('Ø ' + dia);
+      if (h) parts.push('H ' + h);
+      return parts.length ? parts.join(' × ') + ' in' : null;
+    }
+    function money(cents, currency) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency || 'USD', maximumFractionDigits: 0 }).format(cents / 100);
+    }
+    function price(r) {
+      if (r.price_cents == null) return null;
+      var from = r.price_max_cents != null && Number(r.price_max_cents) > Number(r.price_cents);
+      return (from ? 'from ' : '') + money(Number(r.price_cents), r.currency);
+    }
+    // A few feeds store relative links; resolve them against the brand's own site.
+    function absolute(url, brandId) {
+      var b = brandsById[brandId];
+      try { return new URL(url, b ? b.url : location.href).href; } catch (e) { return url; }
+    }
+    function number(n) { return new Intl.NumberFormat('en-US').format(n); }
+
+    // ── Rendering ─────────────────────────────────────────────────
+    function card(r) {
+      var maker = r.vendor && r.vendor.toLowerCase() !== r.brand_name.toLowerCase() ? r.vendor + ' · ' + r.brand_name : r.brand_name;
+      var p = price(r);
+      var size = dims(r);
+      var chips = (r.materials || []).slice(0, 3).map(function (m) { return '<span class="card-tag">' + esc(m) + '</span>'; })
+        .concat((r.colors || []).slice(0, 3).map(function (c) { return '<span class="card-tag is-color">' + esc(c) + '</span>'; }));
+      var stock = r.in_stock === true ? '<span class="card-stock in">In stock</span>' : r.in_stock === false ? '<span class="card-stock out">Sold out</span>' : '';
+      var img = r.image_url
+        ? '<div class="card-image"><img src="' + esc(absolute(r.image_url, r.brand_id)) + '" alt="" loading="lazy" referrerpolicy="no-referrer"></div>'
+        : '<div class="card-image is-empty"></div>';
+      return '<a class="card" href="' + esc(absolute(r.source_url, r.brand_id)) + '" target="_blank" rel="noopener noreferrer">' +
+        img +
+        '<span class="card-maker">' + esc(maker) + '</span>' +
+        '<span class="card-name">' + esc(r.name) + '</span>' +
+        (p ? '<span class="card-price">' + esc(p) + '</span>' : '<span class="card-price is-missing">Price not listed</span>') +
+        (size ? '<span class="card-dims">' + esc(size) + '</span>' : '') +
+        (chips.length ? '<span class="card-chips">' + chips.join('') + '</span>' : '') +
+        stock +
+        '</a>';
+    }
+
+    function show(which) {
+      els.idle.hidden = which !== 'idle';
+      els.empty.hidden = which !== 'empty';
+      els.error.hidden = which !== 'error';
+    }
+
+    function render(data) {
+      els.grid.innerHTML = data.results.map(card).join('');
+      var what = data.q ? ' for <em>' + esc(data.q) + '</em>' : '';
+      els.meta.innerHTML = '<span><em>' + number(data.total) + '</em> ' + (data.total === 1 ? 'result' : 'results') + what + '</span>' +
+        '<span class="timing">' + (data.elapsedMs / 1000).toFixed(1) + 's</span>';
+      if (data.mode === 'fulltext') {
+        els.notice.textContent = 'Meaning-based ranking is offline right now (' + (data.fallbackReason || 'embedding failed') + '). Showing keyword matches only.';
+        els.notice.hidden = false;
+      } else {
+        els.notice.hidden = true;
+      }
+      show(data.total === 0 ? 'empty' : null);
+      els.pager.hidden = data.pages <= 1;
+      els.pageLabel.textContent = 'Page ' + data.page + ' of ' + data.pages;
+      els.prev.disabled = data.page <= 1;
+      els.next.disabled = data.page >= data.pages;
+    }
+
+    // ── Fetching ──────────────────────────────────────────────────
+    function search() {
+      writeUrl();
+      syncControls();
+      if (!hasCriteria()) {
+        els.grid.innerHTML = '';
+        els.meta.innerHTML = '';
+        els.notice.hidden = true;
+        els.pager.hidden = true;
+        show('idle');
+        return;
+      }
+      if (inflight) inflight.abort();
+      inflight = new AbortController();
+      els.grid.classList.add('is-loading');
+      els.meta.innerHTML = '<span>Searching…</span>';
+      show(null);
+
+      var p = new URLSearchParams();
+      if (state.q) p.set('q', state.q);
+      if (state.brand) p.set('brand', state.brand);
+      if (state.category) p.set('category', state.category);
+      if (state.min) p.set('min', state.min);
+      if (state.max) p.set('max', state.max);
+      if (state.stock) p.set('stock', '1');
+      p.set('sort', state.sort);
+      p.set('page', String(state.page));
+
+      fetch(API + '?' + p.toString(), { signal: inflight.signal, credentials: 'same-origin' })
+        .then(function (res) {
+          if (res.status === 401) { location.reload(); return null; }
+          return res.json().then(function (body) {
+            if (!res.ok || !body.ok) throw new Error(body.error || ('HTTP ' + res.status));
+            return body;
+          });
+        })
+        .then(function (body) {
+          if (!body) return;
+          render(body);
+          window.scrollTo({ top: state.page > 1 ? els.meta.offsetTop - 24 : window.scrollY });
+        })
+        .catch(function (err) {
+          if (err.name === 'AbortError') return;
+          els.grid.innerHTML = '';
+          els.meta.innerHTML = '';
+          els.pager.hidden = true;
+          els.errorBody.textContent = err.message;
+          show('error');
+        })
+        .then(function () { els.grid.classList.remove('is-loading'); });
+    }
+
+    function loadMeta() {
+      return fetch(API + '?meta=1', { credentials: 'same-origin' })
+        .then(function (res) { return res.json(); })
+        .then(function (m) {
+          if (!m.ok) throw new Error(m.error || 'meta failed');
+          var indexed = 0, brandCount = 0;
+          m.brands.forEach(function (b) {
+            brandsById[b.id] = b;
+            if (b.products > 0) {
+              brandCount += 1;
+              indexed += b.products;
+              var o = document.createElement('option');
+              o.value = b.id;
+              o.textContent = b.name;
+              els.brand.appendChild(o);
+            }
+          });
+          m.categories.forEach(function (c) {
+            var o = document.createElement('option');
+            o.value = c.id;
+            o.textContent = c.id.replace('-', ' ');
+            els.category.appendChild(o);
+          });
+          els.kicker.textContent = 'Product search · ' + number(indexed) + ' products · ' + brandCount + ' brands';
+        })
+        .catch(function (err) { console.error('meta', err); });
+    }
+
+    // ── Events ────────────────────────────────────────────────────
+    els.form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      readControls();
+      state.page = 1;
+      search();
+    });
+    [els.brand, els.category, els.stock, els.sort].forEach(function (el) {
+      el.addEventListener('change', function () { readControls(); state.page = 1; search(); });
+    });
+    [els.min, els.max].forEach(function (el) {
+      el.addEventListener('change', function () { readControls(); state.page = 1; search(); });
+    });
+    els.prev.addEventListener('click', function () { state.page = Math.max(1, state.page - 1); search(); });
+    els.next.addEventListener('click', function () { state.page += 1; search(); });
+    els.retry.addEventListener('click', search);
+    window.addEventListener('popstate', function () { state = readUrl(); search(); });
+
+    // Brand and category options must exist before the URL state can select them.
+    syncControls();
+    loadMeta().then(search);
+  }());
+  </script>
+</body>
+</html>
