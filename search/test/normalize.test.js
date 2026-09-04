@@ -37,6 +37,13 @@ test('parseDimensions: millimetres convert', () => {
   assert.equal(d.width_cm, 45); assert.equal(d.height_cm, 50);
 });
 
+test('parseDimensions: absurd values are dropped', () => {
+  const d = parseDimensions('Model H 20000000 cm. Also W 3 cm');
+  assert.equal(d.height_cm, null); assert.equal(d.width_cm, 3);
+  const e = parseDimensions('Call 212 555 0100 x 3 x 4 in');
+  assert.ok(e.width_cm == null || e.width_cm <= 1500);
+});
+
 test('parseDimensions: nothing', () => {
   const d = parseDimensions('A lovely chair in 3 colours, ships in 2 weeks.');
   assert.equal(d.width_cm, null); assert.equal(d.raw, null);

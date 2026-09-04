@@ -138,7 +138,13 @@ export function parseDimensions(text) {
     }
   }
 
-  return { ...out, ...found, raw: raw ? raw.trim().slice(0, 120) : null };
+  // Sanity: nothing we index is smaller than 1 mm or larger than 15 m. Anything
+  // outside that is a SKU, a phone number, or a parse mistake, not a dimension.
+  for (const key of ['width_cm', 'depth_cm', 'height_cm', 'diameter_cm']) {
+    if (found[key] != null && !(found[key] >= 0.1 && found[key] <= 1500)) found[key] = null;
+  }
+  const any = ['width_cm', 'depth_cm', 'height_cm', 'diameter_cm'].some((k) => found[k] != null);
+  return { ...out, ...found, raw: any && raw ? raw.trim().slice(0, 120) : null };
 }
 
 function inferUnit(text) {
