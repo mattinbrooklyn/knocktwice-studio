@@ -42,6 +42,9 @@ export default async function handler(req, res) {
       contentType: r.headers.get('content-type'), server: r.headers.get('server'), length: body.length,
       locCount: locs.length, locSample: locs.slice(0, 8),
       jsonLd: (body.match(/application\/ld\+json/g) || []).length,
+      productLinks: [...new Set([...body.matchAll(/href=["']([^"']*\/products\/[^"'?#]+)/g)].map((m) => m[1]))].slice(0, 10),
+      productLinkCount: new Set([...body.matchAll(/href=["']([^"']*\/products\/[^"'?#]+)/g)].map((m) => m[1])).size,
+      generator: (body.match(/<meta[^>]+name=["']generator["'][^>]+content=["']([^"']+)/i) || [])[1] || null,
       bodyStart: body.slice(0, Math.min(20000, Number(req.query?.bytes) || 600)),
     });
   } catch (err) {
