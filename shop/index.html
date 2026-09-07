@@ -232,27 +232,19 @@
       }
 
       .shop-card-title {
-        font-family: var(--font-ui);
-        font-size: 0.9375rem;
-        line-height: 0.92;
+        font-family: var(--font-body);
+        font-size: var(--type-b2);
+        line-height: 1.4167; /* Figma: 17px on 12px (B1|B3) */
         font-weight: 400;
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 400;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
       .shop-card-price {
-        font-family: var(--font-ui);
-        font-size: 0.9375rem;
-        line-height: 0.95;
+        font-family: var(--font-body);
+        font-size: var(--type-b2);
+        line-height: 1.4167; /* Figma: 17px on 12px (B1|B3) */
         font-weight: 700;
-        font-variation-settings:
-          "ELGR" 1,
-          "ELSH" 2,
-          "wght" 700;
         align-self: end;
       }
 
@@ -290,21 +282,6 @@
       .shop-card-add::after {
         width: 0.125rem;
         height: 0.625rem;
-      }
-
-      .shop-trolley {
-        position: absolute;
-        right: -120px;
-        top: -30px;
-        width: 15rem;
-        z-index: 4;
-        pointer-events: none;
-      }
-
-      .shop-trolley img {
-        display: block;
-        width: 100%;
-        height: auto;
       }
 
       /* ── Monster footer wave ───────────────────────────────────────
@@ -414,20 +391,16 @@
           line-height: 0.86;
         }
         .shop-grid {
-          grid-template-columns: 1fr;
+          /* Full-bleed: cancel the page side padding so tiles run edge to edge */
+          margin-inline: calc(-1 * var(--content-left));
+          border-inline: none;
         }
         .shop-card {
-          min-height: 14.25rem;
-          border-right: none;
-        }
-        .shop-card:nth-last-child(-n + 2) {
-          border-bottom: 2px solid var(--color-ink);
-        }
-        .shop-card:last-child {
-          border-bottom: none;
+          min-height: 0;
         }
         .shop-card-media {
-          min-height: 35rem;
+          min-height: 0;
+          aspect-ratio: 223 / 221; /* Figma: ProductImage 223x221 */
           background-size: 3.5rem 3.5rem;
           background-position:
             0 0,
@@ -442,26 +415,21 @@
           font-size: 2rem;
         }
         .shop-card-meta {
-          min-height: 3.25rem;
-          padding: 0.5rem 0.75rem 0.625rem;
+          /* Figma Shop_OnLanding: name over price, 13/20/10 padding, 64px tall */
+          grid-template-columns: 1fr;
+          gap: 0;
+          align-items: start;
+          align-content: start;
+          min-height: 4rem;
+          padding: 0.8125rem var(--content-left) 0.625rem;
         }
         .shop-card-nav,
         .shop-card-add {
           /* display: flex; */
         }
-        .shop-card-title {
-          font-size: 1.3125rem;
-        }
         .shop-card-price {
-          margin-top: 0.1875rem;
-          font-size: 1.125rem;
+          margin-top: 0.125rem; /* Figma: 2px between name and price */
           align-self: auto;
-        }
-        .shop-trolley {
-          right: 0.25rem;
-          bottom: -4.875rem;
-          top: auto;
-          width: 11rem;
         }
         /* Lift wave + blue a touch vs idle (-60vh): client devices / Safari chrome vary fold position */
         #monster-group.wave-risen {
@@ -663,10 +631,6 @@
             role="status"
             aria-live="polite"
           ></p>
-
-          <div class="shop-trolley" aria-hidden="true">
-            <img src="/assets/shopingcart.png" alt="" />
-          </div>
         </section>
       </div>
       <!-- /page -->
