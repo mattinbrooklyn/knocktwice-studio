@@ -56,8 +56,9 @@ body::-webkit-scrollbar { display: none; }
 }
 .policy a:hover { text-decoration: underline; }
 
-.policy-updated {
+.policy .policy-updated {
   margin-top: 3.75rem;                  /* Figma: 60px above "Last Updated" */
+  margin-bottom: 0;
   font-style: italic;
 }
 
@@ -135,13 +136,21 @@ body::-webkit-scrollbar { display: none; }
   overflow: visible;
 }
 
-/* ── Mobile (<=768px) ──────────────────────────── */
+/* ── Mobile (<=768px) ──────────────────────────────
+   Figma: Updates_08-21-26_Mobile → FooterLink_PrivacyPolicy (440 wide) */
 @media (max-width: 768px) {
   .page {
     padding-right: var(--content-left);
-    padding-bottom: calc(var(--wave-height-mobile) + var(--space-xl));
+    /* Figma: 60px above monster (+2px: the wave overlaps the footer by 2px) */
+    padding-bottom: calc(var(--wave-height-mobile) + 3.875rem);
   }
   .policy-page .h1 {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.25rem;             /* Figma: H1 bottom 189 → body 209 */
+  }
+  .policy .h2 {
+    margin-top: 1.25rem;                /* Figma: 20px between sections */
+  }
+  .policy .policy-updated {
+    margin-top: 2.5rem;                 /* Figma: 40px above "Last Updated" */
   }
 }
