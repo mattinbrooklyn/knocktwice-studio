@@ -92,4 +92,15 @@
     }, 2000 + Math.random() * 5000);
   }
   scheduleFooterMonsterBlink();
+
+  // ── FAQ accordion: only one open at a time ─────────────────────
+  var faqs = document.querySelectorAll('details.faq');
+  faqs.forEach(function (faq) {
+    faq.addEventListener('toggle', function () {
+      if (!faq.open) return;
+      faqs.forEach(function (other) {
+        if (other !== faq) other.open = false;
+      });
+    });
+  });
 })();
