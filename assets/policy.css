@@ -31,7 +31,7 @@ body::-webkit-scrollbar { display: none; }
 .policy {
   width: var(--content-width);
   font-family: var(--font-body);
-  font-size: var(--type-b1);
+  font-size: 1rem;                      /* 16px — smaller than --type-b1 (18px) for long policy copy */
   line-height: var(--leading-b1);
   font-weight: 400;
   color: var(--color-ink);
