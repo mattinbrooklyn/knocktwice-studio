@@ -28,13 +28,13 @@ This folder is its own Vercel project, separate from the main site.
 
 1. Vercel dashboard → Add New → Project → import this repo.
 2. Set **Root Directory** to `tools/ortho`.
-3. Add two environment variables:
-   - `ANTHROPIC_API_KEY` — from console.anthropic.com
-   - `ORTHO_PASSWORD` — any shared phrase; you and your partner type it once
-4. Deploy. Share the URL and the password.
+3. Add one environment variable: `ANTHROPIC_API_KEY`, from console.anthropic.com.
+4. Deploy. Share the URL.
 
-The password gates `/api/extract`, so nobody can spend the API key. The page
-itself is harmless static HTML and carries `noindex`.
+The page is unlisted and carries `noindex, nofollow, noarchive`, so it will not
+turn up in search. Be aware that unlisted is obscurity, not access control:
+anyone who has the link can spend the API key. Set a monthly spend cap on that
+key in the Anthropic console and the downside is bounded.
 
 ## Running the renderer without the web app
 

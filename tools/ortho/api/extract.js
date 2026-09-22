@@ -120,9 +120,6 @@ const MODEL = 'claude-opus-5';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-  const gate = process.env.ORTHO_PASSWORD;
-  if (!gate) return res.status(500).json({ error: 'ORTHO_PASSWORD is not set on the server.' });
-  if ((req.body?.password || '') !== gate) return res.status(401).json({ error: 'Wrong password.' });
   if (!process.env.ANTHROPIC_API_KEY) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not set on the server.' });
   }
