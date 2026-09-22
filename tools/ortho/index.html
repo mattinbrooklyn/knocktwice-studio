@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Ortho — furniture drawings for floorplans</title>
+<style>
+  :root {
+    --ink: #111;
+    --muted: #6b6b6b;
+    --rule: #dcdcd6;
+    --bg: #f5f4f0;
+    --panel: #fff;
+    --accent: #1a3fb8;
+    --warn: #8a3b12;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  header {
+    padding: 28px 24px 20px; border-bottom: 1px solid var(--rule); background: var(--panel);
+  }
+  h1 { margin: 0; font-size: 19px; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+  header p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+  main { max-width: 1120px; margin: 0 auto; padding: 24px; }
+  section { background: var(--panel); border: 1px solid var(--rule); padding: 20px; margin-bottom: 18px; }
+  h2 {
+    margin: 0 0 14px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  input[type=text], input[type=password], textarea {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--rule); background: #fff;
+    font: inherit; font-size: 14px; border-radius: 2px;
+  }
+  textarea { min-height: 130px; resize: vertical; font-size: 13px; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+  .row > div { flex: 1 1 260px; }
+  button {
+    font: inherit; font-size: 14px; padding: 9px 18px; border: 1px solid var(--ink);
+    background: var(--ink); color: #fff; cursor: pointer; border-radius: 2px;
+  }
+  button.ghost { background: #fff; color: var(--ink); }
+  button:disabled { opacity: .45; cursor: default; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .msg { padding: 11px 13px; border-left: 3px solid var(--warn); background: #fdf6f1; font-size: 13px; margin-top: 14px; }
+  .msg.ok { border-left-color: #2a6b35; background: #f2f8f3; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 5px 7px 5px 0; }
+  th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td input { padding: 5px 7px; font-size: 13px; }
+  td input.num { width: 72px; }
+  .hidden { display: none; }
+  #preview { background: #fff; border: 1px solid var(--rule); padding: 12px; overflow: auto; }
+  #preview svg { width: 100%; height: auto; display: block; }
+  .downloads { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .assume { font-size: 12.5px; color: var(--muted); margin: 0; padding-left: 18px; }
+  .scale { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ortho</h1>
+  <p>Product page in, measured orthographic drawings out. <span class="scale">1cm = 1 inch</span></p>
+</header>
+
+<main>
+
+<section id="gate">
+  <h2>Password</h2>
+  <div class="row">
+    <div><input type="password" id="password" placeholder="Shared password" autocomplete="current-password"></div>
+    <button id="unlock">Unlock</button>
+  </div>
+  <p class="hint">Kept in this browser so you only type it once.</p>
+</section>
+
+<div id="app" class="hidden">
+
+  <section>
+    <h2>Source</h2>
+    <div class="row">
+      <div>
+        <label for="url">Product URL</label>
+        <input type="text" id="url" placeholder="https://www.cb2.com/...">
+      </div>
+      <button id="go">Read page</button>
+    </div>
+    <p class="hint">
+      Most large retailers block automated requests. If this one does, open the page in your
+      browser, select all, copy, and paste it below — that always works.
+    </p>
+    <div style="margin-top:14px">
+      <label for="pageText">Or paste the page text</label>
+      <textarea id="pageText" placeholder="Cmd-A then Cmd-C on the product page, then paste here."></textarea>
+    </div>
+    <div id="status"></div>
+  </section>
+
+  <section id="editor" class="hidden">
+    <h2>Dimensions — correct anything wrong before generating</h2>
+    <div class="row">
+      <div><label for="name">Name</label><input type="text" id="name"></div>
+      <div><label for="sku">SKU</label><input type="text" id="sku"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div><label for="ovW">Overall width (in)</label><input type="text" class="num" id="ovW"></div>
+      <div><label for="ovD">Overall depth (in)</label><input type="text" class="num" id="ovD"></div>
+      <div><label for="ovH">Overall height (in)</label><input type="text" class="num" id="ovH"></div>
+    </div>
+
+    <h2 style="margin-top:22px">Blocks</h2>
+    <table id="boxes">
+      <thead><tr>
+        <th>Label</th><th>X from left</th><th>Y from back</th><th>Z from floor</th>
+        <th>Width</th><th>Depth</th><th>Height</th><th></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="ghost" id="addBox" style="margin-top:10px">Add a block</button>
+
+    <div id="assumptions"></div>
+
+    <div class="row" style="margin-top:18px">
+      <button id="draw">Generate drawings</button>
+    </div>
+  </section>
+
+  <section id="output" class="hidden">
+    <h2>Drawings</h2>
+    <div id="preview"></div>
+    <div class="downloads" id="downloads"></div>
+    <p class="hint">
+      Sized so one inch of furniture arrives as one centimetre. Place at 100% in Illustrator —
+      do not rescale.
+    </p>
+  </section>
+
+</div>
+</main>
+
+<script type="module">
+import { renderSheet, renderSingle, VIEW_NAMES } from './ortho.js';
+
+const $ = id => document.getElementById(id);
+const store = {
+  get pw() { try { return localStorage.getItem('ortho-pw') || ''; } catch { return ''; } },
+  set pw(v) { try { localStorage.setItem('ortho-pw', v); } catch {} },
+};
+
+let spec = null;
+
+/* ---- gate ---- */
+function unlock() {
+  const v = $('password').value.trim();
+  if (!v) return;
+  store.pw = v;
+  $('gate').classList.add('hidden');
+  $('app').classList.remove('hidden');
+}
+$('unlock').addEventListener('click', unlock);
+$('password').addEventListener('keydown', e => { if (e.key === 'Enter') unlock(); });
+if (store.pw) { $('password').value = store.pw; unlock(); }
+
+/* ---- status ---- */
+function say(text, ok = false) {
+  $('status').innerHTML = text ? `<div class="msg${ok ? ' ok' : ''}">${text}</div>` : '';
+}
+
+/* ---- extraction ---- */
+$('go').addEventListener('click', async () => {
+  const url = $('url').value.trim();
+  const pageText = $('pageText').value.trim();
+  if (!url && !pageText) return say('Give me a URL, or paste the page text.');
+
+  $('go').disabled = true;
+  say('Reading the page…', true);
+  try {
+    const r = await fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url, pageText, password: store.pw }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      say(data.error || 'Something went wrong.');
+      if (data.blocked) $('pageText').focus();
+      return;
+    }
+    spec = data.spec;
+    fill(spec);
+    say(`Read it — geometry is <strong>${spec.confidence}</strong>. Check the numbers below.`, true);
+    $('editor').classList.remove('hidden');
+  } catch (e) {
+    say(`Request failed: ${e.message}`);
+  } finally {
+    $('go').disabled = false;
+  }
+});
+
+/* ---- editable table ---- */
+function boxRow(b = { label: '', x: 0, y: 0, z: 0, w: 0, d: 0, h: 0 }) {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" data-k="label" value="${b.label ?? ''}"></td>
+    ${['x', 'y', 'z', 'w', 'd', 'h'].map(k =>
+      `<td><input type="text" class="num" data-k="${k}" value="${b[k] ?? 0}"></td>`).join('')}
+    <td><button class="ghost" data-drop="1">Remove</button></td>`;
+  tr.querySelector('[data-drop]').addEventListener('click', () => tr.remove());
+  return tr;
+}
+
+function fill(s) {
+  $('name').value = s.meta?.name || '';
+  $('sku').value = s.meta?.sku || '';
+  $('ovW').value = s.overall.width;
+  $('ovD').value = s.overall.depth;
+  $('ovH').value = s.overall.height;
+
+  const body = $('boxes').querySelector('tbody');
+  body.innerHTML = '';
+  for (const b of s.boxes) body.appendChild(boxRow(b));
+
+  const list = s.meta?.assumptions || [];
+  $('assumptions').innerHTML = list.length
+    ? `<div class="msg"><strong>Assumed, not published — verify these:</strong>
+       <ul class="assume">${list.map(a => `<li>${a}</li>`).join('')}</ul></div>`
+    : '';
+}
+
+$('addBox').addEventListener('click', () =>
+  $('boxes').querySelector('tbody').appendChild(boxRow()));
+
+/* Read the table back, so what gets drawn is what is on screen. */
+function collect() {
+  const boxes = [...$('boxes').querySelectorAll('tbody tr')].map(tr => {
+    const out = {};
+    for (const input of tr.querySelectorAll('input')) {
+      const k = input.dataset.k;
+      out[k] = k === 'label' ? input.value.trim() : parseFloat(input.value) || 0;
+    }
+    return out;
+  }).filter(b => b.w > 0 && b.d > 0 && b.h > 0);
+
+  return {
+    ...spec,
+    meta: { ...spec.meta, name: $('name').value.trim(), sku: $('sku').value.trim() },
+    overall: {
+      width: parseFloat($('ovW').value) || 0,
+      depth: parseFloat($('ovD').value) || 0,
+      height: parseFloat($('ovH').value) || 0,
+    },
+    boxes,
+  };
+}
+
+/* ---- drawing ---- */
+function download(name, svg) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+$('draw').addEventListener('click', () => {
+  const s = collect();
+  if (!s.boxes.length) return say('Every block needs a width, depth and height.');
+
+  const stem = (s.meta.name || 'drawing').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48);
+
+  const sheet = renderSheet(s);
+  // Show it fit to the panel; the file keeps its real centimetre size.
+  $('preview').innerHTML = sheet.replace(/width="[\d.]+cm" height="[\d.]+cm"/, 'width="100%"');
+
+  const files = [[`${stem}-sheet.svg`, sheet],
+                 ...VIEW_NAMES.map(v => [`${stem}-${v}.svg`, renderSingle(s, v)])];
+
+  $('downloads').innerHTML = '';
+  for (const [name, svg] of files) {
+    const b = document.createElement('button');
+    b.className = 'ghost';
+    b.textContent = name.replace(`${stem}-`, '').replace('.svg', '');
+    b.addEventListener('click', () => download(name, svg));
+    $('downloads').appendChild(b);
+  }
+  const all = document.createElement('button');
+  all.textContent = 'Download all';
+  all.addEventListener('click', () => files.forEach(([n, s2], i) => setTimeout(() => download(n, s2), i * 250)));
+  $('downloads').appendChild(all);
+
+  $('output').classList.remove('hidden');
+  $('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+</script>
+</body>
+</html>

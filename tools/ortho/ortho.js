@@ -371,8 +371,13 @@ function titleBlock(spec, width) {
   const mods = spec.boxes.filter(b => b.label)
     .map(b => `${b.label.toLowerCase()} ${+b.w}x${+b.d}${b.h !== o.height ? `x${+b.h}H` : ''}`);
   if (mods.length > 1) rows.push(`Modules: ${mods.join(', ')}.`);
-  for (const [k, v] of Object.entries(spec.details || {})) {
-    rows.push(`${k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}: ${v}.`);
+  // Details arrive as a list from the extractor and as an object from hand-
+  // written specs; both are worth printing, so accept either.
+  const details = Array.isArray(spec.details)
+    ? spec.details.map(d => [d.label, d.value])
+    : Object.entries(spec.details || {});
+  for (const [k, v] of details) {
+    rows.push(`${String(k).replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase())}: ${v}.`);
   }
 
   const out = [];

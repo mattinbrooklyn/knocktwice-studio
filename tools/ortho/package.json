@@ -2,5 +2,8 @@
   "name": "ortho",
   "private": true,
   "type": "module",
-  "description": "Orthographic furniture drawings for Illustrator floorplans at 1cm = 1 inch."
+  "description": "Orthographic furniture drawings for Illustrator floorplans at 1cm = 1 inch.",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0"
+  }
 }
