@@ -784,9 +784,49 @@
   var sheetUrl = 'https://script.google.com/macros/s/AKfycbyIKQkkXpe8kO5tsrhDdunKesfhD-xJGHTBSN1FhOC_Z-veuRK8fxkEbzX4_cbhmtZm/exec';
   var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  // Success state lives here, not in each page's markup, so the copy has a
+  // single source across every footer on the site.
+  function buildSuccessPanel() {
+    var panel = document.createElement('div');
+    panel.className = 'footer-newsletter-success';
+
+    var heading = document.createElement('p');
+    heading.className = 'footer-newsletter-success-heading';
+    heading.textContent = "YAY, YOU'RE OFFICIALLY A KNOCKER! 💖";
+
+    var body = document.createElement('p');
+    body.className = 'footer-newsletter-success-body';
+    body.textContent = "We'll be knocking at your door (email) sometime soon! As promised, we'll never get offended if you decide to unsubscribe.";
+
+    var again = document.createElement('p');
+    again.className = 'footer-newsletter-success-body';
+    again.appendChild(document.createTextNode('Used the wrong email or want to sign up with a different email, click '));
+    var reset = document.createElement('button');
+    reset.type = 'button';
+    reset.className = 'footer-newsletter-reset';
+    reset.textContent = 'here';
+    again.appendChild(reset);
+    again.appendChild(document.createTextNode('.'));
+
+    panel.appendChild(heading);
+    panel.appendChild(body);
+    panel.appendChild(again);
+    return { panel: panel, reset: reset };
+  }
+
   forms.forEach(function (form) {
     var input = form.querySelector('.footer-newsletter-input');
     if (!input) return;
+
+    var built = buildSuccessPanel();
+    form.appendChild(built.panel);
+
+    // "here" puts the form back to its default state for a second address
+    built.reset.addEventListener('click', function () {
+      form.classList.remove('is-success');
+      input.value = '';
+      input.focus();
+    });
 
     input.addEventListener('input', function () {
       form.classList.remove('is-error');
