@@ -248,6 +248,39 @@
         align-self: end;
       }
 
+      /* Hover (and tap on touch): the name/price strip turns blue.
+         Figma: Shop_TileHoverState — #378CDA bar, #F7F2EC text. */
+      .shop-card-meta,
+      .shop-card-title,
+      .shop-card-price {
+        transition:
+          background-color 0.18s ease,
+          color 0.18s ease;
+      }
+
+      .shop-card-link:active .shop-card-meta,
+      .shop-card-link:focus-visible .shop-card-meta {
+        background: var(--color-blue);
+      }
+
+      .shop-card-link:active .shop-card-title,
+      .shop-card-link:active .shop-card-price,
+      .shop-card-link:focus-visible .shop-card-title,
+      .shop-card-link:focus-visible .shop-card-price {
+        color: var(--color-bg);
+      }
+
+      @media (hover: hover) {
+        .shop-card-link:hover .shop-card-meta {
+          background: var(--color-blue);
+        }
+
+        .shop-card-link:hover .shop-card-title,
+        .shop-card-link:hover .shop-card-price {
+          color: var(--color-bg);
+        }
+      }
+
       .shop-card-add {
         position: relative;
         width: 1.625rem;
