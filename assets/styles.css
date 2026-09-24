@@ -725,29 +725,64 @@ body.nav-open {
 .footer-newsletter-input.has-error {
   color: var(--color-red);
 }
-.footer-newsletter-error,
-.footer-newsletter-success {
+.footer-newsletter-error {
   min-height: 1rem;
   margin-top: 0.5rem;
   font-family: var(--font-body);
   font-size: var(--type-error);
   line-height: var(--leading-error);
   color: var(--color-bg);
-}
-.footer-newsletter-error {
   display: none;
 }
 .footer-newsletter.is-error .footer-newsletter-error {
   display: block;
 }
-.footer-newsletter.is-success .footer-newsletter-error {
-  display: none;
-}
+
+/* Success state — replaces the heading, field and button in place.
+   Built by scripts.js so the copy has one source across every page. */
 .footer-newsletter-success {
   display: none;
+  text-align: center;
+  color: var(--color-bg);
 }
 .footer-newsletter.is-success .footer-newsletter-success {
   display: block;
+}
+.footer-newsletter.is-success .footer-heading,
+.footer-newsletter.is-success .footer-newsletter-input,
+.footer-newsletter.is-success .footer-newsletter-submit,
+.footer-newsletter.is-success .footer-newsletter-error {
+  display: none;
+}
+.footer-newsletter-success-heading {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  line-height: 1;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+.footer-newsletter-success-body {
+  font-family: var(--font-body);
+  font-size: var(--type-error);
+  line-height: var(--leading-error);
+  font-weight: 400;
+}
+.footer-newsletter-success-body + .footer-newsletter-success-body {
+  margin-top: 1rem;
+}
+.footer-newsletter-reset {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.footer-newsletter-reset:hover {
+  text-decoration: none;
 }
 .footer-newsletter-submit {
   margin-top: 0.5rem;
