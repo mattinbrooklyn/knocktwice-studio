@@ -290,13 +290,16 @@
       .person-col {
         max-width: none;
       }
-      /* Paintbrush per Figma: x=-15, y=340, 144×271.
+      /* Paintbrush per Figma: x=-15, 144×271.
          `.page` has padding-left:var(--content-left)=1.25rem (20px), but
          paintbrush is position:absolute so it sits relative to .page's
-         padding box origin. Subtract 20 from Figma x to align. */
+         padding box origin. Subtract 20 from Figma x to align.
+         top: tucked just under "Since you asked" so it never covers text on
+         load. The heading's position shifts with phone width, so the script
+         at the bottom measures it and sets --brush-top; 530px is the fallback. */
       .paintbrush {
         left: -30px !important;
-        top: 360px !important;
+        top: var(--brush-top, 530px) !important;
         width: 144px !important;
         height: 271px !important;
       }
@@ -865,6 +868,27 @@
     document.querySelectorAll('.obj img').forEach(img => {
       img.addEventListener('dragstart', e => e.preventDefault());
     });
+
+    // Mobile: park the paintbrush just below "Since you asked" so it never
+    // covers text on load. Once dragged, the inline top wins and this is moot.
+    (function () {
+      const brush = document.getElementById('obj-brush');
+      const heading = document.querySelector('.h2');
+      if (!brush || !heading) return;
+      const mobile = window.matchMedia('(max-width: 768px)');
+      const GAP = 8;
+      function placeBrush() {
+        if (!mobile.matches) return;
+        const pr = page.getBoundingClientRect();
+        const scale = pr.width / page.offsetWidth || 1;
+        const top = (heading.getBoundingClientRect().bottom - pr.top) / scale + GAP;
+        brush.style.setProperty('--brush-top', Math.round(top) + 'px');
+      }
+      placeBrush();
+      window.addEventListener('load', placeBrush);
+      window.addEventListener('resize', placeBrush);
+      if (document.fonts) document.fonts.ready.then(placeBrush);
+    }());
   </script>
 </body>
 </html>
