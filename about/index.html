@@ -153,9 +153,10 @@
     .paintbrush .eyes   { width: 100%; height: 100%; }
 
     /* Paint bucket: outer container holds the rotated inner.
-       Fluid vw units so bucket tracks the right edge smoothly. */
+       Fluid vw units so bucket tracks the right edge smoothly.
+       Sits right of / below the intro copy so no text is covered on load. */
     .paint-bucket-outer {
-      left: 70vw; top: 15vw;
+      left: 75vw; top: var(--bucket-top, 22vw);
       width: 20vw; 
       /* height: 26.389vw; */
       overflow: visible;
@@ -610,6 +611,45 @@
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(scalePage, 100);
     });
+
+    // ── Paint bucket (desktop): never cover the intro on load ──────
+    // The bucket scales with vw but the intro copy wraps onto more lines
+    // as the window narrows. Keep the bucket's rotated box below every
+    // intro line that reaches across into its column; at 1440 the CSS 22vw
+    // already clears them. Dragging sets an inline top, which wins over this.
+    (function () {
+      const bucket = document.getElementById('obj-bucket');
+      const inner  = document.getElementById('bucket-inner');
+      const intro  = document.querySelector('.intro');
+      if (!bucket || !inner || !intro) return;
+      const desktop = window.matchMedia('(min-width: 961px)');
+      const GAP = 8;
+      function placeBucket() {
+        bucket.style.removeProperty('--bucket-top');
+        if (!desktop.matches) return;
+        const pr = page.getBoundingClientRect();
+        const outerTop = bucket.getBoundingClientRect().top;
+        const box = inner.getBoundingClientRect();
+        const lift = outerTop - box.top; // rotation pokes above the box
+        const range = document.createRange();
+        let textBottom = -Infinity;
+        for (const p of intro.querySelectorAll('p')) {
+          range.selectNodeContents(p); // per-paragraph: one rect per line
+          for (const line of range.getClientRects()) {
+            if (line.right > box.left) textBottom = Math.max(textBottom, line.bottom);
+          }
+        }
+        if (textBottom === -Infinity) return;
+        const minTop = textBottom - pr.top + GAP + lift;
+        if (outerTop - pr.top < minTop) {
+          bucket.style.setProperty('--bucket-top', Math.round(minTop) + 'px');
+        }
+      }
+      placeBucket();
+      window.addEventListener('load', placeBucket);
+      window.addEventListener('resize', placeBucket);
+      if (document.fonts) document.fonts.ready.then(placeBucket);
+    }());
 
 
     // rAF-throttled eye tracking
