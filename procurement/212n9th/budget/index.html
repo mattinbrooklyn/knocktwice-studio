@@ -388,7 +388,11 @@
         status: cell(0), category: cell(1), type: cell(2), name: cell(3),
         retailer: cell(4), unit: num(cell(5)), qty: num(cell(6)), total: num(cell(7)), link: cell(8),
       };
-      if (!item.name) return;            // stray status/category cells with no item
+      // Labor rows tend to carry their description in the PIECE TYPE column
+      // with no name, so a type alone still counts as an item. A row with
+      // neither is a stray status/category cell — skip it.
+      if (!item.name && !item.type) return;
+      if (!item.name) { item.name = item.type; item.type = ""; }
       // Prefer the Sheet's own total; fall back to unit × qty (qty blank = 1).
       if (!Number.isFinite(item.total)) {
         item.total = Number.isFinite(item.unit) ? item.unit * (Number.isFinite(item.qty) ? item.qty : 1) : NaN;
