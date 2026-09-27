@@ -18,7 +18,8 @@
        Reads the BUDGET DASHBOARD tab of the project Sheet live on every
        load (Google's CSV endpoint, no helper server, no sync step) and
        measures the RECOMMENDED items against the $70k project budget,
-       split by the allocation percentages in the client's budget guidance.
+       split across the Sheet's own categories using the allocation
+       percentages from the client's budget guidance.
        Alternates are listed for reference but never counted.
 
        Categories nothing has been sourced for yet carry a red placeholder
@@ -267,9 +268,10 @@
 
     @media (max-width: 560px) {
       /* Drop the "allocation" column on narrow screens — projected vs variance is the story. */
-      .col-heads, .cat-grid { grid-template-columns: 1fr auto auto; }
+      .col-heads, .cat-grid { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: 0.9rem; }
       .col-heads .hide-sm, .cat-grid .hide-sm { display: none; }
-      .num, .col-heads span:not(:first-child) { min-width: 4.5rem; }
+      .num, .col-heads span:not(:first-child) { min-width: 4rem; }
+      .cat-name { font-size: clamp(1.05rem, 5vw, 1.55rem); }
     }
 
     @media print {
@@ -313,38 +315,29 @@
     gid: "1214391269",            // the BUDGET DASHBOARD tab
     budget: 70000,                // whole project, both rooms
 
-    // Budget guidance shared with the client — order is display order.
-    // Allocation = share × budget.
+    // The Sheet's own categories, in display order, carrying the shares from
+    // the budget guidance shared with the client. Allocation = share × budget.
+    // Guidance → Sheet: Furniture → Furniture & Storage, Textiles → Soft Goods,
+    // Wall Treatments → Labor & Install (paint / wallpaper install), and
+    // Decor & Styling's 15% split evenly across Finishes and Art.
     categories: [
-      { name: "Furniture",       share: 0.40 },
-      { name: "Lighting",        share: 0.15 },
-      { name: "Wall Treatments", share: 0.15 },
-      { name: "Textiles",        share: 0.10 },
-      { name: "Decor & Styling", share: 0.15 },
+      { name: "Furniture & Storage", share: 0.40 },
+      { name: "Lighting",            share: 0.15 },
+      { name: "Soft Goods",          share: 0.10 },
+      { name: "Finishes",            share: 0.075 },
+      { name: "Art",                 share: 0.075 },
+      { name: "Labor & Install",     share: 0.15 },
     ],
     contingency: { name: "Contingency", share: 0.05 },   // reserve, shown separately
 
-    // The Sheet uses the estimate categories; the budget uses the guidance
-    // categories. Map one to the other. Anything unmapped lands in "Other".
-    categoryMap: {
-      "Furniture & Storage": "Furniture",
-      "Lighting":            "Lighting",
-      "Soft Goods":          "Textiles",
-      "Finishes":            "Wall Treatments",   // paint, wallpaper, window treatments
-      "Art":                 "Wall Treatments",   // art, mirrors, framing
-    },
-    // A few piece types belong somewhere other than their Sheet category.
-    pieceTypeMap: {
-      "Planters (Indoors)":  "Decor & Styling",
-    },
-    // Sheet categories tracked outside this budget (per the client's brief:
-    // "Furnishings & Decor only — implementation tracked separately").
-    excludeCategories: ["Labor & Install"],
+    // Sheet categories tracked outside this budget (none right now).
+    // Anything in the Sheet that isn't listed above lands in "Other".
+    excludeCategories: [],
 
     // Categories the design team hasn't sourced yet. Each carries a red
     // placeholder for the BALANCE of its allocation (allocation − recommended
     // so far), so the projected total assumes the full allocation gets spent.
-    placeholders: ["Wall Treatments", "Decor & Styling"],
+    placeholders: ["Finishes", "Art", "Labor & Install"],
 
     // Which STATUS values count. Everything else is listed as an alternate.
     countedStatus: ["recommended"],
@@ -353,6 +346,7 @@
   /* ── Helpers ─────────────────────────────────────────────────────────── */
   const $ = sel => document.querySelector(sel);
   const money = n => "$" + Math.round(n).toLocaleString("en-US");
+  const pctOf = n => +(100 * n / CONFIG.budget).toFixed(1) + "%";   // 7.5%, not 8%
   const moneyCents = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   // "$1,998.00" → 1998. Anything non-numeric ("TBD", blank) → NaN.
@@ -406,8 +400,7 @@
   }
 
   function budgetCategory(item) {
-    if (CONFIG.pieceTypeMap[item.type]) return CONFIG.pieceTypeMap[item.type];
-    return CONFIG.categoryMap[item.category] || "Other";
+    return CONFIG.categories.some(c => c.name === item.category) ? item.category : "Other";
   }
 
   /* ── Roll up ─────────────────────────────────────────────────────────── */
@@ -496,7 +489,7 @@
       if (c.alternates.length) meta.push(`${c.alternates.length} alt${c.alternates.length === 1 ? "" : "s"}`);
       if (c.placeholder) meta.push(`<span class="ph">${money(c.placeholder)} placeholder</span>`);
       if (!meta.length) meta.push("nothing sourced yet");
-      const shareLabel = c.unmapped ? "not in the budget guidance" : `${Math.round(100 * c.allocation / CONFIG.budget)}% · ${meta.join(" · ")}`;
+      const shareLabel = c.unmapped ? "not in the budget guidance" : `${pctOf(c.allocation)} · ${meta.join(" · ")}`;
 
       html += `<details class="cat">
         <summary>
@@ -514,7 +507,7 @@
         <div class="item is-placeholder">
           <span class="item-name">${esc(c.name)} · not yet sourced</span>
           <span class="item-total">${money(c.placeholder)}</span>
-          <span class="item-sub">Balance of the ${Math.round(100 * c.allocation / CONFIG.budget)}% allocation. Replaced by real selections as they're marked Recommended.</span>
+          <span class="item-sub">Balance of the ${pctOf(c.allocation)} allocation. Replaced by real selections as they're marked Recommended.</span>
         </div>`;
       if (c.alternates.length) html += `<p class="items-title">Alternates · not counted</p>` + c.alternates.map(it => itemHTML(it, "alt")).join("");
       if (!c.recommended.length && !c.placeholder && !c.alternates.length) html += `<p class="item-sub">No rows in the Sheet map here yet.</p>`;
