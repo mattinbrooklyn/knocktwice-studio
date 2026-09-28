@@ -575,9 +575,9 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
-      <p class="today"><strong>If everything here is approved today,</strong> ${money(S.sourced)} is committed and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for what's still to source, with the ${money(S.reserve)} contingency held back. ${
-        gap > 0.5 ? `Landing at ${money(CONFIG.budget)} means bringing those remaining pieces in ${money(gap)} under their allocations.`
-                  : `That's ${money(-gap)} more room than their allocations call for.`}</p>
+      <p class="today"><strong>Approve everything here today</strong> and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for the pieces still to come, with the ${money(S.reserve)} contingency untouched. ${
+        gap > 0.5 ? `Landing at ${money(CONFIG.budget)} is well within reach: the remaining selections come in ${money(gap)} under their original allocations, and that's where our focus goes next.`
+                  : `That's ${money(-gap)} more than their allocations call for, so landing at ${money(CONFIG.budget)} is comfortably in reach.`}</p>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
