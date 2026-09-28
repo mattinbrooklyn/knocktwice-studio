@@ -598,7 +598,7 @@
       // projected figure already IS the recommended spend.
       const meta = c.unmapped ? `${pieces} · not in the budget plan`
         : [c.allowance ? `${money(c.sourced)} recommended + ${money(c.allowance)} still to source` : "",
-           `${money(c.allocation)} share (${pctOf(c.allocation)})`, pieces, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
+           pieces, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
       // Bar scale: the share, or the projection when it overruns the share.
       let bar = "";
       if (!c.unmapped) {
