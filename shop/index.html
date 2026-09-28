@@ -97,8 +97,16 @@
         z-index: 2;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
+        /* Dividers = the ink grid background showing through a 2px gap, so
+           neighbouring tiles share exactly one line (spec No. 09). */
+        gap: 2px;
         border: 2px solid var(--color-ink);
+        background: var(--color-ink);
+      }
+
+      /* Odd product count: fill the empty last cell so no ink block shows. */
+      .shop-grid:has(> .shop-card:last-child:nth-child(odd))::after {
+        content: "";
         background: var(--color-bg);
       }
 
@@ -137,17 +145,7 @@
         display: flex;
         flex-direction: column;
         min-height: 16.5rem;
-        border-right: 2px solid var(--color-ink);
-        border-bottom: 2px solid var(--color-ink);
         background: var(--color-bg);
-      }
-
-      .shop-card:nth-child(2n) {
-        border-right: none;
-      }
-
-      .shop-card:nth-last-child(-n + 2) {
-        border-bottom: none;
       }
 
       .shop-card-media {
