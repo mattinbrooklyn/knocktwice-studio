@@ -188,6 +188,19 @@
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
     }
 
+    /* ── The plan: how the budget breaks out ───────────────────── */
+    .plan { border-top: 1.5px solid var(--color-ink); }
+    .plan-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 1rem;
+      align-items: baseline; padding: 0.55rem 0; border-bottom: 1px solid var(--color-khaki);
+      font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+    }
+    .plan-row.total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); font-weight: 700; }
+    .plan-row .num { font-weight: 500; }
+    .plan-row.total .num { font-weight: 700; }
+    .plan-note { font-size: 0.85rem; color: var(--color-caramel); margin: 0.8rem 0 0; max-width: 34rem; }
+    .section-intro { font-size: clamp(0.85rem, 1.3vw, 0.95rem); color: var(--color-caramel); margin: 0.2rem 0 0.9rem; max-width: 34rem; }
+
     /* ── Category ledger ──────────────────────────────────────── */
     .ledger { border-top: 1.5px solid var(--color-ink); }
     .led-row {
@@ -218,7 +231,10 @@
     .num.muted { color: var(--color-caramel); font-weight: 500; }
 
     /* ── Rooms + piece cards ──────────────────────────────────── */
-    .room { margin-top: 2.5rem; }
+    /* Each room is a <details>: closed, it's one line with the count and subtotal. */
+    .room { margin-top: 1.5rem; }
+    .room summary { list-style: none; }
+    .room summary::-webkit-details-marker { display: none; }
     .room-head {
       display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
       border-bottom: 2.5px solid var(--color-ink); padding-bottom: 0.5rem;
@@ -226,7 +242,13 @@
     .room-name {
       font-family: var(--font-display); font-weight: 400;
       font-size: clamp(1.6rem, 5vw, 2.25rem); text-transform: uppercase; letter-spacing: 0.01em; line-height: 1;
+      display: flex; align-items: baseline; gap: 0.55rem;
     }
+    .room-name::before {
+      content: "+"; font-family: var(--font-ui); font-weight: 500; font-size: 0.7em; color: var(--color-caramel); width: 0.8em;
+    }
+    .room[open] .room-name::before { content: "−"; }
+    .room-name small { font-family: var(--font-ui); font-weight: 600; font-size: 0.45em; color: var(--color-caramel); letter-spacing: 0.03em; text-transform: none; }
     .room-total { font-weight: 700; font-size: clamp(1.05rem, 2.6vw, 1.25rem); white-space: nowrap; font-variant-numeric: tabular-nums; }
     .room-total small { display: block; font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem; color: var(--color-caramel); text-align: right; }
 
@@ -301,6 +323,7 @@
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
       .stamp button, .alts-toggle { display: none; }
       .led-bar { display: none; }
+      .room-name::before { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
       .piece, .led-row { break-inside: avoid; }
     }
@@ -494,7 +517,16 @@
     const pct = n => (100 * n / scale).toFixed(2) + "%";
     const over = S.variance > 0;
 
+    const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
+      <div class="section-head" style="margin-top:0"><span class="section-title">How the ${money(CONFIG.budget)} breaks out</span></div>
+      <div class="plan">
+        ${planRows.map(c => `<div class="plan-row"><span>${esc(c.name)}</span><span class="num muted">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
+        <div class="plan-row total"><span>Phase 1 budget</span><span class="num muted">100%</span><span class="num">${money(CONFIG.budget)}</span></div>
+      </div>
+      <p class="plan-note">Our starting allocation from kickoff. It's directional: we refine it together as the design locks and pieces are chosen.</p>
+
+      <div class="section-head"><span class="section-title">Where we are</span></div>
       <div class="headline">
         <div class="headline-label">Projected<br>total</div>
         <div class="headline-amount">${money(S.projected)}
@@ -519,7 +551,7 @@
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
 
-      <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. its share</span></div>
+      <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
 
     S.cats.forEach(c => {
@@ -555,12 +587,16 @@
     });
     html += `</div>`;
 
-    S.rooms.forEach(room => {
-      html += `<section class="room">
-        <div class="room-head">
-          <span class="room-name">${esc(room.name)}</span>
+    html += `<div class="section-head"><span class="section-title">Piece selection by space</span></div>
+      <p class="section-intro">Our recommendation for every piece, room by room. Open a room to review it; each piece with alternates has them tucked underneath.</p>`;
+
+    S.rooms.forEach((room, i) => {
+      const n = room.pieces.length;
+      html += `<details class="room"${i === 0 ? " open" : ""}>
+        <summary class="room-head">
+          <span class="room-name">${esc(room.name)} <small>${n} piece${n === 1 ? "" : "s"}</small></span>
           <span class="room-total">${money(room.total)}<small>recommended</small></span>
-        </div>`;
+        </summary>`;
       room.pieces.forEach(p => {
         const against = p.recommended.reduce((n, it) => n + it.total, 0);
         html += `<div class="piece">
@@ -575,7 +611,7 @@
         }
         html += `</div>`;
       });
-      html += `</section>`;
+      html += `</details>`;
     });
 
     $("#app").innerHTML = html;
