@@ -525,12 +525,12 @@
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
-      <div class="section-head" style="margin-top:0"><span class="section-title">How the ${money(CONFIG.budget)} breaks out</span></div>
+      <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span></div>
       <div class="plan">
         ${planRows.map(c => `<div class="plan-row"><span>${esc(c.name)}</span><span class="num muted">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
         <div class="plan-row total"><span>Phase 1 budget</span><span class="num muted">100%</span><span class="num">${money(CONFIG.budget)}</span></div>
       </div>
-      <p class="plan-note">Our starting allocation from kickoff. It's directional: we refine it together as the design locks and pieces are chosen.</p>
+      <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
 
       <div class="section-head"><span class="section-title">Where we are</span></div>
       <div class="headline">
