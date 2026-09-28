@@ -577,9 +577,9 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
-      <p class="today"><strong>Approve everything here today</strong> and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for the pieces still to come, with the ${money(S.reserve)} contingency untouched. What's left is mostly the details and styling, things like art, glassware, dishes, and textiles, which flex easily. ${
-        gap > 0.5 ? `Landing at ${money(CONFIG.budget)} means bringing those in about ${money(gap)} under their original allocations, well within range depending on how far you want to scale them up or down.`
-                  : `There's ${money(-gap)} more room for them than their allocations call for, so landing at ${money(CONFIG.budget)} is comfortably in reach.`}</p>
+      <p class="today"><strong>Approve everything here today</strong> and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for what's left, with the ${money(S.reserve)} contingency untouched. What's left is mostly details and styling: art, glassware, dishes, textiles. ${
+        gap > 0.5 ? `Those flex easily, so landing at ${money(CONFIG.budget)} is well within reach, about ${money(gap)} under their original allocations. As selections lock in, we calibrate the rest accordingly.`
+                  : `There's ${money(-gap)} more room than their allocations call for, so landing at ${money(CONFIG.budget)} is comfortably in reach. As selections lock in, we calibrate the rest accordingly.`}</p>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
