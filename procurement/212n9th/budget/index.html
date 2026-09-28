@@ -541,6 +541,7 @@
     // are approved as-is, and how far under their plan those would need to land.
     const roomLeft = CONFIG.budget - S.sourced - S.reserve;
     const gap = S.allowance - roomLeft;
+    const highEnd = Math.round(S.projected / 1000) * 1000;   // the at-plan landing, to the nearest $1k
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
@@ -577,9 +578,10 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
-      <p class="today"><strong>Approve everything here today</strong> and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for what's left, with the ${money(S.reserve)} contingency untouched. What's left is mostly details and styling: art, glassware, dishes, textiles. ${
-        gap > 0.5 ? `Those flex easily, so landing at ${money(CONFIG.budget)} is well within reach, about ${money(gap)} under their original allocations. As selections lock in, we calibrate the rest accordingly.`
-                  : `There's ${money(-gap)} more room than their allocations call for, so landing at ${money(CONFIG.budget)} is comfortably in reach. As selections lock in, we calibrate the rest accordingly.`}</p>
+      <p class="today">${
+        gap > 0.5
+          ? `<strong>Our best guess right now: ${money(CONFIG.budget)} to ${money(highEnd)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+          : `<strong>Our best guess right now: at or under ${money(CONFIG.budget)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
