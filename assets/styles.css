@@ -690,7 +690,7 @@ body.nav-open {
 .footer-heading {
   margin: 0 0 0.25rem;
   font-family: var(--font-body);
-  font-size: 0.75rem;
+  font-size: var(--type-b1);          /* B1: 16 → 18 (Global Font Edit) */
   line-height: 1;
   font-weight: 700;
   color: var(--color-bg);
@@ -814,7 +814,7 @@ body.nav-open {
   justify-self: center;
   flex-shrink: 0;
   font-family: var(--font-ui);
-  font-size: 0.75rem;
+  font-size: var(--type-field);       /* Field: 16 → 18 (Global Font Edit) */
   line-height: 1;
   font-weight: 400;
   color: var(--color-bg);
@@ -1154,11 +1154,14 @@ html.kt-home-monster-open body {
   }
   /* Wave / modal stack: anchor to footer + safe-area (overrides weaker per-page rules).
      About mounts `#monster-linear-ticker` beneath the wave — taller bottom offset wins below. */
+  /* --footer-offset is the footer's real rendered height (content + iOS
+     home-indicator inset), set by scripts.js. Without it the footer grows
+     past --footer-panel-height and covers the bottom of the wave (eyes). */
   #monster-group {
-    bottom: var(--footer-panel-height) !important;
+    bottom: var(--footer-offset, calc(var(--footer-panel-height) + env(safe-area-inset-bottom, 0px))) !important;
   }
   #page-scaler:has(#monster-linear-ticker) #monster-group {
-    bottom: var(--footer-panel-height) !important;
+    bottom: var(--footer-offset, calc(var(--footer-panel-height) + env(safe-area-inset-bottom, 0px))) !important;
   }
   #monster-linear-ticker {
     display: none !important;
@@ -1169,14 +1172,18 @@ html.kt-home-monster-open body {
   .footer {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto env(safe-area-inset-bottom, 0px);
+    grid-template-rows: auto auto auto;
     gap: 1.75rem;
     justify-content: unset;
     align-items: stretch;
-    height: var(--footer-panel-height);
+    /* Content-driven height: links + mailing list + icons + copyright no
+       longer fit a fixed 430px. The panel height is now just a floor. */
+    height: auto;
     min-height: calc(var(--footer-panel-height) + env(safe-area-inset-bottom, 0px));
     padding-top: 1.875rem;
-    padding-bottom: 1.5rem;
+    /* Safe-area lives in the padding (was an empty 4th grid row, which also
+       added a stray 1.75rem gap under the copyright). */
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
     box-sizing: border-box;
   }
   .footer-panel {
@@ -1193,14 +1200,12 @@ html.kt-home-monster-open body {
   .footer-links {
     order: 1;
     gap: 0.75rem;
-    font-size: 0.875rem;
   }
   .footer-links--support {
     order: 2;
   }
   .footer-heading {
     margin-bottom: 0;
-    font-size: 0.75rem;
   }
   .footer-newsletter {
     order: 3;

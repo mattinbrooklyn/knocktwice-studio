@@ -776,6 +776,22 @@
   window.KT.lightbox = { open: open, close: close };
 }());
 
+// ── Footer offset (wave sits on top of the real footer height) ────
+// Mobile footer height is content-driven, so publish its rendered height
+// as --footer-offset; styles.css anchors #monster-group to it. Re-measures
+// when the footer changes size (fonts, mailing-list states, rotation).
+(function () {
+  var footer = document.querySelector('.footer');
+  if (!footer) return;
+  var root = document.documentElement;
+  function update() {
+    root.style.setProperty('--footer-offset', footer.offsetHeight + 'px');
+  }
+  update();
+  if (window.ResizeObserver) new ResizeObserver(update).observe(footer, { box: 'border-box' });
+  else window.addEventListener('resize', update);
+}());
+
 // ── Footer mailing-list form ───────────────────────────────────────
 (function () {
   var forms = document.querySelectorAll('[data-footer-newsletter]');
