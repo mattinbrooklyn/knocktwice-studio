@@ -266,17 +266,17 @@
     .room-total { font-weight: 700; font-size: clamp(1.05rem, 2.6vw, 1.25rem); white-space: nowrap; font-variant-numeric: tabular-nums; }
     .room-total small { display: block; font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem; color: var(--color-caramel); text-align: right; }
 
-    .piece { padding: 1.1rem 0; border-bottom: 1px solid var(--color-khaki); }
+    .piece { padding: 0.9rem 0; border-bottom: 1px solid var(--color-khaki); }
     .piece-label {
       font-family: var(--font-ui); font-weight: 700; font-size: 0.9rem;
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
-      margin: 0 0 0.35rem;
+      margin: 0 0 0.2rem;
     }
     /* A hero row is one recommended item. Photos slot into the first column
        later: the grid already reserves it, collapsed to zero while empty. */
     .hero {
-      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.15rem 1rem;
-      align-items: baseline; padding: 0.35rem 0;
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.05rem 1rem;
+      align-items: baseline; padding: 0.25rem 0;
     }
     .hero + .hero { border-top: 1px solid var(--color-khaki); margin-top: 0.3rem; padding-top: 0.6rem; }
     .hero-photo { grid-row: span 2; width: 0; }
@@ -286,13 +286,14 @@
     .hero-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
     .hero-sub { grid-column: 2; font-size: 0.88rem; color: var(--color-caramel); }
     .hero-price { font-weight: 700; font-size: clamp(1rem, 2.4vw, 1.1rem); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
-    .hero-price small { display: block; font-weight: 500; font-size: 0.8rem; color: var(--color-caramel); }
+    /* Quantity sits in its own cell under the price, so it never stretches the name row. */
+    .hero-qty { grid-column: 3; font-size: 0.8rem; color: var(--color-caramel); white-space: nowrap; text-align: right; }
 
     /* The alternates reveal. */
     .alts-toggle {
       font-family: var(--font-ui); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.03em;
       color: var(--color-ink); background: transparent; border: 1.5px solid var(--color-ink);
-      border-radius: var(--radius-pill); padding: 0.2rem 0.75rem; margin-top: 0.6rem;
+      border-radius: var(--radius-pill); padding: 0.2rem 0.75rem; margin-top: 0.45rem;
       display: inline-flex; align-items: center; gap: 0.45rem;
     }
     .alts-toggle::before { content: "+"; font-weight: 500; }
@@ -513,8 +514,9 @@
     return `<div class="hero">
       <span class="hero-photo">${photo}</span>
       <span class="hero-name">${linkName(it)}</span>
-      <span class="hero-price">${moneyCents(it.total)}<small>${qtyLine(it)}</small></span>
+      <span class="hero-price">${moneyCents(it.total)}</span>
       <span class="hero-sub">${subLine(it)}</span>
+      <span class="hero-qty">${qtyLine(it)}</span>
     </div>`;
   }
 
