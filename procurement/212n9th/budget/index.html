@@ -215,7 +215,15 @@
       .plan-wrap { grid-template-columns: minmax(0, 1fr); }
       .plan-note { margin-top: 1rem; }
     }
-    .section-intro { font-size: clamp(0.85rem, 1.3vw, 0.95rem); color: var(--color-caramel); margin: 0.2rem 0 0.9rem; max-width: 34rem; }
+    /* Part two of the page: the walkthrough. A heavier break than a section head. */
+    .part { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 2.5px solid var(--color-ink); }
+    .part .section-title { display: block; margin-bottom: 0.4rem; }
+    .part-title {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1; letter-spacing: 0.01em; text-transform: uppercase;
+      margin: 0 0 0.6rem;
+    }
+    .part-intro { font-size: clamp(0.9rem, 1.4vw, 1rem); margin: 0; max-width: 34rem; }
 
     /* ── Category ledger ──────────────────────────────────────── */
     .ledger { border-top: 1.5px solid var(--color-ink); }
@@ -622,8 +630,11 @@
     });
     html += `</div>`;
 
-    html += `<div class="section-head"><span class="section-title">Piece selection by space</span></div>
-      <p class="section-intro">Our recommendation for every piece, room by room. Open a room to review it; each piece with alternates has them tucked underneath.</p>`;
+    html += `<div class="part">
+        <span class="section-title">Piece selection by space</span>
+        <h2 class="part-title">The pieces,<br>room by room</h2>
+        <p class="part-intro">Our recommendation for every piece. Open a room to review it; each piece with alternates has them tucked underneath.</p>
+      </div>`;
 
     S.rooms.forEach((room, i) => {
       const n = room.pieces.length;
