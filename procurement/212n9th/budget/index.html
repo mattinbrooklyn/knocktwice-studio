@@ -580,8 +580,8 @@
       </div>
       <p class="today">${
         gap > 0.5
-          ? `<strong>Our best guess right now: ${money(CONFIG.budget)} to ${money(highEnd)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
-          : `<strong>Our best guess right now: at or under ${money(CONFIG.budget)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+          ? `<strong>Where we expect to land: ${money(CONFIG.budget)} to ${money(highEnd)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+          : `<strong>Where we expect to land: at or under ${money(CONFIG.budget)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
