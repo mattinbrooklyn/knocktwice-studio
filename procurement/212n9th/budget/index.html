@@ -199,6 +199,17 @@
       text-transform: uppercase; line-height: 1.05; letter-spacing: 0.01em;
     }
     .led-meta { grid-column: 1; font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem; color: var(--color-caramel); }
+    /* Per-category bar: recommended + allowance against that category's share.
+       The share is the full width; anything past it is drawn as an overrun. */
+    .led-bar {
+      grid-column: 1 / -1; position: relative; height: 0.45rem; margin-top: 0.35rem;
+      background: var(--color-white); border: 1px solid var(--color-khaki); display: flex; overflow: hidden;
+    }
+    .led-bar span { display: block; height: 100%; }
+    .led-bar .seg-rec   { background: var(--color-ink); }
+    .led-bar .seg-allow { background: var(--color-khaki); }
+    .led-bar .seg-over  { background: var(--color-red); }
+    .led-bar .share-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--color-ink); }
     .num {
       font-weight: 600; font-size: clamp(0.95rem, 2.2vw, 1.05rem);
       white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 4.5rem;
@@ -250,20 +261,20 @@
     .alts-toggle::before { content: "+"; font-weight: 500; }
     .alts-toggle[aria-expanded="true"] { background: var(--color-ink); color: var(--color-bg); }
     .alts-toggle[aria-expanded="true"]::before { content: "−"; }
-    .alts { display: none; margin: 0.7rem 0 0.2rem; padding-left: 0.9rem; border-left: 2px solid var(--color-khaki); }
+    .alts { display: none; margin: 0.55rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
     .alts[data-open] { display: block; }
+    /* One line per alternate: name + details left, delta + price right. */
     .alt {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 1rem;
-      align-items: baseline; padding: 0.5rem 0;
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      padding: 0.3rem 0; font-size: 0.85rem; line-height: 1.35;
     }
     .alt + .alt { border-top: 1px solid var(--color-khaki); }
-    .alt-name { font-weight: 600; font-size: 0.95rem; }
+    .alt-name { font-weight: 600; color: var(--color-ink); }
     .alt-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
-    .alt-sub { grid-column: 1; font-size: 0.85rem; color: var(--color-caramel); }
-    .alt-delta { font-weight: 700; font-size: 0.95rem; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
-    .alt-delta small { display: block; font-weight: 500; font-size: 0.78rem; color: var(--color-caramel); }
+    .alt-sub { color: var(--color-caramel); }
+    .alt-delta { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+    .alt-delta small { font-weight: 500; color: var(--color-caramel); }
     .alt-delta.less { color: var(--color-green); }
-    .alts-note { font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem; color: var(--color-caramel); margin: 0.5rem 0 0; }
 
     /* ── Notes / errors ───────────────────────────────────────── */
     .note { font-size: 0.85rem; color: var(--color-caramel); margin-top: 2rem; max-width: 36rem; }
@@ -288,6 +299,7 @@
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
       .stamp button, .alts-toggle { display: none; }
+      .led-bar { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
       .piece, .led-row { break-inside: avoid; }
     }
@@ -469,10 +481,10 @@
     const delta = it.total - against;
     const cls = delta < -0.5 ? "less" : "";
     const text = Math.abs(delta) < 0.5 ? "same price" : (delta < 0 ? "−" : "+") + money(Math.abs(delta));
+    const sub = subLine(it);
     return `<div class="alt">
-      <span class="alt-name">${linkName(it)}</span>
-      <span class="alt-delta ${cls}">${text}<small>${moneyCents(it.total)}${qtyLine(it) ? " · " + qtyLine(it) : ""}</small></span>
-      <span class="alt-sub">${subLine(it)}</span>
+      <span><span class="alt-name">${linkName(it)}</span>${sub ? ` <span class="alt-sub">· ${sub}</span>` : ""}</span>
+      <span class="alt-delta ${cls}">${text} <small>· ${money(it.total)}</small></span>
     </div>`;
   }
 
@@ -505,20 +517,38 @@
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
 
-      <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. share</span></div>
+      <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. its share</span></div>
       <div class="ledger">`;
 
     S.cats.forEach(c => {
       const v = c.variance;
       const vClass = c.unmapped ? "muted" : v > 0.5 ? "over" : v < -0.5 ? "under" : "muted";
       const vText = c.unmapped ? "—" : v > 0.5 ? "+" + money(v) : v < -0.5 ? "−" + money(-v) : "on target";
-      const meta = c.unmapped ? "not in the budget plan"
-        : [`${pctOf(c.allocation)} · ${money(c.allocation)}`, c.allowance ? `${money(c.allowance)} allowance` : ""].filter(Boolean).join(" · ");
+      const pieces = `${c.count} piece${c.count === 1 ? "" : "s"}`;
+      // Only spell out the split when an allowance is in play; otherwise the
+      // projected figure already IS the recommended spend.
+      const meta = c.unmapped ? `${pieces} · not in the budget plan`
+        : [c.allowance ? `${money(c.sourced)} recommended + ${money(c.allowance)} allowance` : "",
+           `${money(c.allocation)} share (${pctOf(c.allocation)})`, pieces].filter(Boolean).join(" · ");
+      // Bar scale: the share, or the projection when it overruns the share.
+      let bar = "";
+      if (!c.unmapped) {
+        const span = Math.max(c.allocation, c.projected) || 1;
+        const w = n => (100 * n / span).toFixed(2) + "%";
+        const within = Math.min(c.sourced, c.allocation);
+        bar = `<span class="led-bar">
+          <span class="seg-rec" style="width:${w(within)}"></span>
+          <span class="seg-allow" style="width:${w(c.allowance)}"></span>
+          <span class="seg-over" style="width:${w(Math.max(0, c.sourced - c.allocation))}"></span>
+          ${c.projected > c.allocation ? `<span class="share-line" style="left:${w(c.allocation)}"></span>` : ""}
+        </span>`;
+      }
       html += `<div class="led-row">
         <span class="led-name">${esc(c.name)}</span>
         <span class="num">${money(c.projected)}</span>
         <span class="num ${vClass}">${vText}</span>
         <span class="led-meta">${meta}</span>
+        ${bar}
       </div>`;
     });
     html += `</div>`;
@@ -539,7 +569,6 @@
           html += `<button type="button" class="alts-toggle" aria-expanded="false">${n} alternate${n === 1 ? "" : "s"}</button>
             <div class="alts">
               ${p.alternates.map(it => altHTML(it, against)).join("")}
-              <p class="alts-note">Prices shown against our recommendation. Alternates aren't in the total.</p>
             </div>`;
         }
         html += `</div>`;
