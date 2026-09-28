@@ -539,7 +539,7 @@
           <small class="${over ? "over" : "under"}">${over ? money(S.variance) + " over" : money(-S.variance) + " under"} the ${money(CONFIG.budget)} budget</small>
         </div>
       </div>
-      <p class="assumption">Assumes every category still being sourced uses its full allocation, so this is a conservative read that firms up as selections land.${
+      <p class="assumption">This is where things stand today, assuming every category still being sourced uses its full allocation. As pieces are confirmed the projection dials in, and we can focus on bringing the remaining selections in under their allocations.${
         overCats.length ? ` Over the plan today: ${overCats.map(c => `${esc(c.name)} +${money(c.variance)}`).join(", ")}.` : ""}</p>
       <div class="bar">
         <span class="seg-rec" style="width:${pct(S.sourced)}"></span>
