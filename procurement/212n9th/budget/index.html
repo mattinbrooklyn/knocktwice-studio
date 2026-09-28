@@ -142,6 +142,10 @@
       color: var(--color-caramel); margin-top: 0.35rem; text-align: right;
     }
     .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
+    .today {
+      font-size: 0.92rem; margin: 1.1rem 0 0; padding: 0.7rem 0 0.7rem 0.9rem;
+      border-left: 3px solid var(--color-ink); max-width: 38rem;
+    }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -191,16 +195,18 @@
     }
 
     /* ── The plan: how the budget breaks out ───────────────────── */
-    .plan { border-top: 1.5px solid var(--color-ink); }
-    .plan-row {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 1rem;
-      align-items: baseline; padding: 0.55rem 0; border-bottom: 1px solid var(--color-khaki);
-      font-size: clamp(0.95rem, 2.2vw, 1.05rem);
+    /* A compact grid: one small cell per category, wrapping to fit. */
+    .plan {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr)); gap: 0 1.25rem;
+      border-top: 1.5px solid var(--color-ink);
     }
-    .plan-row.total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); font-weight: 700; }
-    .plan-row .num { font-weight: 500; }
-    .plan-row.total .num { font-weight: 700; }
-    .plan-note { font-size: 0.85rem; color: var(--color-caramel); margin: 0.8rem 0 0; max-width: 34rem; }
+    .plan-cell {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem;
+      padding: 0.45rem 0; border-bottom: 1px solid var(--color-khaki); font-size: 0.92rem;
+    }
+    .plan-cell span:first-child { font-weight: 600; }
+    .plan-cell .num { font-weight: 500; font-size: 0.88rem; color: var(--color-caramel); min-width: 0; }
+    .plan-note { font-size: 0.85rem; color: var(--color-caramel); margin: 0.7rem 0 0; max-width: 36rem; }
     .section-intro { font-size: clamp(0.85rem, 1.3vw, 0.95rem); color: var(--color-caramel); margin: 0.2rem 0 0.9rem; max-width: 34rem; }
 
     /* ── Category ledger ──────────────────────────────────────── */
@@ -522,13 +528,16 @@
     const pct = n => (100 * n / scale).toFixed(2) + "%";
     const over = S.variance > 0;
     const overCats = S.cats.filter(c => !c.unmapped && c.variance > 0.5);
+    // What's left of the budget for unsourced categories if today's recommendations
+    // are approved as-is, and how far under their plan those would need to land.
+    const roomLeft = CONFIG.budget - S.sourced - S.reserve;
+    const gap = S.allowance - roomLeft;
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
-      <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span></div>
+      <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span><span class="section-title">${money(CONFIG.budget)} target</span></div>
       <div class="plan">
-        ${planRows.map(c => `<div class="plan-row"><span>${esc(c.name)}</span><span class="num muted">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
-        <div class="plan-row total"><span>Phase 1 budget</span><span class="num muted">100%</span><span class="num">${money(CONFIG.budget)}</span></div>
+        ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="num">${pctOf(c.share * CONFIG.budget)} · ${money(c.share * CONFIG.budget)}</span></div>`).join("")}
       </div>
       <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
 
@@ -558,6 +567,9 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
+      <p class="today"><strong>If everything here is approved today,</strong> ${money(S.sourced)} is committed and ${money(roomLeft)} of the ${money(CONFIG.budget)} remains for what's still to source, with the ${money(S.reserve)} contingency held back. ${
+        gap > 0.5 ? `Landing at ${money(CONFIG.budget)} means bringing those remaining pieces in ${money(gap)} under their allocations.`
+                  : `That's ${money(-gap)} more room than their allocations call for.`}</p>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
