@@ -195,18 +195,24 @@
     }
 
     /* ── The plan: how the budget breaks out ───────────────────── */
-    /* A compact grid: one small cell per category, wrapping to fit. */
-    .plan {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr)); gap: 0 1.25rem;
-      border-top: 1.5px solid var(--color-ink);
+    /* Two-column table on the left, the explainer beside it on the right;
+       stacks on narrow screens. */
+    .plan-wrap {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 2.5rem;
+      border-top: 1.5px solid var(--color-ink); padding-top: 0.25rem;
     }
     .plan-cell {
       display: flex; align-items: baseline; justify-content: space-between; gap: 0.6rem;
-      padding: 0.45rem 0; border-bottom: 1px solid var(--color-khaki); font-size: 0.92rem;
+      padding: 0.4rem 0; border-bottom: 1px solid var(--color-khaki); font-size: 0.92rem;
     }
+    .plan-cell:last-child { border-bottom: 0; }
     .plan-cell span:first-child { font-weight: 600; }
     .plan-cell .num { font-weight: 500; font-size: 0.88rem; color: var(--color-caramel); min-width: 0; }
-    .plan-note { font-size: 0.85rem; color: var(--color-caramel); margin: 0.7rem 0 0; max-width: 36rem; }
+    .plan-note { font-size: 0.88rem; color: var(--color-caramel); margin: 0.6rem 0 0; }
+    @media (max-width: 640px) {
+      .plan-wrap { grid-template-columns: minmax(0, 1fr); }
+      .plan-note { margin-top: 1rem; }
+    }
     .section-intro { font-size: clamp(0.85rem, 1.3vw, 0.95rem); color: var(--color-caramel); margin: 0.2rem 0 0.9rem; max-width: 34rem; }
 
     /* ── Category ledger ──────────────────────────────────────── */
@@ -536,10 +542,12 @@
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
       <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span><span class="section-title">${money(CONFIG.budget)} target</span></div>
-      <div class="plan">
-        ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="num">${pctOf(c.share * CONFIG.budget)} · ${money(c.share * CONFIG.budget)}</span></div>`).join("")}
+      <div class="plan-wrap">
+        <div class="plan">
+          ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="num">${pctOf(c.share * CONFIG.budget)} · ${money(c.share * CONFIG.budget)}</span></div>`).join("")}
+        </div>
+        <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
       </div>
-      <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
 
       <div class="section-head"><span class="section-title">Where we are</span></div>
       <div class="headline">
