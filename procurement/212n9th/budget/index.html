@@ -537,7 +537,6 @@
     const scale = Math.max(CONFIG.budget, S.projected);
     const pct = n => (100 * n / scale).toFixed(2) + "%";
     const over = S.variance > 0;
-    const overCats = S.cats.filter(c => !c.unmapped && c.variance > 0.5);
     // What's left of the budget for unsourced categories if today's recommendations
     // are approved as-is, and how far under their plan those would need to land.
     const roomLeft = CONFIG.budget - S.sourced - S.reserve;
@@ -560,8 +559,7 @@
           <small class="${over ? "over" : "under"}">${over ? money(S.variance) + " over" : money(-S.variance) + " under"} the ${money(CONFIG.budget)} budget</small>
         </div>
       </div>
-      <p class="assumption">This is where things stand today, assuming every category still being sourced uses its full allocation. As pieces are confirmed the projection dials in, and we can focus on bringing the remaining selections in under their allocations.${
-        overCats.length ? ` Over the plan today: ${overCats.map(c => `${esc(c.name)} +${money(c.variance)}`).join(", ")}.` : ""}</p>
+      <p class="assumption">After our first round, with recommendations in for the bulk of the pieces and all of the big anchor items, here's where things stand. Anything still being sourced is counted at its full allocation until it's confirmed.</p>
       <div class="bar">
         <span class="seg-rec" style="width:${pct(S.sourced)}"></span>
         <span class="seg-allow" style="width:${pct(S.allowance)}"></span>
