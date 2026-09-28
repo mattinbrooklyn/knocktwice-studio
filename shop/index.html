@@ -97,8 +97,16 @@
         z-index: 2;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0;
+        /* Dividers = the ink grid background showing through a 2px gap, so
+           neighbouring tiles share exactly one line (spec No. 09). */
+        gap: 2px;
         border: 2px solid var(--color-ink);
+        background: var(--color-ink);
+      }
+
+      /* Odd product count: fill the empty last cell so no ink block shows. */
+      .shop-grid:has(> .shop-card:last-child:nth-child(odd))::after {
+        content: "";
         background: var(--color-bg);
       }
 
@@ -137,17 +145,7 @@
         display: flex;
         flex-direction: column;
         min-height: 16.5rem;
-        border-right: 2px solid var(--color-ink);
-        border-bottom: 2px solid var(--color-ink);
         background: var(--color-bg);
-      }
-
-      .shop-card:nth-child(2n) {
-        border-right: none;
-      }
-
-      .shop-card:nth-last-child(-n + 2) {
-        border-bottom: none;
       }
 
       .shop-card-media {
@@ -233,8 +231,8 @@
 
       .shop-card-title {
         font-family: var(--font-body);
-        font-size: var(--type-b2);
-        line-height: 1.4167; /* Figma: 17px on 12px (B1|B3) */
+        font-size: var(--type-b1);
+        line-height: var(--leading-b1);
         font-weight: 400;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -242,8 +240,8 @@
 
       .shop-card-price {
         font-family: var(--font-body);
-        font-size: var(--type-b2);
-        line-height: 1.4167; /* Figma: 17px on 12px (B1|B3) */
+        font-size: var(--type-b1);
+        line-height: var(--leading-b1);
         font-weight: 700;
         align-self: end;
       }
