@@ -23,9 +23,10 @@
        underneath. Alternates show their price as a delta against the
        recommendation and never touch the totals.
 
-       Categories nothing has been sourced for yet carry an "allowance"
-       for the balance of their share, so the projection assumes the
-       full budget gets spent rather than quietly reading as headroom.
+       Every category counts as in progress until CONFIG.complete says
+       otherwise, and projects at the larger of what's recommended and its
+       share. The projection is deliberately conservative: it never reads
+       an unfinished category as savings.
 
        Everything project-specific lives in CONFIG at the top of the
        script. Nothing on this page writes back to the Sheet.
@@ -140,6 +141,7 @@
       display: block; font-weight: 600; font-size: clamp(0.85rem, 2vw, 1rem);
       color: var(--color-caramel); margin-top: 0.35rem; text-align: right;
     }
+    .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -377,10 +379,12 @@
     ],
     contingency: { share: 0.05 },   // reserve, shown separately
 
-    // Categories not fully sourced yet carry an allowance for the BALANCE of
-    // their share (share − recommended so far), so the projection assumes the
-    // full budget gets spent.
-    allowances: ["Finishes", "Art", "Labor & Install"],
+    // Every category counts as still-in-progress until it's listed here. An
+    // in-progress category projects at the larger of what's recommended so far
+    // and its share — the unsourced balance shows as "still to source" — so the
+    // page never reads an unfinished category as savings. Add a category here
+    // once the design team calls it complete and its real number takes over.
+    complete: [],
 
     // Which Status values count toward the totals. Everything else is an alternate.
     countedStatus: ["recommended"],
@@ -462,7 +466,8 @@
     });
     if (other.count) cats.push(other);
     cats.forEach(c => {
-      c.allowance = CONFIG.allowances.includes(c.name) ? Math.max(0, c.allocation - c.sourced) : 0;
+      c.complete = CONFIG.complete.includes(c.name);
+      c.allowance = c.complete ? 0 : Math.max(0, c.allocation - c.sourced);   // still to source, at plan
       c.projected = c.sourced + c.allowance;
       c.variance = c.projected - c.allocation;
     });
@@ -516,6 +521,7 @@
     const scale = Math.max(CONFIG.budget, S.projected);
     const pct = n => (100 * n / scale).toFixed(2) + "%";
     const over = S.variance > 0;
+    const overCats = S.cats.filter(c => !c.unmapped && c.variance > 0.5);
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
     let html = `
@@ -528,11 +534,13 @@
 
       <div class="section-head"><span class="section-title">Where we are</span></div>
       <div class="headline">
-        <div class="headline-label">Projected<br>total</div>
+        <div class="headline-label">Projected<br>at plan</div>
         <div class="headline-amount">${money(S.projected)}
           <small class="${over ? "over" : "under"}">${over ? money(S.variance) + " over" : money(-S.variance) + " under"} the ${money(CONFIG.budget)} budget</small>
         </div>
       </div>
+      <p class="assumption">Assumes every category still being sourced uses its full allocation, so this is a conservative read that firms up as selections land.${
+        overCats.length ? ` Over the plan today: ${overCats.map(c => `${esc(c.name)} +${money(c.variance)}`).join(", ")}.` : ""}</p>
       <div class="bar">
         <span class="seg-rec" style="width:${pct(S.sourced)}"></span>
         <span class="seg-allow" style="width:${pct(S.allowance)}"></span>
@@ -541,13 +549,13 @@
       </div>
       <div class="legend">
         <span class="l-rec">Recommended</span>
-        <span class="l-allow">Allowances</span>
+        <span class="l-allow">Still to source</span>
         <span class="l-res">Contingency</span>
         ${over ? "" : `<span class="l-room">Headroom · ${money(-S.variance)}</span>`}
       </div>
       <div class="ladder">
         <div class="lad-row"><span class="lad-label">Recommended pieces <small>· ${S.count} items</small></span><span class="lad-amount">${money(S.sourced)}</span></div>
-        <div class="lad-row is-allow"><span class="lad-label">Allowances <small>· not yet sourced</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
+        <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
 
@@ -556,14 +564,17 @@
 
     S.cats.forEach(c => {
       const v = c.variance;
-      const vClass = c.unmapped ? "muted" : v > 0.5 ? "over" : v < -0.5 ? "under" : "muted";
-      const vText = c.unmapped ? "—" : v > 0.5 ? "+" + money(v) : v < -0.5 ? "−" + money(-v) : "on target";
+      // Green is earned: only a COMPLETE category that came in under its share
+      // shows a saving. Unfinished ones read "in progress" instead.
+      const vClass = c.unmapped ? "muted" : v > 0.5 ? "over" : (c.complete && v < -0.5) ? "under" : "muted";
+      const vText = c.unmapped ? "—" : v > 0.5 ? "+" + money(v)
+        : c.complete ? (v < -0.5 ? "−" + money(-v) : "on target") : "in progress";
       const pieces = `${c.count} piece${c.count === 1 ? "" : "s"}`;
       // Only spell out the split when an allowance is in play; otherwise the
       // projected figure already IS the recommended spend.
       const meta = c.unmapped ? `${pieces} · not in the budget plan`
-        : [c.allowance ? `${money(c.sourced)} recommended + ${money(c.allowance)} allowance` : "",
-           `${money(c.allocation)} share (${pctOf(c.allocation)})`, pieces].filter(Boolean).join(" · ");
+        : [c.allowance ? `${money(c.sourced)} recommended + ${money(c.allowance)} still to source` : "",
+           `${money(c.allocation)} share (${pctOf(c.allocation)})`, pieces, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
       // Bar scale: the share, or the projection when it overruns the share.
       let bar = "";
       if (!c.unmapped) {
