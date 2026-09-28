@@ -166,6 +166,7 @@
     .legend .l-rec::before   { background: var(--color-ink); }
     .legend .l-allow::before { background: var(--color-khaki); }
     .legend .l-res::before   { background: repeating-linear-gradient(135deg, var(--color-khaki) 0 1px, transparent 1px 3px); }
+    .legend .l-room::before  { background: var(--color-white); }
 
     .ladder { margin-top: 1.25rem; border-top: 2.5px solid var(--color-ink); }
     .lad-row {
@@ -510,6 +511,7 @@
         <span class="l-rec">Recommended</span>
         <span class="l-allow">Allowances</span>
         <span class="l-res">Contingency</span>
+        ${over ? "" : `<span class="l-room">Headroom · ${money(-S.variance)}</span>`}
       </div>
       <div class="ladder">
         <div class="lad-row"><span class="lad-label">Recommended pieces <small>· ${S.count} items</small></span><span class="lad-amount">${money(S.sourced)}</span></div>
