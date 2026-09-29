@@ -160,7 +160,15 @@
       font-weight: 400; font-size: var(--type-anim); line-height: 1.35;
       margin: 0.5rem 0 0; max-width: 36rem; text-wrap: pretty;
     }
-    .takeaway strong { font-weight: 700; white-space: nowrap; }
+    /* The figure is marked like a highlighter pass: the one use of yellow on
+       the page. It stays in the body face because both other brand fonts
+       misread as money (Erica One's zeros fill in, Handjet's read as eights). */
+    .takeaway strong {
+      font-weight: 700; white-space: nowrap;
+      background: var(--color-yellow); padding: 0.05em 0.22em;
+      margin-right: -0.1em;   /* keeps the comma that follows from drifting away */
+    }
+    .takeaway strong.over { background: none; padding: 0; margin: 0; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
