@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F7F2EC">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/webp" href="/assets/images/Logo_DifferentStates_03-30-26_Favicon_Eye_Blue.webp">
+  <title>212 N 9th · Budget Dashboard · Knock Twice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Erica+One&family=Handjet:wght@100..900&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       BUDGET — the client's companion to the design presentation for
+       212 N 9th.
+
+       Reads the BUDGET VISIBILITY DASH tab of the project Sheet live on
+       every load (Google's CSV endpoint; no helper, no sync step) and
+       answers three questions in the order a client asks them:
+         1. Where do we stand?        the takeaway, three figures, one bar
+         2. How does that break down? one table, category by category
+         3. What did you pick?        every recommended piece, room by room
+       Alternates show their price as a delta against the recommendation
+       and never touch the totals.
+
+       The range's top end is deliberately conservative: a category still
+       being sourced is counted at the larger of what's recommended and its
+       budget, until CONFIG.complete says it's done.
+
+       Everything project-specific lives in CONFIG at the top of the
+       script. Nothing on this page writes back to the Sheet.
+       ────────────────────────────────────────────────────────────── */
+
+    /* Brand tokens inlined so the page keeps its styling even if the shared
+       /assets/styles.css is blocked (corporate filter, PDF engine, etc.). */
+    :root {
+      --color-bg: #F7F2EC;
+      --color-ink: #32261F;
+      --color-blue: #378CDA;
+      --color-green: #51B18C;
+      --color-khaki: #D1C3B6;
+      --color-white: #FFFFFF;
+      --color-yellow: #FADB4B;
+      --color-pink: #EC8EDF;
+      --color-red: #FF0004;
+      --color-caramel: #9A7555;
+      --font-display: 'Erica One', 'Arial Black', sans-serif;
+      --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --radius-input: 0.25rem;
+      --radius-pill: 2rem;
+      /* Brand type scale, mirrored from /assets/styles.css. Every size on this
+         page is one of these:
+           H1 / H2     Erica One        title, section headlines, room names
+           B1          Instrument Sans  body copy, table rows, prices
+           small       Instrument Sans  detail lines under a row
+           nav         Handjet          the lede
+           field       Handjet          the eyebrow
+           chip        Handjet          labels, toggles (16), dense captions (14) */
+      --type-h1: clamp(2.875rem, 5.23vw, 4.25rem);    /* 46 → 68 */
+      --type-h2: clamp(1.625rem, 3.13vw, 1.875rem);   /* 26 → 30 */
+      --type-b1: clamp(1rem, 1.54vw, 1.125rem);       /* 16 → 18 */
+      --type-nav: clamp(1.375rem, 2.13vw, 1.625rem);  /* 22 → 26 */
+      --type-field: clamp(1rem, 1.3vw, 1.125rem);     /* 16 → 18 */
+      --type-chip: 1rem;                              /* 16 */
+      --type-chip-mobile-stack: 0.875rem;             /* 14 */
+      --leading-h1: clamp(3rem, 5.35vw, 4.375rem);        /* 48 → 70 */
+      --leading-h2: clamp(1.8125rem, 3.18vw, 2.0625rem);  /* 29 → 33 */
+      --leading-b1: clamp(1.375rem, 1.96vw, 1.5rem);      /* 22 → 24 */
+      /* Brand small text (--type-error) runs 12 → 14. Held at its 14 so the
+         detail lines stay readable on a phone. */
+      --type-small: 0.875rem;
+    }
+
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    /* Neutralize the shared site's mobile "footer blue" reveal. */
+    body::after { display: none !important; content: none !important; }
+    /* Restore the native cursor — the shared stylesheet hides it (cursor: none)
+       for the main site's JS-drawn custom cursor, which this page doesn't load. */
+    html, body { cursor: auto !important; }
+    *, *::before, *::after { cursor: auto !important; }
+    a, button { cursor: pointer !important; }
+
+    html, body { background: var(--color-bg); }
+    body {
+      color: var(--color-ink);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .wrap {
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: clamp(1.25rem, 3.5vw, 2.75rem) clamp(1.1rem, 4vw, 2rem) 3rem;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────── */
+    .eyebrow {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: var(--type-field);
+      color: var(--color-blue);
+      display: flex; align-items: center; gap: 0.55rem;
+      margin: 0 0 0.9rem;
+    }
+    .eyebrow img { height: 1.5em; width: auto; display: block; }
+
+    h1.title {
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: var(--type-h1);
+      line-height: var(--leading-h1);
+      letter-spacing: 0.01em;
+      text-transform: uppercase;
+      margin: 0 0 0.7rem;
+    }
+    .lede {
+      font-family: var(--font-ui);
+      font-weight: 500;
+      font-size: var(--type-nav);
+      color: var(--color-blue);
+      margin: 0 0 1.1rem;
+    }
+    .intro {
+      font-size: var(--type-b1); line-height: var(--leading-b1);
+      max-width: 34rem; margin: 0;
+    }
+    .stamp {
+      display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap;
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .stamp button {
+      font: inherit; color: var(--color-blue); background: none; border: 0; padding: 0;
+      letter-spacing: inherit; text-transform: inherit;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .stamp button:disabled { color: var(--color-khaki); text-decoration: none; }
+
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+
+    /* ── Where we stand ───────────────────────────────────────── */
+    /* The takeaway is the page's lead: the one line a client should leave
+       with. Body face, because Erica One's numerals read badly as money. */
+    .takeaway {
+      font-weight: 700; font-size: var(--type-h2); line-height: var(--leading-h2);
+      margin: 0.35rem 0 0; max-width: 36rem; text-wrap: balance;
+    }
+    .over  { color: var(--color-red); }
+    .under { color: var(--color-green); }
+
+    /* Three figures, ruled rather than boxed. */
+    .figures {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1.5rem;
+      margin: 1.75rem 0 0; border-top: 1.5px solid var(--color-ink);
+    }
+    .figure { padding: 0.7rem 0 0; }
+    .figure dt {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .figure dd { margin: 0; }
+    .figure-amount {
+      display: block; font-weight: 700; font-size: var(--type-nav); line-height: 1.25;
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .figure-note { display: block; font-size: var(--type-small); color: var(--color-caramel); }
+    @media (max-width: 560px) {
+      /* Stacked, each figure becomes a row: label and note left, amount right. */
+      .figures { grid-template-columns: minmax(0, 1fr); }
+      .figure {
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 1rem; align-items: baseline;
+        padding: 0.6rem 0; border-bottom: 1px solid var(--color-khaki);
+      }
+      .figure:last-child { border-bottom: 0; }
+      .figure dd { display: contents; }
+      .figure-amount { grid-column: 2; grid-row: 1; }
+      .figure-note { grid-column: 1 / -1; }
+    }
+
+    /* One bar, the whole budget: recommended / left to work with / contingency. */
+    .bar {
+      position: relative; height: 0.9rem; margin: 1.25rem 0 0.55rem;
+      background: var(--color-white); border: 1.5px solid var(--color-ink);
+      display: flex; overflow: hidden;
+    }
+    .bar span { display: block; height: 100%; }
+    .bar .seg-rec   { background: var(--color-ink); }
+    .bar .seg-left  { background: var(--color-khaki); }
+    .bar .seg-res   { background: var(--color-white);
+      background-image: repeating-linear-gradient(135deg, var(--color-khaki) 0 2px, transparent 2px 6px); }
+    .bar .seg-over  { background: var(--color-red); }
+    .legend {
+      display: flex; gap: 0.2rem 1.1rem; flex-wrap: wrap;
+      font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack); color: var(--color-caramel);
+    }
+    .legend span::before {
+      content: ""; display: inline-block; width: 0.7em; height: 0.7em; margin-right: 0.4em;
+      border: 1px solid var(--color-ink); vertical-align: -0.02em;
+    }
+    .legend .l-rec::before  { background: var(--color-ink); }
+    .legend .l-left::before { background: var(--color-khaki); }
+    .legend .l-res::before  { background: repeating-linear-gradient(135deg, var(--color-khaki) 0 1px, transparent 1px 3px); }
+    .legend .l-over::before { background: var(--color-red); }
+
+    /* The working behind the takeaway, folded away for anyone who wants it. */
+    .means-more summary {
+      list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
+      border: 2px solid var(--color-ink); border-radius: var(--radius-pill);
+      padding: 0.2rem 0.75rem; margin-top: 1.25rem; cursor: pointer !important;
+    }
+    .means-more summary * { cursor: pointer !important; }
+    .means-more summary::-webkit-details-marker { display: none; }
+    .means-more summary::before { content: "+"; font-weight: 500; }
+    .means-more[open] summary { background: var(--color-ink); color: var(--color-bg); }
+    .means-more[open] summary::before { content: "−"; }
+    .means-more p { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.7rem 0 0; max-width: 36rem; }
+
+    /* ── Section heads ────────────────────────────────────────── */
+    .section-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      margin: 2.5rem 0 0.25rem;
+    }
+    .section-title {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+
+    .section-h {
+      font-family: var(--font-display); font-weight: 400; font-size: var(--type-h2);
+      line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase; margin: 0 0 0.4rem;
+    }
+    .section-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0 0 1.1rem; max-width: 34rem; }
+    /* A section of the page. The rule above it does the separating. */
+    .section { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
+    .section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+    /* The walkthrough is the evidence behind the numbers above. */
+    .part { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
+    .part .section-title { display: block; margin-bottom: 0.4rem; }
+    .part-title {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: var(--type-h2); line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase;
+      margin: 0 0 0.6rem;
+    }
+    .part-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0; max-width: 34rem; }
+
+    /* ── The breakdown: one table, budget against recommended ──── */
+    .ledger { border-top: 1.5px solid var(--color-ink); }
+    .led-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem 7rem 7rem; gap: 0.1rem 1rem;
+      grid-template-areas: "name budget rec status" "meta meta meta meta" "bar bar bar bar";
+      align-items: baseline; padding: 0.75rem 0; border-bottom: 1px solid var(--color-khaki);
+    }
+    .led-head {
+      padding: 0.45rem 0; border-bottom: 1px solid var(--color-khaki);
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .led-head span:not(:first-child) { text-align: right; }
+    .led-name   { grid-area: name; font-weight: 700; font-size: var(--type-b1); line-height: 1.3; }
+    .led-budget { grid-area: budget; }
+    .led-rec    { grid-area: rec; }
+    .led-status { grid-area: status; }
+    .led-meta {
+      grid-area: meta; font-family: var(--font-ui); font-weight: 600;
+      font-size: var(--type-chip-mobile-stack); color: var(--color-caramel);
+    }
+    /* Recommended against the category's budget. The budget is the full
+       width; anything past it is drawn as an overrun, in red. */
+    .led-bar {
+      grid-area: bar; position: relative; height: 0.4rem; margin-top: 0.4rem;
+      background: var(--color-white); border: 1px solid var(--color-khaki); display: flex; overflow: hidden;
+    }
+    .led-bar span { display: block; height: 100%; }
+    .led-bar .seg-rec  { background: var(--color-ink); }
+    .led-bar .seg-over { background: var(--color-red); }
+    .num {
+      font-weight: 600; font-size: var(--type-b1);
+      white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right;
+    }
+    .led-budget { color: var(--color-caramel); font-weight: 500; }
+    .led-status { font-weight: 500; color: var(--color-caramel); }
+    .led-status.over  { color: var(--color-red); font-weight: 600; }
+    .led-status.under { color: var(--color-green); font-weight: 600; }
+    .led-row.is-total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); margin-top: -1px; }
+    .led-row.is-total .led-budget { color: var(--color-ink); font-weight: 700; }
+    .led-row.is-total .led-rec { font-weight: 700; }
+    .driver {
+      font-size: var(--type-b1); line-height: var(--leading-b1);
+      margin: 1.25rem 0 0; padding-left: 1rem; border-left: 3px solid var(--color-ink); max-width: 36rem;
+    }
+    @media (max-width: 560px) {
+      /* Four columns don't fit a phone. Name and status share the first line;
+         the two amounts share the second, each carrying its own label. */
+      .led-head { display: none; }
+      .led-row {
+        grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 0.75rem;
+        grid-template-areas: "name status" "budget rec" "meta meta" "bar bar";
+      }
+      .led-budget, .led-rec { font-size: var(--type-small); font-weight: 500; color: var(--color-ink); }
+      .led-budget { text-align: left; }
+      .led-budget::before, .led-rec::before {
+        content: attr(data-label) " "; color: var(--color-caramel);
+      }
+      .led-rec:empty { display: none; }
+      .led-row.is-total .led-budget, .led-row.is-total .led-rec { font-weight: 700; }
+    }
+
+    /* ── Rooms + piece cards ──────────────────────────────────── */
+    /* Each room is a <details>: closed, it's one line with the count and subtotal. */
+    .room { margin-top: 1.5rem; }
+    .room summary { list-style: none; }
+    .room summary::-webkit-details-marker { display: none; }
+    .room-head {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      border-bottom: 2.5px solid var(--color-ink); padding-bottom: 0.5rem;
+    }
+    .room-name {
+      font-family: var(--font-display); font-weight: 400;
+      font-size: var(--type-h2); text-transform: uppercase; letter-spacing: 0.01em; line-height: var(--leading-h2);
+      display: flex; align-items: baseline; gap: 0.55rem;
+    }
+    .room-name::before {
+      content: "+"; font-family: var(--font-ui); font-weight: 500; font-size: var(--type-nav); color: var(--color-caramel); width: 1.1rem;
+    }
+    .room[open] .room-name::before { content: "−"; }
+    .room-name small { white-space: nowrap; font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip); color: var(--color-caramel); letter-spacing: 0.03em; text-transform: none; }
+    .room-total { font-weight: 700; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .room-total small { display: block; font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack); color: var(--color-caramel); text-align: right; }
+
+    .piece { padding: 0.9rem 0; border-bottom: 1px solid var(--color-khaki); }
+    .piece-label {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+      margin: 0 0 0.2rem;
+    }
+    /* A hero row is one recommended item. Photos slot into the first column
+       later: the grid already reserves it, collapsed to zero while empty. */
+    .hero {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.05rem 1rem;
+      align-items: baseline; padding: 0.25rem 0;
+    }
+    .hero + .hero { border-top: 1px solid var(--color-khaki); margin-top: 0.3rem; padding-top: 0.6rem; }
+    .hero-photo { grid-row: span 2; width: 0; }
+    .hero-photo img { width: 4.5rem; height: 4.5rem; object-fit: cover; display: block; border: 1px solid var(--color-khaki); }
+    .hero-photo:has(img) { width: 4.5rem; }
+    /* With no photo, drop the photo column altogether. Left in place, its
+       column gap would indent every name away from its label. */
+    .hero:not(:has(img)) { grid-template-columns: minmax(0, 1fr) auto; }
+    .hero:not(:has(img)) .hero-photo { display: none; }
+    .hero:not(:has(img)) .hero-sub { grid-column: 1; }
+    .hero:not(:has(img)) .hero-qty { grid-column: 2; }
+    .hero-name { font-weight: 600; font-size: var(--type-b1); line-height: 1.3; }
+    .hero-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
+    .hero-sub { grid-column: 2; font-size: var(--type-small); color: var(--color-caramel); }
+    .hero-price { font-weight: 700; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+    /* Quantity sits in its own cell under the price, so it never stretches the name row. */
+    .hero-qty { grid-column: 3; font-size: var(--type-small); color: var(--color-caramel); white-space: nowrap; text-align: right; }
+
+    /* The alternates reveal. */
+    .alts-toggle {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
+      color: var(--color-ink); background: transparent; border: 2px solid var(--color-ink);
+      border-radius: var(--radius-pill); padding: 0.2rem 0.75rem; margin-top: 0.45rem;
+      display: inline-flex; align-items: center; gap: 0.45rem;
+    }
+    .alts-toggle::before { content: "+"; font-weight: 500; }
+    .alts-toggle[aria-expanded="true"] { background: var(--color-ink); color: var(--color-bg); }
+    .alts-toggle[aria-expanded="true"]::before { content: "−"; }
+    .alts { display: none; margin: 0.55rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
+    .alts[data-open] { display: block; }
+    /* One line per alternate: name + details left, delta + price right. */
+    .alt {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      padding: 0.3rem 0; font-size: var(--type-small); line-height: 1.35;
+    }
+    .alt + .alt { border-top: 1px solid var(--color-khaki); }
+    .alt-name { font-weight: 600; color: var(--color-ink); }
+    .alt-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
+    .alt-sub { color: var(--color-caramel); }
+    .alt-delta { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+    .alt-delta small { font-size: inherit; font-weight: 500; color: var(--color-caramel); }
+    .alt-delta.less { color: var(--color-green); }
+
+    /* ── Notes / errors ───────────────────────────────────────── */
+    .notes { margin-top: 3rem; padding-top: 1.25rem; border-top: 1.5px solid var(--color-ink); max-width: 36rem; }
+    .notes p { font-size: var(--type-small); line-height: 1.5; color: var(--color-caramel); margin: 0.4rem 0 0; }
+    .notes .stamp { margin-top: 1rem; }
+    .warning {
+      background: var(--color-yellow); color: var(--color-ink);
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.85rem 1rem; font-size: var(--type-b1); margin-top: 1.5rem;
+    }
+    .loading { font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip); color: var(--color-caramel); padding: 2rem 0; }
+    .foot {
+      font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack);
+      color: var(--color-caramel); text-align: center; padding: 2.5rem 1rem 0;
+    }
+
+    @media (max-width: 480px) {
+      /* No room for the count beside the name: drop it to its own line,
+         indented past the +/− so it sits under the name. */
+      .room-name { flex-wrap: wrap; row-gap: 0; }
+      .room-name small { flex-basis: 100%; padding-left: calc(1.1rem + 0.55rem); }
+    }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      @page { margin: 0; }
+      .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
+      .stamp button, .alts-toggle { display: none; }
+      .room-name::before { display: none; }
+      .alts { display: block; }          /* print everything, alternates included */
+      .piece, .led-row { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <p class="eyebrow">
+      <img src="/assets/logo-keyhole.svg" alt="" aria-hidden="true">
+      Knock Twice
+    </p>
+    <h1 class="title">212 N 9th</h1>
+    <p class="lede">Initial design package · budget dashboard</p>
+    <p class="intro" id="intro">A companion to the design presentation. It shows what our recommendations cost, how that
+      compares with the budget we set together, and what is still to come.</p>
+
+    <div class="warning" id="warning" hidden></div>
+
+    <hr class="rule">
+
+    <div id="app"><p class="loading">Loading…</p></div>
+
+    <div class="notes">
+      <span class="section-title">Reading this page</span>
+      <p>Totals count our recommendation for each piece. Alternates are there to compare, and aren't in the totals.</p>
+      <p>Prices are list prices at the time of sourcing. Tax, shipping, and trade discounts aren't included.</p>
+      <p>The numbers come straight from our working budget, so this page is always current.</p>
+      <p class="stamp">
+        <span id="stamp-text">Loading…</span>
+        <button type="button" id="refresh" disabled>Refresh</button>
+      </p>
+    </div>
+    <p class="foot">Knock Twice · 212 N 9th · Initial Design Package · Budget Dashboard</p>
+  </main>
+
+  <script>
+  /* ── CONFIG — everything project-specific lives here ─────────────────── */
+  const CONFIG = {
+    sheetId: "1KhWinSYJopcwviQjfrZb1ks1ZHi3ZJqQDtG0OYWu5IM",
+    sheetName: "BUDGET VISIBILITY DASH",
+    budget: 70000,                // whole project, both rooms
+
+    // The Sheet's own categories, in display order, carrying the shares from
+    // the budget guidance shared with the client. Allocation = share × budget.
+    // Guidance → Sheet: Furniture → Furniture & Storage, Textiles → Soft Goods,
+    // Wall Treatments → Labor & Install (paint / wallpaper install), and
+    // Decor & Styling's 15% split evenly across Finishes and Art.
+    categories: [
+      { name: "Furniture & Storage", share: 0.40 },
+      { name: "Lighting",            share: 0.15 },
+      { name: "Soft Goods",          share: 0.10 },
+      { name: "Finishes",            share: 0.075 },
+      { name: "Art",                 share: 0.075 },
+      { name: "Labor & Install",     share: 0.15 },
+    ],
+    contingency: { share: 0.05 },   // reserve, shown separately
+
+    // Every category counts as still-in-progress until it's listed here. An
+    // in-progress category projects at the larger of what's recommended so far
+    // and its share — the unsourced balance shows as "still to source" — so the
+    // page never reads an unfinished category as savings. Add a category here
+    // once the design team calls it complete and its real number takes over.
+    complete: [],
+
+    // Which Status values count toward the totals. Everything else is an alternate.
+    countedStatus: ["recommended"],
+
+    // Sheet column headers → fields. Matching is case-insensitive and ignores
+    // punctuation, so "Qty." and "Room(s)" both resolve.
+    columns: {
+      room: "Rooms", status: "Status", category: "Category", piece: "Piece",
+      name: "Name", description: "Description", color: "Color", retailer: "Retailer",
+      unit: "Unit Price", qty: "Qty", total: "Total Price", link: "Link",
+      image: "Image",      // optional — add an Image column of direct image URLs and photos appear
+    },
+  };
+
+  /* ── Helpers ─────────────────────────────────────────────────────────── */
+  const $ = sel => document.querySelector(sel);
+  const money = n => "$" + Math.round(n).toLocaleString("en-US");
+  const moneyCents = n => "$" + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pctOf = n => +(100 * n / CONFIG.budget).toFixed(1) + "%";
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const num = v => { const n = parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")); return Number.isFinite(n) ? n : NaN; };
+  const key = s => String(s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  // Google's CSV export quotes every field; fields can contain commas and
+  // newlines (long retailer URLs, notes), so a real parser, not split(",").
+  function parseCSV(text) {
+    const rows = [[]]; let field = "", inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"' && text[i + 1] === '"') { field += '"'; i++; }
+        else if (c === '"') inQuotes = false;
+        else field += c;
+      } else if (c === '"') inQuotes = true;
+      else if (c === ",") { rows[rows.length - 1].push(field); field = ""; }
+      else if (c === "\n") { rows[rows.length - 1].push(field); field = ""; rows.push([]); }
+      else if (c !== "\r") field += c;
+    }
+    rows[rows.length - 1].push(field);
+    return rows.filter(r => r.some(v => v.trim() !== ""));
+  }
+
+  /* ── Read the Sheet ──────────────────────────────────────────────────── */
+  function readItems(csvRows) {
+    const headerIdx = csvRows.findIndex(r => r.some(v => key(v) === key(CONFIG.columns.status)));
+    if (headerIdx < 0) throw new Error(`Couldn't find a "${CONFIG.columns.status}" column on the ${CONFIG.sheetName} tab.`);
+    const header = csvRows[headerIdx].map(key);
+    const col = {};
+    for (const [field, label] of Object.entries(CONFIG.columns)) col[field] = header.indexOf(key(label));
+
+    const items = [];
+    csvRows.slice(headerIdx + 1).forEach((r, i) => {
+      const cell = f => col[f] >= 0 ? (r[col[f]] ?? "").trim() : "";
+      const it = {
+        row: headerIdx + i + 2,
+        room: cell("room"), status: cell("status"), category: cell("category"), piece: cell("piece"),
+        name: cell("name"), description: cell("description"), color: cell("color"), retailer: cell("retailer"),
+        unit: num(cell("unit")), qty: num(cell("qty")), total: num(cell("total")), link: cell("link"), image: cell("image"),
+      };
+      // Labor rows carry their description in the Piece column with no Name;
+      // a row with no Name and no price is a stub (e.g. an alt still to be
+      // sourced) — leave it off the page.
+      if (!it.name && !(it.total > 0)) return;
+      if (!it.name) it.name = it.piece;
+      if (!Number.isFinite(it.total)) it.total = Number.isFinite(it.unit) ? it.unit * (Number.isFinite(it.qty) ? it.qty : 1) : 0;
+      it.counted = CONFIG.countedStatus.includes(it.status.toLowerCase());
+      items.push(it);
+    });
+    return items;
+  }
+
+  /* ── Roll up ─────────────────────────────────────────────────────────── */
+  function summarize(items) {
+    const cats = CONFIG.categories.map(c => ({ name: c.name, allocation: c.share * CONFIG.budget, sourced: 0, count: 0 }));
+    const other = { name: "Other", allocation: 0, sourced: 0, count: 0, unmapped: true };
+    items.filter(it => it.counted).forEach(it => {
+      const cat = cats.find(c => c.name === it.category) || other;
+      cat.sourced += it.total; cat.count++;
+    });
+    if (other.count) cats.push(other);
+    cats.forEach(c => {
+      c.complete = CONFIG.complete.includes(c.name);
+      c.allowance = c.complete ? 0 : Math.max(0, c.allocation - c.sourced);   // still to source, at plan
+      c.projected = c.sourced + c.allowance;
+      c.variance = c.projected - c.allocation;
+    });
+    const sourced = cats.reduce((n, c) => n + c.sourced, 0);
+    const allowance = cats.reduce((n, c) => n + c.allowance, 0);
+    const reserve = CONFIG.contingency.share * CONFIG.budget;
+    const projected = sourced + allowance + reserve;
+
+    // Rooms in Sheet order; inside each, pieces in order of first appearance.
+    const rooms = [];
+    items.forEach(it => {
+      let room = rooms.find(r => r.name === it.room);
+      if (!room) { room = { name: it.room || "Unassigned", pieces: [], total: 0 }; rooms.push(room); }
+      let piece = room.pieces.find(p => p.name === it.piece);
+      if (!piece) { piece = { name: it.piece || it.name, recommended: [], alternates: [] }; room.pieces.push(piece); }
+      (it.counted ? piece.recommended : piece.alternates).push(it);
+      if (it.counted) room.total += it.total;
+    });
+
+    return { cats, rooms, sourced, allowance, reserve, projected, variance: projected - CONFIG.budget,
+             count: items.filter(it => it.counted).length };
+  }
+
+  /* ── Render ──────────────────────────────────────────────────────────── */
+  const linkName = it => it.link ? `<a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.name)}</a>` : esc(it.name);
+  const subLine = it => [it.description, it.color, it.retailer].filter(Boolean).map(esc).join(" · ");
+  const qtyLine = it => Number.isFinite(it.qty) && it.qty !== 1 && Number.isFinite(it.unit) ? `${it.qty} × ${moneyCents(it.unit)}` : "";
+
+  function heroHTML(it) {
+    const photo = it.image ? `<img src="${esc(it.image)}" alt="" loading="lazy">` : "";
+    return `<div class="hero">
+      <span class="hero-photo">${photo}</span>
+      <span class="hero-name">${linkName(it)}</span>
+      <span class="hero-price">${moneyCents(it.total)}</span>
+      <span class="hero-sub">${subLine(it)}</span>
+      <span class="hero-qty">${qtyLine(it)}</span>
+    </div>`;
+  }
+
+  function altHTML(it, against) {
+    const delta = it.total - against;
+    const cls = delta < -0.5 ? "less" : "";
+    const text = Math.abs(delta) < 0.5 ? "same price" : (delta < 0 ? "−" : "+") + money(Math.abs(delta));
+    const sub = subLine(it);
+    return `<div class="alt">
+      <span><span class="alt-name">${linkName(it)}</span>${sub ? ` <span class="alt-sub">· ${sub}</span>` : ""}</span>
+      <span class="alt-delta ${cls}">${text} <small>· ${money(it.total)}</small></span>
+    </div>`;
+  }
+
+  function render(S) {
+    const over = S.variance > 0;
+    // What the budget still has for unsourced pieces if today's recommendations
+    // are approved as-is, once the contingency is set aside.
+    const roomLeft = CONFIG.budget - S.sourced - S.reserve;
+    const pastBudget = roomLeft < -0.5;
+    const highEnd = Math.round(S.projected / 1000) * 1000;   // the conservative landing, to the nearest $1k
+    const ranged = over && highEnd > CONFIG.budget;
+    const spent = S.sourced + S.reserve;
+    const scale = Math.max(CONFIG.budget, spent);
+    const pct = n => (100 * Math.max(0, n) / scale).toFixed(2) + "%";
+
+    // The takeaway. Three cases: already past the budget on recommendations
+    // alone; on budget only if the rest comes in lean; comfortably inside it.
+    const takeaway = pastBudget
+      ? `Our recommendations so far come to ${money(spent)} with contingency, ${money(-roomLeft)} over the ${money(CONFIG.budget)} budget.`
+      : ranged
+        ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
+        : `We expect to land at or under ${money(CONFIG.budget)}, all in.`;
+    const working = pastBudget
+      ? `Approving everything here commits ${money(S.sourced)}. With the ${money(S.reserve)} contingency, that is past the budget before the remaining pieces are sourced. The alternates under each piece are where we can bring it back.`
+      : ranged
+        ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full budgets, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+        : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, which covers their budgets in full. As selections lock in, we calibrate accordingly.`;
+
+    let html = `
+      <section class="section">
+        <span class="section-title">Where we stand</span>
+        <p class="takeaway">${takeaway}</p>
+        <dl class="figures">
+          <div class="figure"><dt>Budget</dt><dd>
+            <span class="figure-amount">${money(CONFIG.budget)}</span>
+            <span class="figure-note">all in, both rooms</span></dd></div>
+          <div class="figure"><dt>Recommended so far</dt><dd>
+            <span class="figure-amount">${money(S.sourced)}</span>
+            <span class="figure-note">${S.count} piece${S.count === 1 ? "" : "s"}</span></dd></div>
+          <div class="figure"><dt>${pastBudget ? "Over budget" : "Left to work with"}</dt><dd>
+            <span class="figure-amount${pastBudget ? " over" : ""}">${money(Math.abs(roomLeft))}</span>
+            <span class="figure-note">after a ${money(S.reserve)} contingency</span></dd></div>
+        </dl>
+        <div class="bar">
+          <span class="seg-rec" style="width:${pct(Math.min(S.sourced, CONFIG.budget))}"></span>
+          <span class="seg-left" style="width:${pct(roomLeft)}"></span>
+          <span class="seg-res" style="width:${pct(Math.min(S.reserve, CONFIG.budget - Math.min(S.sourced, CONFIG.budget)))}"></span>
+          <span class="seg-over" style="width:${pct(-roomLeft)}"></span>
+        </div>
+        <div class="legend">
+          <span class="l-rec">Recommended</span>
+          ${pastBudget ? "" : `<span class="l-left">Left to work with</span>`}
+          <span class="l-res">Contingency</span>
+          ${pastBudget ? `<span class="l-over">Over budget</span>` : ""}
+        </div>
+        <details class="means-more">
+          <summary>How we get there</summary>
+          <p>${working}</p>
+        </details>
+      </section>
+
+      <section class="section">
+        <h2 class="section-h">How the budget breaks down</h2>
+        <p class="section-intro">The budget by category, set at kickoff as our baseline, against what we've recommended so far.</p>
+        <div class="ledger">
+          <div class="led-row led-head"><span>Category</span><span>Budget</span><span>Recommended</span><span>Status</span></div>`;
+
+    const overs = [];
+    S.cats.forEach(c => {
+      const diff = c.sourced - c.allocation;
+      // Every status says something: how far over, how much is left to
+      // source, or that the category hasn't been started. Green is earned:
+      // only a COMPLETE category that came in under its budget shows a saving.
+      let status, cls = "";
+      if (c.unmapped)            status = "Not in the budget";
+      else if (diff > 0.5)     { status = money(diff) + " over"; cls = "over"; overs.push(c); }
+      else if (c.complete)     { status = diff < -0.5 ? money(-diff) + " under" : "On budget"; cls = diff < -0.5 ? "under" : ""; }
+      else if (!c.count)         status = "Not started";
+      else                       status = money(-diff) + " to go";
+      const meta = [c.unmapped ? "" : pctOf(c.allocation) + " of the budget",
+                    `${c.count} piece${c.count === 1 ? "" : "s"}`, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
+      let bar = "";
+      if (!c.unmapped) {
+        const span = Math.max(c.allocation, c.sourced) || 1;
+        const w = n => (100 * n / span).toFixed(2) + "%";
+        bar = `<span class="led-bar">
+          <span class="seg-rec" style="width:${w(Math.min(c.sourced, c.allocation))}"></span>
+          <span class="seg-over" style="width:${w(Math.max(0, diff))}"></span>
+        </span>`;
+      }
+      html += `<div class="led-row">
+        <span class="led-name">${esc(c.name)}</span>
+        <span class="num led-budget" data-label="Budget">${c.unmapped ? "" : money(c.allocation)}</span>
+        <span class="num led-rec" data-label="Recommended">${money(c.sourced)}</span>
+        <span class="num led-status ${cls}">${status}</span>
+        <span class="led-meta">${meta}</span>
+        ${bar}
+      </div>`;
+    });
+    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
+    const budgetTotal = S.cats.reduce((n, c) => n + c.allocation, 0) + S.reserve;
+    html += `<div class="led-row">
+        <span class="led-name">Contingency</span>
+        <span class="num led-budget" data-label="Budget">${money(S.reserve)}</span>
+        <span class="num led-rec" data-label="Recommended"></span>
+        <span class="num led-status">Held in reserve</span>
+        <span class="led-meta">${pctOf(S.reserve)} of the budget</span>
+      </div>
+      <div class="led-row is-total">
+        <span class="led-name">Total</span>
+        <span class="num led-budget" data-label="Budget">${money(budgetTotal)}</span>
+        <span class="num led-rec" data-label="Recommended">${money(S.sourced)}</span>
+        <span class="num led-status"></span>
+      </div>
+    </div>`;
+    // Name what's moving the top of the range. It is exactly the overages:
+    // every other unfinished category is counted at its budget.
+    if (overs.length && ranged) {
+      const list = overs.map((c, i) => `${esc(c.name)} is ${money(c.sourced - c.allocation)} over${i ? "" : " its budget"}`);
+      const joined = list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list[0];
+      html += `<p class="driver">${joined}. That is what puts the top of our range above ${money(CONFIG.budget)}.</p>`;
+    }
+    html += `</section>`;
+
+    html += `<div class="part">
+        <h2 class="part-title">The pieces,<br>room by room</h2>
+        <p class="part-intro">Our recommendation for every piece. Open a room to review it; each piece with alternates has them tucked underneath.</p>
+      </div>`;
+
+    S.rooms.forEach((room, i) => {
+      const n = room.pieces.length;
+      html += `<details class="room"${i === 0 ? " open" : ""}>
+        <summary class="room-head">
+          <span class="room-name">${esc(room.name)} <small>${n} piece${n === 1 ? "" : "s"}</small></span>
+          <span class="room-total">${money(room.total)}<small>recommended</small></span>
+        </summary>`;
+      room.pieces.forEach(p => {
+        const against = p.recommended.reduce((n, it) => n + it.total, 0);
+        html += `<div class="piece">
+          <p class="piece-label">${esc(p.name)}</p>
+          ${p.recommended.map(heroHTML).join("")}`;
+        if (p.alternates.length) {
+          const n = p.alternates.length;
+          html += `<button type="button" class="alts-toggle" aria-expanded="false">${n} alternate${n === 1 ? "" : "s"}</button>
+            <div class="alts">
+              ${p.alternates.map(it => altHTML(it, against)).join("")}
+            </div>`;
+        }
+        html += `</div>`;
+      });
+      html += `</details>`;
+    });
+
+    $("#app").innerHTML = html;
+  }
+
+  // One handler for every alternates toggle, present or future.
+  $("#app").addEventListener("click", e => {
+    const btn = e.target.closest(".alts-toggle");
+    if (!btn) return;
+    const open = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!open));
+    const alts = btn.nextElementSibling;
+    if (open) alts.removeAttribute("data-open"); else alts.setAttribute("data-open", "");
+  });
+
+  /* ── Load ────────────────────────────────────────────────────────────── */
+  async function load() {
+    const btn = $("#refresh"), stamp = $("#stamp-text"), warn = $("#warning");
+    btn.disabled = true; stamp.textContent = "Loading…"; warn.hidden = true;
+    try {
+      // gviz serves the tab as CSV with CORS headers for link-shared Sheets;
+      // the timestamp param sidesteps any cached copy.
+      const url = `https://docs.google.com/spreadsheets/d/${CONFIG.sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(CONFIG.sheetName)}&_=${Date.now()}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Google answered ${res.status}.`);
+      const text = await res.text();
+      if (text.trimStart().startsWith("<")) throw new Error("Google returned a sign-in page instead of the Sheet.");
+      render(summarize(readItems(parseCSV(text))));
+      const now = new Date();
+      stamp.textContent = `Updated ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+    } catch (err) {
+      stamp.textContent = "Couldn't load the budget";
+      warn.hidden = false;
+      warn.innerHTML = `<strong>Couldn't load the budget.</strong> ${esc(err.message)} Try Refresh in a moment.`;
+      if (!$("#app").querySelector(".piece")) $("#app").innerHTML = "";
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  $("#refresh").addEventListener("click", load);
+  load();
+  </script>
+</body>
+</html>
