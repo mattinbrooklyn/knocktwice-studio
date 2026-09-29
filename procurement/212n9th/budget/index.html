@@ -141,11 +141,35 @@
       display: block; font-weight: 600; font-size: clamp(0.85rem, 2vw, 1rem);
       color: var(--color-caramel); margin-top: 0.35rem; text-align: right;
     }
-    .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
-    .today {
-      font-size: 0.92rem; margin: 1.1rem 0 0; padding: 0.7rem 0 0.7rem 0.9rem;
-      border-left: 3px solid var(--color-ink); max-width: 38rem;
+    /* The plan's headline sits directly on its table, so it carries its own gap. */
+    .headline.is-plan { margin-bottom: 1rem; }
+    /* Its label is too wide to share a line with the number on a phone, so
+       stack on purpose and run the caption inline beside the number. */
+    @media (max-width: 480px) {
+      .headline.is-plan { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .headline.is-plan .headline-amount small { display: inline; margin: 0 0 0 0.3rem; }
     }
+    .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
+    /* What this means: the takeaway in one sentence, with the working behind
+       it folded away for anyone who wants it. */
+    .means { margin: 1.5rem 0 0; padding: 0.2rem 0 0.3rem 1rem; border-left: 3px solid var(--color-ink); max-width: 38rem; }
+    .means .section-title { display: block; margin-bottom: 0.3rem; }
+    .means-statement {
+      font-weight: 700; font-size: clamp(1.3rem, 3.8vw, 1.7rem); line-height: 1.2;
+      letter-spacing: -0.01em; margin: 0; text-wrap: balance;
+    }
+    .means-more summary {
+      list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.03em;
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-pill);
+      padding: 0.2rem 0.75rem; margin-top: 0.7rem; cursor: pointer !important;
+    }
+    .means-more summary * { cursor: pointer !important; }
+    .means-more summary::-webkit-details-marker { display: none; }
+    .means-more summary::before { content: "+"; font-weight: 500; }
+    .means-more[open] summary { background: var(--color-ink); color: var(--color-bg); }
+    .means-more[open] summary::before { content: "−"; }
+    .means-more p { font-size: 0.92rem; margin: 0.7rem 0 0; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -207,6 +231,11 @@
       align-items: baseline; padding: 0.4rem 0; border-bottom: 1px solid var(--color-khaki); font-size: 0.92rem;
     }
     .plan-cell:last-child { border-bottom: 0; }
+    /* The total closes the table: ink rule above, in place of the khaki one. */
+    .plan-cell:has(+ .is-total) { border-bottom: 0; }
+    .plan-cell.is-total { border-top: 1.5px solid var(--color-ink); padding-top: 0.5rem; }
+    .plan-cell.is-total .pct, .plan-cell.is-total .num { font-weight: 700; }
+    .plan-cell.is-total span:first-child { font-weight: 700; }
     .plan-cell span:first-child { font-weight: 600; }
     .plan-cell .pct { font-weight: 500; font-size: 0.88rem; color: var(--color-caramel); text-align: right; font-variant-numeric: tabular-nums; }
     .plan-cell .num { font-weight: 600; font-size: 0.92rem; color: var(--color-ink); min-width: 4.5rem; }
@@ -552,11 +581,19 @@
     const highEnd = Math.round(S.projected / 1000) * 1000;   // the at-plan landing, to the nearest $1k
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
+    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
+    const planTotal = planRows.reduce((n, c) => n + c.share * CONFIG.budget, 0);
     let html = `
-      <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span><span class="section-title">${money(CONFIG.budget)} target</span></div>
+      <div class="headline is-plan">
+        <div class="headline-label">Initial budget<br>allocation</div>
+        <div class="headline-amount">${money(CONFIG.budget)}
+          <small>target</small>
+        </div>
+      </div>
       <div class="plan-wrap">
         <div class="plan">
           ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="pct">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
+          <div class="plan-cell is-total"><span>Total</span><span class="pct">${pctOf(planTotal)}</span><span class="num">${money(planTotal)}</span></div>
         </div>
         <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
       </div>
@@ -586,10 +623,20 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
-      <p class="today">${
-        gap > 0.5
-          ? `<strong>Where we expect to land: ${money(CONFIG.budget)} to ${money(highEnd)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
-          : `<strong>Where we expect to land: at or under ${money(CONFIG.budget)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+      <div class="means">
+        <span class="section-title">What this means</span>
+        <p class="means-statement">${
+          gap > 0.5
+            ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
+            : `We expect to land at or under ${money(CONFIG.budget)}, all in.`}</p>
+        <details class="means-more">
+          <summary>How we get there</summary>
+          <p>${
+            gap > 0.5
+              ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+              : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+        </details>
+      </div>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
