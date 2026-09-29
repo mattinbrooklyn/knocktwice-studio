@@ -150,6 +150,8 @@
       font-weight: 700; font-size: var(--type-h2); line-height: var(--leading-h2);
       margin: 0.35rem 0 0; max-width: 36rem; text-wrap: balance;
     }
+    /* The condition the takeaway rests on. Body size, so the range stays the lead. */
+    .takeaway-if { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.5rem 0 0; max-width: 34rem; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -291,10 +293,6 @@
     .led-row.is-total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); margin-top: -1px; }
     .led-row.is-total .led-budget { color: var(--color-ink); font-weight: 700; }
     .led-row.is-total .led-rec { font-weight: 700; }
-    .driver {
-      font-size: var(--type-b1); line-height: var(--leading-b1);
-      margin: 1.25rem 0 0; padding-left: 1rem; border-left: 3px solid var(--color-ink); max-width: 36rem;
-    }
     @media (max-width: 560px) {
       /* Four columns don't fit a phone. Name and status share the first line;
          the two amounts share the second, each carrying its own label. */
@@ -628,11 +626,15 @@
 
     // The takeaway. Three cases: already past the budget on recommendations
     // alone; on budget only if the rest comes in lean; comfortably inside it.
+    // Read as one sentence: the condition runs into the figure beneath it.
+    const condition = pastBudget
+      ? `If we move forward with every recommendation, we are at`
+      : `If we move forward with every recommendation and keep the rest on or under budget, we land at`;
     const takeaway = pastBudget
-      ? `Our recommendations so far come to ${money(spent)} with contingency, ${money(-roomLeft)} over the ${money(CONFIG.budget)} budget.`
+      ? `${money(spent)}, which is ${money(-roomLeft)} over budget.`
       : ranged
-        ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
-        : `We expect to land at or under ${money(CONFIG.budget)}, all in.`;
+        ? `${money(CONFIG.budget)} to ${money(highEnd)}, all in.`
+        : `${money(CONFIG.budget)} or less, all in.`;
     const working = pastBudget
       ? `Approving everything here commits ${money(S.sourced)}. With the ${money(S.reserve)} contingency, that is past the budget before the remaining pieces are sourced. The alternates under each piece are where we can bring it back.`
       : ranged
@@ -642,6 +644,7 @@
     let html = `
       <section class="section">
         <span class="section-title">Where we stand</span>
+        <p class="takeaway-if">${condition}</p>
         <p class="takeaway">${takeaway}</p>
         <dl class="figures">
           <div class="figure"><dt>Budget</dt><dd>
@@ -678,7 +681,6 @@
         <div class="ledger">
           <div class="led-row led-head"><span>Category</span><span>Budget</span><span>Recommended</span><span>Status</span></div>`;
 
-    const overs = [];
     S.cats.forEach(c => {
       const diff = c.sourced - c.allocation;
       // Every status says something: how far over, how much is left to
@@ -686,7 +688,7 @@
       // only a COMPLETE category that came in under its budget shows a saving.
       let status, cls = "";
       if (c.unmapped)            status = "Not in the budget";
-      else if (diff > 0.5)     { status = money(diff) + " over"; cls = "over"; overs.push(c); }
+      else if (diff > 0.5)     { status = money(diff) + " over"; cls = "over"; }
       else if (c.complete)     { status = diff < -0.5 ? money(-diff) + " under" : "On budget"; cls = diff < -0.5 ? "under" : ""; }
       else if (!c.count)         status = "Not started";
       else                       status = money(-diff) + " to go";
@@ -726,18 +728,11 @@
         <span class="num led-status"></span>
       </div>
     </div>`;
-    // Name what's moving the top of the range. It is exactly the overages:
-    // every other unfinished category is counted at its budget.
-    if (overs.length && ranged) {
-      const list = overs.map((c, i) => `${esc(c.name)} is ${money(c.sourced - c.allocation)} over${i ? "" : " its budget"}`);
-      const joined = list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list[0];
-      html += `<p class="driver">${joined}. That is what puts the top of our range above ${money(CONFIG.budget)}.</p>`;
-    }
     html += `</section>`;
 
     html += `<div class="part">
         <h2 class="part-title">The pieces,<br>room by room</h2>
-        <p class="part-intro">Our recommendation for every piece. Open a room to review it; each piece with alternates has them tucked underneath.</p>
+        <p class="part-intro">Open a room to see each piece we recommend and any alternates.</p>
       </div>`;
 
     S.rooms.forEach((room, i) => {
