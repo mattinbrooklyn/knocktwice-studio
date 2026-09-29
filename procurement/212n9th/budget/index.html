@@ -141,6 +141,14 @@
       display: block; font-weight: 600; font-size: clamp(0.85rem, 2vw, 1rem);
       color: var(--color-caramel); margin-top: 0.35rem; text-align: right;
     }
+    /* The plan's headline sits directly on its table, so it carries its own gap. */
+    .headline.is-plan { margin-bottom: 1rem; }
+    /* Its label is too wide to share a line with the number on a phone, so
+       stack on purpose and run the caption inline beside the number. */
+    @media (max-width: 480px) {
+      .headline.is-plan { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .headline.is-plan .headline-amount small { display: inline; margin: 0 0 0 0.3rem; }
+    }
     .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
     .today {
       font-size: 0.92rem; margin: 1.1rem 0 0; padding: 0.7rem 0 0.7rem 0.9rem;
@@ -207,6 +215,11 @@
       align-items: baseline; padding: 0.4rem 0; border-bottom: 1px solid var(--color-khaki); font-size: 0.92rem;
     }
     .plan-cell:last-child { border-bottom: 0; }
+    /* The total closes the table: ink rule above, in place of the khaki one. */
+    .plan-cell:has(+ .is-total) { border-bottom: 0; }
+    .plan-cell.is-total { border-top: 1.5px solid var(--color-ink); padding-top: 0.5rem; }
+    .plan-cell.is-total .pct, .plan-cell.is-total .num { font-weight: 700; }
+    .plan-cell.is-total span:first-child { font-weight: 700; }
     .plan-cell span:first-child { font-weight: 600; }
     .plan-cell .pct { font-weight: 500; font-size: 0.88rem; color: var(--color-caramel); text-align: right; font-variant-numeric: tabular-nums; }
     .plan-cell .num { font-weight: 600; font-size: 0.92rem; color: var(--color-ink); min-width: 4.5rem; }
@@ -552,11 +565,19 @@
     const highEnd = Math.round(S.projected / 1000) * 1000;   // the at-plan landing, to the nearest $1k
 
     const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
+    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
+    const planTotal = planRows.reduce((n, c) => n + c.share * CONFIG.budget, 0);
     let html = `
-      <div class="section-head" style="margin-top:0"><span class="section-title">Initial budget allocation</span><span class="section-title">${money(CONFIG.budget)} target</span></div>
+      <div class="headline is-plan">
+        <div class="headline-label">Initial budget<br>allocation</div>
+        <div class="headline-amount">${money(CONFIG.budget)}
+          <small>target</small>
+        </div>
+      </div>
       <div class="plan-wrap">
         <div class="plan">
           ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="pct">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
+          <div class="plan-cell is-total"><span>Total</span><span class="pct">${pctOf(planTotal)}</span><span class="num">${money(planTotal)}</span></div>
         </div>
         <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
       </div>
