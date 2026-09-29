@@ -183,6 +183,30 @@
         object-fit: cover;
       }
 
+      /* Coming Soon / Sold Out sticker (spec No. 17): tilted mustard pill
+         centred on the product image. Scales with the tile via vw. */
+      .shop-card-status {
+        position: absolute;
+        left: 50%;
+        top: 52%;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 2.35em;
+        padding: 0 1.3em;
+        border-radius: var(--radius-pill);
+        background: var(--color-yellow);
+        color: var(--color-ink);
+        font-family: var(--font-display);
+        font-size: clamp(0.875rem, 1.6vw, 1.4375rem);
+        line-height: 1;
+        text-transform: uppercase;
+        white-space: nowrap;
+        transform: translate(-50%, -50%) rotate(-14deg);
+        pointer-events: none;
+      }
+
       .shop-card-nav {
         position: absolute;
         inset: 50% 1.125rem auto 1.125rem;
@@ -892,6 +916,9 @@
                     currencyCode
                   }
                 }
+                launchStatus: metafield(namespace: "custom", key: "launch_status") {
+                  value
+                }
               }
             }
           }
@@ -934,12 +961,19 @@
         const safePrice = escapeHtml(price);
         const safeUrl = escapeHtml(productUrl);
         const safeAlt = escapeHtml((image && image.altText) || title);
+        // Shopify product metafield custom.launch_status (spec No. 17)
+        const status = product.launchStatus && product.launchStatus.value;
+        const statusPill =
+          status === "Coming Soon" || status === "Sold Out"
+            ? `<span class="shop-card-status">${escapeHtml(status)}</span>`
+            : "";
 
         return `
           <article class="shop-card">
             <a class="shop-card-link" href="${safeUrl}">
               <div class="shop-card-media${image ? " has-image" : ""}">
                 ${image ? `<img class="shop-card-image" src="${escapeHtml(image.url)}" alt="${safeAlt}" loading="lazy">` : ""}
+                ${statusPill}
                 ${showMobileArrows ? `<div class="shop-card-nav" aria-hidden="true"><span class="shop-card-arrow">&lt;</span><span class="shop-card-arrow">&gt;</span></div>` : ""}
               </div>
               <div class="shop-card-meta">
