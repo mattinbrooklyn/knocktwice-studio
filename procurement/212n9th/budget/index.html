@@ -150,10 +150,26 @@
       .headline.is-plan .headline-amount small { display: inline; margin: 0 0 0 0.3rem; }
     }
     .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
-    .today {
-      font-size: 0.92rem; margin: 1.1rem 0 0; padding: 0.7rem 0 0.7rem 0.9rem;
-      border-left: 3px solid var(--color-ink); max-width: 38rem;
+    /* What this means: the takeaway in one sentence, with the working behind
+       it folded away for anyone who wants it. */
+    .means { margin: 1.5rem 0 0; padding: 0.2rem 0 0.3rem 1rem; border-left: 3px solid var(--color-ink); max-width: 38rem; }
+    .means .section-title { display: block; margin-bottom: 0.3rem; }
+    .means-statement {
+      font-weight: 700; font-size: clamp(1.3rem, 3.8vw, 1.7rem); line-height: 1.2;
+      letter-spacing: -0.01em; margin: 0; text-wrap: balance;
     }
+    .means-more summary {
+      list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: var(--font-ui); font-weight: 700; font-size: 0.95rem; letter-spacing: 0.03em;
+      border: 1.5px solid var(--color-ink); border-radius: var(--radius-pill);
+      padding: 0.2rem 0.75rem; margin-top: 0.7rem; cursor: pointer !important;
+    }
+    .means-more summary * { cursor: pointer !important; }
+    .means-more summary::-webkit-details-marker { display: none; }
+    .means-more summary::before { content: "+"; font-weight: 500; }
+    .means-more[open] summary { background: var(--color-ink); color: var(--color-bg); }
+    .means-more[open] summary::before { content: "−"; }
+    .means-more p { font-size: 0.92rem; margin: 0.7rem 0 0; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -607,10 +623,20 @@
         <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
         <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
       </div>
-      <p class="today">${
-        gap > 0.5
-          ? `<strong>Where we expect to land: ${money(CONFIG.budget)} to ${money(highEnd)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
-          : `<strong>Where we expect to land: at or under ${money(CONFIG.budget)} all in.</strong> Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+      <div class="means">
+        <span class="section-title">What this means</span>
+        <p class="means-statement">${
+          gap > 0.5
+            ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
+            : `We expect to land at or under ${money(CONFIG.budget)}, all in.`}</p>
+        <details class="means-more">
+          <summary>How we get there</summary>
+          <p>${
+            gap > 0.5
+              ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+              : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+        </details>
+      </div>
 
       <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
       <div class="ledger">`;
