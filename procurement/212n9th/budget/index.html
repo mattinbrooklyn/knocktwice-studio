@@ -50,6 +50,9 @@
       --font-ui: 'Handjet', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       --radius-input: 0.25rem;
       --radius-pill: 2rem;
+      /* Brand type scale, mirrored from /assets/styles.css. */
+      --type-h2: clamp(1.625rem, 3.13vw, 1.875rem);   /* 26 → 30 */
+      --type-nav: clamp(1.375rem, 2.13vw, 1.625rem);  /* 22 → 26 */
     }
 
     * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
@@ -141,22 +144,14 @@
       display: block; font-weight: 600; font-size: clamp(0.85rem, 2vw, 1rem);
       color: var(--color-caramel); margin-top: 0.35rem; text-align: right;
     }
-    /* The plan's headline sits directly on its table, so it carries its own gap. */
-    .headline.is-plan { margin-bottom: 1rem; }
-    /* Its label is too wide to share a line with the number on a phone, so
-       stack on purpose and run the caption inline beside the number. */
-    @media (max-width: 480px) {
-      .headline.is-plan { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
-      .headline.is-plan .headline-amount small { display: inline; margin: 0 0 0 0.3rem; }
-    }
     .assumption { font-size: 0.88rem; color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
     /* What this means: the takeaway in one sentence, with the working behind
        it folded away for anyone who wants it. */
     .means { margin: 1.5rem 0 0; padding: 0.2rem 0 0.3rem 1rem; border-left: 3px solid var(--color-ink); max-width: 38rem; }
     .means .section-title { display: block; margin-bottom: 0.3rem; }
     .means-statement {
-      font-weight: 700; font-size: clamp(1.3rem, 3.8vw, 1.7rem); line-height: 1.2;
-      letter-spacing: -0.01em; margin: 0; text-wrap: balance;
+      font-weight: 700; font-size: var(--type-nav); line-height: 1.2;
+      margin: 0; text-wrap: balance;
     }
     .means-more summary {
       list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
@@ -219,6 +214,22 @@
     }
 
     /* ── The plan: how the budget breaks out ───────────────────── */
+    /* A brand H2 with the target on the line beneath, at the same size. This is
+       context: the projected total below stays the page's one big number. */
+    .plan-head { margin-bottom: 0.7rem; }
+    .plan-title {
+      font-family: var(--font-display); font-weight: 400; font-size: var(--type-h2);
+      line-height: 1.05; letter-spacing: 0.01em; text-transform: uppercase; margin: 0 0 0.3rem;
+    }
+    .plan-target { display: block; }
+    .plan-target {
+      font-weight: 700; font-size: var(--type-h2); line-height: 1.05;
+      white-space: nowrap; font-variant-numeric: tabular-nums;
+    }
+    .plan-target small {
+      font-family: var(--font-ui); font-weight: 700; font-size: 1rem;
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
     /* Two-column table on the left, the explainer beside it on the right;
        stacks on narrow screens. */
     .plan-wrap {
@@ -584,11 +595,9 @@
     // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
     const planTotal = planRows.reduce((n, c) => n + c.share * CONFIG.budget, 0);
     let html = `
-      <div class="headline is-plan">
-        <div class="headline-label">Initial budget<br>allocation</div>
-        <div class="headline-amount">${money(CONFIG.budget)}
-          <small>target</small>
-        </div>
+      <div class="plan-head">
+        <h2 class="plan-title">Initial budget allocation</h2>
+        <span class="plan-target">${money(CONFIG.budget)} <small>target</small></span>
       </div>
       <div class="plan-wrap">
         <div class="plan">
