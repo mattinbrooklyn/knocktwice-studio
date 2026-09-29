@@ -13,20 +13,21 @@
   <link rel="stylesheet" href="/assets/styles.css">
   <style>
     /* ──────────────────────────────────────────────────────────────
-       BUDGET — the client's review page for 212 N 9th, Phase 1.
+       BUDGET — the client's companion to the design presentation for
+       212 N 9th.
 
        Reads the BUDGET VISIBILITY DASH tab of the project Sheet live on
        every load (Google's CSV endpoint; no helper, no sync step) and
-       shows three things: where the projected total stands against the
-       $70k budget, how that splits by category, and a room-by-room walk
-       through every recommended piece with its alternates tucked
-       underneath. Alternates show their price as a delta against the
-       recommendation and never touch the totals.
+       answers three questions in the order a client asks them:
+         1. Where do we stand?        the takeaway, three figures, one bar
+         2. How does that break down? one table, category by category
+         3. What did you pick?        every recommended piece, room by room
+       Alternates show their price as a delta against the recommendation
+       and never touch the totals.
 
-       Every category counts as in progress until CONFIG.complete says
-       otherwise, and projects at the larger of what's recommended and its
-       share. The projection is deliberately conservative: it never reads
-       an unfinished category as savings.
+       The range's top end is deliberately conservative: a category still
+       being sourced is counted at the larger of what's recommended and its
+       budget, until CONFIG.complete says it's done.
 
        Everything project-specific lives in CONFIG at the top of the
        script. Nothing on this page writes back to the Sheet.
@@ -132,7 +133,6 @@
       display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap;
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
-      margin-top: 1rem;
     }
     .stamp button {
       font: inherit; color: var(--color-blue); background: none; border: 0; padding: 0;
@@ -143,85 +143,83 @@
 
     .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
 
-    /* ── The one number ───────────────────────────────────────── */
-    .headline {
-      display: flex; align-items: flex-end; justify-content: space-between;
-      gap: 1rem 2rem; flex-wrap: wrap;
+    /* ── Where we stand ───────────────────────────────────────── */
+    /* The takeaway is the page's lead: the one line a client should leave
+       with. Body face, because Erica One's numerals read badly as money. */
+    .takeaway {
+      font-weight: 700; font-size: var(--type-h2); line-height: var(--leading-h2);
+      margin: 0.35rem 0 0; max-width: 36rem; text-wrap: balance;
     }
-    .headline-label {
-      font-family: var(--font-display); font-weight: 400;
-      font-size: var(--type-h2); text-transform: uppercase; letter-spacing: 0.01em;
-      line-height: var(--leading-h2);
-    }
-    .headline-amount {
-      font-family: var(--font-body); font-weight: 700;
-      font-size: var(--type-h2); line-height: var(--leading-h2);
-      font-variant-numeric: tabular-nums; white-space: nowrap;
-    }
-    .headline-amount small {
-      display: block; font-weight: 600; font-size: var(--type-small); line-height: 1.4;
-      color: var(--color-caramel); margin-top: 0.1rem; text-align: right;
-    }
-    .assumption { font-size: var(--type-b1); line-height: var(--leading-b1); color: var(--color-caramel); margin: 0.9rem 0 0; max-width: 36rem; }
-    /* What this means: the takeaway in one sentence, with the working behind
-       it folded away for anyone who wants it. */
-    .means { margin: 1.5rem 0 0; padding: 0.2rem 0 0.3rem 1rem; border-left: 3px solid var(--color-ink); max-width: 38rem; }
-    .means .section-title { display: block; margin-bottom: 0.3rem; }
-    .means-statement {
-      /* Body face, not display: Erica One's numerals are hard to read as
-         dollar figures. Size is the brand's nav step. */
-      font-weight: 700; font-size: var(--type-nav); line-height: 1.2;
-      margin: 0; text-wrap: balance;
-    }
-    .means-more summary {
-      list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
-      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
-      border: 2px solid var(--color-ink); border-radius: var(--radius-pill);
-      padding: 0.2rem 0.75rem; margin-top: 0.7rem; cursor: pointer !important;
-    }
-    .means-more summary * { cursor: pointer !important; }
-    .means-more summary::-webkit-details-marker { display: none; }
-    .means-more summary::before { content: "+"; font-weight: 500; }
-    .means-more[open] summary { background: var(--color-ink); color: var(--color-bg); }
-    .means-more[open] summary::before { content: "−"; }
-    .means-more p { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.7rem 0 0; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
-    /* Stacked bar: recommended / allowances / contingency, against the budget line. */
+    /* Three figures, ruled rather than boxed. */
+    .figures {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1.5rem;
+      margin: 1.75rem 0 0; border-top: 1.5px solid var(--color-ink);
+    }
+    .figure { padding: 0.7rem 0 0; }
+    .figure dt {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .figure dd { margin: 0; }
+    .figure-amount {
+      display: block; font-weight: 700; font-size: var(--type-nav); line-height: 1.25;
+      font-variant-numeric: tabular-nums; white-space: nowrap;
+    }
+    .figure-note { display: block; font-size: var(--type-small); color: var(--color-caramel); }
+    @media (max-width: 560px) {
+      /* Stacked, each figure becomes a row: label and note left, amount right. */
+      .figures { grid-template-columns: minmax(0, 1fr); }
+      .figure {
+        display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 1rem; align-items: baseline;
+        padding: 0.6rem 0; border-bottom: 1px solid var(--color-khaki);
+      }
+      .figure:last-child { border-bottom: 0; }
+      .figure dd { display: contents; }
+      .figure-amount { grid-column: 2; grid-row: 1; }
+      .figure-note { grid-column: 1 / -1; }
+    }
+
+    /* One bar, the whole budget: recommended / left to work with / contingency. */
     .bar {
-      position: relative; height: 0.9rem; margin: 1.1rem 0 0.55rem;
+      position: relative; height: 0.9rem; margin: 1.25rem 0 0.55rem;
       background: var(--color-white); border: 1.5px solid var(--color-ink);
       display: flex; overflow: hidden;
     }
     .bar span { display: block; height: 100%; }
     .bar .seg-rec   { background: var(--color-ink); }
-    .bar .seg-allow { background: var(--color-khaki); }
+    .bar .seg-left  { background: var(--color-khaki); }
     .bar .seg-res   { background: var(--color-white);
       background-image: repeating-linear-gradient(135deg, var(--color-khaki) 0 2px, transparent 2px 6px); }
-    .bar .budget-line { position: absolute; top: -0.3rem; bottom: -0.3rem; width: 0; border-left: 2px solid var(--color-red); }
+    .bar .seg-over  { background: var(--color-red); }
     .legend {
-      display: flex; gap: 1.1rem; flex-wrap: wrap;
+      display: flex; gap: 0.2rem 1.1rem; flex-wrap: wrap;
       font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack); color: var(--color-caramel);
     }
     .legend span::before {
       content: ""; display: inline-block; width: 0.7em; height: 0.7em; margin-right: 0.4em;
       border: 1px solid var(--color-ink); vertical-align: -0.02em;
     }
-    .legend .l-rec::before   { background: var(--color-ink); }
-    .legend .l-allow::before { background: var(--color-khaki); }
-    .legend .l-res::before   { background: repeating-linear-gradient(135deg, var(--color-khaki) 0 1px, transparent 1px 3px); }
-    .legend .l-room::before  { background: var(--color-white); }
+    .legend .l-rec::before  { background: var(--color-ink); }
+    .legend .l-left::before { background: var(--color-khaki); }
+    .legend .l-res::before  { background: repeating-linear-gradient(135deg, var(--color-khaki) 0 1px, transparent 1px 3px); }
+    .legend .l-over::before { background: var(--color-red); }
 
-    .ladder { margin-top: 1.25rem; border-top: 2.5px solid var(--color-ink); }
-    .lad-row {
-      display: flex; align-items: baseline; justify-content: space-between;
-      gap: 1rem; padding: 0.7rem 0 0;
+    /* The working behind the takeaway, folded away for anyone who wants it. */
+    .means-more summary {
+      list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
+      border: 2px solid var(--color-ink); border-radius: var(--radius-pill);
+      padding: 0.2rem 0.75rem; margin-top: 1.25rem; cursor: pointer !important;
     }
-    .lad-label { font-weight: 600; font-size: var(--type-b1); }
-    .lad-label small { font-weight: 500; color: var(--color-caramel); font-size: var(--type-small); }
-    .lad-amount { font-weight: 600; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .lad-row.is-allow .lad-amount { color: var(--color-caramel); }
+    .means-more summary * { cursor: pointer !important; }
+    .means-more summary::-webkit-details-marker { display: none; }
+    .means-more summary::before { content: "+"; font-weight: 500; }
+    .means-more[open] summary { background: var(--color-ink); color: var(--color-bg); }
+    .means-more[open] summary::before { content: "−"; }
+    .means-more p { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.7rem 0 0; max-width: 36rem; }
 
     /* ── Section heads ────────────────────────────────────────── */
     .section-head {
@@ -233,50 +231,17 @@
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
     }
 
-    /* ── The plan: how the budget breaks out ───────────────────── */
-    /* A brand H2 with the target on the line beneath, at the same size. This is
-       context: the projected total below stays the page's one big number. */
-    .plan-head { margin-bottom: 0.7rem; }
-    .plan-title {
+    .section-h {
       font-family: var(--font-display); font-weight: 400; font-size: var(--type-h2);
-      line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase; margin: 0;
+      line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase; margin: 0 0 0.4rem;
     }
-    .plan-target { display: block; }
-    .plan-target {
-      font-weight: 700; font-size: var(--type-h2); line-height: var(--leading-h2);
-      white-space: nowrap; font-variant-numeric: tabular-nums;
-    }
-    .plan-target small {
-      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
-      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
-    }
-    /* Two-column table on the left, the explainer beside it on the right;
-       stacks on narrow screens. */
-    .plan-wrap {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 2.5rem;
-      border-top: 1.5px solid var(--color-ink); padding-top: 0.25rem;
-    }
-    /* Three columns: category · share (caramel) · dollars (ink). */
-    .plan-cell {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0 1rem;
-      align-items: baseline; padding: 0.4rem 0; border-bottom: 1px solid var(--color-khaki); font-size: var(--type-b1);
-    }
-    .plan-cell:last-child { border-bottom: 0; }
-    /* The total closes the table: ink rule above, in place of the khaki one. */
-    .plan-cell:has(+ .is-total) { border-bottom: 0; }
-    .plan-cell.is-total { border-top: 1.5px solid var(--color-ink); padding-top: 0.5rem; }
-    .plan-cell.is-total .pct, .plan-cell.is-total .num { font-weight: 700; }
-    .plan-cell.is-total span:first-child { font-weight: 700; }
-    .plan-cell span:first-child { font-weight: 600; }
-    .plan-cell .pct { font-weight: 500; font-size: var(--type-small); color: var(--color-caramel); text-align: right; font-variant-numeric: tabular-nums; }
-    .plan-cell .num { font-weight: 600; font-size: var(--type-b1); color: var(--color-ink); min-width: 4.5rem; }
-    .plan-note { font-size: var(--type-b1); line-height: var(--leading-b1); color: var(--color-caramel); margin: 0.6rem 0 0; }
-    @media (max-width: 640px) {
-      .plan-wrap { grid-template-columns: minmax(0, 1fr); }
-      .plan-note { margin-top: 1rem; }
-    }
-    /* Part two of the page: the walkthrough. A heavier break than a section head. */
-    .part { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 2.5px solid var(--color-ink); }
+    .section-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0 0 1.1rem; max-width: 34rem; }
+    /* A section of the page. The rule above it does the separating. */
+    .section { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
+    .section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+
+    /* The walkthrough is the evidence behind the numbers above. */
+    .part { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
     .part .section-title { display: block; margin-bottom: 0.4rem; }
     .part-title {
       font-family: var(--font-display); font-weight: 400;
@@ -285,31 +250,67 @@
     }
     .part-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0; max-width: 34rem; }
 
-    /* ── Category ledger ──────────────────────────────────────── */
+    /* ── The breakdown: one table, budget against recommended ──── */
     .ledger { border-top: 1.5px solid var(--color-ink); }
     .led-row {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.1rem 1rem;
-      align-items: baseline; padding: 0.8rem 0; border-bottom: 1px solid var(--color-khaki);
+      display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem 7rem 7rem; gap: 0.1rem 1rem;
+      grid-template-areas: "name budget rec status" "meta meta meta meta" "bar bar bar bar";
+      align-items: baseline; padding: 0.75rem 0; border-bottom: 1px solid var(--color-khaki);
     }
-    /* Same style as the category names in the allocation table above. */
-    .led-name { font-weight: 700; font-size: var(--type-b1); line-height: 1.3; }
-    .led-meta { grid-column: 1; font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack); color: var(--color-caramel); }
-    /* Per-category bar: recommended + allowance against that category's share.
-       The share is the full width; anything past it is drawn as an overrun. */
+    .led-head {
+      padding: 0.45rem 0; border-bottom: 1px solid var(--color-khaki);
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .led-head span:not(:first-child) { text-align: right; }
+    .led-name   { grid-area: name; font-weight: 700; font-size: var(--type-b1); line-height: 1.3; }
+    .led-budget { grid-area: budget; }
+    .led-rec    { grid-area: rec; }
+    .led-status { grid-area: status; }
+    .led-meta {
+      grid-area: meta; font-family: var(--font-ui); font-weight: 600;
+      font-size: var(--type-chip-mobile-stack); color: var(--color-caramel);
+    }
+    /* Recommended against the category's budget. The budget is the full
+       width; anything past it is drawn as an overrun, in red. */
     .led-bar {
-      grid-column: 1 / -1; position: relative; height: 0.45rem; margin-top: 0.35rem;
+      grid-area: bar; position: relative; height: 0.4rem; margin-top: 0.4rem;
       background: var(--color-white); border: 1px solid var(--color-khaki); display: flex; overflow: hidden;
     }
     .led-bar span { display: block; height: 100%; }
-    .led-bar .seg-rec   { background: var(--color-ink); }
-    .led-bar .seg-allow { background: var(--color-khaki); }
-    .led-bar .seg-over  { background: var(--color-red); }
-    .led-bar .share-line { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1.5px solid var(--color-ink); }
+    .led-bar .seg-rec  { background: var(--color-ink); }
+    .led-bar .seg-over { background: var(--color-red); }
     .num {
       font-weight: 600; font-size: var(--type-b1);
-      white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; min-width: 4.5rem;
+      white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right;
     }
-    .num.muted { color: var(--color-caramel); font-weight: 500; }
+    .led-budget { color: var(--color-caramel); font-weight: 500; }
+    .led-status { font-weight: 500; color: var(--color-caramel); }
+    .led-status.over  { color: var(--color-red); font-weight: 600; }
+    .led-status.under { color: var(--color-green); font-weight: 600; }
+    .led-row.is-total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); margin-top: -1px; }
+    .led-row.is-total .led-budget { color: var(--color-ink); font-weight: 700; }
+    .led-row.is-total .led-rec { font-weight: 700; }
+    .driver {
+      font-size: var(--type-b1); line-height: var(--leading-b1);
+      margin: 1.25rem 0 0; padding-left: 1rem; border-left: 3px solid var(--color-ink); max-width: 36rem;
+    }
+    @media (max-width: 560px) {
+      /* Four columns don't fit a phone. Name and status share the first line;
+         the two amounts share the second, each carrying its own label. */
+      .led-head { display: none; }
+      .led-row {
+        grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 0.75rem;
+        grid-template-areas: "name status" "budget rec" "meta meta" "bar bar";
+      }
+      .led-budget, .led-rec { font-size: var(--type-small); font-weight: 500; color: var(--color-ink); }
+      .led-budget { text-align: left; }
+      .led-budget::before, .led-rec::before {
+        content: attr(data-label) " "; color: var(--color-caramel);
+      }
+      .led-rec:empty { display: none; }
+      .led-row.is-total .led-budget, .led-row.is-total .led-rec { font-weight: 700; }
+    }
 
     /* ── Rooms + piece cards ──────────────────────────────────── */
     /* Each room is a <details>: closed, it's one line with the count and subtotal. */
@@ -349,6 +350,12 @@
     .hero-photo { grid-row: span 2; width: 0; }
     .hero-photo img { width: 4.5rem; height: 4.5rem; object-fit: cover; display: block; border: 1px solid var(--color-khaki); }
     .hero-photo:has(img) { width: 4.5rem; }
+    /* With no photo, drop the photo column altogether. Left in place, its
+       column gap would indent every name away from its label. */
+    .hero:not(:has(img)) { grid-template-columns: minmax(0, 1fr) auto; }
+    .hero:not(:has(img)) .hero-photo { display: none; }
+    .hero:not(:has(img)) .hero-sub { grid-column: 1; }
+    .hero:not(:has(img)) .hero-qty { grid-column: 2; }
     .hero-name { font-weight: 600; font-size: var(--type-b1); line-height: 1.3; }
     .hero-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
     .hero-sub { grid-column: 2; font-size: var(--type-small); color: var(--color-caramel); }
@@ -382,7 +389,9 @@
     .alt-delta.less { color: var(--color-green); }
 
     /* ── Notes / errors ───────────────────────────────────────── */
-    .note { font-size: var(--type-small); color: var(--color-caramel); margin-top: 2rem; max-width: 36rem; }
+    .notes { margin-top: 3rem; padding-top: 1.25rem; border-top: 1.5px solid var(--color-ink); max-width: 36rem; }
+    .notes p { font-size: var(--type-small); line-height: 1.5; color: var(--color-caramel); margin: 0.4rem 0 0; }
+    .notes .stamp { margin-top: 1rem; }
     .warning {
       background: var(--color-yellow); color: var(--color-ink);
       border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
@@ -395,12 +404,10 @@
     }
 
     @media (max-width: 480px) {
-      .led-row { column-gap: 0.75rem; }
       /* No room for the count beside the name: drop it to its own line,
          indented past the +/− so it sits under the name. */
       .room-name { flex-wrap: wrap; row-gap: 0; }
       .room-name small { flex-basis: 100%; padding-left: calc(1.1rem + 0.55rem); }
-      .num { min-width: 4rem; }
     }
 
     @media print {
@@ -408,7 +415,6 @@
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
       .stamp button, .alts-toggle { display: none; }
-      .led-bar { display: none; }
       .room-name::before { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
       .piece, .led-row { break-inside: avoid; }
@@ -424,12 +430,8 @@
     </p>
     <h1 class="title">212 N 9th</h1>
     <p class="lede">Initial design package · budget dashboard</p>
-    <p class="intro" id="intro">Where the budget stands, by category and by piece. Our recommendation for each piece is
-      what's counted. Alternates are there to explore, and aren't in the total.</p>
-    <p class="stamp">
-      <span id="stamp-text">Loading…</span>
-      <button type="button" id="refresh" disabled>Refresh</button>
-    </p>
+    <p class="intro" id="intro">A companion to the design presentation. It shows what our recommendations cost, how that
+      compares with the budget we set together, and what is still to come.</p>
 
     <div class="warning" id="warning" hidden></div>
 
@@ -437,7 +439,16 @@
 
     <div id="app"><p class="loading">Loading…</p></div>
 
-    <p class="note">Prices are list prices at the time of sourcing. Tax, shipping, and trade discounts aren't included.</p>
+    <div class="notes">
+      <span class="section-title">Reading this page</span>
+      <p>Totals count our recommendation for each piece. Alternates are there to compare, and aren't in the totals.</p>
+      <p>Prices are list prices at the time of sourcing. Tax, shipping, and trade discounts aren't included.</p>
+      <p>The numbers come straight from our working budget, so this page is always current.</p>
+      <p class="stamp">
+        <span id="stamp-text">Loading…</span>
+        <button type="button" id="refresh" disabled>Refresh</button>
+      </p>
+    </div>
     <p class="foot">Knock Twice · 212 N 9th · Initial Design Package · Budget Dashboard</p>
   </main>
 
@@ -603,112 +614,127 @@
   }
 
   function render(S) {
-    const scale = Math.max(CONFIG.budget, S.projected);
-    const pct = n => (100 * n / scale).toFixed(2) + "%";
     const over = S.variance > 0;
-    // What's left of the budget for unsourced categories if today's recommendations
-    // are approved as-is, and how far under their plan those would need to land.
+    // What the budget still has for unsourced pieces if today's recommendations
+    // are approved as-is, once the contingency is set aside.
     const roomLeft = CONFIG.budget - S.sourced - S.reserve;
-    const gap = S.allowance - roomLeft;
-    const highEnd = Math.round(S.projected / 1000) * 1000;   // the at-plan landing, to the nearest $1k
+    const pastBudget = roomLeft < -0.5;
+    const highEnd = Math.round(S.projected / 1000) * 1000;   // the conservative landing, to the nearest $1k
+    const ranged = over && highEnd > CONFIG.budget;
+    const spent = S.sourced + S.reserve;
+    const scale = Math.max(CONFIG.budget, spent);
+    const pct = n => (100 * Math.max(0, n) / scale).toFixed(2) + "%";
 
-    const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
-    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
-    const planTotal = planRows.reduce((n, c) => n + c.share * CONFIG.budget, 0);
+    // The takeaway. Three cases: already past the budget on recommendations
+    // alone; on budget only if the rest comes in lean; comfortably inside it.
+    const takeaway = pastBudget
+      ? `Our recommendations so far come to ${money(spent)} with contingency, ${money(-roomLeft)} over the ${money(CONFIG.budget)} budget.`
+      : ranged
+        ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
+        : `We expect to land at or under ${money(CONFIG.budget)}, all in.`;
+    const working = pastBudget
+      ? `Approving everything here commits ${money(S.sourced)}. With the ${money(S.reserve)} contingency, that is past the budget before the remaining pieces are sourced. The alternates under each piece are where we can bring it back.`
+      : ranged
+        ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full budgets, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
+        : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, which covers their budgets in full. As selections lock in, we calibrate accordingly.`;
+
     let html = `
-      <div class="plan-head">
-        <h2 class="plan-title">Initial budget allocation</h2>
-        <span class="plan-target">${money(CONFIG.budget)} <small>target</small></span>
-      </div>
-      <div class="plan-wrap">
-        <div class="plan">
-          ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="pct">${pctOf(c.share * CONFIG.budget)}</span><span class="num">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
-          <div class="plan-cell is-total"><span>Total</span><span class="pct">${pctOf(planTotal)}</span><span class="num">${money(planTotal)}</span></div>
+      <section class="section">
+        <span class="section-title">Where we stand</span>
+        <p class="takeaway">${takeaway}</p>
+        <dl class="figures">
+          <div class="figure"><dt>Budget</dt><dd>
+            <span class="figure-amount">${money(CONFIG.budget)}</span>
+            <span class="figure-note">all in, both rooms</span></dd></div>
+          <div class="figure"><dt>Recommended so far</dt><dd>
+            <span class="figure-amount">${money(S.sourced)}</span>
+            <span class="figure-note">${S.count} piece${S.count === 1 ? "" : "s"}</span></dd></div>
+          <div class="figure"><dt>${pastBudget ? "Over budget" : "Left to work with"}</dt><dd>
+            <span class="figure-amount${pastBudget ? " over" : ""}">${money(Math.abs(roomLeft))}</span>
+            <span class="figure-note">after a ${money(S.reserve)} contingency</span></dd></div>
+        </dl>
+        <div class="bar">
+          <span class="seg-rec" style="width:${pct(Math.min(S.sourced, CONFIG.budget))}"></span>
+          <span class="seg-left" style="width:${pct(roomLeft)}"></span>
+          <span class="seg-res" style="width:${pct(Math.min(S.reserve, CONFIG.budget - Math.min(S.sourced, CONFIG.budget)))}"></span>
+          <span class="seg-over" style="width:${pct(-roomLeft)}"></span>
         </div>
-        <p class="plan-note">How we initially allocated the ${money(CONFIG.budget)} target budget across categories. It's directional, set at kickoff to give us a baseline to track against, and we refine it together as the design locks and pieces are chosen.</p>
-      </div>
-
-      <div class="section-head"><span class="section-title">Where we are</span></div>
-      <div class="headline">
-        <div class="headline-label">Projected<br>at plan</div>
-        <div class="headline-amount">${money(S.projected)}
-          <small class="${over ? "over" : "under"}">${over ? money(S.variance) + " over" : money(-S.variance) + " under"} the ${money(CONFIG.budget)} budget</small>
+        <div class="legend">
+          <span class="l-rec">Recommended</span>
+          ${pastBudget ? "" : `<span class="l-left">Left to work with</span>`}
+          <span class="l-res">Contingency</span>
+          ${pastBudget ? `<span class="l-over">Over budget</span>` : ""}
         </div>
-      </div>
-      <p class="assumption">After our first round, with recommendations in for the bulk of the pieces and all of the big anchor items, here's where things stand. Anything still being sourced is counted at its full allocation until it's confirmed.</p>
-      <div class="bar">
-        <span class="seg-rec" style="width:${pct(S.sourced)}"></span>
-        <span class="seg-allow" style="width:${pct(S.allowance)}"></span>
-        <span class="seg-res" style="width:${pct(S.reserve)}"></span>
-        ${over ? `<span class="budget-line" style="left:${pct(CONFIG.budget)}"></span>` : ""}
-      </div>
-      <div class="legend">
-        <span class="l-rec">Recommended</span>
-        <span class="l-allow">Still to source</span>
-        <span class="l-res">Contingency</span>
-        ${over ? "" : `<span class="l-room">Headroom · ${money(-S.variance)}</span>`}
-      </div>
-      <div class="ladder">
-        <div class="lad-row"><span class="lad-label">Recommended pieces <small>· ${S.count} items</small></span><span class="lad-amount">${money(S.sourced)}</span></div>
-        <div class="lad-row is-allow"><span class="lad-label">Still to source <small>· at plan</small></span><span class="lad-amount">${money(S.allowance)}</span></div>
-        <div class="lad-row"><span class="lad-label">Contingency <small>· ${pctOf(S.reserve)} reserve</small></span><span class="lad-amount">${money(S.reserve)}</span></div>
-      </div>
-      <div class="means">
-        <span class="section-title">What this means</span>
-        <p class="means-statement">${
-          gap > 0.5
-            ? `We expect to land between ${money(CONFIG.budget)} and ${money(highEnd)}, all in.`
-            : `We expect to land at or under ${money(CONFIG.budget)}, all in.`}</p>
         <details class="means-more">
           <summary>How we get there</summary>
-          <p>${
-            gap > 0.5
-              ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full allocations, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
-              : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, ${money(-gap)} more than their allocations call for. As selections lock in, we calibrate accordingly.`}</p>
+          <p>${working}</p>
         </details>
-      </div>
+      </section>
 
-      <div class="section-head"><span class="section-title">By category</span><span class="section-title">Projected · vs. the plan</span></div>
-      <div class="ledger">`;
+      <section class="section">
+        <h2 class="section-h">How the budget breaks down</h2>
+        <p class="section-intro">The budget by category, set at kickoff as our baseline, against what we've recommended so far.</p>
+        <div class="ledger">
+          <div class="led-row led-head"><span>Category</span><span>Budget</span><span>Recommended</span><span>Status</span></div>`;
 
+    const overs = [];
     S.cats.forEach(c => {
-      const v = c.variance;
-      // Green is earned: only a COMPLETE category that came in under its share
-      // shows a saving. Unfinished ones read "in progress" instead.
-      const vClass = c.unmapped ? "muted" : v > 0.5 ? "over" : (c.complete && v < -0.5) ? "under" : "muted";
-      const vText = c.unmapped ? "—" : v > 0.5 ? "+" + money(v)
-        : c.complete ? (v < -0.5 ? "−" + money(-v) : "on target") : "in progress";
-      const pieces = `${c.count} piece${c.count === 1 ? "" : "s"}`;
-      // Only spell out the split when an allowance is in play; otherwise the
-      // projected figure already IS the recommended spend.
-      const meta = c.unmapped ? `${pieces} · not in the budget plan`
-        : [c.allowance ? `${money(c.sourced)} recommended + ${money(c.allowance)} still to source` : "",
-           pieces, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
-      // Bar scale: the share, or the projection when it overruns the share.
+      const diff = c.sourced - c.allocation;
+      // Every status says something: how far over, how much is left to
+      // source, or that the category hasn't been started. Green is earned:
+      // only a COMPLETE category that came in under its budget shows a saving.
+      let status, cls = "";
+      if (c.unmapped)            status = "Not in the budget";
+      else if (diff > 0.5)     { status = money(diff) + " over"; cls = "over"; overs.push(c); }
+      else if (c.complete)     { status = diff < -0.5 ? money(-diff) + " under" : "On budget"; cls = diff < -0.5 ? "under" : ""; }
+      else if (!c.count)         status = "Not started";
+      else                       status = money(-diff) + " to go";
+      const meta = [c.unmapped ? "" : pctOf(c.allocation) + " of the budget",
+                    `${c.count} piece${c.count === 1 ? "" : "s"}`, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
       let bar = "";
       if (!c.unmapped) {
-        const span = Math.max(c.allocation, c.projected) || 1;
+        const span = Math.max(c.allocation, c.sourced) || 1;
         const w = n => (100 * n / span).toFixed(2) + "%";
-        const within = Math.min(c.sourced, c.allocation);
         bar = `<span class="led-bar">
-          <span class="seg-rec" style="width:${w(within)}"></span>
-          <span class="seg-allow" style="width:${w(c.allowance)}"></span>
-          <span class="seg-over" style="width:${w(Math.max(0, c.sourced - c.allocation))}"></span>
-          ${c.projected > c.allocation ? `<span class="share-line" style="left:${w(c.allocation)}"></span>` : ""}
+          <span class="seg-rec" style="width:${w(Math.min(c.sourced, c.allocation))}"></span>
+          <span class="seg-over" style="width:${w(Math.max(0, diff))}"></span>
         </span>`;
       }
       html += `<div class="led-row">
         <span class="led-name">${esc(c.name)}</span>
-        <span class="num">${money(c.projected)}</span>
-        <span class="num ${vClass}">${vText}</span>
+        <span class="num led-budget" data-label="Budget">${c.unmapped ? "" : money(c.allocation)}</span>
+        <span class="num led-rec" data-label="Recommended">${money(c.sourced)}</span>
+        <span class="num led-status ${cls}">${status}</span>
         <span class="led-meta">${meta}</span>
         ${bar}
       </div>`;
     });
-    html += `</div>`;
+    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
+    const budgetTotal = S.cats.reduce((n, c) => n + c.allocation, 0) + S.reserve;
+    html += `<div class="led-row">
+        <span class="led-name">Contingency</span>
+        <span class="num led-budget" data-label="Budget">${money(S.reserve)}</span>
+        <span class="num led-rec" data-label="Recommended"></span>
+        <span class="num led-status">Held in reserve</span>
+        <span class="led-meta">${pctOf(S.reserve)} of the budget</span>
+      </div>
+      <div class="led-row is-total">
+        <span class="led-name">Total</span>
+        <span class="num led-budget" data-label="Budget">${money(budgetTotal)}</span>
+        <span class="num led-rec" data-label="Recommended">${money(S.sourced)}</span>
+        <span class="num led-status"></span>
+      </div>
+    </div>`;
+    // Name what's moving the top of the range. It is exactly the overages:
+    // every other unfinished category is counted at its budget.
+    if (overs.length && ranged) {
+      const list = overs.map((c, i) => `${esc(c.name)} is ${money(c.sourced - c.allocation)} over${i ? "" : " its budget"}`);
+      const joined = list.length > 1 ? list.slice(0, -1).join(", ") + " and " + list[list.length - 1] : list[0];
+      html += `<p class="driver">${joined}. That is what puts the top of our range above ${money(CONFIG.budget)}.</p>`;
+    }
+    html += `</section>`;
 
     html += `<div class="part">
-        <span class="section-title">Piece selection by space</span>
         <h2 class="part-title">The pieces,<br>room by room</h2>
         <p class="part-intro">Our recommendation for every piece. Open a room to review it; each piece with alternates has them tucked underneath.</p>
       </div>`;
