@@ -153,22 +153,15 @@
     .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 3rem 0 1.5rem; }
 
     /* ── Where we stand ───────────────────────────────────────── */
-    /* The takeaway is the page's lead: one sentence at one size, with only
-       the figures in bold. Body face, because Erica One's numerals read
-       badly as money. */
+    /* The takeaway: one plain sentence at body size, figures in semibold.
+       Deliberately low key. The three figures beneath carry the section.
+       Figures stay in the body face: both other brand fonts misread as money
+       (Erica One's zeros fill in, Handjet's read as eights). */
     .takeaway {
-      font-weight: 400; font-size: var(--type-anim); line-height: 1.35;
-      margin: 0.5rem 0 0; max-width: 36rem; text-wrap: pretty;
+      font-weight: 400; font-size: var(--type-b1); line-height: var(--leading-b1);
+      margin: 0.5rem 0 0; max-width: 34rem; text-wrap: balance;   /* no stray last line on a phone */
     }
-    /* The figure is marked like a highlighter pass: the one use of yellow on
-       the page. It stays in the body face because both other brand fonts
-       misread as money (Erica One's zeros fill in, Handjet's read as eights). */
-    .takeaway strong {
-      font-weight: 700; white-space: nowrap;
-      background: var(--color-yellow); padding: 0.05em 0.22em;
-      margin-right: -0.1em;   /* keeps the comma that follows from drifting away */
-    }
-    .takeaway strong.over { background: none; padding: 0; margin: 0; }
+    .takeaway strong { font-weight: 600; white-space: nowrap; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
