@@ -57,12 +57,14 @@
            B1          Instrument Sans  body copy, table rows, prices
            small       Instrument Sans  detail lines under a row
            nav         Handjet          the lede
+           anim        Instrument Sans  the takeaway, one step above body copy
            field       Handjet          the eyebrow
            chip        Handjet          labels, toggles (16), dense captions (14) */
       --type-h1: clamp(2.875rem, 5.23vw, 4.25rem);    /* 46 → 68 */
       --type-h2: clamp(1.625rem, 3.13vw, 1.875rem);   /* 26 → 30 */
       --type-b1: clamp(1rem, 1.54vw, 1.125rem);       /* 16 → 18 */
       --type-nav: clamp(1.375rem, 2.13vw, 1.625rem);  /* 22 → 26 */
+      --type-anim: clamp(1.125rem, 1.8vw, 1.375rem);  /* 18 → 22 */
       --type-field: clamp(1rem, 1.3vw, 1.125rem);     /* 16 → 18 */
       --type-chip: 1rem;                              /* 16 */
       --type-chip-mobile-stack: 0.875rem;             /* 14 */
@@ -131,8 +133,9 @@
       margin: 0 0 1.1rem;
     }
     .intro {
-      font-size: var(--type-b1); line-height: var(--leading-b1);
-      max-width: 34rem; margin: 0;
+      /* A quiet preface, a step below body copy, so the takeaway leads. */
+      font-size: var(--type-small); line-height: 1.5;
+      max-width: 30rem; margin: 0;
     }
     .stamp {
       display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap;
@@ -154,7 +157,7 @@
        the figures in bold. Body face, because Erica One's numerals read
        badly as money. */
     .takeaway {
-      font-weight: 400; font-size: var(--type-nav); line-height: 1.3;
+      font-weight: 400; font-size: var(--type-anim); line-height: 1.35;
       margin: 0.5rem 0 0; max-width: 36rem; text-wrap: pretty;
     }
     .takeaway strong { font-weight: 700; white-space: nowrap; }
