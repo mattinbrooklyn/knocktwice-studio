@@ -150,14 +150,14 @@
     .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 3rem 0 1.5rem; }
 
     /* ── Where we stand ───────────────────────────────────────── */
-    /* The takeaway is the page's lead: the one line a client should leave
-       with. Body face, because Erica One's numerals read badly as money. */
+    /* The takeaway is the page's lead: one sentence at one size, with only
+       the figures in bold. Body face, because Erica One's numerals read
+       badly as money. */
     .takeaway {
-      font-weight: 700; font-size: var(--type-h2); line-height: var(--leading-h2);
-      margin: 0.35rem 0 0; max-width: 36rem; text-wrap: balance;
+      font-weight: 400; font-size: var(--type-nav); line-height: 1.3;
+      margin: 0.5rem 0 0; max-width: 36rem; text-wrap: pretty;
     }
-    /* The condition the takeaway rests on. Body size, so the range stays the lead. */
-    .takeaway-if { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.5rem 0 0; max-width: 34rem; }
+    .takeaway strong { font-weight: 700; white-space: nowrap; }
     .over  { color: var(--color-red); }
     .under { color: var(--color-green); }
 
@@ -636,15 +636,12 @@
 
     // The takeaway. Three cases: already past the budget on recommendations
     // alone; on budget only if the rest comes in lean; comfortably inside it.
-    // Read as one sentence: the condition runs into the figure beneath it.
-    const condition = pastBudget
-      ? `If we move forward with every recommendation, we are at`
-      : `If we move forward with every recommendation and keep the rest on or under budget, we land at`;
+    const ifWeProceed = `If we move forward with every recommendation and keep the rest on or under budget, we land at`;
     const takeaway = pastBudget
-      ? `${money(spent)}, which is ${money(-roomLeft)} over budget.`
+      ? `If we move forward with every recommendation, we are at <strong>${money(spent)}</strong>, which is <strong class="over">${money(-roomLeft)} over budget</strong>.`
       : ranged
-        ? `${money(CONFIG.budget)} to ${money(highEnd)}, all in.`
-        : `${money(CONFIG.budget)} or less, all in.`;
+        ? `${ifWeProceed} <strong>${money(CONFIG.budget)} to ${money(highEnd)}</strong>, all in.`
+        : `${ifWeProceed} <strong>${money(CONFIG.budget)} or less</strong>, all in.`;
     const working = pastBudget
       ? `Approving everything here commits ${money(S.sourced)}. With the ${money(S.reserve)} contingency, that is past the budget before the remaining pieces are sourced. The alternates under each piece are where we can bring it back.`
       : ranged
@@ -654,12 +651,11 @@
     let html = `
       <section class="section">
         <span class="section-title">Where we stand</span>
-        <p class="takeaway-if">${condition}</p>
         <p class="takeaway">${takeaway}</p>
         <dl class="figures">
           <div class="figure"><dt>Budget</dt><dd>
             <span class="figure-amount">${money(CONFIG.budget)}</span>
-            <span class="figure-note">all in, both rooms</span></dd></div>
+            <span class="figure-note">across both rooms</span></dd></div>
           <div class="figure"><dt>Recommended so far</dt><dd>
             <span class="figure-amount">${money(S.sourced)}</span>
             <span class="figure-note">${S.count} piece${S.count === 1 ? "" : "s"}</span></dd></div>
