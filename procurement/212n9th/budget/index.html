@@ -83,6 +83,11 @@
     *, *::before, *::after { cursor: auto !important; }
     a, button { cursor: pointer !important; }
 
+    /* A visible focus ring for keyboard users. */
+    a:focus-visible, button:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--color-blue); outline-offset: 3px;
+    }
+
     html, body { background: var(--color-bg); }
     body {
       color: var(--color-ink);
@@ -138,10 +143,11 @@
       font: inherit; color: var(--color-blue); background: none; border: 0; padding: 0;
       letter-spacing: inherit; text-transform: inherit;
       text-decoration: underline; text-underline-offset: 3px;
+      padding: 0.6rem 0; margin: -0.6rem 0;
     }
     .stamp button:disabled { color: var(--color-khaki); text-decoration: none; }
 
-    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 1.75rem 0; }
+    .rule { border: 0; border-top: 1.5px solid var(--color-ink); margin: 3rem 0 1.5rem; }
 
     /* ── Where we stand ───────────────────────────────────────── */
     /* The takeaway is the page's lead: the one line a client should leave
@@ -214,7 +220,7 @@
       list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
       border: 2px solid var(--color-ink); border-radius: var(--radius-pill);
-      padding: 0.2rem 0.75rem; margin-top: 1.25rem; cursor: pointer !important;
+      padding: 0 0.75rem; min-height: 2rem; line-height: 1; margin-top: 1.25rem; cursor: pointer !important;
     }
     .means-more summary * { cursor: pointer !important; }
     .means-more summary::-webkit-details-marker { display: none; }
@@ -248,7 +254,7 @@
     .part-title {
       font-family: var(--font-display); font-weight: 400;
       font-size: var(--type-h2); line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase;
-      margin: 0 0 0.6rem;
+      margin: 0 0 0.4rem;
     }
     .part-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0; max-width: 34rem; }
 
@@ -314,10 +320,11 @@
     /* Each room is a <details>: closed, it's one line with the count and subtotal. */
     .room { margin-top: 1.5rem; }
     .room summary { list-style: none; }
+    .room summary, .room summary * { cursor: pointer !important; }
     .room summary::-webkit-details-marker { display: none; }
     .room-head {
       display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-      border-bottom: 2.5px solid var(--color-ink); padding-bottom: 0.5rem;
+      border-bottom: 1.5px solid var(--color-ink); padding-bottom: 0.5rem;
     }
     .room-name {
       font-family: var(--font-display); font-weight: 400;
@@ -365,7 +372,8 @@
     .alts-toggle {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
       color: var(--color-ink); background: transparent; border: 2px solid var(--color-ink);
-      border-radius: var(--radius-pill); padding: 0.2rem 0.75rem; margin-top: 0.45rem;
+      border-radius: var(--radius-pill); padding: 0 0.75rem; margin-top: 0.45rem;
+      min-height: 2rem; line-height: 1;
       display: inline-flex; align-items: center; gap: 0.45rem;
     }
     .alts-toggle::before { content: "+"; font-weight: 500; }
@@ -387,8 +395,10 @@
     .alt-delta.less { color: var(--color-green); }
 
     /* ── Notes / errors ───────────────────────────────────────── */
-    .notes { margin-top: 3rem; padding-top: 1.25rem; border-top: 1.5px solid var(--color-ink); max-width: 36rem; }
-    .notes p { font-size: var(--type-small); line-height: 1.5; color: var(--color-caramel); margin: 0.4rem 0 0; }
+    /* No rule above: the last room's rule already closes the section, and a
+       second one this close would read as a double line. */
+    .notes { margin-top: 3rem; }
+    .notes p { font-size: var(--type-small); line-height: 1.5; color: var(--color-caramel); margin: 0.4rem 0 0; max-width: 36rem; }
     .notes .stamp { margin-top: 1rem; }
     .warning {
       background: var(--color-yellow); color: var(--color-ink);
@@ -398,7 +408,7 @@
     .loading { font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip); color: var(--color-caramel); padding: 2rem 0; }
     .foot {
       font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack);
-      color: var(--color-caramel); text-align: center; padding: 2.5rem 1rem 0;
+      color: var(--color-caramel); padding: 2rem 0 0; margin: 0;
     }
 
     @media (max-width: 480px) {
@@ -412,7 +422,7 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
-      .stamp button, .alts-toggle { display: none; }
+      .stamp button, .alts-toggle, .means-more summary { display: none; }
       .room-name::before { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
       .piece, .led-row { break-inside: avoid; }
@@ -638,8 +648,8 @@
     const working = pastBudget
       ? `Approving everything here commits ${money(S.sourced)}. With the ${money(S.reserve)} contingency, that is past the budget before the remaining pieces are sourced. The alternates under each piece are where we can bring it back.`
       : ranged
-        ? `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, mostly details and styling that flex easily. Bring those in lean and we land at ${money(CONFIG.budget)}. At their full budgets, we land near ${money(highEnd)}. As selections lock in, we calibrate accordingly.`
-        : `Approving everything here commits ${money(S.sourced)} and leaves ${money(roomLeft)} for what's left, which covers their budgets in full. As selections lock in, we calibrate accordingly.`;
+        ? `What's left to source is mostly details and styling, which flex easily. Their budgets total ${money(S.allowance)} and we have ${money(roomLeft)} to work with, which is where the range comes from. As selections lock in, we calibrate accordingly.`
+        : `What's left to source has budgets totaling ${money(S.allowance)}, and we have ${money(roomLeft)} to work with, so it is covered in full. As selections lock in, we calibrate accordingly.`;
 
     let html = `
       <section class="section">
@@ -731,7 +741,7 @@
     html += `</section>`;
 
     html += `<div class="part">
-        <h2 class="part-title">The pieces,<br>room by room</h2>
+        <h2 class="part-title">The pieces, room by room</h2>
         <p class="part-intro">Open a room to see each piece we recommend and any alternates.</p>
       </div>`;
 
@@ -796,6 +806,9 @@
       btn.disabled = false;
     }
   }
+
+  // A printed or saved copy should hold the whole page, not just what was open.
+  window.addEventListener("beforeprint", () => document.querySelectorAll("details").forEach(d => { d.open = true; }));
 
   $("#refresh").addEventListener("click", load);
   load();
