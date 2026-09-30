@@ -749,7 +749,7 @@
 
     // The takeaway. Three cases: already past the budget on recommendations
     // alone; on budget only if the rest comes in lean; comfortably inside it.
-    const ifWeProceed = `If we move forward with every recommendation and keep the rest on or under budget, we land at`;
+    const ifWeProceed = `If we move forward with every recommendation and keep the remaining pieces within budget, we land at`;
     const takeaway = pastBudget
       ? `If we move forward with every recommendation, we are at <strong>${money(spent)}</strong>, which is <strong class="over">${money(-roomLeft)} over budget</strong>.`
       : ranged
