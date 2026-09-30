@@ -132,4 +132,9 @@ assert.equal(sandbox.safe_("-great"), "'-great");
 assert.equal(sandbox.safe_("fine"), "fine");
 assert.equal(sandbox.safe_(12000), 12000);
 console.log("formula guard: text starting with = + - @ is stored as plain text");
+// The script is pasted into Apps Script by hand, and the Mac clipboard can
+// mangle anything outside plain ASCII (a "·" arrived in email as "¬∑").
+const odd = [...code].filter(c => c.charCodeAt(0) > 127);
+assert.equal(odd.length, 0, "script must be plain ASCII to survive copy and paste; found: " + [...new Set(odd)].join(" "));
+console.log("paste-safe: the script is plain ASCII");
 console.log("\nALL SCRIPT CHECKS PASSED");

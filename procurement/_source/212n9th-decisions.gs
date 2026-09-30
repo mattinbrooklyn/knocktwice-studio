@@ -1,5 +1,5 @@
 /**
- * Knock Twice — 212 N 9th budget page: client decisions (Google Apps Script).
+ * Knock Twice - 212 N 9th budget page: client decisions (Google Apps Script).
  *
  * The budget page's "Send to Knock Twice" posts the client's whole set of
  * decisions here. Each send:
@@ -17,19 +17,19 @@
  * To make a preferred alternate official, change the Status column on the
  * BUDGET VISIBILITY DASH tab as usual.
  *
- * ── SETUP ──────────────────────────────────────────────────────────────────
+ * -- SETUP ------------------------------------------------------------------
  * Runs as its own project in your Drive and opens the Sheet by SHEET_ID
  * below. (Attached to the Sheet instead, it inherits the Sheet's drive and
  * sharing rules, which can block the client with "Access Denied".)
- *   1. Go to script.google.com → New project.
+ *   1. Go to script.google.com -> New project.
  *   2. Replace everything in Code.gs with this file. Save.
- *   3. Deploy → New deployment → gear icon → Web app.
+ *   3. Deploy -> New deployment -> gear icon -> Web app.
  *        Execute as: Me.   Who has access: Anyone.   Deploy.
  *      Authorize when asked: it needs this Sheet and permission to send email.
  *   4. Copy the Web app URL (it ends in /exec). That goes in the page's
  *      CONFIG.decisions.endpoint.
- * To update later: Deploy → Manage deployments → edit (pencil) →
- * Version: New version → Deploy. The URL stays the same.
+ * To update later: Deploy -> Manage deployments -> edit (pencil) ->
+ * Version: New version -> Deploy. The URL stays the same.
  */
 
 var SHEET_ID = '1KhWinSYJopcwviQjfrZb1ks1ZHi3ZJqQDtG0OYWu5IM';   // the 212 N 9th Sheet; blank = the Sheet this script is attached to
@@ -185,18 +185,18 @@ function email_(d, rows, from, when, tabUrl) {
     var what = r.decision === 'Withdrawn' ? 'withdrawn'
       : r.decision === 'Prefers alternate' ? 'prefers the ' + esc_(r.choice)
       : r.decision === 'Approved' ? 'approved' : 'note';
-    var price = r.price !== '' ? ' · ' + money_(r.price) : '';
-    var note = r.note ? '<br><em style="color:#9A7555">“' + esc_(r.note) + '”</em>' : '';
-    var where = r.room ? esc_(r.room) + ' · ' : '';
+    var price = r.price !== '' ? ' &middot; ' + money_(r.price) : '';
+    var note = r.note ? '<br><em style="color:#9A7555">&ldquo;' + esc_(r.note) + '&rdquo;</em>' : '';
+    var where = r.room ? esc_(r.room) + ' &middot; ' : '';
     return '<li style="margin:6px 0"><b>' + where + esc_(r.piece) + '</b>: ' + what + price +
            ' <span style="color:#9A7555">(' + r.change.toLowerCase() + ')</span>' + note + '</li>';
   }
   var diff = Number(d.withPicks) - Number(d.recommended);
   var totals = isFinite(diff) && Math.abs(diff) >= 0.5
     ? '<p style="margin:0 0 12px">With their picks, recommended comes to <b>' + money_(d.withPicks) + '</b> (' +
-      (diff < 0 ? '−' : '+') + money_(Math.abs(diff)) + ' against ours).</p>'
+      (diff < 0 ? '&minus;' : '+') + money_(Math.abs(diff)) + ' against ours).</p>'
     : '';
-  var page = /^https:\/\//.test(String(d.pageUrl || '')) ? ' · <a href="' + esc_(d.pageUrl) + '">Open the budget page</a>' : '';
+  var page = /^https:\/\//.test(String(d.pageUrl || '')) ? ' &middot; <a href="' + esc_(d.pageUrl) + '">Open the budget page</a>' : '';
   return '<div style="font-family:Arial,Helvetica,sans-serif;color:#32261F;max-width:640px;line-height:1.45">' +
     '<h2 style="margin:0 0 2px">212 N 9th: decisions from ' + esc_(from) + '</h2>' +
     '<p style="margin:0 0 12px;color:#9A7555">Sent ' + esc_(when) + '</p>' + totals +
