@@ -672,6 +672,10 @@
       if (!it.name) it.name = it.piece;
       if (!Number.isFinite(it.total)) it.total = Number.isFinite(it.unit) ? it.unit * (Number.isFinite(it.qty) ? it.qty : 1) : 0;
       it.counted = CONFIG.countedStatus.includes(it.status.toLowerCase());
+      // Clearing a row's Room hides it from the client. A Recommended row is
+      // the exception: it stays (under "Unassigned") so a missing room can
+      // never quietly drop real money out of the totals.
+      if (!it.room && !it.counted) return;
       items.push(it);
     });
     return items;
