@@ -230,7 +230,6 @@
     } else if (!editing.has(k) && box) box.remove();
 
     const s = sent(), sentPick = tidy(s.picks[k]), lines = [];
-    if (p.prefer && x.alts[p.prefer]) lines.push(`<span class="dc-mark is-prefer"></span>You prefer the ${esc(p.prefer)}, ${signed(x.alts[p.prefer].total - x.against)}.`);
     if (p.note && !editing.has(k)) lines.push(`Your note: “${esc(p.note)}”`);
     const team = sheet && sheet.team[k];
     if (team && same(sheet.picks[k], p)) {
