@@ -425,6 +425,92 @@
     .alt-delta small { font-size: inherit; font-weight: 500; color: var(--color-caramel); }
     .alt-delta.less { color: var(--color-green); }
 
+    /* ── Client decisions (decisions.js) ──────────────────────── */
+    /* Every control is a brand chip: Handjet 16, 2rem tall, 2px ink outline,
+       filled ink when on. Nothing here adds color. */
+    .piece-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.45rem; }
+    .piece-actions:empty { display: none; }
+    .piece-actions .alts-toggle { margin-top: 0; }
+    .dc-pill {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
+      color: var(--color-ink); background: transparent; border: 2px solid var(--color-ink);
+      border-radius: var(--radius-pill); padding: 0 0.75rem; min-height: 2rem; line-height: 1;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+    }
+    .dc-pill[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
+    .dc-approve::before { content: ""; width: 0.6rem; height: 0.6rem; border: 1.5px solid currentColor; }
+    .dc-approve[aria-pressed="true"]::before { background: currentColor; }
+    .dc-prefer {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip-mobile-stack); letter-spacing: 0.03em;
+      color: var(--color-ink); background: none; border: 0; padding: 0.2rem 0; margin-top: 0.1rem;
+      text-decoration: underline; text-underline-offset: 3px;
+    }
+    .dc-prefer[aria-pressed="true"] { text-decoration: none; }
+    .dc-prefer[aria-pressed="true"]::before { content: "■ "; }
+    .alt.is-picked .alt-name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    /* "Prefer this" sits beside the price; on a phone it takes its own line. */
+    .alt .dc-prefer { margin: 0 0 0 0.25rem; padding: 0; white-space: nowrap; }
+    @media (max-width: 560px) {
+      .alt { flex-wrap: wrap; }
+      .alt > span:first-child { flex: 1 1 0; min-width: 0; }   /* the name wraps, the price keeps its place */
+      .alt .dc-prefer { flex-basis: 100%; margin: 0.15rem 0 0; text-align: left; }
+    }
+
+    /* What the client has said about a piece, and what we said back. */
+    .dc-status { margin: 0.6rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
+    .dc-status:empty { display: none; }
+    .dc-status p { font-size: var(--type-small); line-height: 1.45; margin: 0.15rem 0 0; }
+    .dc-status p:first-child { margin-top: 0; }
+    .dc-meta { font-family: var(--font-ui); font-weight: 600; letter-spacing: 0.03em; color: var(--color-caramel); }
+    .dc-team { color: var(--color-ink); }
+    .dc-team b { font-family: var(--font-ui); font-weight: 700; letter-spacing: 0.03em; }
+    .dc-note-edit { margin-top: 0.6rem; display: grid; gap: 0.45rem; justify-items: start; }
+    .dc-input {
+      font: inherit; font-size: var(--type-b1); line-height: 1.4; color: var(--color-ink);
+      background: var(--color-white); border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.5rem 0.65rem; width: 100%;
+    }
+    textarea.dc-input { resize: vertical; min-height: 4.5rem; }
+
+    /* Your decisions: the review-and-send section at the end of the page. */
+    .dc-list { border-top: 1.5px solid var(--color-ink); }
+    .dc-list:empty { display: none; }
+    .dc-empty { font-size: var(--type-b1); color: var(--color-caramel); margin: 0; }
+    .dc-room { margin: 1rem 0 0.2rem; }
+    .dc-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 1rem;
+      padding: 0.5rem 0; border-bottom: 1px solid var(--color-khaki); font-size: var(--type-b1);
+    }
+    .dc-row b { font-weight: 600; }
+    .dc-row .dc-price { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .dc-row .dc-sub { grid-column: 1 / -1; font-size: var(--type-small); color: var(--color-caramel); }
+    .dc-total { font-size: var(--type-b1); margin: 1rem 0 0; }
+    .dc-field { display: grid; gap: 0.35rem; margin-top: 1.25rem; max-width: 34rem; }
+    .dc-field > span {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
+      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
+    }
+    .dc-send-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin-top: 1.25rem; }
+    .dc-send { background: var(--color-ink); color: var(--color-bg); min-height: 2.5rem; padding: 0 1.1rem; }
+    .dc-send:disabled { background: var(--color-khaki); border-color: var(--color-khaki); color: var(--color-ink); }
+    .dc-result { font-size: var(--type-small); }
+    .dc-result.is-error { color: var(--color-red); }
+    .dc-last { font-size: var(--type-small); color: var(--color-caramel); margin: 0.75rem 0 0; }
+
+    /* The tray: only there while something is waiting to be sent. */
+    .dc-tray {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+      background: var(--color-bg); border-top: 1.5px solid var(--color-ink);
+      padding: 0.6rem clamp(1.1rem, 4vw, 2rem) calc(0.6rem + env(safe-area-inset-bottom));
+    }
+    .dc-tray-inner {
+      max-width: 40rem; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; flex-wrap: wrap;
+    }
+    .dc-tray-text { font-size: var(--type-small); line-height: 1.35; }
+    .dc-tray-text b { font-weight: 600; }
+    body.has-tray { padding-bottom: 5rem; }
+
     /* ── Notes / errors ───────────────────────────────────────── */
     /* No rule above: the last room's rule already closes the section, and a
        second one this close would read as a double line. */
@@ -453,7 +539,8 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
-      .stamp button, .alts-toggle, .means-more summary { display: none; }
+      .stamp button, .alts-toggle, .means-more summary, .dc-pill, .dc-prefer, .dc-tray, .dc-field, .dc-send-row { display: none; }
+      body.has-tray { padding-bottom: 0; }
       .room-name::before { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
       .piece, .led-row { break-inside: avoid; }
@@ -531,6 +618,15 @@
       name: "Name", description: "Description", color: "Color", retailer: "Retailer",
       unit: "Unit Price", qty: "Qty", total: "Total Price", link: "Link",
       image: "Image",      // optional — add an Image column of direct image URLs and photos appear
+    },
+
+    // Client decisions (decisions.js). Off until `endpoint` holds the Apps
+    // Script web-app URL from procurement/_source/212n9th-decisions.gs.
+    // Add #preview-decisions to the page URL to see the controls before then.
+    decisions: {
+      endpoint: "",
+      tab: "Client Actions",
+      storageKey: "kt-212n9th-decisions-v1",
     },
   };
 
@@ -647,7 +743,7 @@
     const cls = delta < -0.5 ? "less" : "";
     const text = Math.abs(delta) < 0.5 ? "same price" : (delta < 0 ? "−" : "+") + money(Math.abs(delta));
     const sub = subLine(it);
-    return `<div class="alt">
+    return `<div class="alt" data-alt="${esc(it.name)}">
       <span><span class="alt-name">${linkName(it)}</span>${sub ? ` <span class="alt-sub">· ${sub}</span>` : ""}</span>
       <span class="alt-delta ${cls}">${text} <small>· ${money(it.total)}</small></span>
     </div>`;
@@ -794,17 +890,13 @@
         </summary>`;
       room.pieces.forEach(p => {
         const against = p.recommended.reduce((n, it) => n + it.total, 0);
-        html += `<div class="piece">
+        const n = p.alternates.length;
+        html += `<div class="piece" data-key="${esc(room.name + "|" + p.name)}">
           <p class="piece-label">${esc(p.name)}</p>
-          ${p.recommended.map(heroHTML).join("")}`;
-        if (p.alternates.length) {
-          const n = p.alternates.length;
-          html += `<button type="button" class="alts-toggle" aria-expanded="false">${n} alternate${n === 1 ? "" : "s"}</button>
-            <div class="alts">
-              ${p.alternates.map(it => altHTML(it, against)).join("")}
-            </div>`;
-        }
-        html += `</div>`;
+          ${p.recommended.map(heroHTML).join("")}
+          <div class="piece-actions">${n ? `<button type="button" class="alts-toggle" aria-expanded="false">${n} alternate${n === 1 ? "" : "s"}</button>` : ""}</div>
+          ${n ? `<div class="alts">${p.alternates.map(it => altHTML(it, against)).join("")}</div>` : ""}
+        </div>`;
       });
       html += `</details>`;
     });
@@ -818,7 +910,7 @@
     if (!btn) return;
     const open = btn.getAttribute("aria-expanded") === "true";
     btn.setAttribute("aria-expanded", String(!open));
-    const alts = btn.nextElementSibling;
+    const alts = btn.closest(".piece").querySelector(".alts");
     if (open) alts.removeAttribute("data-open"); else alts.setAttribute("data-open", "");
   });
 
@@ -834,7 +926,10 @@
       if (!res.ok) throw new Error(`Google answered ${res.status}.`);
       const text = await res.text();
       if (text.trimStart().startsWith("<")) throw new Error("Google returned a sign-in page instead of the Sheet.");
-      render(summarize(readItems(parseCSV(text))));
+      const summary = summarize(readItems(parseCSV(text)));
+      render(summary);
+      window.KTBudget.summary = summary;
+      document.dispatchEvent(new CustomEvent("budget:rendered", { detail: summary }));
       const now = new Date();
       stamp.textContent = `Updated ${now.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
     } catch (err) {
@@ -850,8 +945,12 @@
   // A printed or saved copy should hold the whole page, not just what was open.
   window.addEventListener("beforeprint", () => document.querySelectorAll("details").forEach(d => { d.open = true; }));
 
+  // What decisions.js needs from this page. It listens for "budget:rendered".
+  window.KTBudget = { CONFIG, money, moneyCents, esc, parseCSV, key, summary: null };
+
   $("#refresh").addEventListener("click", load);
   load();
   </script>
+  <script src="decisions.js"></script>
 </body>
 </html>
