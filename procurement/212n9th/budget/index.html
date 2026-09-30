@@ -14,23 +14,25 @@
   <style>
     /* ──────────────────────────────────────────────────────────────
        BUDGET — the client's companion to the design presentation for
-       212 N 9th.
+       212 N 9th, laid out like the Room for Two estimate: white cards, one
+       job, the actions always in reach.
 
        Reads the BUDGET VISIBILITY DASH tab of the project Sheet live on
-       every load (Google's CSV endpoint; no helper, no sync step) and
-       answers three questions in the order a client asks them:
-         1. Where do we stand?        the takeaway, three figures, one bar
-         2. How does that break down? one table, category by category
-         3. What did you pick?        every recommended piece, room by room
+       every load (Google's CSV endpoint; no helper, no sync step):
+         Where we stand   the takeaway, three figures, one bar
+         The budget       one slim line per category, budget against picks
+         Room by room     a card per room, closed until opened; every piece,
+                          its alternates, and the client's decisions
        Alternates show their price as a delta against the recommendation
-       and never touch the totals.
+       and never touch the totals. Client decisions (decisions.js) add a
+       fixed bar at the bottom: progress, total, review, send.
 
        The range's top end is deliberately conservative: a category still
        being sourced is counted at the larger of what's recommended and its
        budget, until CONFIG.complete says it's done.
 
        Everything project-specific lives in CONFIG at the top of the
-       script. Nothing on this page writes back to the Sheet.
+       script.
        ────────────────────────────────────────────────────────────── */
 
     /* Brand tokens inlined so the page keeps its styling even if the shared
@@ -167,7 +169,7 @@
     /* Three figures, ruled rather than boxed. */
     .figures {
       display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1.5rem;
-      margin: 1.75rem 0 0; border-top: 1.5px solid var(--color-ink);
+      margin: 1.25rem 0 0; border-top: 1.5px solid var(--color-ink);
     }
     .figure { padding: 0.7rem 0 0; }
     .figure dt {
@@ -195,7 +197,7 @@
 
     /* One bar, the whole budget: recommended / left to work with / contingency. */
     .bar {
-      position: relative; height: 0.9rem; margin: 1.25rem 0 0.55rem;
+      position: relative; height: 0.9rem; margin: 1.1rem 0 0.55rem;
       background: var(--color-white); border: 1.5px solid var(--color-ink);
       display: flex; overflow: hidden;
     }
@@ -223,7 +225,7 @@
       list-style: none; display: inline-flex; align-items: center; gap: 0.45rem;
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
       border: 2px solid var(--color-ink); border-radius: var(--radius-pill);
-      padding: 0 0.75rem; min-height: 2rem; line-height: 1; margin-top: 1.25rem; cursor: pointer !important;
+      padding: 0 0.75rem; min-height: 2rem; line-height: 1; margin-top: 1rem; cursor: pointer !important;
     }
     .means-more summary * { cursor: pointer !important; }
     .means-more summary::-webkit-details-marker { display: none; }
@@ -232,175 +234,111 @@
     .means-more[open] summary::before { content: "−"; }
     .means-more p { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.7rem 0 0; max-width: 36rem; }
 
-    /* ── Section heads ────────────────────────────────────────── */
-    .section-head {
-      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-      margin: 2.5rem 0 0.25rem;
-    }
+    /* ── Labels ───────────────────────────────────────────────── */
     .section-title {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
     }
 
-    /* ── The budget we set: the kickoff breakout ─────────────────── */
-    /* Opens the page so the client starts from the plan they agreed to. Kept
-       compact: a one-line explainer, then the categories in two columns
-       (reading down each column) with the total on its own line beneath. */
-    .plan-note { font-size: var(--type-b1); line-height: var(--leading-b1); color: var(--color-caramel); margin: 0.35rem 0 0.9rem; max-width: 34rem; }
-    /* A reference list, not a feature: small type, no row dividers, an ink
-       rule above and below. */
-    .plan {
-      display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2.5rem;
-      grid-auto-flow: column; grid-template-rows: repeat(var(--rows), auto);
-      border-top: 1.5px solid var(--color-ink); padding: 0.4rem 0;
+    /* ── Cards: the Room for Two estimate's white boxes ───────── */
+    .card {
+      background: var(--color-white); border: 1.5px solid var(--color-ink); border-radius: 0.85rem;
+      padding: 1rem 1.15rem 1.1rem; margin: 0 0 0.85rem;
     }
-    /* Three columns: category · share (caramel) · dollars (ink). */
-    .plan-cell {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto 4.5rem; gap: 0 0.75rem;
-      align-items: baseline; padding: 0.22rem 0; font-size: var(--type-small); line-height: 1.4;
-    }
-    .plan-cell .pct { font-size: var(--type-small); color: var(--color-caramel); text-align: right; font-variant-numeric: tabular-nums; }
-    .plan-cell .amt { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    /* The total closes the table: an ink rule across both columns. */
-    .plan-total { border-top: 1.5px solid var(--color-ink); padding-top: 0.5rem; }
-    .plan-total span:first-child, .plan-total .amt { font-weight: 700; }
-    @media (max-width: 640px) {
-      .plan { grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; grid-template-rows: none; }
-    }
+    .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; flex-wrap: wrap; }
+    .card-head .aside { font-size: var(--type-small); color: var(--color-caramel); }
+    /* Inside a card, dividers soften to khaki: the card's outline does the framing. */
+    .card .figures { border-top: 1px solid var(--color-khaki); }
 
-    .section-h {
-      font-family: var(--font-display); font-weight: 400; font-size: var(--type-h2);
-      line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase; margin: 0 0 0.4rem;
+    /* ── The budget: one slim line per category ───────────────── */
+    .snap { margin-top: 0.7rem; }
+    .snap-row {
+      display: grid; grid-template-columns: minmax(0, 1fr) 4.75rem minmax(5rem, 11rem) 6.75rem; gap: 0 0.9rem;
+      align-items: center; padding: 0.32rem 0; font-size: var(--type-small); line-height: 1.35;
     }
-    .section-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0 0 1.1rem; max-width: 34rem; }
-    /* A section of the page. The rule above it does the separating. */
-    .section { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
-    .section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
-
-    /* The walkthrough is the evidence behind the numbers above. */
-    .part { margin-top: 3rem; padding-top: 1.5rem; border-top: 1.5px solid var(--color-ink); }
-    .part .section-title { display: block; margin-bottom: 0.4rem; }
-    .part-title {
-      font-family: var(--font-display); font-weight: 400;
-      font-size: var(--type-h2); line-height: var(--leading-h2); letter-spacing: 0.01em; text-transform: uppercase;
-      margin: 0 0 0.4rem;
-    }
-    .part-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0; max-width: 34rem; }
-
-    /* ── The breakdown: one table, budget against recommended ──── */
-    .ledger { border-top: 1.5px solid var(--color-ink); }
-    .led-row {
-      display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem 7rem 7rem; gap: 0.1rem 1rem;
-      grid-template-areas: "name budget rec status" "bar bar bar bar" "meta meta meta meta";
-      align-items: baseline; padding: 0.75rem 0; border-bottom: 1px solid var(--color-khaki);
-    }
-    .led-head {
-      padding: 0.45rem 0; border-bottom: 1px solid var(--color-khaki);
-      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
-      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
-    }
-    .led-head span:not(:first-child) { text-align: right; }
-    .led-name   { grid-area: name; font-weight: 700; font-size: var(--type-b1); line-height: 1.3; }
-    .led-budget { grid-area: budget; }
-    .led-rec    { grid-area: rec; }
-    .led-status { grid-area: status; }
-    .led-meta {
-      grid-area: meta; font-family: var(--font-ui); font-weight: 600;
-      font-size: var(--type-chip-mobile-stack); color: var(--color-caramel); margin-top: 0.35rem;
-    }
-    /* The pieces behind a category's number, biggest first, each linking down
-       to where it sits in the room walkthrough. */
-    .led-more summary { list-style: none; display: inline-flex; gap: 0.35rem; cursor: pointer !important; }
-    .led-more summary::-webkit-details-marker { display: none; }
-    .led-more summary::before { content: "+"; font-weight: 500; }
-    .led-more[open] summary::before { content: "−"; }
-    .led-items { margin: 0.45rem 0 0.1rem; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
-    .led-item {
-      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-      padding: 0.2rem 0; font-family: var(--font-body); font-weight: 400; font-size: var(--type-small); line-height: 1.35; color: var(--color-ink);
-    }
-    .led-item a { color: inherit; font-weight: 600; text-decoration-color: var(--color-khaki); text-underline-offset: 3px; cursor: pointer !important; }
-    .led-item a:hover { text-decoration-color: var(--color-ink); }
-    .led-item .where { color: var(--color-caramel); }
-    .led-item .amt { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .snap-name { min-width: 0; }
+    .snap-name .pct { color: var(--color-caramel); margin-left: 0.3rem; font-variant-numeric: tabular-nums; }
+    .snap-budget { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .snap-status { text-align: right; color: var(--color-caramel); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .snap-status.over { color: var(--color-red); font-weight: 600; }
+    .snap-status.under { color: var(--color-green); font-weight: 600; }
     /* Recommended against the category's budget. The budget is the full
        width; anything past it is drawn as an overrun, in red. */
-    .led-bar {
-      grid-area: bar; position: relative; height: 0.4rem; margin-top: 0.45rem;
-      background: var(--color-white); border: 1px solid var(--color-khaki); display: flex; overflow: hidden;
+    .snap-bar {
+      position: relative; height: 0.45rem; display: flex; overflow: hidden;
+      background: var(--color-white); border: 1px solid var(--color-khaki);
     }
-    .led-bar span { display: block; height: 100%; }
-    .led-bar .seg-rec  { background: var(--color-ink); }
-    .led-bar .seg-over { background: var(--color-red); }
-    .num {
-      font-weight: 600; font-size: var(--type-b1);
-      white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right;
-    }
-    .led-budget { color: var(--color-caramel); font-weight: 500; }
-    .led-status { font-weight: 500; color: var(--color-caramel); }
-    .led-status.over  { color: var(--color-red); font-weight: 600; }
-    .led-status.under { color: var(--color-green); font-weight: 600; }
-    .led-row.is-total { border-bottom: 0; border-top: 1.5px solid var(--color-ink); margin-top: -1px; }
-    .led-row.is-total .led-budget { color: var(--color-ink); font-weight: 700; }
-    .led-row.is-total .led-rec { font-weight: 700; }
+    .snap-bar span { display: block; height: 100%; }
+    .snap-bar .seg-rec  { background: var(--color-ink); }
+    .snap-bar .seg-over { background: var(--color-red); }
+    .snap-bar.is-reserve { background-image: repeating-linear-gradient(135deg, var(--color-khaki) 0 1px, transparent 1px 4px); }
+    .snap-row.is-total { border-top: 1.5px solid var(--color-ink); margin-top: 0.3rem; padding-top: 0.5rem; }
+    .snap-row.is-total .snap-name, .snap-row.is-total .snap-budget { font-weight: 700; }
+    .snap-row.is-total .snap-status { grid-column: 3 / -1; }   /* the total has no bar, so its note takes that space */
     @media (max-width: 560px) {
-      /* Four columns don't fit a phone. Name and status share the first line;
-         the two amounts share the second, each carrying its own label. */
-      .led-head { display: none; }
-      .led-row {
-        grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 0.75rem;
-        grid-template-areas: "name status" "budget rec" "bar bar" "meta meta";
+      /* Name and status on one line; the bar beneath with the budget beside it. */
+      .snap-row {
+        grid-template-columns: minmax(0, 1fr) auto; gap: 0.25rem 0.75rem;
+        grid-template-areas: "name status" "bar budget"; padding: 0.45rem 0;
       }
-      .led-budget, .led-rec { font-size: var(--type-small); font-weight: 500; color: var(--color-ink); }
-      .led-budget { text-align: left; }
-      .led-budget::before, .led-rec::before {
-        content: attr(data-label) " "; color: var(--color-caramel);
-      }
-      .led-rec:empty { display: none; }
-      .led-row.is-total .led-budget, .led-row.is-total .led-rec { font-weight: 700; }
+      .snap-name { grid-area: name; } .snap-status { grid-area: status; }
+      .snap-bar { grid-area: bar; } .snap-budget { grid-area: budget; font-weight: 500; color: var(--color-caramel); }
+      .snap-row.is-total { grid-template-areas: "name budget" "status status"; }
+      .snap-row.is-total .snap-status { text-align: left; }
+      .snap-row.is-total .snap-budget { color: var(--color-ink); font-weight: 700; }
     }
 
-    /* ── Rooms + piece cards ──────────────────────────────────── */
-    /* Each room is a <details>: closed, it's one line with the count and subtotal. */
-    .room { margin-top: 1.5rem; }
+    /* ── Room by room ─────────────────────────────────────────── */
+    .rooms-head { margin: 2rem 0 0.8rem; }
+    .rooms-intro { font-size: var(--type-b1); line-height: var(--leading-b1); margin: 0.3rem 0 0; max-width: 34rem; }
+
+    /* Each room is a card: closed, one line with its count, subtotal and
+       progress, like the estimate's category cards. */
+    .room { padding: 0; overflow: hidden; }
     .room summary { list-style: none; }
     .room summary, .room summary * { cursor: pointer !important; }
     .room summary::-webkit-details-marker { display: none; }
-    .room-head {
-      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
-      border-bottom: 1.5px solid var(--color-ink); padding-bottom: 0.5rem;
-    }
+    .room-head { display: flex; align-items: center; gap: 0.9rem; padding: 0.95rem 1.05rem; }
+    .chevron { flex: 0 0 auto; font-size: 0.8rem; color: var(--color-caramel); transition: transform 0.2s ease; }
+    .room[open] .chevron { transform: rotate(90deg); }
+    .room-headings { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; flex: 1 1 auto; }
     .room-name {
-      font-family: var(--font-display); font-weight: 400;
-      font-size: var(--type-h2); text-transform: uppercase; letter-spacing: 0.01em; line-height: var(--leading-h2);
-      display: flex; align-items: baseline; gap: 0.55rem;
+      font-family: var(--font-display); font-weight: 400; font-size: var(--type-h2);
+      line-height: 1; letter-spacing: 0.01em; text-transform: uppercase;
     }
-    .room-name::before {
-      content: "+"; font-family: var(--font-ui); font-weight: 500; font-size: var(--type-nav); color: var(--color-caramel); width: 1.1rem;
-    }
-    .room[open] .room-name::before { content: "−"; }
-    .room-name small { white-space: nowrap; font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip); color: var(--color-caramel); letter-spacing: 0.03em; text-transform: none; }
-    .room-total { font-weight: 700; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .room-total small { display: block; font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack); color: var(--color-caramel); text-align: right; }
+    .room-meta { font-size: var(--type-small); color: var(--color-caramel); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    /* Body font: Handjet's "0" reads as "8" at this size. */
+    .room-progress { flex: 0 0 auto; font-weight: 600; font-size: var(--type-small); color: var(--color-caramel); white-space: nowrap; }
+    .room-progress.partial { color: var(--color-ink); }
+    .room-progress.complete { color: var(--color-green); }
+    .room-progress:empty { display: none; }
+    .room[open] .room-head { border-bottom: 1px solid var(--color-khaki); }
+    .room-panel { padding: 0 1.05rem; }
 
-    .piece { padding: 0.9rem 0; border-bottom: 1px solid var(--color-khaki); }
+    /* One piece per row. A decision tints the whole row, as in the estimate:
+       green for approved, pink for a preferred alternate. */
+    .piece {
+      padding: 0.95rem 0.35rem; margin: 0 -0.35rem; border-bottom: 1px solid var(--color-khaki);
+      border-radius: 0.5rem; transition: background 0.15s ease, box-shadow 0.15s ease;
+    }
+    .room-panel .piece:last-child { border-bottom: 0; }
+    .piece.is-approved { background: rgba(81, 177, 140, 0.10); box-shadow: inset 3px 0 0 var(--color-green); }
+    .piece.is-preferred { background: rgba(236, 142, 223, 0.12); box-shadow: inset 3px 0 0 var(--color-pink); }
     .piece-label {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
       margin: 0 0 0.2rem;
     }
     /* A hero row is one recommended item. Photos slot into the first column
-       later: the grid already reserves it, collapsed to zero while empty. */
+       once the Sheet has an Image column; until then the column collapses. */
     .hero {
       display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.05rem 1rem;
       align-items: baseline; padding: 0.25rem 0;
     }
     .hero + .hero { border-top: 1px solid var(--color-khaki); margin-top: 0.3rem; padding-top: 0.6rem; }
     .hero-photo { grid-row: span 2; width: 0; }
-    .hero-photo img { width: 4.5rem; height: 4.5rem; object-fit: cover; display: block; border: 1px solid var(--color-khaki); }
-    .hero-photo:has(img) { width: 4.5rem; }
-    /* With no photo, drop the photo column altogether. Left in place, its
-       column gap would indent every name away from its label. */
+    .hero-photo img { width: 4rem; height: 4rem; object-fit: cover; display: block; border: 1px solid var(--color-khaki); border-radius: 0.5rem; }
+    .hero-photo:has(img) { width: 4rem; }
     .hero:not(:has(img)) { grid-template-columns: minmax(0, 1fr) auto; }
     .hero:not(:has(img)) .hero-photo { display: none; }
     .hero:not(:has(img)) .hero-sub { grid-column: 1; }
@@ -408,24 +346,23 @@
     .hero-name { font-weight: 600; font-size: var(--type-b1); line-height: 1.3; }
     .hero-name a { color: inherit; text-decoration-color: var(--color-blue); text-underline-offset: 3px; }
     .hero-sub { grid-column: 2; font-size: var(--type-small); color: var(--color-caramel); }
-    .hero-price { font-weight: 700; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
-    /* Quantity sits in its own cell under the price, so it never stretches the name row. */
+    .hero-price { font-weight: 600; font-size: var(--type-b1); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
     .hero-qty { grid-column: 3; font-size: var(--type-small); color: var(--color-caramel); white-space: nowrap; text-align: right; }
 
     /* The alternates reveal. */
-    .alts-toggle {
+    .piece-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.55rem; }
+    .piece-actions:empty { display: none; }
+    .alts-toggle, .dc-pill {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
-      color: var(--color-ink); background: transparent; border: 2px solid var(--color-ink);
-      border-radius: var(--radius-pill); padding: 0 0.75rem; margin-top: 0.45rem;
-      min-height: 2rem; line-height: 1;
-      display: inline-flex; align-items: center; gap: 0.45rem;
+      color: var(--color-ink); background: var(--color-white); border: 2px solid var(--color-ink);
+      border-radius: var(--radius-pill); padding: 0 0.75rem; min-height: 2rem; line-height: 1;
+      display: inline-flex; align-items: center; gap: 0.4rem;
     }
     .alts-toggle::before { content: "+"; font-weight: 500; }
     .alts-toggle[aria-expanded="true"] { background: var(--color-ink); color: var(--color-bg); }
     .alts-toggle[aria-expanded="true"]::before { content: "−"; }
     .alts { display: none; margin: 0.55rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
     .alts[data-open] { display: block; }
-    /* One line per alternate: name + details left, delta + price right. */
     .alt {
       display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
       padding: 0.3rem 0; font-size: var(--type-small); line-height: 1.35;
@@ -439,56 +376,41 @@
     .alt-delta.less { color: var(--color-green); }
 
     /* ── Client decisions (decisions.js) ──────────────────────── */
-    /* Every control is a brand chip: Handjet 16, 2rem tall, 2px ink outline.
-       Color only ever marks a decision, and means the same thing everywhere:
-         green = approved (the page's "good news" color; "in cart" in the
-                 Room for Two estimate)
-         pink  = prefers an alternate ("alternate requested" in the estimate)
-       Ink fill marks something open (alternates, a note being written). Red
-       stays "over budget" only, blue stays links. */
-    .piece-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.45rem; }
-    .piece-actions:empty { display: none; }
-    .piece-actions .alts-toggle { margin-top: 0; }
-    .dc-pill {
-      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.03em;
-      color: var(--color-ink); background: transparent; border: 2px solid var(--color-ink);
-      border-radius: var(--radius-pill); padding: 0 0.75rem; min-height: 2rem; line-height: 1;
-      display: inline-flex; align-items: center; gap: 0.4rem;
-    }
+    /* Chips follow the brand spec: Handjet 16, 2rem tall, 2px ink outline.
+       Color only ever marks a decision, and means the same as in the estimate:
+         green = approved       pink = prefers an alternate
+         blue  = the one main action (Send)
+       Ink fill marks something open (alternates, a note being written).
+       Red stays "over budget" only. */
     .dc-pill[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
     .dc-approve::before { content: ""; width: 0.6rem; height: 0.6rem; border: 1.5px solid currentColor; }
     .dc-approve[aria-pressed="true"] { background: var(--color-green); color: var(--color-ink); }
     .dc-approve[aria-pressed="true"]::before { background: currentColor; }
     .dc-prefer {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip-mobile-stack); letter-spacing: 0.03em;
-      color: var(--color-ink); background: none; border: 0; padding: 0.2rem 0; margin-top: 0.1rem;
-      text-decoration: underline; text-underline-offset: 3px;
+      color: var(--color-ink); background: none; border: 0; padding: 0; margin: 0 0 0 0.25rem;
+      text-decoration: underline; text-underline-offset: 3px; white-space: nowrap;
     }
-    /* A chosen alternate carries a small pink chip in place of the link. The
-       chip is on the inner span so it hugs its text even when the button
-       takes a full line on a phone. */
     .dc-prefer[aria-pressed="true"] { text-decoration: none; }
     .dc-prefer[aria-pressed="true"] > span {
       display: inline-block; background: var(--color-pink); border: 1.5px solid var(--color-ink);
       border-radius: var(--radius-pill); padding: 0.05rem 0.5rem;
     }
-    /* The decision's square: the same shape as the bar legend's, so the page has one marker language. */
+    @media (max-width: 560px) {
+      .alt { flex-wrap: wrap; }
+      .alt > span:first-child { flex: 1 1 0; min-width: 0; }
+      .alt .dc-prefer { flex-basis: 100%; margin: 0.15rem 0 0; text-align: left; }
+    }
+    /* The decision's square: the same shape as the bar legend's. */
     .dc-mark {
       display: inline-block; width: 0.65em; height: 0.65em; margin-right: 0.4em; vertical-align: -0.02em;
       border: 1px solid var(--color-ink); background: var(--color-white);
     }
     .dc-mark.is-approved { background: var(--color-green); }
     .dc-mark.is-prefer { background: var(--color-pink); }
-    /* "Prefer this" sits beside the price; on a phone it takes its own line. */
-    .alt .dc-prefer { margin: 0 0 0 0.25rem; padding: 0; white-space: nowrap; }
-    @media (max-width: 560px) {
-      .alt { flex-wrap: wrap; }
-      .alt > span:first-child { flex: 1 1 0; min-width: 0; }   /* the name wraps, the price keeps its place */
-      .alt .dc-prefer { flex-basis: 100%; margin: 0.15rem 0 0; text-align: left; }
-    }
 
     /* What the client has said about a piece, and what we said back. */
-    .dc-status { margin: 0.6rem 0 0; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
+    .dc-status { margin: 0.6rem 0 0; }
     .dc-status:empty { display: none; }
     .dc-status p { font-size: var(--type-small); line-height: 1.45; margin: 0.15rem 0 0; }
     .dc-status p:first-child { margin-top: 0; }
@@ -498,55 +420,98 @@
     .dc-note-edit { margin-top: 0.6rem; display: grid; gap: 0.45rem; justify-items: start; }
     .dc-input {
       font: inherit; font-size: var(--type-b1); line-height: 1.4; color: var(--color-ink);
-      background: var(--color-white); border: 1px solid var(--color-ink); border-radius: var(--radius-input);
-      padding: 0.4rem 0.6rem; width: 100%; max-width: 34rem;
+      background: var(--color-bg); border: 1.5px solid var(--color-khaki); border-radius: var(--radius-input);
+      padding: 0.5rem 0.65rem; width: 100%;
     }
+    .dc-input:focus { outline: 2px solid var(--color-blue); outline-offset: 1px; border-color: var(--color-ink); }
     .dc-input::placeholder { color: var(--color-caramel); }
     textarea.dc-input { resize: vertical; min-height: 3.5rem; display: block; }
     .dc-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-    /* Your decisions: the review-and-send section at the end of the page. */
-    .dc-list { border-top: 1.5px solid var(--color-ink); }
-    .dc-list:empty { display: none; }
+    /* The bar: fixed at the bottom, as in the estimate. Progress on the left,
+       the total in the middle, Your picks and Send on the right. */
+    .dc-bar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+      background: var(--color-white); border-top: 1.5px solid var(--color-ink);
+      box-shadow: 0 -4px 20px rgba(50, 38, 31, 0.10);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .dc-bar-inner {
+      max-width: 44rem; margin: 0 auto; padding: 0.7rem clamp(1.1rem, 4vw, 2rem) 0.8rem;
+      display: flex; align-items: center; gap: 0.6rem 1.1rem; flex-wrap: wrap;
+    }
+    .dc-progress { flex: 1 1 9.5rem; min-width: 0; }
+    .dc-headline { font-weight: 700; font-size: var(--type-b1); line-height: 1.15; }
+    .dc-headline b { color: var(--color-green); }
+    .dc-track { height: 6px; border-radius: 6px; background: var(--color-khaki); margin: 0.4rem 0 0.3rem; overflow: hidden; }
+    .dc-fill { height: 100%; width: 0; border-radius: 6px; background: var(--color-green); transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+    .dc-sub { font-size: var(--type-small); color: var(--color-caramel); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dc-total { flex: 0 0 auto; text-align: right; line-height: 1; }
+    .dc-amount { font-weight: 700; font-size: var(--type-nav); font-variant-numeric: tabular-nums; }
+    .dc-total-label {
+      font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip-mobile-stack);
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-caramel); margin-top: 0.25rem;
+    }
+    .dc-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .dc-delta { font-family: var(--font-body); font-weight: 600; letter-spacing: 0; text-transform: none; font-variant-numeric: tabular-nums; }
+    .dc-picks-btn[aria-expanded="true"] { background: var(--color-ink); color: var(--color-bg); }
+    .dc-picks-btn::after { content: "▾"; font-size: 0.8em; }
+    .dc-picks-btn[aria-expanded="true"]::after { content: "▴"; }
+    .dc-send {
+      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip); letter-spacing: 0.02em;
+      color: var(--color-white); background: var(--color-blue); border: 2px solid var(--color-blue);
+      border-radius: var(--radius-pill); min-height: 2.5rem; padding: 0 1.2rem; white-space: nowrap;
+    }
+    .dc-send:hover:not(:disabled) { background: var(--color-ink); border-color: var(--color-ink); }
+    .dc-send:disabled { opacity: 0.45; }
+    .dc-line { flex: 1 1 100%; font-size: var(--type-small); color: var(--color-caramel); margin: 0; }
+    .dc-line:empty { display: none; }
+    .dc-line.is-error { color: var(--color-red); }
+    .dc-line.is-ok { color: var(--color-ink); }
+
+    /* Your picks: a drawer that opens above the bar. */
+    .dc-drawer { max-width: 44rem; margin: 0 auto; padding: 0 clamp(1.1rem, 4vw, 2rem); max-height: 55vh; overflow: auto; }
+    .dc-drawer[hidden] { display: none; }
+    .dc-drawer-inner { padding: 0.9rem 0 0.8rem; border-bottom: 1px solid var(--color-khaki); }
     .dc-empty { font-size: var(--type-small); color: var(--color-caramel); margin: 0; }
-    .dc-room { margin: 1rem 0 0.2rem; }
+    .dc-room { display: block; margin: 0.7rem 0 0.15rem; }
+    .dc-room:first-child { margin-top: 0; }
     .dc-row {
-      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 1rem;
-      padding: 0.5rem 0; border-bottom: 1px solid var(--color-khaki); font-size: var(--type-b1);
+      display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.05rem 1rem;
+      padding: 0.35rem 0; border-bottom: 1px solid var(--color-khaki); font-size: var(--type-small);
     }
     .dc-row b { font-weight: 600; }
     .dc-row .dc-price { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .dc-row .dc-sub { grid-column: 1 / -1; font-size: var(--type-small); color: var(--color-caramel); }
-    .dc-total { font-size: var(--type-small); margin: 0.75rem 0 0; }
-    .dc-general-toggle { margin-top: 1rem; }
-    .dc-general { margin-top: 1rem; }
-    .dc-send-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; }
-    .dc-send { background: var(--color-ink); color: var(--color-bg); }
-    .dc-send:disabled { background: var(--color-khaki); border-color: var(--color-khaki); color: var(--color-ink); }
-    .dc-result { font-size: var(--type-small); margin: 0.5rem 0 0; }
-    .dc-result:empty { display: none; }
-    .dc-result.is-error { color: var(--color-red); }
-    .dc-last { font-size: var(--type-small); color: var(--color-caramel); margin: 0.5rem 0 0; }
-    .dc-last:empty { display: none; }
+    .dc-row .dc-rowsub { grid-column: 1 / -1; color: var(--color-caramel); }
+    .dc-general-toggle { margin-top: 0.8rem; }
+    .dc-general { margin-top: 0.8rem; }
+    body.has-bar .wrap { padding-bottom: 10rem; }
 
-    /* The tray: only there while something is waiting to be sent. */
-    .dc-tray {
-      position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-      background: var(--color-bg); border-top: 1.5px solid var(--color-ink);
-      padding: 0.6rem clamp(1.1rem, 4vw, 2rem) calc(0.6rem + env(safe-area-inset-bottom));
+    @media (max-width: 600px) {
+      /* Compact bar: progress on top, total and Your picks share a row, then
+         a full-width Send. */
+      /* Progress and total share the top line; the buttons share the second.
+         The count detail waits in Your picks, so the bar stays short. */
+      .dc-bar-inner { padding: 0.55rem clamp(1.1rem, 4vw, 1.5rem) 0.6rem; gap: 0.45rem 0.75rem; }
+      .dc-progress { flex: 1 1 0; }
+      .dc-sub { display: none; }
+      .dc-track { margin-bottom: 0; }
+      .dc-amount { font-size: var(--type-anim); }
+      .dc-total-label { font-size: 0.75rem; }
+      .dc-actions { flex: 1 1 100%; }
+      .dc-send { flex: 1 1 auto; min-height: 2.25rem; }
+      .dc-line { font-size: 0.8rem; }
+      /* The room's count drops under its name rather than squeezing it. */
+      .room-head { flex-wrap: wrap; row-gap: 0.2rem; }
+      .room-headings { flex: 1 1 calc(100% - 2rem); }
+      .room-progress { flex-basis: 100%; padding-left: calc(0.8rem + 0.7rem); }
+      .room-head { gap: 0.7rem; padding: 0.85rem 0.9rem; }
+      .room-panel { padding: 0 0.9rem; }
+      .card { padding: 0.9rem 0.95rem 1rem; }
     }
-    .dc-tray-inner {
-      max-width: 40rem; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between; gap: 0.5rem 1rem; flex-wrap: wrap;
-    }
-    .dc-tray-text { font-size: var(--type-small); line-height: 1.35; }
-    .dc-tray-text b { font-weight: 600; }
-    body.has-tray { padding-bottom: 5rem; }
 
     /* ── Notes / errors ───────────────────────────────────────── */
-    /* No rule above: the last room's rule already closes the section, and a
-       second one this close would read as a double line. */
-    .notes { margin-top: 3rem; }
+    .notes { margin-top: 2rem; }
     .notes p { font-size: var(--type-small); line-height: 1.5; color: var(--color-caramel); margin: 0.4rem 0 0; max-width: 36rem; }
     .notes .stamp { margin-top: 1rem; }
     .warning {
@@ -556,22 +521,15 @@
     }
     .loading { font-family: var(--font-ui); font-weight: 600; font-size: var(--type-chip); color: var(--color-caramel); padding: 2rem 0; }
 
-    @media (max-width: 480px) {
-      /* No room for the count beside the name: drop it to its own line,
-         indented past the +/− so it sits under the name. */
-      .room-name { flex-wrap: wrap; row-gap: 0; }
-      .room-name small { flex-basis: 100%; padding-left: calc(1.1rem + 0.55rem); }
-    }
-
     @media print {
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
-      .stamp button, .alts-toggle, .means-more summary, .dc-pill, .dc-prefer, .dc-tray, .dc-general-toggle, .dc-send-row { display: none; }
-      body.has-tray { padding-bottom: 0; }
-      .room-name::before { display: none; }
+      .stamp button, .alts-toggle, .means-more summary, .dc-pill, .dc-prefer, .dc-bar, .chevron { display: none; }
+      body.has-bar .wrap { padding-bottom: 0; }
       .alts { display: block; }          /* print everything, alternates included */
-      .piece, .led-row { break-inside: avoid; }
+      .piece, .snap-row { break-inside: avoid; }
+      .card { break-inside: avoid-page; }
     }
   </style>
 </head>
@@ -646,7 +604,8 @@
 
     // Client decisions (decisions.js). Off until `endpoint` holds the Apps
     // Script web-app URL from procurement/_source/212n9th-decisions.gs.
-    // Add #preview-decisions to the page URL to see the controls before then.
+    // Add #preview-decisions to the page URL (or set preview: true) to see
+    // the controls with sending off.
     decisions: {
       endpoint: "https://script.google.com/macros/s/AKfycbwW4UklPMYGBy4CwOwNkuNjj9zTWFkW7dwvt5XB_lokekPpAcZ-L7cK_3eUQWtuQ27H/exec",
       tab: "Client Actions",
@@ -799,22 +758,8 @@
         ? `What's left to source is mostly details and styling, which flex easily. Their budgets total ${money(S.allowance)} and we have ${money(roomLeft)} to work with, which is where the range comes from. As selections lock in, we calibrate accordingly.`
         : `What's left to source has budgets totaling ${money(S.allowance)}, and we have ${money(roomLeft)} to work with, so it is covered in full. As selections lock in, we calibrate accordingly.`;
 
-    // The kickoff breakout, contingency last. Summed from the shares, not
-    // assumed: if they stop adding to 100% the table says so.
-    const planRows = [...CONFIG.categories, { name: "Contingency", share: CONFIG.contingency.share }];
-    const planTotal = planRows.reduce((n, c) => n + c.share * CONFIG.budget, 0);
-
     let html = `
-      <section class="section">
-        <span class="section-title">The budget we set</span>
-        <p class="plan-note">Set at kickoff. We refine it together as the design locks.</p>
-        <div class="plan" style="--rows:${Math.ceil(planRows.length / 2)}">
-          ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="pct">${pctOf(c.share * CONFIG.budget)}</span><span class="amt">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
-        </div>
-        <div class="plan-cell plan-total"><span>Total</span><span class="pct">${pctOf(planTotal)}</span><span class="amt">${money(planTotal)}</span></div>
-      </section>
-
-      <section class="section">
+      <section class="card">
         <span class="section-title">Where we stand</span>
         <p class="takeaway">${takeaway}</p>
         <dl class="figures">
@@ -846,101 +791,76 @@
         </details>
       </section>
 
-      <section class="section">
-        <h2 class="section-h">How the budget breaks down</h2>
-        <p class="section-intro">Each category's budget against what we've recommended so far.</p>
-        <div class="ledger">
-          <div class="led-row led-head"><span>Category</span><span>Budget</span><span>Recommended</span><span>Status</span></div>`;
+      <section class="card">
+        <div class="card-head"><span class="section-title">The budget</span><span class="aside">Set at kickoff, by category</span></div>
+        <div class="snap">`;
 
+    // One slim line per category: its budget, a bar of what's recommended
+    // against it, and a status that always says something.
     S.cats.forEach(c => {
       const diff = c.sourced - c.allocation;
-      // Every status says something: how far over, how much is left to
-      // source, or that the category hasn't been started. Green is earned:
-      // only a COMPLETE category that came in under its budget shows a saving.
       let status, cls = "";
       if (c.unmapped)            status = "Not in the budget";
       else if (diff > 0.5)     { status = money(diff) + " over"; cls = "over"; }
       else if (c.complete)     { status = diff < -0.5 ? money(-diff) + " under" : "On budget"; cls = diff < -0.5 ? "under" : ""; }
       else if (!c.count)         status = "Not started";
       else                       status = money(-diff) + " to go";
-      const label = [`${c.count} piece${c.count === 1 ? "" : "s"}`, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
-      const items = [...c.items].sort((a, b) => b.total - a.total).map(it =>
-        `<div class="led-item"><span><a href="#" data-goto="${esc(it.room + "|" + it.piece)}">${esc(it.name)}</a> <span class="where">· ${esc(it.piece)} · ${esc(it.room)}</span></span><span class="amt">${money(it.total)}</span></div>`).join("");
-      const meta = c.count
-        ? `<details class="led-more"><summary>${label}</summary><div class="led-items">${items}</div></details>`
-        : label;
-      let bar = "";
-      if (!c.unmapped) {
-        const span = Math.max(c.allocation, c.sourced) || 1;
-        const w = n => (100 * n / span).toFixed(2) + "%";
-        bar = `<span class="led-bar">
-          <span class="seg-rec" style="width:${w(Math.min(c.sourced, c.allocation))}"></span>
-          <span class="seg-over" style="width:${w(Math.max(0, diff))}"></span>
-        </span>`;
-      }
-      html += `<div class="led-row">
-        <span class="led-name">${esc(c.name)}</span>
-        <span class="num led-budget" data-label="Budget">${c.unmapped ? "" : money(c.allocation)}</span>
-        <span class="num led-rec" data-label="Recommended">${money(c.sourced)}</span>
-        <span class="num led-status ${cls}">${status}</span>
-        <span class="led-meta">${meta}</span>
-        ${bar}
+      const span = Math.max(c.allocation, c.sourced) || 1;
+      const w = n => (100 * n / span).toFixed(2) + "%";
+      html += `<div class="snap-row">
+        <span class="snap-name">${esc(c.name)}${c.unmapped ? "" : `<span class="pct">${pctOf(c.allocation)}</span>`}</span>
+        <span class="snap-budget">${c.unmapped ? "" : money(c.allocation)}</span>
+        <span class="snap-bar"><span class="seg-rec" style="width:${w(Math.min(c.sourced, c.allocation || c.sourced))}"></span><span class="seg-over" style="width:${w(c.unmapped ? 0 : Math.max(0, diff))}"></span></span>
+        <span class="snap-status ${cls}">${status}</span>
       </div>`;
     });
+    // Summed from the shares, not assumed: if they stop adding to 100% the table says so.
     const budgetTotal = S.cats.reduce((n, c) => n + c.allocation, 0) + S.reserve;
-    html += `<div class="led-row">
-        <span class="led-name">Contingency</span>
-        <span class="num led-budget" data-label="Budget">${money(S.reserve)}</span>
-        <span class="num led-rec" data-label="Recommended"></span>
-        <span class="num led-status">Held in reserve</span>
+    html += `<div class="snap-row">
+        <span class="snap-name">Contingency<span class="pct">${pctOf(S.reserve)}</span></span>
+        <span class="snap-budget">${money(S.reserve)}</span>
+        <span class="snap-bar is-reserve"></span>
+        <span class="snap-status">Held in reserve</span>
       </div>
-      <div class="led-row is-total">
-        <span class="led-name">Total</span>
-        <span class="num led-budget" data-label="Budget">${money(budgetTotal)}</span>
-        <span class="num led-rec" data-label="Recommended">${money(S.sourced)}</span>
-        <span class="num led-status"></span>
+      <div class="snap-row is-total">
+        <span class="snap-name">Total</span>
+        <span class="snap-budget">${money(budgetTotal)}</span>
+        <span class="snap-status">${money(S.sourced)} recommended so far</span>
       </div>
-    </div>`;
-    html += `</section>`;
+    </div></section>`;
 
-    html += `<div class="part">
-        <h2 class="part-title">The pieces, room by room</h2>
-        <p class="part-intro">Open a room to see each piece we recommend and any alternates.</p>
+    html += `<div class="rooms-head">
+        <span class="section-title">Room by room</span>
+        <p class="rooms-intro" id="rooms-intro">Open a room to see every piece we recommend and its alternates.</p>
       </div>`;
 
-    S.rooms.forEach((room, i) => {
+    S.rooms.forEach(room => {
       const n = room.pieces.length;
-      html += `<details class="room"${i === 0 ? " open" : ""}>
+      html += `<details class="card room" data-room="${esc(room.name)}">
         <summary class="room-head">
-          <span class="room-name">${esc(room.name)} <small>${n} piece${n === 1 ? "" : "s"}</small></span>
-          <span class="room-total">${money(room.total)}<small>recommended</small></span>
-        </summary>`;
+          <span class="chevron" aria-hidden="true">▶</span>
+          <span class="room-headings">
+            <span class="room-name">${esc(room.name)}</span>
+            <span class="room-meta">${n} piece${n === 1 ? "" : "s"} · ${money(room.total)} recommended</span>
+          </span>
+          <span class="room-progress" data-room-progress></span>
+        </summary>
+        <div class="room-panel">`;
       room.pieces.forEach(p => {
         const against = p.recommended.reduce((n, it) => n + it.total, 0);
-        const n = p.alternates.length;
+        const alts = p.alternates.length;
         html += `<div class="piece" data-key="${esc(room.name + "|" + p.name)}">
           <p class="piece-label">${esc(p.name)}</p>
           ${p.recommended.map(heroHTML).join("")}
-          <div class="piece-actions">${n ? `<button type="button" class="alts-toggle" aria-expanded="false">${n} alternate${n === 1 ? "" : "s"}</button>` : ""}</div>
-          ${n ? `<div class="alts">${p.alternates.map(it => altHTML(it, against)).join("")}</div>` : ""}
+          <div class="piece-actions">${alts ? `<button type="button" class="alts-toggle" aria-expanded="false">${alts} alternate${alts === 1 ? "" : "s"}</button>` : ""}</div>
+          ${alts ? `<div class="alts">${p.alternates.map(it => altHTML(it, against)).join("")}</div>` : ""}
         </div>`;
       });
-      html += `</details>`;
+      html += `</div></details>`;
     });
 
     $("#app").innerHTML = html;
   }
-
-  // A piece named in the breakdown links to where it sits in the rooms below.
-  $("#app").addEventListener("click", e => {
-    const link = e.target.closest("[data-goto]");
-    if (!link) return;
-    e.preventDefault();
-    const piece = [...document.querySelectorAll(".piece[data-key]")].find(el => el.dataset.key === link.dataset.goto);
-    if (!piece) return;
-    piece.closest("details.room").open = true;
-    piece.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
 
   // One handler for every alternates toggle, present or future.
   $("#app").addEventListener("click", e => {
