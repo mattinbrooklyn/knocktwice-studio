@@ -189,7 +189,7 @@
       row.classList.toggle("is-picked", chosen);
       row.querySelector(".dc-prefer")?.remove();
       row.insertAdjacentHTML("beforeend",
-        `<button type="button" class="dc-prefer" data-dc="prefer" aria-pressed="${chosen}">${chosen ? "Your pick · undo" : "Prefer this"}</button>`);
+        `<button type="button" class="dc-prefer" data-dc="prefer" aria-pressed="${chosen}"><span>${chosen ? "Your pick" : "Prefer this"}</span></button>`);
     });
     if (p.prefer && x.alts[p.prefer]) {
       el.querySelector(".alts")?.setAttribute("data-open", "");
@@ -209,8 +209,8 @@
     } else if (!editing.has(k) && box) box.remove();
 
     const s = sent(), sentPick = tidy(s.picks[k]), lines = [];
-    if (p.approved) lines.push(`You approved this.`);
-    if (p.prefer && x.alts[p.prefer]) lines.push(`You prefer the ${esc(p.prefer)}, ${signed(x.alts[p.prefer].total - x.against)}.`);
+    if (p.approved) lines.push(`<span class="dc-mark is-approved"></span>You approved this.`);
+    if (p.prefer && x.alts[p.prefer]) lines.push(`<span class="dc-mark is-prefer"></span>You prefer the ${esc(p.prefer)}, ${signed(x.alts[p.prefer].total - x.against)}.`);
     if (p.note && !editing.has(k)) lines.push(`Your note: “${esc(p.note)}”`);
     const team = sheet && sheet.team[k];
     if (team && same(sheet.picks[k], p)) {
@@ -230,21 +230,28 @@
       app.insertAdjacentHTML("beforeend", `
         <section class="section" id="your-decisions">
           <h2 class="section-h">Your decisions</h2>
-          <p class="section-intro">Nothing here is final. Send what you've decided so far, then change or add to it whenever you like. The latest send is the one we work from.</p>
+          <p class="section-intro">Nothing here is final. Send what you have and change it any time.</p>
           <div class="dc-summary"></div>
-          <label class="dc-field"><span>Anything else for the team</span>
-            <textarea class="dc-input" id="dc-general" rows="3"></textarea></label>
-          <label class="dc-field"><span>Your name</span>
-            <input class="dc-input" id="dc-name" autocomplete="name" maxlength="80"></label>
-          <div class="dc-send-row">
-            <button type="button" class="dc-pill dc-send" data-dc="send">Send to Knock Twice</button>
-            <span class="dc-result" aria-live="polite"></span>
+          <button type="button" class="dc-pill dc-general-toggle" data-dc="general" aria-expanded="false">Add a note for the team</button>
+          <div class="dc-general" hidden>
+            <label class="dc-visually-hidden" for="dc-general">A note for the team</label>
+            <textarea class="dc-input" id="dc-general" rows="2" placeholder="Anything else for the team"></textarea>
           </div>
-          <p class="dc-last"></p>
+          <div class="dc-form" hidden>
+            <div class="dc-send-row">
+              <label class="dc-visually-hidden" for="dc-name">Your name</label>
+              <input class="dc-input dc-name" id="dc-name" autocomplete="name" maxlength="80" placeholder="Your name">
+              <button type="button" class="dc-pill dc-send" data-dc="send">Send to Knock Twice</button>
+            </div>
+            <p class="dc-result" aria-live="polite"></p>
+            <p class="dc-last"></p>
+          </div>
         </section>`);
       sec = document.getElementById("your-decisions");
-      sec.querySelector("#dc-general").value = tidy(working()[GENERAL]).note;
+      const general = tidy(working()[GENERAL]).note;
+      sec.querySelector("#dc-general").value = general;
       sec.querySelector("#dc-name").value = local.name || "";
+      if (general) openGeneral(sec);
     }
 
     const w = working(), pending = new Set(pendingKeys()), c = counts();
@@ -254,7 +261,7 @@
     });
     let html = "";
     if (!Object.keys(byRoom).length) {
-      html = `<p class="dc-empty">Approve pieces, prefer an alternate or leave a note above, and they'll gather here.</p>`;
+      html = `<p class="dc-empty">Approve, prefer or note pieces above and they'll gather here.</p>`;
     } else {
       html += `<div class="dc-list">`;
       // Rooms and pieces in page order, not the order they were picked.
@@ -264,10 +271,11 @@
         html += `<p class="section-title dc-room">${esc(room.name)}</p>`;
         ks.forEach(k => {
           const x = index[k], p = tidy(w[k]), alt = p.prefer && x.alts[p.prefer];
-          const what = alt ? `Prefers the ${esc(p.prefer)}` : p.approved ? "Approved" : "Note";
+          const what = alt ? `<span class="dc-mark is-prefer"></span>Prefers the ${esc(p.prefer)}`
+            : p.approved ? `<span class="dc-mark is-approved"></span>Approved` : `<span class="dc-mark"></span>Note`;
           const price = alt ? money(alt.total) : p.approved ? money(x.against) : "";
           const sub = [p.note ? `“${esc(p.note)}”` : "", pending.has(k) ? "not sent yet" : ""].filter(Boolean).join(" · ");
-          html += `<div class="dc-row"><span><b>${esc(x.piece)}</b> · ${what}</span><span class="dc-price">${price}</span>` +
+          html += `<div class="dc-row"><span><b>${esc(x.piece)}</b> ${what}</span><span class="dc-price">${price}</span>` +
                   (sub ? `<span class="dc-sub">${sub}</span>` : "") + `</div>`;
         });
       });
@@ -278,6 +286,10 @@
     }
     sec.querySelector(".dc-summary").innerHTML = html;
 
+    // The name and Send row only appears once there's something to send.
+    const s0 = sent();
+    sec.querySelector(".dc-form").hidden = !(Object.keys(byRoom).length || tidy(w[GENERAL]).note || s0.id);
+
     const btn = sec.querySelector(".dc-send");
     const nothingNew = !pending.size;
     btn.disabled = !canSend || nothingNew;
@@ -285,6 +297,11 @@
     sec.querySelector(".dc-last").textContent = !canSend
       ? "Sending switches on once this page is connected."
       : s.when ? `Last sent ${s.when}${s.from ? " by " + s.from : ""}.${nothingNew ? " Change anything above to send again." : ""}` : "";
+  }
+
+  function openGeneral(sec) {
+    sec.querySelector(".dc-general").hidden = false;
+    sec.querySelector(".dc-general-toggle").hidden = true;
   }
 
   function drawTray() {
@@ -361,6 +378,12 @@
       case "note": if (editing.has(k)) editing.delete(k); else editing.add(k); break;
       case "note-done": editing.delete(k); break;
       case "send": send(); return;
+      case "general": {
+        const sec = document.getElementById("your-decisions");
+        openGeneral(sec);
+        sec.querySelector("#dc-general").focus();
+        return;
+      }
       default: return;
     }
     mount();

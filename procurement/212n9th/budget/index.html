@@ -424,8 +424,13 @@
     .alt-delta.less { color: var(--color-green); }
 
     /* ── Client decisions (decisions.js) ──────────────────────── */
-    /* Every control is a brand chip: Handjet 16, 2rem tall, 2px ink outline,
-       filled ink when on. Nothing here adds color. */
+    /* Every control is a brand chip: Handjet 16, 2rem tall, 2px ink outline.
+       Color only ever marks a decision, and means the same thing everywhere:
+         green = approved (the page's "good news" color; "in cart" in the
+                 Room for Two estimate)
+         pink  = prefers an alternate ("alternate requested" in the estimate)
+       Ink fill marks something open (alternates, a note being written). Red
+       stays "over budget" only, blue stays links. */
     .piece-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.45rem; }
     .piece-actions:empty { display: none; }
     .piece-actions .alts-toggle { margin-top: 0; }
@@ -437,15 +442,28 @@
     }
     .dc-pill[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
     .dc-approve::before { content: ""; width: 0.6rem; height: 0.6rem; border: 1.5px solid currentColor; }
+    .dc-approve[aria-pressed="true"] { background: var(--color-green); color: var(--color-ink); }
     .dc-approve[aria-pressed="true"]::before { background: currentColor; }
     .dc-prefer {
       font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip-mobile-stack); letter-spacing: 0.03em;
       color: var(--color-ink); background: none; border: 0; padding: 0.2rem 0; margin-top: 0.1rem;
       text-decoration: underline; text-underline-offset: 3px;
     }
+    /* A chosen alternate carries a small pink chip in place of the link. The
+       chip is on the inner span so it hugs its text even when the button
+       takes a full line on a phone. */
     .dc-prefer[aria-pressed="true"] { text-decoration: none; }
-    .dc-prefer[aria-pressed="true"]::before { content: "■ "; }
-    .alt.is-picked .alt-name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+    .dc-prefer[aria-pressed="true"] > span {
+      display: inline-block; background: var(--color-pink); border: 1.5px solid var(--color-ink);
+      border-radius: var(--radius-pill); padding: 0.05rem 0.5rem;
+    }
+    /* The decision's square: the same shape as the bar legend's, so the page has one marker language. */
+    .dc-mark {
+      display: inline-block; width: 0.65em; height: 0.65em; margin-right: 0.4em; vertical-align: -0.02em;
+      border: 1px solid var(--color-ink); background: var(--color-white);
+    }
+    .dc-mark.is-approved { background: var(--color-green); }
+    .dc-mark.is-prefer { background: var(--color-pink); }
     /* "Prefer this" sits beside the price; on a phone it takes its own line. */
     .alt .dc-prefer { margin: 0 0 0 0.25rem; padding: 0; white-space: nowrap; }
     @media (max-width: 560px) {
@@ -465,15 +483,17 @@
     .dc-note-edit { margin-top: 0.6rem; display: grid; gap: 0.45rem; justify-items: start; }
     .dc-input {
       font: inherit; font-size: var(--type-b1); line-height: 1.4; color: var(--color-ink);
-      background: var(--color-white); border: 1.5px solid var(--color-ink); border-radius: var(--radius-input);
-      padding: 0.5rem 0.65rem; width: 100%;
+      background: var(--color-white); border: 1px solid var(--color-ink); border-radius: var(--radius-input);
+      padding: 0.4rem 0.6rem; width: 100%; max-width: 34rem;
     }
-    textarea.dc-input { resize: vertical; min-height: 4.5rem; }
+    .dc-input::placeholder { color: var(--color-caramel); }
+    textarea.dc-input { resize: vertical; min-height: 3.5rem; display: block; }
+    .dc-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     /* Your decisions: the review-and-send section at the end of the page. */
     .dc-list { border-top: 1.5px solid var(--color-ink); }
     .dc-list:empty { display: none; }
-    .dc-empty { font-size: var(--type-b1); color: var(--color-caramel); margin: 0; }
+    .dc-empty { font-size: var(--type-small); color: var(--color-caramel); margin: 0; }
     .dc-room { margin: 1rem 0 0.2rem; }
     .dc-row {
       display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 1rem;
@@ -482,18 +502,19 @@
     .dc-row b { font-weight: 600; }
     .dc-row .dc-price { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
     .dc-row .dc-sub { grid-column: 1 / -1; font-size: var(--type-small); color: var(--color-caramel); }
-    .dc-total { font-size: var(--type-b1); margin: 1rem 0 0; }
-    .dc-field { display: grid; gap: 0.35rem; margin-top: 1.25rem; max-width: 34rem; }
-    .dc-field > span {
-      font-family: var(--font-ui); font-weight: 700; font-size: var(--type-chip);
-      letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-caramel);
-    }
-    .dc-send-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1rem; margin-top: 1.25rem; }
-    .dc-send { background: var(--color-ink); color: var(--color-bg); min-height: 2.5rem; padding: 0 1.1rem; }
+    .dc-total { font-size: var(--type-small); margin: 0.75rem 0 0; }
+    .dc-general-toggle { margin-top: 1rem; }
+    .dc-general { margin-top: 1rem; }
+    /* Name and Send share a line; on a phone the button drops beneath. */
+    .dc-send-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+    .dc-name { flex: 0 1 16rem; min-width: 0; }
+    .dc-send { background: var(--color-ink); color: var(--color-bg); }
     .dc-send:disabled { background: var(--color-khaki); border-color: var(--color-khaki); color: var(--color-ink); }
-    .dc-result { font-size: var(--type-small); }
+    .dc-result { font-size: var(--type-small); margin: 0.5rem 0 0; }
+    .dc-result:empty { display: none; }
     .dc-result.is-error { color: var(--color-red); }
-    .dc-last { font-size: var(--type-small); color: var(--color-caramel); margin: 0.75rem 0 0; }
+    .dc-last { font-size: var(--type-small); color: var(--color-caramel); margin: 0.5rem 0 0; }
+    .dc-last:empty { display: none; }
 
     /* The tray: only there while something is waiting to be sent. */
     .dc-tray {
@@ -537,7 +558,7 @@
       * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       @page { margin: 0; }
       .wrap { max-width: none; margin: 0; padding: 16mm 18mm; }
-      .stamp button, .alts-toggle, .means-more summary, .dc-pill, .dc-prefer, .dc-tray, .dc-field, .dc-send-row { display: none; }
+      .stamp button, .alts-toggle, .means-more summary, .dc-pill, .dc-prefer, .dc-tray, .dc-general-toggle, .dc-send-row { display: none; }
       body.has-tray { padding-bottom: 0; }
       .room-name::before { display: none; }
       .alts { display: block; }          /* print everything, alternates included */
@@ -781,7 +802,7 @@
     let html = `
       <section class="section">
         <span class="section-title">The budget we set</span>
-        <p class="plan-note">Set at kickoff as a directional baseline, and refined together as the design locks and pieces are chosen.</p>
+        <p class="plan-note">Set at kickoff. We refine it together as the design locks.</p>
         <div class="plan" style="--rows:${Math.ceil(planRows.length / 2)}">
           ${planRows.map(c => `<div class="plan-cell"><span>${esc(c.name)}</span><span class="pct">${pctOf(c.share * CONFIG.budget)}</span><span class="amt">${money(c.share * CONFIG.budget)}</span></div>`).join("")}
         </div>
