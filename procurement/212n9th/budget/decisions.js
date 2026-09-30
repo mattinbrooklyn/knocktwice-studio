@@ -2,8 +2,11 @@
    DECISIONS — the client's side of the conversation for 212 N 9th.
 
    On each piece the client can approve our recommendation, prefer one of
-   its alternates, or leave a note. Picks save on this device as they go.
-   "Send to Knock Twice" posts the whole set to a Google Apps Script
+   its alternates, or leave a note. Picks save on this device as they go,
+   and a bar fixed to the bottom of the page (as in the Room for Two
+   estimate) shows progress, the total with their picks, a "Your picks"
+   drawer and Send. "Send to Knock Twice" posts the whole set to a Google
+   Apps Script
    (procurement/_source/212n9th-decisions.gs), which appends it to the
    Client Actions tab of the project Sheet and emails the team.
 
@@ -15,15 +18,15 @@
    The team answers in the Client Actions tab (Team status, Team reply) and
    this page shows those answers back on each piece.
 
-   Off until CONFIG.decisions.endpoint is set. Add #preview-decisions to the
-   URL to see the controls before then (sending stays off).
+   Off until CONFIG.decisions.endpoint is set. CONFIG.decisions.preview, or
+   #preview-decisions in the URL, shows the controls with sending off.
    ────────────────────────────────────────────────────────────── */
 (function () {
   const B = window.KTBudget;
   if (!B) return;
   const { CONFIG, money, esc, parseCSV, key } = B;
   const D = CONFIG.decisions || {};
-  const previewing = location.hash === "#preview-decisions";
+  const previewing = Boolean(D.preview) || location.hash === "#preview-decisions";
   if (!D.endpoint && !previewing) return;
   const canSend = Boolean(D.endpoint);
   const app = document.getElementById("app");
@@ -109,6 +112,8 @@
     return total;
   }
 
+  const decided = (k, p) => !!(p && index[k] && (p.approved || (p.prefer && index[k].alts[p.prefer])));
+
   function counts() {
     const c = { approved: 0, prefer: 0, notes: 0 };
     Object.entries(working()).forEach(([k, p]) => {
@@ -169,14 +174,30 @@
   function mount() {
     if (!summary) return;
     app.querySelectorAll(".piece[data-key]").forEach(drawPiece);
-    drawReview();
-    drawTray();
+    drawRooms();
+    drawBar();
+    drawDrawer();
+  }
+
+  // "3/13 decided" on each room card, as the estimate shows "0/7 reviewed".
+  function drawRooms() {
+    const w = working();
+    app.querySelectorAll(".room[data-room]").forEach(card => {
+      const ks = [...card.querySelectorAll(".piece[data-key]")].map(el => el.dataset.key);
+      const done = ks.filter(k => decided(k, w[k])).length;
+      const out = card.querySelector("[data-room-progress]");
+      out.textContent = `${done}/${ks.length} decided`;
+      out.classList.toggle("partial", done > 0 && done < ks.length);
+      out.classList.toggle("complete", ks.length > 0 && done === ks.length);
+    });
   }
 
   function drawPiece(el) {
     const k = el.dataset.key, x = index[k];
     if (!x) return;
     const p = pickOf(k);
+    el.classList.toggle("is-approved", p.approved);
+    el.classList.toggle("is-preferred", !!(p.prefer && x.alts[p.prefer]));
     const actions = el.querySelector(".piece-actions");
     actions.querySelectorAll(".dc-pill").forEach(n => n.remove());
     actions.insertAdjacentHTML("beforeend",
@@ -209,7 +230,6 @@
     } else if (!editing.has(k) && box) box.remove();
 
     const s = sent(), sentPick = tidy(s.picks[k]), lines = [];
-    if (p.approved) lines.push(`<span class="dc-mark is-approved"></span>You approved this.`);
     if (p.prefer && x.alts[p.prefer]) lines.push(`<span class="dc-mark is-prefer"></span>You prefer the ${esc(p.prefer)}, ${signed(x.alts[p.prefer].total - x.against)}.`);
     if (p.note && !editing.has(k)) lines.push(`Your note: “${esc(p.note)}”`);
     const team = sheet && sheet.team[k];
@@ -222,50 +242,94 @@
     status.innerHTML = lines.map(l => `<p>${l}</p>`).join("");
   }
 
-  // The review-and-send section. Its inputs are built once and never redrawn,
-  // so typing a note is never interrupted; only the list refreshes.
-  function drawReview() {
-    let sec = document.getElementById("your-decisions");
-    if (!sec) {
-      app.insertAdjacentHTML("beforeend", `
-        <section class="section" id="your-decisions">
-          <h2 class="section-h">Your decisions</h2>
-          <p class="section-intro">Nothing here is final. Send what you have and change it any time.</p>
-          <div class="dc-summary"></div>
-          <button type="button" class="dc-pill dc-general-toggle" data-dc="general" aria-expanded="false">Add a note for the team</button>
-          <div class="dc-general" hidden>
-            <label class="dc-visually-hidden" for="dc-general">A note for the team</label>
-            <textarea class="dc-input" id="dc-general" rows="2" placeholder="Anything else for the team"></textarea>
-          </div>
-          <div class="dc-form" hidden>
-            <div class="dc-send-row">
-              <button type="button" class="dc-pill dc-send" data-dc="send">Send to Knock Twice</button>
+  /* ── The bar and its drawer ──────────────────────────────────────────
+     Built once, outside the budget's redraws, so an open drawer or a note
+     being typed is never interrupted. */
+  function bar() {
+    let el = document.getElementById("dc-bar");
+    if (el) return el;
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="dc-bar" id="dc-bar" role="region" aria-label="Your decisions">
+        <div class="dc-drawer" id="dc-drawer" hidden>
+          <div class="dc-drawer-inner">
+            <div class="dc-list"></div>
+            <button type="button" class="dc-pill dc-general-toggle" data-dc="general">Add a note for the team</button>
+            <div class="dc-general" hidden>
+              <label class="dc-visually-hidden" for="dc-general">A note for the team</label>
+              <textarea class="dc-input" id="dc-general" rows="2" placeholder="Anything else for the team"></textarea>
             </div>
-            <p class="dc-result" aria-live="polite"></p>
-            <p class="dc-last"></p>
           </div>
-        </section>`);
-      sec = document.getElementById("your-decisions");
-      const general = tidy(working()[GENERAL]).note;
-      sec.querySelector("#dc-general").value = general;
-      if (general) openGeneral(sec);
-    }
+        </div>
+        <div class="dc-bar-inner">
+          <div class="dc-progress">
+            <div class="dc-headline"></div>
+            <div class="dc-track"><div class="dc-fill"></div></div>
+            <div class="dc-sub"></div>
+          </div>
+          <div class="dc-total"><div class="dc-amount"></div><div class="dc-total-label"></div></div>
+          <div class="dc-actions">
+            <button type="button" class="dc-pill dc-picks-btn" data-dc="picks" aria-expanded="false" aria-controls="dc-drawer">Your picks</button>
+            <button type="button" class="dc-send" data-dc="send">Send to Knock Twice</button>
+          </div>
+          <p class="dc-line" aria-live="polite"></p>
+        </div>
+      </div>`);
+    document.body.classList.add("has-bar");
+    el = document.getElementById("dc-bar");
+    const general = tidy(working()[GENERAL]).note;
+    el.querySelector("#dc-general").value = general;
+    if (general) openGeneral();
+    return el;
+  }
 
-    const w = working(), pending = new Set(pendingKeys()), c = counts();
+  function openGeneral() {
+    const el = bar();
+    el.querySelector(".dc-general").hidden = false;
+    el.querySelector(".dc-general-toggle").hidden = true;
+  }
+
+  function drawBar() {
+    const el = bar();
+    const w = working(), keys = Object.keys(index), c = counts(), pending = pendingKeys();
+    const done = keys.filter(k => decided(k, w[k])).length;
+    el.querySelector(".dc-headline").innerHTML = `<b>${done}</b> of ${keys.length} pieces decided`;
+    el.querySelector(".dc-fill").style.width = keys.length ? (100 * done / keys.length).toFixed(1) + "%" : "0";
+    el.querySelector(".dc-sub").textContent = [
+      plural(c.approved, "approved", "approved"), plural(c.prefer, "alternate", "alternates"), plural(c.notes, "note", "notes"),
+      pending.length ? plural(pending.length, "change not sent", "changes not sent") : "",
+    ].filter(Boolean).join(" · ");
+
+    const total = withPicks(), diff = total - summary.sourced;
+    el.querySelector(".dc-amount").textContent = money(total);
+    // The delta stays in the body face: Handjet's zeros read as eights.
+    el.querySelector(".dc-total-label").innerHTML = Math.abs(diff) >= 0.5 ? `With your picks <span class="dc-delta">${signed(diff)}</span>` : "Recommended";
+
+    const send = el.querySelector(".dc-send");
+    send.disabled = !canSend || !pending.length;
+    const line = el.querySelector(".dc-line");
+    if (!line.dataset.result) {
+      const s = sent();
+      line.className = "dc-line";
+      line.textContent = !canSend ? "Sending is off in this preview."
+        : pending.length ? "" : s.when ? `Last sent ${s.when}. Change anything and send again.` : "";
+    }
+  }
+
+  function drawDrawer() {
+    const el = bar(), w = working(), pending = new Set(pendingKeys());
     const byRoom = {};
     Object.keys(w).filter(k => index[k] && !isEmpty(w[k])).forEach(k => {
       (byRoom[index[k].room] = byRoom[index[k].room] || []).push(k);
     });
     let html = "";
     if (!Object.keys(byRoom).length) {
-      html = `<p class="dc-empty">Approve, prefer or note pieces above and they'll gather here.</p>`;
+      html = `<p class="dc-empty">Approve, prefer or note pieces in the rooms above and they'll gather here.</p>`;
     } else {
-      html += `<div class="dc-list">`;
       // Rooms and pieces in page order, not the order they were picked.
       summary.rooms.forEach(room => {
         const ks = room.pieces.map(p => room.name + "|" + p.name).filter(k => (byRoom[room.name] || []).includes(k));
         if (!ks.length) return;
-        html += `<p class="section-title dc-room">${esc(room.name)}</p>`;
+        html += `<span class="section-title dc-room">${esc(room.name)}</span>`;
         ks.forEach(k => {
           const x = index[k], p = tidy(w[k]), alt = p.prefer && x.alts[p.prefer];
           const what = alt ? `<span class="dc-mark is-prefer"></span>Prefers the ${esc(p.prefer)}`
@@ -273,55 +337,20 @@
           const price = alt ? money(alt.total) : p.approved ? money(x.against) : "";
           const sub = [p.note ? `“${esc(p.note)}”` : "", pending.has(k) ? "not sent yet" : ""].filter(Boolean).join(" · ");
           html += `<div class="dc-row"><span><b>${esc(x.piece)}</b> ${what}</span><span class="dc-price">${price}</span>` +
-                  (sub ? `<span class="dc-sub">${sub}</span>` : "") + `</div>`;
+                  (sub ? `<span class="dc-rowsub">${sub}</span>` : "") + `</div>`;
         });
       });
-      html += `</div>`;
-      const diff = withPicks() - summary.sourced;
-      html += `<p class="dc-total">${[plural(c.approved, "approved", "approved"), plural(c.prefer, "alternate", "alternates"), plural(c.notes, "note", "notes")].join(" · ")}.` +
-              (Math.abs(diff) >= 0.5 ? ` With your picks, recommended comes to <b>${money(withPicks())}</b>, ${signed(diff)} against ours.` : "") + `</p>`;
     }
-    sec.querySelector(".dc-summary").innerHTML = html;
-
-    // The Send row only appears once there's something to send.
-    const s0 = sent();
-    sec.querySelector(".dc-form").hidden = !(Object.keys(byRoom).length || tidy(w[GENERAL]).note || s0.id);
-
-    const btn = sec.querySelector(".dc-send");
-    const nothingNew = !pending.size;
-    btn.disabled = !canSend || nothingNew;
-    const s = sent();
-    sec.querySelector(".dc-last").textContent = !canSend
-      ? "Sending switches on once this page is connected."
-      : s.when ? `Last sent ${s.when}.${nothingNew ? " Change anything above to send again." : ""}` : "";
-  }
-
-  function openGeneral(sec) {
-    sec.querySelector(".dc-general").hidden = false;
-    sec.querySelector(".dc-general-toggle").hidden = true;
-  }
-
-  function drawTray() {
-    const n = pendingKeys().length;
-    let tray = document.querySelector(".dc-tray");
-    document.body.classList.toggle("has-tray", n > 0);
-    if (!n) { tray?.remove(); return; }
-    if (!tray) {
-      document.body.insertAdjacentHTML("beforeend",
-        `<div class="dc-tray" role="region" aria-label="Decisions not yet sent"><div class="dc-tray-inner">` +
-        `<span class="dc-tray-text"></span><button type="button" class="dc-pill" data-dc="review">Review and send</button></div></div>`);
-      tray = document.querySelector(".dc-tray");
-    }
-    const diff = withPicks() - (summary ? summary.sourced : 0);
-    tray.querySelector(".dc-tray-text").innerHTML = `<b>${plural(n, "change", "changes")} not sent</b>` +
-      (Math.abs(diff) >= 0.5 ? ` · with your picks ${money(withPicks())} (${signed(diff)})` : "");
+    el.querySelector(".dc-list").innerHTML = html;
   }
 
   /* ── Send ────────────────────────────────────────────────────────── */
   async function send() {
-    const sec = document.getElementById("your-decisions");
-    const result = sec.querySelector(".dc-result"), btn = sec.querySelector(".dc-send");
-    const say = (text, error) => { result.textContent = text; result.classList.toggle("is-error", !!error); };
+    const el = bar(), btn = el.querySelector(".dc-send"), line = el.querySelector(".dc-line");
+    const say = (text, kind) => {
+      line.textContent = text; line.dataset.result = kind || "";
+      line.className = "dc-line" + (kind === "error" ? " is-error" : kind === "ok" ? " is-ok" : "");
+    };
 
     const w = working();
     const decisions = Object.keys(w).filter(k => index[k] && !isEmpty(w[k])).map(k => {
@@ -334,14 +363,13 @@
         note: p.note,
       };
     });
-    const general = tidy(w[GENERAL]).note;
     const payload = {
-      project: "212 N 9th", from: "Client", general, decisions,   // one shared link, so no name to ask for
+      project: "212 N 9th", from: "Client", general: tidy(w[GENERAL]).note, decisions,   // one shared link, so no name to ask for
       recommended: summary.sourced, withPicks: withPicks(),
       pageUrl: location.origin + location.pathname,
     };
 
-    btn.disabled = true; say("Sending…");
+    btn.disabled = true; say("Sending…", "busy");
     try {
       // A plain-text body keeps this a "simple" request, which Apps Script accepts.
       const res = await fetch(D.endpoint, { method: "POST", body: JSON.stringify(payload) });
@@ -350,52 +378,63 @@
       local.lastSent = { id: reply.submission, when: reply.when, from: "Client", picks: JSON.parse(JSON.stringify(w)) };
       local.dirty = false;
       saveStore();
-      say("Sent. Thank you. We'll reply here on each piece.");
+      say("Sent. Thank you. We'll reply here on each piece.", "ok");
       mount();
     } catch (e) {
-      say("Couldn't send just now. Everything is saved on this device, so nothing is lost. Try again in a moment.", true);
+      say("Couldn't send just now. Everything is saved on this device, so nothing is lost. Try again in a moment.", "error");
       btn.disabled = false;
     }
   }
 
   /* ── Events: one listener for every control, present or future ───── */
+  // Any change clears a finished send's message, so the bar talks about now.
+  const clearResult = () => { const line = document.querySelector(".dc-line"); if (line && line.dataset.result !== "busy") line.dataset.result = ""; };
+
   app.addEventListener("click", e => {
     const btn = e.target.closest("[data-dc]");
     if (!btn) return;
     const piece = btn.closest(".piece[data-key]"), k = piece && piece.dataset.key;
     switch (btn.dataset.dc) {
-      case "approve": setPick(k, { approved: !pickOf(k).approved, prefer: "" }); break;
+      case "approve": setPick(k, { approved: !pickOf(k).approved, prefer: "" }); clearResult(); break;
       case "prefer": {
         const name = btn.closest(".alt").dataset.alt;
         setPick(k, { prefer: pickOf(k).prefer === name ? "" : name, approved: false });
+        clearResult();
         break;
       }
       case "note": if (editing.has(k)) editing.delete(k); else editing.add(k); break;
       case "note-done": editing.delete(k); break;
-      case "send": send(); return;
-      case "general": {
-        const sec = document.getElementById("your-decisions");
-        openGeneral(sec);
-        sec.querySelector("#dc-general").focus();
-        return;
-      }
       default: return;
     }
     mount();
   });
+
   document.addEventListener("click", e => {
-    if (e.target.closest('[data-dc="review"]')) document.getElementById("your-decisions")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const btn = e.target.closest("#dc-bar [data-dc]");
+    if (!btn) return;
+    switch (btn.dataset.dc) {
+      case "send": send(); break;
+      case "picks": {
+        const drawer = document.getElementById("dc-drawer"), open = drawer.hidden;
+        drawer.hidden = !open;
+        btn.setAttribute("aria-expanded", String(open));
+        break;
+      }
+      case "general": openGeneral(); document.getElementById("dc-general").focus(); break;
+    }
   });
-  app.addEventListener("input", e => {
+
+  document.addEventListener("input", e => {
     const t = e.target;
     if (t.matches("[data-dc-note]")) {
       setPick(t.closest(".piece[data-key]").dataset.key, { note: t.value });
-      drawReview(); drawTray();
-      const piece = t.closest(".piece");
-      drawPiece(piece);   // the open box is left alone, only its status line updates
+      clearResult();
+      drawPiece(t.closest(".piece"));   // the open box is left alone, only its status line updates
+      drawBar(); drawDrawer();
     } else if (t.id === "dc-general") {
       setPick(GENERAL, { note: t.value });
-      drawReview(); drawTray();
+      clearResult();
+      drawBar(); drawDrawer();
     }
   });
 
@@ -406,7 +445,8 @@
   function onRendered(S) {
     summary = S;
     buildIndex(S);
-    document.getElementById("your-decisions")?.remove();   // the budget redraw replaced the page body
+    const intro = document.getElementById("rooms-intro");
+    if (intro) intro.textContent = "Open a room to approve our pick, prefer an alternate, or leave a note. Send whenever you're ready; nothing is final.";
     mount();
   }
   document.addEventListener("budget:rendered", e => onRendered(e.detail));
