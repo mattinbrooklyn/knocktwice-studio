@@ -291,7 +291,7 @@
     .ledger { border-top: 1.5px solid var(--color-ink); }
     .led-row {
       display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem 7rem 7rem; gap: 0.1rem 1rem;
-      grid-template-areas: "name budget rec status" "meta meta meta meta" "bar bar bar bar";
+      grid-template-areas: "name budget rec status" "bar bar bar bar" "meta meta meta meta";
       align-items: baseline; padding: 0.75rem 0; border-bottom: 1px solid var(--color-khaki);
     }
     .led-head {
@@ -306,12 +306,27 @@
     .led-status { grid-area: status; }
     .led-meta {
       grid-area: meta; font-family: var(--font-ui); font-weight: 600;
-      font-size: var(--type-chip-mobile-stack); color: var(--color-caramel);
+      font-size: var(--type-chip-mobile-stack); color: var(--color-caramel); margin-top: 0.35rem;
     }
+    /* The pieces behind a category's number, biggest first, each linking down
+       to where it sits in the room walkthrough. */
+    .led-more summary { list-style: none; display: inline-flex; gap: 0.35rem; cursor: pointer !important; }
+    .led-more summary::-webkit-details-marker { display: none; }
+    .led-more summary::before { content: "+"; font-weight: 500; }
+    .led-more[open] summary::before { content: "−"; }
+    .led-items { margin: 0.45rem 0 0.1rem; padding-left: 0.8rem; border-left: 2px solid var(--color-khaki); }
+    .led-item {
+      display: flex; align-items: baseline; justify-content: space-between; gap: 1rem;
+      padding: 0.2rem 0; font-family: var(--font-body); font-weight: 400; font-size: var(--type-small); line-height: 1.35; color: var(--color-ink);
+    }
+    .led-item a { color: inherit; font-weight: 600; text-decoration-color: var(--color-khaki); text-underline-offset: 3px; cursor: pointer !important; }
+    .led-item a:hover { text-decoration-color: var(--color-ink); }
+    .led-item .where { color: var(--color-caramel); }
+    .led-item .amt { font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
     /* Recommended against the category's budget. The budget is the full
        width; anything past it is drawn as an overrun, in red. */
     .led-bar {
-      grid-area: bar; position: relative; height: 0.4rem; margin-top: 0.4rem;
+      grid-area: bar; position: relative; height: 0.4rem; margin-top: 0.45rem;
       background: var(--color-white); border: 1px solid var(--color-khaki); display: flex; overflow: hidden;
     }
     .led-bar span { display: block; height: 100%; }
@@ -334,7 +349,7 @@
       .led-head { display: none; }
       .led-row {
         grid-template-columns: minmax(0, 1fr) auto; gap: 0.1rem 0.75rem;
-        grid-template-areas: "name status" "budget rec" "meta meta" "bar bar";
+        grid-template-areas: "name status" "budget rec" "bar bar" "meta meta";
       }
       .led-budget, .led-rec { font-size: var(--type-small); font-weight: 500; color: var(--color-ink); }
       .led-budget { text-align: left; }
@@ -708,11 +723,11 @@
 
   /* ── Roll up ─────────────────────────────────────────────────────────── */
   function summarize(items) {
-    const cats = CONFIG.categories.map(c => ({ name: c.name, allocation: c.share * CONFIG.budget, sourced: 0, count: 0 }));
-    const other = { name: "Other", allocation: 0, sourced: 0, count: 0, unmapped: true };
+    const cats = CONFIG.categories.map(c => ({ name: c.name, allocation: c.share * CONFIG.budget, sourced: 0, count: 0, items: [] }));
+    const other = { name: "Other", allocation: 0, sourced: 0, count: 0, items: [], unmapped: true };
     items.filter(it => it.counted).forEach(it => {
       const cat = cats.find(c => c.name === it.category) || other;
-      cat.sourced += it.total; cat.count++;
+      cat.sourced += it.total; cat.count++; cat.items.push(it);
     });
     if (other.count) cats.push(other);
     cats.forEach(c => {
@@ -858,7 +873,12 @@
       else if (c.complete)     { status = diff < -0.5 ? money(-diff) + " under" : "On budget"; cls = diff < -0.5 ? "under" : ""; }
       else if (!c.count)         status = "Not started";
       else                       status = money(-diff) + " to go";
-      const meta = [`${c.count} piece${c.count === 1 ? "" : "s"}`, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
+      const label = [`${c.count} piece${c.count === 1 ? "" : "s"}`, c.complete ? "complete" : ""].filter(Boolean).join(" · ");
+      const items = [...c.items].sort((a, b) => b.total - a.total).map(it =>
+        `<div class="led-item"><span><a href="#" data-goto="${esc(it.room + "|" + it.piece)}">${esc(it.name)}</a> <span class="where">· ${esc(it.piece)} · ${esc(it.room)}</span></span><span class="amt">${money(it.total)}</span></div>`).join("");
+      const meta = c.count
+        ? `<details class="led-more"><summary>${label}</summary><div class="led-items">${items}</div></details>`
+        : label;
       let bar = "";
       if (!c.unmapped) {
         const span = Math.max(c.allocation, c.sourced) || 1;
@@ -920,6 +940,17 @@
 
     $("#app").innerHTML = html;
   }
+
+  // A piece named in the breakdown links to where it sits in the rooms below.
+  $("#app").addEventListener("click", e => {
+    const link = e.target.closest("[data-goto]");
+    if (!link) return;
+    e.preventDefault();
+    const piece = [...document.querySelectorAll(".piece[data-key]")].find(el => el.dataset.key === link.dataset.goto);
+    if (!piece) return;
+    piece.closest("details.room").open = true;
+    piece.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 
   // One handler for every alternates toggle, present or future.
   $("#app").addEventListener("click", e => {
