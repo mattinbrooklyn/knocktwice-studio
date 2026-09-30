@@ -18,7 +18,10 @@
  * BUDGET VISIBILITY DASH tab as usual.
  *
  * ── SETUP ──────────────────────────────────────────────────────────────────
- *   1. Open the 212 N 9th Sheet → Extensions → Apps Script.
+ * Runs as its own project in your Drive and opens the Sheet by SHEET_ID
+ * below. (Attached to the Sheet instead, it inherits the Sheet's drive and
+ * sharing rules, which can block the client with "Access Denied".)
+ *   1. Go to script.google.com → New project.
  *   2. Replace everything in Code.gs with this file. Save.
  *   3. Deploy → New deployment → gear icon → Web app.
  *        Execute as: Me.   Who has access: Anyone.   Deploy.
@@ -29,6 +32,7 @@
  * Version: New version → Deploy. The URL stays the same.
  */
 
+var SHEET_ID = '1KhWinSYJopcwviQjfrZb1ks1ZHi3ZJqQDtG0OYWu5IM';   // the 212 N 9th Sheet; blank = the Sheet this script is attached to
 var TAB = 'Client Actions';
 var NOTIFY_EMAIL = '';   // blank = the Google account that deployed this script
 var HEADERS = ['Sent', 'Submission', 'From', 'Room', 'Piece', 'Decision', 'Choice', 'Price', 'Note', 'Change', 'Team status', 'Team reply'];
@@ -41,7 +45,7 @@ function doPost(e) {
   lock.waitLock(20000);   // two sends at once must not interleave their rows
   try {
     var d = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
     var tz = ss.getSpreadsheetTimeZone();
     var now = new Date();
     var id = 'S' + Utilities.formatDate(now, tz, 'yyyyMMdd-HHmmss');

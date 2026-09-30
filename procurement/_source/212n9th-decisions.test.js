@@ -45,7 +45,7 @@ const ss = {
 };
 const chain = new Proxy({}, { get: (t, k) => (k === "build" ? () => ({}) : () => chain) });
 const sandbox = {
-  SpreadsheetApp: { getActiveSpreadsheet: () => ss, newDataValidation: () => chain },
+  SpreadsheetApp: { getActiveSpreadsheet: () => ss, openById: id => { assert.equal(id, "1KhWinSYJopcwviQjfrZb1ks1ZHi3ZJqQDtG0OYWu5IM"); return ss; }, newDataValidation: () => chain },
   Utilities: { formatDate: (d, tz, f) => f === "yyyyMMdd-HHmmss"
     ? `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`
     : `Sep ${d.getDate()}, 2026 ${d.getHours() - 12}:${pad(d.getMinutes())} PM` },
