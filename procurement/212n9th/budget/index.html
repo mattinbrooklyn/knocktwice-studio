@@ -373,7 +373,9 @@
     .alt-sub { color: var(--color-caramel); }
     .alt-delta { font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
     .alt-delta small { font-size: inherit; font-weight: 500; color: var(--color-caramel); }
+    /* Against our pick: green costs less, red costs more. */
     .alt-delta.less { color: var(--color-green); }
+    .alt-delta.more { color: var(--color-red); }
 
     /* ── Client decisions (decisions.js) ──────────────────────── */
     /* Chips follow the brand spec: Handjet 16, 2rem tall, 2px ink outline.
@@ -381,7 +383,8 @@
          green = approved       pink = prefers an alternate
          blue  = the one main action (Send)
        Ink fill marks something open (alternates, a note being written).
-       Red stays "over budget" only. */
+       Red means over: a category over budget, or an alternate that costs
+       more than our pick (green when it costs less). */
     .dc-pill[aria-pressed="true"] { background: var(--color-ink); color: var(--color-bg); }
     .dc-approve::before { content: ""; width: 0.6rem; height: 0.6rem; border: 1.5px solid currentColor; }
     .dc-approve[aria-pressed="true"] { background: var(--color-green); color: var(--color-ink); }
@@ -723,7 +726,7 @@
 
   function altHTML(it, against) {
     const delta = it.total - against;
-    const cls = delta < -0.5 ? "less" : "";
+    const cls = delta < -0.5 ? "less" : delta > 0.5 ? "more" : "";
     const text = Math.abs(delta) < 0.5 ? "same price" : (delta < 0 ? "−" : "+") + money(Math.abs(delta));
     const sub = subLine(it);
     return `<div class="alt" data-alt="${esc(it.name)}">
