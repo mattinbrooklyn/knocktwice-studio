@@ -33,7 +33,7 @@
      A pick is { approved, prefer, note }: approved and prefer (an alternate's
      name) are exclusive; a note can sit with either or alone.
 
-     local (this device):  picks, dirty, name, lastSent
+     local (this device):  picks, dirty, lastSent
      sheet (Client Actions, latest send):  id, when, from, picks, team
 
      While the client hasn't touched anything since their last send, the
@@ -51,7 +51,7 @@
   const same = (a, b) => { const x = tidy(a), y = tidy(b); return x.approved === y.approved && x.prefer === y.prefer && x.note === y.note; };
 
   function readStore() {
-    const empty = { picks: {}, dirty: false, name: "", lastSent: null };
+    const empty = { picks: {}, dirty: false, lastSent: null };
     try { return Object.assign(empty, JSON.parse(localStorage.getItem(D.storageKey) || "{}")); }
     catch (e) { return empty; }
   }
@@ -223,7 +223,7 @@
   }
 
   // The review-and-send section. Its inputs are built once and never redrawn,
-  // so typing a name or note is never interrupted; only the list refreshes.
+  // so typing a note is never interrupted; only the list refreshes.
   function drawReview() {
     let sec = document.getElementById("your-decisions");
     if (!sec) {
@@ -239,8 +239,6 @@
           </div>
           <div class="dc-form" hidden>
             <div class="dc-send-row">
-              <label class="dc-visually-hidden" for="dc-name">Your name</label>
-              <input class="dc-input dc-name" id="dc-name" autocomplete="name" maxlength="80" placeholder="Your name">
               <button type="button" class="dc-pill dc-send" data-dc="send">Send to Knock Twice</button>
             </div>
             <p class="dc-result" aria-live="polite"></p>
@@ -250,7 +248,6 @@
       sec = document.getElementById("your-decisions");
       const general = tidy(working()[GENERAL]).note;
       sec.querySelector("#dc-general").value = general;
-      sec.querySelector("#dc-name").value = local.name || "";
       if (general) openGeneral(sec);
     }
 
@@ -286,7 +283,7 @@
     }
     sec.querySelector(".dc-summary").innerHTML = html;
 
-    // The name and Send row only appears once there's something to send.
+    // The Send row only appears once there's something to send.
     const s0 = sent();
     sec.querySelector(".dc-form").hidden = !(Object.keys(byRoom).length || tidy(w[GENERAL]).note || s0.id);
 
@@ -296,7 +293,7 @@
     const s = sent();
     sec.querySelector(".dc-last").textContent = !canSend
       ? "Sending switches on once this page is connected."
-      : s.when ? `Last sent ${s.when}${s.from ? " by " + s.from : ""}.${nothingNew ? " Change anything above to send again." : ""}` : "";
+      : s.when ? `Last sent ${s.when}.${nothingNew ? " Change anything above to send again." : ""}` : "";
   }
 
   function openGeneral(sec) {
@@ -324,9 +321,7 @@
   async function send() {
     const sec = document.getElementById("your-decisions");
     const result = sec.querySelector(".dc-result"), btn = sec.querySelector(".dc-send");
-    const name = sec.querySelector("#dc-name").value.trim();
     const say = (text, error) => { result.textContent = text; result.classList.toggle("is-error", !!error); };
-    if (!name) { say("Add your name so we know who's sending.", true); sec.querySelector("#dc-name").focus(); return; }
 
     const w = working();
     const decisions = Object.keys(w).filter(k => index[k] && !isEmpty(w[k])).map(k => {
@@ -341,7 +336,7 @@
     });
     const general = tidy(w[GENERAL]).note;
     const payload = {
-      project: "212 N 9th", from: name, general, decisions,
+      project: "212 N 9th", from: "Client", general, decisions,   // one shared link, so no name to ask for
       recommended: summary.sourced, withPicks: withPicks(),
       pageUrl: location.origin + location.pathname,
     };
@@ -352,10 +347,10 @@
       const res = await fetch(D.endpoint, { method: "POST", body: JSON.stringify(payload) });
       const reply = await res.json();
       if (!reply.ok) throw new Error(reply.error || "The script didn't accept it.");
-      local.lastSent = { id: reply.submission, when: reply.when, from: name, picks: JSON.parse(JSON.stringify(w)) };
+      local.lastSent = { id: reply.submission, when: reply.when, from: "Client", picks: JSON.parse(JSON.stringify(w)) };
       local.dirty = false;
       saveStore();
-      say(`Sent. Thank you, ${name}. We'll reply here on each piece.`);
+      say("Sent. Thank you. We'll reply here on each piece.");
       mount();
     } catch (e) {
       say("Couldn't send just now. Everything is saved on this device, so nothing is lost. Try again in a moment.", true);
@@ -401,15 +396,12 @@
     } else if (t.id === "dc-general") {
       setPick(GENERAL, { note: t.value });
       drawReview(); drawTray();
-    } else if (t.id === "dc-name") {
-      local.name = t.value; saveStore();
     }
   });
 
   /* ── Start ───────────────────────────────────────────────────────── */
-  const notes = document.querySelector(".notes .stamp");
-  notes?.insertAdjacentHTML("beforebegin",
-    `<p>Approve, prefer or note anything as you go. Your picks save on this device until you send them, and you can send as often as you like.</p>`);
+  document.querySelector(".notes p")?.insertAdjacentText("beforeend",
+    " Your picks save on this device until you send them.");
 
   function onRendered(S) {
     summary = S;
