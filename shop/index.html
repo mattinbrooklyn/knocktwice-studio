@@ -81,13 +81,10 @@
         /* min-height: 15rem; */
       }
 
+      /* Size + leading come from the global .h1 (--type-h1 / --leading-h1),
+         same as every other page — only layout is set here. */
       .h1 {
         width: 48rem;
-        font-family: var(--font-display);
-        font-size: 4rem;
-        line-height: 0.88;
-        font-weight: 400;
-        color: var(--color-ink);
         text-transform: uppercase;
         margin: 0;
       }
@@ -442,8 +439,6 @@
         }
         .h1 {
           width: min(30rem, 100%);
-          font-size: clamp(3.25rem, 14vw, 4rem);
-          line-height: 0.86;
         }
         .shop-grid {
           /* Full-bleed: cancel the page side padding so tiles run edge to edge */
