@@ -1,0 +1,684 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_liquid_km6hEj": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<div class=\"top-space\"></div>\n\n<style>\n#shopify-section-template--22918826655964__custom_liquid_km6hEj {\n  background-color: #f7f2ec;\n}\n\n.top-space {\n  min-height: 105px;\n  background-color: #f7f2ec;\n}\n\n@media screen and (max-width: 989px) {\n  .top-space {\n    display: none !important;\n    min-height: 0 !important;\n  }\n\n  #shopify-section-template--22918826655964__custom_liquid_km6hEj {\n    display: none !important;\n  }\n}\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_mbcBrH": {
+      "type": "custom-liquid",
+      "disabled": true,
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<a href=\"/cart\" class=\"kt-cart-button\" aria-label=\"Cart\">\n  <svg width=\"28\" height=\"28\" viewBox=\"0 0 24 24\" fill=\"none\">\n    <path d=\"M6.5 7.5H17.5L16.5 20H7.5L6.5 7.5Z\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linejoin=\"round\"/>\n    <path d=\"M9 7.5V5.5C9 3.8 10.3 2.5 12 2.5C13.7 2.5 15 3.8 15 5.5V7.5\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\"/>\n  </svg>\n\n  {% if cart.item_count > 0 %}\n    <span class=\"kt-cart-count\">{{ cart.item_count }}</span>\n  {% endif %}\n</a>\n\n<style>\n.kt-cart-button {\n  position: fixed;\n  top: 3.8rem;\n  right: 0;\n  z-index: 1000;\n  width: 5.5rem;\n  height: 3.75rem;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: #32261F;\n  background: #F7F2EC;\n  border: 1.5px solid #32261F;\n  border-right: 0;\n  border-radius: 999px 0 0 999px;\n  text-decoration: none;\n}\n\n.kt-cart-button:hover {\n  background: #32261F;\n  color: #F7F2EC;\n}\n\n.kt-cart-count {\n  position: absolute;\n  top: 0.35rem;\n  right: 0.65rem;\n  min-width: 1.15rem;\n  height: 1.15rem;\n  padding: 0 0.25rem;\n  border-radius: 999px;\n  background: #378CDA;\n  color: #fff;\n  font-size: 0.7rem;\n  line-height: 1.15rem;\n  text-align: center;\n  font-weight: 700;\n}\n\n@media screen and (max-width: 989px) {\n  .kt-cart-button {\n    top: 1rem;\n    width: 4.5rem;\n    height: 3rem;\n  }\n}\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_HYcthN": {
+      "type": "custom-liquid",
+      "disabled": true,
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap\" rel=\"stylesheet\">\n\n<div class=\"kt-nav-wrap\">\n  <a href=\"/\" class=\"kt-logo\" aria-label=\"Home\">\n    <svg preserveAspectRatio=\"none\" width=\"100%\" height=\"100%\" overflow=\"visible\" style=\"display:block;\" viewBox=\"0 0 51.7794 99.3243\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path class=\"logo-eye-sclera\" d=\"M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z\" fill=\"#F7F2EC\"/>\n      <circle cx=\"27.325\" cy=\"19.055\" r=\"6.127\" fill=\"#32261F\"/>\n      <path d=\"M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z\" fill=\"#378CDA\"/>\n    </svg>\n  </a>\n\n  <input type=\"checkbox\" id=\"kt-menu-toggle\" class=\"kt-menu-toggle\">\n  <label for=\"kt-menu-toggle\" class=\"kt-menu-button\" aria-label=\"Menu\">\n  <svg class=\"kt-menu-icon\" width=\"34\" height=\"20\" viewBox=\"0 0 34 20\" fill=\"none\" aria-hidden=\"true\">\n    <path d=\"M0 1H34M0 10H34M0 19H34\" stroke=\"currentColor\" stroke-width=\"2\"/>\n  </svg>\n  <span class=\"kt-menu-text\">Menu</span>\n</label>\n\n  <nav class=\"kt-nav\">\n    <a href=\"/pages/about\">About</a>\n    <a href=\"/pages/interiors\">Interiors</a>\n    <a href=\"/pages/experiences\">Experiences</a>\n    <a href=\"/collections/shop\" class=\"active\">Shop</a>\n    <a href=\"/pages/contact\">Contact</a>\n  </nav>\n</div>\n\n<style>\n  :root {\n    --kt-bg: #F7F2EC;\n    --kt-ink: #32261F;\n    --kt-blue: #378CDA;\n    --kt-font: 'Handjet', sans-serif;\n  }\n\n  .kt-menu-toggle {\n    display: none;\n  }\n\n  .kt-logo svg path {\n    transition: fill 0.2s ease;\n  }\n\n  .kt-logo:hover svg path,\n  .kt-logo:active svg path {\n    fill: var(--kt-ink);\n  }\n\n  .kt-logo:hover svg path.logo-eye-sclera,\n  .kt-logo:active svg path.logo-eye-sclera {\n    fill: var(--kt-bg);\n  }\n\n  .kt-nav a {\n    color: var(--kt-ink);\n    text-decoration: none;\n    font-family: var(--kt-font);\n    font-size: 1.375rem;\n    font-weight: 400;\n    line-height: 1.6875rem;\n    letter-spacing: -0.01375rem;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;\n  }\n\n  .kt-nav a.active,\n  .kt-nav a:hover {\n    color: var(--kt-blue);\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n  }\n\n  @media screen and (min-width: 990px) {\n    .kt-side-nav-section {\n      height: 0 !important;\n      min-height: 0 !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      overflow: visible !important;\n    }\n\n    body.kt-has-side-nav main {\n      padding-left: 170px !important;\n      box-sizing: border-box !important;\n    }\n\n    .kt-nav-wrap {\n      position: fixed;\n      left: 2.5rem;\n      top: 3.8rem;\n      z-index: 1000;\n      width: 7rem;\n    }\n\n    .kt-logo {\n      display: block;\n      width: 3.25rem;\n      height: 6.25rem;\n      margin-bottom: 4.2rem;\n    }\n\n    .kt-menu-button {\n      display: none;\n    }\n\n    .kt-nav {\n      display: flex;\n      flex-direction: column;\n      gap: 0.5rem;\n    }\n  }\n\n @media screen and (max-width: 989px) {\n  .kt-side-nav-section {\n    height: 0 !important;\n    min-height: 0 !important;\n    margin: 0 !important;\n    padding: 0 !important;\n    overflow: visible !important;\n  }\n\n  body.kt-has-custom-nav main {\n    padding-left: 0 !important;\n    padding-top: 97px !important;\n    box-sizing: border-box !important;\n    background: var(--kt-bg) !important;\n  }\n\n  .kt-nav-shell {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    z-index: 1200;\n    height: 97px;\n    background: var(--kt-bg);\n  }\n\n  /* Logo — center, acts as home */\n  .kt-logo {\n    position: absolute;\n    top: 30px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 25px;\n    height: 47px;\n  }\n\n  /* Hamburger pill — left edge, flat side against the edge */\n  .kt-menu-button {\n    position: absolute;\n    top: 30px;\n    left: 0;\n    width: 76px;\n    height: 47px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    background: var(--kt-bg);\n    color: var(--kt-ink);\n    border: 2px solid var(--kt-ink);\n    border-left: 0;\n    border-radius: 0 23.5px 23.5px 0;\n    cursor: pointer;\n    user-select: none;\n  }\n\n  .kt-menu-icon {\n    display: block;\n    width: 34px;\n    height: 20px;\n  }\n\n  /* Keep \"Menu\" for screen readers only */\n  .kt-menu-text {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    overflow: hidden;\n    clip-path: inset(50%);\n    white-space: nowrap;\n  }\n\n  .kt-nav {\n    position: absolute;\n    top: 97px;\n    left: 0;\n    right: 0;\n    display: none;\n    flex-direction: column;\n    background: var(--kt-bg);\n    border-bottom: 1px solid rgba(50, 38, 31, 0.18);\n    padding: 14px 18px 18px;\n    box-sizing: border-box;\n  }\n\n  .kt-nav a {\n    display: block;\n    padding: 8px 0;\n    font-size: 1.45rem;\n    line-height: 1.35rem;\n  }\n\n  .kt-menu-toggle:checked ~ .kt-nav {\n    display: flex;\n  }\n\n  /* Cart pill — right edge, mirror of the menu pill */\n  .kt-cart-button {\n    top: 30px;\n    right: 0;\n    width: 76px;\n    height: 47px;\n    box-sizing: border-box;\n    border-width: 2px;\n    border-right: 0;\n    border-radius: 23.5px 0 0 23.5px;\n    z-index: 1400;\n  }\n\n  .kt-cart-button svg {\n    width: 27px;\n    height: 26px;\n  }\n\n  .kt-cart-count {\n    top: 0.3rem;\n    right: 0.6rem;\n    min-width: 1rem;\n    height: 1rem;\n    font-size: 0.65rem;\n    line-height: 1rem;\n  }\n}\n</style>\n\n<script>\n  document.body.classList.add('kt-has-side-nav');\n\n  const currentScript = document.currentScript;\n  const section = currentScript.closest('.shopify-section');\n\n  if (section) {\n    section.classList.add('kt-side-nav-section');\n  }\n</script>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_LNbgEx": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Handjet:wght@100..900&display=swap\" rel=\"stylesheet\">\n\n<div class=\"kt-nav-shell\">\n  <a href=\"https://www.knocktwice.studio/home/\" class=\"kt-logo\" aria-label=\"Home\">\n    <svg preserveAspectRatio=\"none\" width=\"100%\" height=\"100%\" overflow=\"visible\" style=\"display:block;\" viewBox=\"0 0 51.7794 99.3243\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n      <path class=\"logo-eye-sclera\" d=\"M14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z\" fill=\"#F7F2EC\"/>\n      <circle cx=\"27.325\" cy=\"19.055\" r=\"6.127\" fill=\"#32261F\"/>\n      <path d=\"M51.7794 23.6295C51.7794 15.4832 49.9456 9.50408 46.278 5.705C42.6104 1.89954 36.7524 0 28.7041 0H23.139C15.0906 0 9.21993 1.90592 5.53323 5.705C1.84653 9.51045 0 15.4832 0 23.6295C0 31.7759 1.8529 37.8315 5.56507 41.7899C7.51984 43.8807 10.0795 45.4105 13.225 46.3985L7.3734 99.3243H44.2913L38.4461 46.4495C41.6616 45.4615 44.2659 43.9125 46.2461 41.7899C49.9328 37.8315 51.7794 31.7759 51.7794 23.6295ZM14.8805 23.5467C22.2221 17.5293 29.5573 17.5293 36.8988 23.5467C29.5573 26.4788 22.2221 26.4788 14.8805 23.5467Z\" fill=\"#378CDA\"/>\n    </svg>\n  </a>\n\n  <input type=\"checkbox\" id=\"kt-menu-toggle\" class=\"kt-menu-toggle\">\n\n  <label for=\"kt-menu-toggle\" class=\"kt-menu-button\" aria-label=\"Menu\">\n  <svg class=\"kt-menu-icon\" width=\"34\" height=\"20\" viewBox=\"0 0 34 20\" fill=\"none\" aria-hidden=\"true\">\n    <path d=\"M0 1H34M0 10H34M0 19H34\" stroke=\"currentColor\" stroke-width=\"2\"/>\n  </svg>\n  <span class=\"kt-menu-text\">Menu</span>\n</label>\n\n  <nav class=\"kt-nav\">\n    <label for=\"kt-menu-toggle\" class=\"kt-menu-close\" aria-label=\"Close menu\">\n      <svg viewBox=\"0 0 16.4142 16.4142\" fill=\"none\" aria-hidden=\"true\">\n        <path d=\"M15.7071 0.707107L0.707107 15.7071\" stroke=\"currentColor\" stroke-width=\"2\"/>\n        <path d=\"M0.707107 0.707107L15.7071 15.7071\" stroke=\"currentColor\" stroke-width=\"2\"/>\n      </svg>\n    </label>\n    <a href=\"https://www.knocktwice.studio/about/\">About</a>\n    <a href=\"https://www.knocktwice.studio/interiors/\">Interiors</a>\n    <a href=\"https://www.knocktwice.studio/experiences/\">Experiences</a>\n    <a href=\"https://www.knocktwice.studio/shop/\" class=\"active\">Shop</a>\n    <a href=\"https://www.knocktwice.studio/contact/\">Contact</a>\n  </nav>\n</div>\n\n<a href=\"/cart\" class=\"kt-cart-button\" aria-label=\"Cart\">\n  <svg class=\"kt-cart-svg\" width=\"41\" height=\"39\" viewBox=\"0 0 41 39\" fill=\"none\" aria-hidden=\"true\" xmlns=\"http://www.w3.org/2000/svg\">\n  <path d=\"M22.1816 26.7263C22.1816 26.7263 22.1824 26.7263 22.1831 26.7263C22.1831 26.7263 22.1838 26.7263 22.1845 26.7263H28.0331C28.0331 26.7263 28.0338 26.7263 28.0345 26.7263C28.0345 26.7263 28.0353 26.7263 28.036 26.7263H34.0973C34.5627 26.7263 34.9767 26.4285 35.1258 25.986L40.9157 8.80324C40.9381 8.73786 40.9526 8.67174 40.962 8.60563C40.9859 8.51554 40.9997 8.42182 40.9997 8.32447C40.9997 7.72292 40.5133 7.2347 39.914 7.2347H29.7853C29.7853 7.2347 29.7824 7.2347 29.7809 7.2347H20.436C20.436 7.2347 20.4338 7.2347 20.4331 7.2347H11.0498L10.0351 4.29304C9.93736 4.00898 9.72603 3.77795 9.45246 3.65516L1.52965 0.0952465C0.982502 -0.150315 0.340542 0.0952466 0.0951934 0.644491C-0.150155 1.19374 0.0951934 1.83815 0.642343 2.08444L8.13742 5.45111L15.0549 25.5109L11.7793 30.9655C11.5774 31.3019 11.5709 31.7219 11.7641 32.064C11.9566 32.4062 12.3178 32.6176 12.7093 32.6176H13.1457C12.7954 33.2388 12.5942 33.9559 12.5942 34.7187C12.5942 37.0792 14.5071 38.9993 16.8585 38.9993C19.21 38.9993 21.1228 37.0792 21.1228 34.7187C21.1228 33.9552 20.9216 33.2388 20.5713 32.6176H28.3747C28.0244 33.2388 27.8232 33.9559 27.8232 34.7187C27.8232 37.0792 29.7361 38.9993 32.0875 38.9993C34.4389 38.9993 36.3518 37.0792 36.3518 34.7187C36.3518 33.9552 36.1506 33.2388 35.8003 32.6176H36.8345C37.4338 32.6176 37.9201 32.1294 37.9201 31.5279C37.9201 30.9263 37.4338 30.4381 36.8345 30.4381H14.6316L16.8607 26.7263H22.1824H22.1816ZM18.9516 34.7194C18.9516 35.8782 18.0122 36.8205 16.8585 36.8205C15.7049 36.8205 14.7654 35.8775 14.7654 34.7194C14.7654 33.5614 15.7049 32.6184 16.8585 32.6184C18.0122 32.6184 18.9516 33.5607 18.9516 34.7194ZM34.1813 34.7194C34.1813 35.8782 33.2419 36.8205 32.0882 36.8205C30.9346 36.8205 29.9952 35.8775 29.9952 34.7194C29.9952 33.5614 30.9346 32.6184 32.0882 32.6184C33.2419 32.6184 34.1813 33.5607 34.1813 34.7194ZM38.4188 9.41424L36.236 15.8911H30.111L30.7659 9.41424H38.4188ZM27.9282 15.8911H22.2902L21.6352 9.41424H28.5839L27.9289 15.8911H27.9282ZM27.7081 18.0707L27.0531 24.5475H23.1659L22.5109 18.0707H27.7081ZM20.9831 24.5468H17.0199L14.7864 18.0699H20.3281L20.9831 24.5468ZM33.3193 24.5468H29.2352L29.8902 18.0699H35.5014L33.3186 24.5468H33.3193ZM19.4524 9.41424L20.1074 15.8911H14.0345L11.801 9.41424H19.4517H19.4524Z\" fill=\"currentColor\"/>\n</svg>\n\n  {% if cart.item_count > 0 %}\n    <span class=\"kt-cart-count\">{{ cart.item_count }}</span>\n  {% endif %}\n</a>\n\n<script>\n  (() => {\n    if (window.__ktCartCount) return;\n    window.__ktCartCount = true;\n\n    // Draw the count badge on the cart icon (hide it when the cart is empty)\n    const render = (count) => {\n      document.querySelectorAll('.kt-cart-button').forEach((btn) => {\n        let badge = btn.querySelector('.kt-cart-count');\n        if (count > 0) {\n          if (!badge) {\n            badge = document.createElement('span');\n            badge.className = 'kt-cart-count';\n            btn.appendChild(badge);\n          }\n          badge.textContent = count;\n        } else if (badge) {\n          badge.remove();\n        }\n      });\n    };\n\n    // Always ask Shopify for the live count, never a cached answer\n    const refresh = () =>\n      fetch('/cart.js', { headers: { Accept: 'application/json' }, cache: 'no-store' })\n        .then((r) => r.json())\n        .then((cart) => render(cart.item_count))\n        .catch(() => {});\n\n    // Whenever the theme adds/changes/removes cart items, refresh the count\n    const originalFetch = window.fetch;\n    window.fetch = function (...args) {\n      const url = String(args[0] && args[0].url ? args[0].url : args[0]);\n      const request = originalFetch.apply(this, args);\n      if (/\\/cart\\/(add|change|update|clear)/.test(url)) {\n        request.then(() => refresh()).catch(() => {});\n      }\n      return request;\n    };\n\n    // Coming back to this page with the Back button (the browser may show\n    // the page exactly as it was left, old count included), or returning to\n    // this tab after changing the cart somewhere else: refresh the count\n    window.addEventListener('pageshow', refresh);\n    document.addEventListener('visibilitychange', () => {\n      if (document.visibilityState === 'visible') refresh();\n    });\n\n    refresh();\n  })();\n</script>\n\n<style>\n  :root {\n    --kt-bg: #F7F2EC;\n    --kt-ink: #32261F;\n    --kt-blue: #378CDA;\n    --kt-font: 'Handjet', sans-serif;\n  }\n\n  .kt-menu-toggle {\n    display: none;\n  }\n\n  .kt-logo svg path {\n    transition: fill 0.2s ease;\n  }\n\n  .kt-logo:hover svg path,\n  .kt-logo:active svg path {\n    fill: var(--kt-ink);\n  }\n\n  .kt-logo:hover svg path.logo-eye-sclera,\n  .kt-logo:active svg path.logo-eye-sclera {\n    fill: var(--kt-bg);\n  }\n\n  .kt-nav a {\n    color: var(--kt-ink);\n    text-decoration: none;\n    font-family: var(--kt-font);\n    font-size: 1.375rem;\n    font-weight: 400;\n    line-height: 1.6875rem;\n    letter-spacing: -0.01375rem;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;\n  }\n\n  .kt-nav a.active,\n  .kt-nav a:hover {\n    color: var(--kt-blue);\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n  }\n\n  .kt-cart-button {\n    position: fixed;\n    right: 0;\n    z-index: 1300;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    color: var(--kt-ink);\n    background: var(--kt-bg);\n    border: 2px solid var(--kt-ink);\n    border-right: 0;\n    border-radius: 999px 0 0 999px;\n    text-decoration: none;\n  }\n\n  .kt-cart-button:hover {\n    background: var(--kt-ink);\n    color: var(--kt-bg);\n  }\n\n  .kt-cart-count {\n    position: absolute;\n    min-width: 1.15rem;\n    height: 1.15rem;\n    padding: 0 0.25rem;\n    border-radius: 999px;\n    background: var(--kt-blue);\n    color: #fff;\n    font-size: 0.7rem;\n    line-height: 1.15rem;\n    text-align: center;\n    font-weight: 700;\n  }\n\n  @media screen and (min-width: 990px) {\n    .kt-side-nav-section {\n      height: 0 !important;\n      min-height: 0 !important;\n      margin: 0 !important;\n      padding: 0 !important;\n      overflow: visible !important;\n    }\n\n    body.kt-has-custom-nav {\n      background: var(--kt-bg) !important;\n    }\n\n    body.kt-has-custom-nav main {\n      padding-left: 210px !important;\n      box-sizing: border-box !important;\n      background: var(--kt-bg) !important;\n    }\n\n    .kt-nav-shell {\n      position: fixed;\n      left: 2.5rem;\n      top: 3.8rem;\n      z-index: 1200;\n      width: 7rem;\n    }\n\n    .kt-logo {\n      display: block;\n      width: 3.25rem;\n      height: 6.25rem;\n      margin-bottom: 4.2rem;\n    }\n\n    .kt-menu-button {\n      display: none;\n    }\n\n    .kt-nav {\n      display: flex;\n      flex-direction: column;\n      gap: 0.5rem;\n    }\n\n    .kt-cart-button {\n      top: 3.8rem;\n      width: 5.5rem;\n      height: 3.75rem;\n    }\n\n    .kt-cart-count {\n      top: 0.35rem;\n      right: 0.65rem;\n    }\n  }\n\n  @media screen and (max-width: 989px) {\n  .kt-side-nav-section {\n    height: 0 !important;\n    min-height: 0 !important;\n    margin: 0 !important;\n    padding: 0 !important;\n    overflow: visible !important;\n  }\n\n  body.kt-has-custom-nav main {\n    padding-left: 0 !important;\n    padding-top: 97px !important;\n    box-sizing: border-box !important;\n    background: var(--kt-bg) !important;\n  }\n\n  .kt-nav-shell {\n    position: fixed;\n    top: 0;\n    left: 0;\n    right: 0;\n    z-index: 1200;\n    height: 97px;\n    background: var(--kt-bg);\n  }\n\n  /* Logo — center, acts as home */\n  .kt-logo {\n    position: absolute;\n    top: 30px;\n    left: 50%;\n    transform: translateX(-50%);\n    width: 25px;\n    height: 47px;\n  }\n\n  /* Hamburger pill — left edge, flat side against the edge */\n  .kt-menu-button {\n    position: absolute;\n    top: 30px;\n    left: 0;\n    width: 76px;\n    height: 47px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    background: var(--kt-bg);\n    color: var(--kt-ink);\n    border: 2px solid var(--kt-ink);\n    border-left: 0;\n    border-radius: 0 23.5px 23.5px 0;\n    cursor: pointer;\n    user-select: none;\n  }\n\n  .kt-menu-icon {\n    display: block;\n    width: 34px;\n    height: 20px;\n  }\n\n  /* Keep \"Menu\" for screen readers only */\n  .kt-menu-text {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    overflow: hidden;\n    clip-path: inset(50%);\n    white-space: nowrap;\n  }\n\n  .kt-nav {\n    position: absolute;\n    top: 97px;\n    left: 0;\n    right: 0;\n    display: none;\n    flex-direction: column;\n    background: var(--kt-bg);\n    border-bottom: 1px solid rgba(50, 38, 31, 0.18);\n    padding: 14px 18px 18px;\n    box-sizing: border-box;\n  }\n\n  .kt-nav a {\n    display: block;\n    padding: 8px 0;\n    font-size: 1.45rem;\n    line-height: 1.35rem;\n  }\n\n  .kt-menu-toggle:checked ~ .kt-nav {\n    display: flex;\n  }\n\n  /* Cart pill — right edge, mirror of the menu pill */\n  .kt-cart-button {\n    top: 30px;\n    right: 0;\n    width: 76px;\n    height: 47px;\n    box-sizing: border-box;\n    border-width: 2px;\n    border-right: 0;\n    border-radius: 23.5px 0 0 23.5px;\n    z-index: 1400;\n  }\n\n  .kt-cart-button svg {\n    width: 27px;\n    height: 26px;\n  }\n\n  .kt-cart-count {\n    top: 0.3rem;\n    right: 0.6rem;\n    min-width: 1rem;\n    height: 1rem;\n    font-size: 0.65rem;\n    line-height: 1rem;\n  }\n}\n\n  /* Mobile menu: full-screen overlay, same as the main site (spec No. 15) */\n  .kt-nav-shell .kt-menu-close { display: none; }\n\n  @media screen and (max-width: 989px) {\n    .kt-nav-shell:has(.kt-menu-toggle:checked) { z-index: 10000; }\n    body:has(.kt-menu-toggle:checked) { overflow: hidden; }\n\n    .kt-nav-shell .kt-nav {\n      position: fixed;\n      inset: 0;\n      z-index: 1;\n      height: 100vh;\n      height: 100dvh;\n      padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)\n               env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);\n      background: #EC8EDF;\n      border-bottom: 0;\n      overscroll-behavior: none;\n    }\n    .kt-nav-shell .kt-nav a {\n      flex: 1 1 0;\n      min-height: 0;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      padding: 0 1rem;\n      border-top: 1px solid var(--kt-ink);\n      font-size: 2.125rem;\n      line-height: 1.12;\n      letter-spacing: -0.02125rem;\n      text-transform: uppercase;\n      text-align: center;\n    }\n    .kt-nav-shell .kt-nav a:last-of-type { border-bottom: 1px solid var(--kt-ink); }\n    .kt-nav-shell .kt-nav a.active,\n    .kt-nav-shell .kt-nav a:hover {\n      color: var(--kt-ink);\n      background: #FADB4B;\n    }\n\n    .kt-nav-shell .kt-menu-close {\n      display: flex;\n      position: absolute;\n      top: 1.875rem;\n      right: 1.625rem;\n      z-index: 1;\n      width: 2.75rem;\n      height: 2.75rem;\n      align-items: flex-start;\n      justify-content: flex-end;\n      color: var(--kt-ink);\n      cursor: pointer;\n    }\n    .kt-nav-shell .kt-menu-close svg { width: 0.9375rem; height: 0.9375rem; display: block; }\n  }\n\n  /* Cart button: blue pressed state, badge turns chocolate (spec No. 16) */\n  .kt-cart-button:hover,\n  .kt-cart-button:active {\n    background: var(--kt-blue);\n    color: var(--kt-bg);\n  }\n  .kt-cart-button:hover .kt-cart-count,\n  .kt-cart-button:active .kt-cart-count {\n    background: var(--kt-ink);\n    color: var(--kt-bg);\n  }\n\n  /* Cart button: bigger icon + badge overlapping it on mobile (spec No. 16) */\n  @media screen and (max-width: 989px) {\n    .kt-cart-button svg.kt-cart-svg {\n      width: 44px;\n      height: 44px;\n      margin: -4px 0 0 2px;\n    }\n    .kt-cart-button svg path,\n    .kt-cart-button svg circle {\n      vector-effect: non-scaling-stroke;\n    }\n    .kt-cart-button .kt-cart-count {\n      top: 4px;\n      right: 12px;\n      min-width: 14px;\n      height: 14px;\n      padding: 0 3px;\n      font-size: 9px;\n      line-height: 14px;\n      box-sizing: border-box;\n    }\n  }\n  /* Cart button: bigger icon + badge next to it on desktop (spec No. 16) */\n  @media screen and (min-width: 990px) {\n    .kt-cart-button svg.kt-cart-svg {\n      width: 52px;\n      height: 52px;\n      margin: -5px 0 0 3px;\n    }\n    .kt-cart-button svg path,\n    .kt-cart-button svg circle {\n      vector-effect: non-scaling-stroke;\n    }\n    .kt-cart-button .kt-cart-count {\n      top: 4px;\n      right: 12px;\n      min-width: 18px;\n      height: 18px;\n      padding: 0 4px;\n      font-size: 10px;\n      line-height: 16px;\n      box-sizing: border-box;\n    }\n  }\n  /* ── Match the native side nav (assets/styles.css .logo / .nav) ── */\n  @media screen and (min-width: 990px) {\n    .kt-nav-shell {\n      top: 3.8125rem;                 /* --logo-top: 61px */\n    }\n    .kt-logo {\n      /* Menu starts at --nav-top (200px): 200 − 61 logo top − 100 logo */\n      margin-bottom: calc(12.5rem - 3.8125rem - 6.25rem);\n    }\n    .kt-nav a {\n      font-size: clamp(1.375rem, 2.13vw, 1.625rem);     /* --type-nav: 22 → 26 */\n      line-height: clamp(1.6875rem, 2.22vw, 1.875rem);  /* --leading-nav: 27 → 30 */\n      letter-spacing: -0.01375rem;                      /* --tracking-nav */\n    }\n    /* Current page: bold chocolate, like native. Blue is hover only. */\n    .kt-nav a.active {\n      color: var(--kt-ink);\n    }\n    .kt-nav a:hover {\n      color: var(--kt-blue);\n    }\n  }\n  /* Cart icon: Figma artwork, centred in the pill at the Figma proportion\n     (icon height ≈ 71% of the pill height) */\n  .kt-cart-button svg.kt-cart-svg { margin: 0 !important; }\n  @media screen and (max-width: 989px) {\n    .kt-cart-button svg.kt-cart-svg { width: 35px !important; height: 33.3px !important; }\n  }\n  @media screen and (min-width: 990px) {\n    .kt-cart-button svg.kt-cart-svg { width: 40px !important; height: 40px !important; }\n  }\n</style>\n\n<script>\n  document.body.classList.add('kt-has-custom-nav');\n\n  const currentScript = document.currentScript;\n  const section = currentScript.closest('.shopify-section');\n\n  if (section) {\n    section.classList.add('kt-side-nav-section');\n  }\n</script>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_PErLxU": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<style>\n  /* Shared chevron arrows (Figma: Carrot_Left / Carrot_Right, 10x20, 2px stroke) */\n  .kt-gallery-arrow {\n    position: absolute;\n    top: var(--kt-arrow-top, 50%);\n    z-index: 5;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 44px;\n    height: 44px;\n    margin: 0;\n    padding: 0;\n    border: 0;\n    background: transparent;\n    color: #F7F2EC;\n    transform: translateY(-50%);\n    cursor: pointer;\n    -webkit-tap-highlight-color: transparent;\n    transition: color 200ms ease;\n  }\n\n  .kt-gallery-arrow svg {\n    display: block;\n    width: 10px;\n    height: 20px;\n  }\n\n  .kt-gallery-arrow--prev { left: 3px; }\n  .kt-gallery-arrow--next { right: 3px; }\n\n  .kt-gallery-arrow.is-on-light {\n    color: #32261F;\n  }\n\n  .kt-gallery-arrow:focus-visible {\n    outline: 2px solid #378CDA;\n    outline-offset: -6px;\n    border-radius: 6px;\n  }\n\n  /* \"Also Nice\" carousel — arrows on every screen size */\n  [id*=\"product_recommendations\"] .resource-list__carousel > slideshow-container {\n    position: relative;\n  }\n\n  /* Hide Horizon's own black round arrows on the Also Nice carousel */\n  [id*=\"product_recommendations\"] .resource-list__carousel > slideshow-container > slideshow-arrows {\n    display: none;\n  }\n\n  /* Product image gallery — arrows only where it is a swipe slideshow */\n  .kt-arrow--gallery {\n    display: none;\n  }\n\n  @media screen and (max-width: 749px) {\n    media-gallery slideshow-container {\n      position: relative;\n    }\n\n    .kt-arrow--gallery {\n      display: flex;\n    }\n  }\n\n  @media (prefers-reduced-motion: reduce) {\n    .kt-gallery-arrow { transition: none; }\n  }\n\n  /* Gallery dots — Figma: 10x10, off-white fill, 2px chocolate stroke */\n  media-gallery slideshow-controls:has(.slideshow-controls__dots) {\n    mix-blend-mode: normal;\n  }\n\n  media-gallery .slideshow-controls__dots {\n    gap: 7.33px;\n  }\n\n  media-gallery .slideshow-controls__dots button {\n    --size: 10px;\n  }\n\n  media-gallery .slideshow-controls__dots button::after,\n  media-gallery .slideshow-controls__dots button:hover::after {\n    box-sizing: border-box;\n    background-color: #F7F2EC;\n    border: 2px solid #32261F;\n    box-shadow: none;\n    opacity: 0.5;\n  }\n\n  media-gallery .slideshow-controls__dots button[aria-selected=\"true\"]::after {\n    opacity: 1;\n  }\n</style>\n\n<script>\n  (function () {\n    var OFF_WHITE = [247, 242, 236];\n    var CHOCOLATE = [50, 38, 31];\n    var cache = {};\n\n    function channel(c) {\n      c = c / 255;\n      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);\n    }\n\n    function luminance(rgb) {\n      return 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);\n    }\n\n    function contrast(a, b) {\n      var hi = Math.max(a, b), lo = Math.min(a, b);\n      return (hi + 0.05) / (lo + 0.05);\n    }\n\n    var L_OFF = luminance(OFF_WHITE);\n    var L_INK = luminance(CHOCOLATE);\n\n    // Average colour of the strip of an image that sits behind one arrow.\n    // Resolves to true when chocolate reads better than off-white there.\n    function isLightBehind(src, side) {\n      var key = src + '|' + side;\n      if (key in cache) return Promise.resolve(cache[key]);\n\n      return new Promise(function (resolve) {\n        var url;\n        try {\n          url = new URL(src, location.href);\n          url.searchParams.set('width', '80');\n        } catch (e) {\n          resolve(false);\n          return;\n        }\n\n        var img = new Image();\n        img.crossOrigin = 'anonymous';\n        var timer = setTimeout(function () { resolve(false); }, 6000);\n\n        img.onload = function () {\n          clearTimeout(timer);\n          try {\n            var canvas = document.createElement('canvas');\n            canvas.width = img.naturalWidth;\n            canvas.height = img.naturalHeight;\n            var ctx = canvas.getContext('2d');\n            ctx.drawImage(img, 0, 0);\n\n            var w = canvas.width, h = canvas.height;\n            var sw = Math.max(1, Math.round(w * 0.14));\n            var sx = side === 'prev' ? 0 : w - sw;\n            var sy = Math.round(h * 0.4);\n            var sh = Math.max(1, Math.round(h * 0.2));\n            var data = ctx.getImageData(sx, sy, sw, sh).data;\n\n            var r = 0, g = 0, b = 0, n = 0;\n            for (var i = 0; i < data.length; i += 4) {\n              r += data[i]; g += data[i + 1]; b += data[i + 2]; n++;\n            }\n            var bg = luminance([r / n, g / n, b / n]);\n            var light = contrast(bg, L_INK) > contrast(bg, L_OFF);\n            cache[key] = light;\n            resolve(light);\n          } catch (e) {\n            resolve(false);\n          }\n        };\n\n        img.onerror = function () {\n          clearTimeout(timer);\n          resolve(false);\n        };\n\n        img.src = url.href;\n      });\n    }\n\n    function chevron(direction) {\n      var d = direction === 'prev' ? 'M9 1L1 10L9 19' : 'M1 1L9 10L1 19';\n      return '<svg viewBox=\"0 0 10 20\" fill=\"none\" aria-hidden=\"true\">' +\n        '<path d=\"' + d + '\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>' +\n        '</svg>';\n    }\n\n    function makeArrows(container, kind, prevLabel, nextLabel) {\n      var prev = document.createElement('button');\n      prev.type = 'button';\n      prev.className = 'kt-gallery-arrow kt-gallery-arrow--prev kt-arrow--' + kind;\n      prev.setAttribute('aria-label', prevLabel);\n      prev.innerHTML = chevron('prev');\n\n      var next = document.createElement('button');\n      next.type = 'button';\n      next.className = 'kt-gallery-arrow kt-gallery-arrow--next kt-arrow--' + kind;\n      next.setAttribute('aria-label', nextLabel);\n      next.innerHTML = chevron('next');\n\n      container.appendChild(prev);\n      container.appendChild(next);\n      return { prev: prev, next: next };\n    }\n\n    function tint(button, src, side) {\n      if (!src) return;\n      isLightBehind(src, side).then(function (light) {\n        button.classList.toggle('is-on-light', light);\n      });\n    }\n\n    function onScrollEnd(scroller, callback) {\n      var t;\n      scroller.addEventListener('scroll', function () {\n        clearTimeout(t);\n        t = setTimeout(callback, 150);\n      }, { passive: true });\n      scroller.addEventListener('scrollend', callback);\n    }\n\n    /* ── Product image gallery ─────────────────────────── */\n    function setupGallery(gallery) {\n      var show = gallery.querySelector('slideshow-component');\n      if (!show || show.dataset.ktArrows) return;\n\n      var slides = show.querySelectorAll('slideshow-slide');\n      if (slides.length < 2) return;\n\n      var container = show.querySelector('slideshow-container') || show;\n      show.dataset.ktArrows = '1';\n      var arrows = makeArrows(container, 'gallery', 'Previous image', 'Next image');\n\n      function refresh() {\n        var i = Number(show.current);\n        var slide = show.querySelectorAll('slideshow-slide')[isNaN(i) ? 0 : i];\n        var img = slide && slide.querySelector('img');\n        var src = img && (img.currentSrc || img.src);\n        tint(arrows.prev, src, 'prev');\n        tint(arrows.next, src, 'next');\n      }\n\n      arrows.prev.addEventListener('click', function () {\n        if (typeof show.previous === 'function') show.previous();\n        setTimeout(refresh, 350);\n      });\n\n      arrows.next.addEventListener('click', function () {\n        if (typeof show.next === 'function') show.next();\n        setTimeout(refresh, 350);\n      });\n\n      var scroller = show.querySelector('slideshow-slides');\n      if (scroller) onScrollEnd(scroller, refresh);\n\n      refresh();\n    }\n\n    /* ── \"Also Nice\" recommendations carousel ──────────── */\n    function setupCarousel(section) {\n      var show = section.querySelector('slideshow-component.resource-list__carousel');\n      if (!show || show.dataset.ktArrows) return;\n\n      var cards = show.querySelectorAll('.resource-list__slide');\n      var scroller = show.querySelector('slideshow-slides');\n      var container = show.querySelector(':scope > slideshow-container');\n      if (cards.length < 3 || !scroller || !container) return;\n\n      show.dataset.ktArrows = '1';\n      var arrows = makeArrows(container, 'carousel', 'Previous product', 'Next product');\n      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;\n\n      function step() {\n        return cards[0].getBoundingClientRect().width;\n      }\n\n      function go(direction) {\n        var max = scroller.scrollWidth - scroller.clientWidth;\n        var target = scroller.scrollLeft + direction * step();\n\n        // Move one card, stop at the end, and only loop once already at the end\n        if (direction > 0) {\n          target = scroller.scrollLeft >= max - 1 ? 0 : Math.min(target, max);\n        } else {\n          target = scroller.scrollLeft <= 1 ? max : Math.max(target, 0);\n        }\n\n        scroller.scrollTo({ left: target, behavior: reduceMotion ? 'auto' : 'smooth' });\n        setTimeout(refresh, 450);\n      }\n\n      // The card whose image sits under a given arrow\n      function cardUnder(button) {\n        var b = button.getBoundingClientRect();\n        var x = b.left + b.width / 2;\n        for (var i = 0; i < cards.length; i++) {\n          var r = cards[i].getBoundingClientRect();\n          if (x >= r.left && x <= r.right) return cards[i];\n        }\n        return null;\n      }\n\n      function imageSrc(card) {\n        var img = card && card.querySelector('.card-gallery img');\n        return img && (img.currentSrc || img.src);\n      }\n\n      function refresh() {\n        // Sit the arrows on the middle of the product images, not the whole card\n        var gallery = cards[0].querySelector('.card-gallery');\n        if (gallery) {\n          var top = gallery.getBoundingClientRect().top - container.getBoundingClientRect().top;\n          container.style.setProperty('--kt-arrow-top', (top + gallery.offsetHeight / 2) + 'px');\n        }\n\n        tint(arrows.prev, imageSrc(cardUnder(arrows.prev)), 'prev');\n        tint(arrows.next, imageSrc(cardUnder(arrows.next)), 'next');\n      }\n\n      arrows.prev.addEventListener('click', function () { go(-1); });\n      arrows.next.addEventListener('click', function () { go(1); });\n      onScrollEnd(scroller, refresh);\n      window.addEventListener('resize', refresh);\n\n      refresh();\n    }\n\n    function init() {\n      document.querySelectorAll('media-gallery').forEach(setupGallery);\n      document.querySelectorAll('product-recommendations').forEach(setupCarousel);\n    }\n\n    if (document.readyState === 'loading') {\n      document.addEventListener('DOMContentLoaded', init);\n    } else {\n      init();\n    }\n\n    // Recommendations arrive later over the network\n    new MutationObserver(function () {\n      document.querySelectorAll('product-recommendations').forEach(setupCarousel);\n    }).observe(document.body, { childList: true, subtree: true });\n\n    document.addEventListener('shopify:section:load', init);\n  })();\n</script>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_U73Ybk": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<style>\n   /* Mobile menu: X looks like staging, with a bigger invisible tap area */\n  @media screen and (max-width: 989px) {\n    .kt-nav-shell .kt-nav .kt-menu-close {\n      top: 0;\n      right: 0;\n      width: 5.5rem;\n      height: 5.5rem;\n      padding: 1.875rem 1.625rem 0 0;\n      box-sizing: border-box;\n    }\n  }\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "main": {
+      "type": "product-information",
+      "blocks": {
+        "media-gallery": {
+          "type": "_product-media-gallery",
+          "static": true,
+          "settings": {
+            "media_presentation": "grid",
+            "media_columns": "one",
+            "image_gap": 0,
+            "large_first_image": false,
+            "icons_style": "none",
+            "slideshow_controls_style": "counter",
+            "slideshow_mobile_controls_style": "dots",
+            "thumbnail_position": "right",
+            "thumbnail_width": 44,
+            "thumbnail_radius": 0,
+            "aspect_ratio": "adapt",
+            "constrain_to_viewport": true,
+            "media_fit": "cover",
+            "media_radius": 0,
+            "extend_media": false,
+            "zoom": false,
+            "video_loop": false,
+            "hide_variants": true,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "product-details": {
+          "type": "_product-details",
+          "static": true,
+          "settings": {
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "details_position": "flex-start",
+            "gap": 0,
+            "sticky_details_desktop": true,
+            "background_media": "none",
+            "background_color": "",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 24,
+            "padding-block-end": 24,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "custom_liquid_f6XJ3B": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<div class=\"kt-product-title-price\">\n  <h1 class=\"kt-product-title\">\n    {{ product.title | upcase }}\n  </h1>\n\n \n</div>\n\n<style>\n  .kt-product-title-price {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 24px;\n    width: 100%;\n    margin-bottom: 28px;\n  }\n\n  .kt-product-title {\n    margin: 0;\n    font-size: clamp(22px, 1vw, 26px);\n    line-height: 0.95;\n    font-weight: 900;\n    letter-spacing: -1px;\n    text-transform: uppercase;\n  }\n\n  .kt-product-price {\n    font-size: clamp(14px, 1vw, 16px);\n    line-height: 1;\n    font-weight: 900;\n    white-space: nowrap;\n  }\n\n  @media screen and (max-width: 749px) {\n    .kt-product-title-price {\n      align-items: flex-start;\n      gap: 12px;\n    }\n\n    .kt-product-title {\n      font-size: 30px;\n    }\n\n    .kt-product-price {\n      font-size: 22px;\n      padding-top: 4px;\n    }\n  }\n</style>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_JythCJ": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "{%- assign color = product.title | split: ' ' | last -%}\n\n<div class=\"kt-product-meta\">\n  <p class=\"kt-product-color\">{{ product.tags[0] }}</p>\n  <p class=\"kt-product-price\">{{ product.price | money }}</p>\n</div>\n\n<style>\n  .kt-product-meta {\n    display: flex;\n    align-items: baseline;\n    justify-content: space-between;\n    gap: 24px;\n    width: 100%;\n    margin-top: 15px;     /* Figma: title ends 277, row starts 292 */\n  }\n\n  .kt-product-color,\n  .kt-product-price {\n    margin: 0;\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: 22px;\n    line-height: 27px;\n    font-weight: 400;\n    letter-spacing: 0;\n    color: #32261F;\n     text-transform:capitalize\n  }\n\n  .kt-product-price {\n    text-align: right;\n    white-space: nowrap;\n  }\n</style>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_7bcj9k": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<div class=\"kt-product-description\">\n  {{ product.description }}\n</div>\n\n<style>\n  .kt-product-description {\n    width: 100%;\n    margin-top: 15px;      /* Figma: price row ends 319, description starts 334 */\n    margin-bottom: 30px;   /* Figma: description ends 410, Quantity label 440 */\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: 14px;       /* B1/Web */\n    line-height: 22px;\n    font-weight: 400;\n    letter-spacing: 0;\n    color: #32261F;\n  }\n\n  /* Shopify's rich text field emits <p>, <ul>, <strong> etc. — reset then respace */\n  .kt-product-description p,\n  .kt-product-description ul,\n  .kt-product-description ol {\n    margin: 0;\n  }\n\n  .kt-product-description p + p,\n  .kt-product-description p + ul,\n  .kt-product-description p + ol,\n  .kt-product-description ul + p,\n  .kt-product-description ol + p {\n    margin-top: 10px;      /* Figma: paragraph spacing */\n  }\n\n  .kt-product-description ul,\n  .kt-product-description ol {\n    padding-left: 20px;\n  }\n\n  .kt-product-description li + li {\n    margin-top: 4px;       /* Figma: list spacing */\n  }\n\n  .kt-product-description strong,\n  .kt-product-description b {\n    font-weight: 700;\n  }\n\n  .kt-product-description a {\n    color: #378CDA;\n    text-decoration: underline;\n  }\n\n  .kt-product-description > *:first-child { margin-top: 0; }\n  .kt-product-description > *:last-child { margin-bottom: 0; }\n</style>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_B4biNn": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<div class=\"kt-qty\" data-kt-qty>\n  <label class=\"kt-qty__label\" for=\"kt-qty-input\">Quantity</label>\n\n  <div class=\"kt-qty__control\">\n    <button type=\"button\" class=\"kt-qty__btn kt-qty__btn--minus\" data-kt-qty-step=\"-1\" aria-label=\"Decrease quantity\"></button>\n    <input class=\"kt-qty__input\" id=\"kt-qty-input\" name=\"quantity\" type=\"number\"\n           min=\"1\" step=\"1\" value=\"1\" inputmode=\"numeric\" aria-label=\"Quantity\">\n    <button type=\"button\" class=\"kt-qty__btn kt-qty__btn--plus\" data-kt-qty-step=\"1\" aria-label=\"Increase quantity\"></button>\n  </div>\n</div>\n\n<style>\n  .kt-qty {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;              /* Figma: label 440–463, pill top 473 */\n    width: 100%;\n    margin-bottom: 30px;    /* Figma: pill bottom 528, next heading 558 */\n  }\n\n  .kt-qty__label {\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: 14px;        /* B3/Web */\n    line-height: 22px;\n    font-weight: 700;\n    color: #32261F;\n  }\n\n  .kt-qty__control {\n    display: grid;\n    grid-template-columns: 54px 1fr 54px;  /* 54 + 2px border = 56px cap */\n    align-items: stretch;\n    height: 55px;\n    border: 2px solid #32261F;\n    border-radius: 100px;\n    background: #FFFFFF;\n    overflow: hidden;\n  }\n\n  .kt-qty__btn {\n    position: relative;\n    appearance: none;\n    border: 0;\n    background: transparent;\n    color: #32261F;\n    cursor: pointer;\n    padding: 0;\n    transition: background-color 120ms ease, color 120ms ease;\n  }\n\n  /* Dividers */\n  .kt-qty__btn--minus { border-right: 2px solid #32261F; }\n  .kt-qty__btn--plus  { border-left:  2px solid #32261F; }\n\n  /* Glyphs drawn as 16px bars, 2px thick — Figma spec */\n  .kt-qty__btn::before,\n  .kt-qty__btn::after {\n    content: '';\n    position: absolute;\n    top: 50%;\n    left: 50%;\n    background: currentColor;\n    transform: translate(-50%, -50%);\n  }\n\n  .kt-qty__btn::before { width: 16px; height: 2px; }\n  .kt-qty__btn--plus::after { width: 2px; height: 16px; }\n\n  /* Hover: blue cell, white glyph */\n  .kt-qty__btn:hover {\n    background-color: #378CDA;\n    color: #FFFFFF;\n  }\n\n  .kt-qty__btn:focus-visible {\n    background-color: #378CDA;\n    color: #FFFFFF;\n    outline: none;\n  }\n\n  /* At minimum quantity: dim the minus button */\n  .kt-qty__btn:disabled {\n    cursor: default;\n    opacity: 0.35;\n    background-color: transparent;\n    color: #32261F;\n  }\n\n  .kt-qty__input {\n    appearance: none;\n    -moz-appearance: textfield;\n    border: 0;\n    background: transparent;\n    color: #32261F;\n    font-family: 'Handjet', sans-serif;\n    font-size: 16px;\n    line-height: 22px;\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n    text-align: center;\n    min-width: 0;\n    padding: 0;\n  }\n\n  .kt-qty__input:focus { outline: none; }\n\n  .kt-qty__input::-webkit-outer-spin-button,\n  .kt-qty__input::-webkit-inner-spin-button {\n    -webkit-appearance: none;\n    margin: 0;\n  }\n\n  @media (prefers-reduced-motion: reduce) {\n    .kt-qty__btn { transition: none; }\n  }\n</style>\n\n<script>\n  const ktQtyInit = () => {\n    document.querySelectorAll('[data-kt-qty]').forEach((root) => {\n      if (root.dataset.ktQtyReady) return;\n      root.dataset.ktQtyReady = 'true';\n\n      const input = root.querySelector('.kt-qty__input');\n      if (!input) return;\n\n      // Connect the quantity box to this section's Add to Cart form\n      const section = root.closest('.shopify-section') || document;\n      const form = section.querySelector('form[action*=\"/cart/add\"]');\n      const formId = form && form.getAttribute('id');\n      if (formId) input.setAttribute('form', formId);\n\n      const min = () => Number(input.min) || 1;\n      const clamp = (n) => Math.max(min(), Math.floor(Number(n)) || min());\n      const update = () => {\n        root.querySelector('[data-kt-qty-step=\"-1\"]').disabled = clamp(input.value) <= min();\n      };\n\n      root.addEventListener('click', (e) => {\n        const btn = e.target.closest('[data-kt-qty-step]');\n        if (!btn) return;\n        input.value = clamp(Number(input.value) + Number(btn.dataset.ktQtyStep));\n        input.dispatchEvent(new Event('change', { bubbles: true }));\n        update();\n      });\n\n      input.addEventListener('change', () => {\n        input.value = clamp(input.value);\n        update();\n      });\n\n      update();\n    });\n  };\n\n  // Run after the whole page loads, so the Add to Cart form (which comes after this block) exists\n  if (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', ktQtyInit);\n  } else {\n    ktQtyInit();\n  }\n</script>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_Cm7Rt4": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<div class=\"kt-upload\" data-kt-upload>\n  <p class=\"kt-upload__heading\">No polaroid? No problem.</p>\n  <p class=\"kt-upload__body\">Upload your photo and we'll print it and tuck it in with your order.</p>\n\n  <label class=\"kt-upload__button\" for=\"kt-upload-input\">\n    <span class=\"kt-upload__text\">Add Photo</span>\n    <svg class=\"kt-upload__icon\" width=\"18\" height=\"17\" viewBox=\"0 0 18 17\" fill=\"none\" aria-hidden=\"true\">\n      <path d=\"M9 11V2M9 2L5.5 5.5M9 2l3.5 3.5\"\n            stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n      <path d=\"M2 11.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5\"\n            stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n    </svg>\n    <input class=\"kt-upload__input\" id=\"kt-upload-input\" type=\"file\"\n           name=\"properties[Photo]\"\n           accept=\".jpg,.jpeg,.png,.tif,.tiff,image/jpeg,image/png,image/tiff\">\n  </label>\n\n  <p class=\"kt-upload__error\" data-kt-upload-error hidden>Hmm. That format is not supported try again (.jpg, .png, .tiff)</p>\n\n  <p class=\"kt-upload__file\" data-kt-upload-file hidden>\n    <a class=\"kt-upload__file-link\" data-kt-upload-link target=\"_blank\" rel=\"noopener\">\n      <svg class=\"kt-upload__file-icon\" width=\"18\" height=\"18\" viewBox=\"0 0 18 18\" fill=\"none\" aria-hidden=\"true\">\n        <rect x=\"1\" y=\"2\" width=\"16\" height=\"14\" rx=\"2\" stroke=\"currentColor\" stroke-width=\"2\"/>\n        <circle cx=\"6\" cy=\"7\" r=\"1.3\" fill=\"currentColor\"/>\n        <path d=\"M2 13l4-4 3.5 3.5L12 10l4 4\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n      </svg>\n      <span class=\"kt-upload__file-name\" data-kt-upload-name></span>\n    </a>\n    <button type=\"button\" class=\"kt-upload__remove\" data-kt-upload-remove aria-label=\"Remove photo\">&times;</button>\n  </p>\n</div>\n\n<style>\n  .kt-upload {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    margin-bottom: 24px;\n  }\n\n  .kt-upload__heading {\n    margin: 0;\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1, 14px);        /* B3/Web */\n    line-height: var(--kt-leading-b1, 22px);\n    font-weight: 700;\n    color: #32261F;\n  }\n\n  .kt-upload__body {\n    margin: 5px 0 10px;     /* Figma: 5px below heading, 10px above button */\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1, 14px);        /* B1/Web */\n    line-height: var(--kt-leading-b1, 22px);\n    font-weight: 400;\n    color: #32261F;\n  }\n\n  .kt-upload__button {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 10px;              /* Figma: text ends 1154, icon starts 1164 */\n    height: 55px;\n    border: 2px solid #32261F;\n    border-radius: 100px;\n    background: #FFFFFF;\n    color: #32261F;\n    cursor: pointer;\n    transition: background-color 120ms ease, color 120ms ease, opacity 120ms ease;\n  }\n\n  .kt-upload__text {\n    font-family: 'Handjet', sans-serif;\n    font-size: var(--kt-type-button, 16px);\n    line-height: var(--kt-leading-button, 22px);\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n  }\n\n  .kt-upload__icon { flex: none; }\n\n  /* Hover: blue fill, off-white text + icon */\n  .kt-upload__button:hover,\n  .kt-upload__button:focus-within {\n    background-color: #378CDA;\n    color: #F7F2EC;\n  }\n\n  .kt-upload__input {\n    position: absolute;\n    width: 1px; height: 1px;\n    padding: 0; margin: -1px;\n    overflow: hidden;\n    clip-path: inset(50%);\n    white-space: nowrap;\n    border: 0;\n  }\n\n  /* ── Error state ─────────────────────────────── */\n  .kt-upload__error {\n    margin: 8px 0 0;\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1, 14px);\n    line-height: var(--kt-leading-b1, 22px);\n    color: #FF0004;\n  }\n\n  /* ── Success state: photo attached ───────────── */\n  .kt-upload__file {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin: 8px 0 0;\n    min-width: 0;\n  }\n\n  /* Without this the rules above would beat the hidden attribute */\n  .kt-upload__file[hidden],\n  .kt-upload__error[hidden] {\n    display: none;\n  }\n\n  .kt-upload__file-link {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    color: #378CDA;\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1, 14px);\n    line-height: var(--kt-leading-b1, 22px);\n    font-weight: 700;\n    text-decoration: none;\n    cursor: pointer;\n  }\n\n  .kt-upload__file-link:hover .kt-upload__file-name {\n    text-decoration: underline;\n  }\n\n  .kt-upload__file-icon { flex: none; }\n\n  /* One line only — longer names truncate with … */\n  .kt-upload__file-name {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n  }\n\n  .kt-upload__remove {\n    flex: none;\n    appearance: none;\n    border: 0;\n    padding: 0;\n    background: none;\n    color: #378CDA;\n    font: inherit;\n    font-size: 20px;\n    line-height: 1;\n    cursor: pointer;\n  }\n\n  /* One photo per order: button is disabled while a photo is attached */\n  .kt-upload.is-filled .kt-upload__button {\n    opacity: 0.5;\n    cursor: default;\n  }\n  .kt-upload.is-filled .kt-upload__button:hover,\n  .kt-upload.is-filled .kt-upload__button:focus-within {\n    background: #FFFFFF;\n    color: #32261F;\n  }\n\n  @media (prefers-reduced-motion: reduce) {\n    .kt-upload__button { transition: none; }\n  }\n</style>\n\n<script>\n  (function () {\n    // \"No polaroid? No problem.\" — one photo per frame ordered.\n    // The customer can add up to as many photos as the Quantity box says.\n    // Each photo rides on the Add to Cart form as its own line item\n    // property: \"Photo\" when there is one, \"Photo 1\", \"Photo 2\"… when more.\n    function ktUploadInit() {\n      var root = document.querySelector('[data-kt-upload]');\n      if (!root || root.dataset.ktUploadReady) return;\n      root.dataset.ktUploadReady = 'true';\n\n      var picker = root.querySelector('.kt-upload__input');\n      var button = root.querySelector('.kt-upload__button');\n      var error = root.querySelector('[data-kt-upload-error]');\n      var template = root.querySelector('[data-kt-upload-file]');\n      var allowed = /\\.(jpe?g|png|tiff?)$/i;\n      var photos = []; // { input, row, url }\n\n      var section = root.closest('.shopify-section') || document;\n      var form = section.querySelector('form[action*=\"/cart/add\"]');\n      var formId = form && form.getAttribute('id');\n      var qtyInput = section.querySelector('.kt-qty__input') || document.querySelector('.kt-qty__input');\n\n      // The picker only opens the file dialog; picked files move to their\n      // own hidden input so the picker is free for the next photo.\n      picker.removeAttribute('name');\n      picker.removeAttribute('form');\n\n      var holder = document.createElement('div');\n      holder.hidden = true;\n      root.appendChild(holder);\n\n      // Clones of the original file row go here, one per photo\n      var list = document.createElement('div');\n      list.className = 'kt-upload__files';\n      template.parentNode.insertBefore(list, template.nextSibling);\n\n      function limit() {\n        var n = qtyInput ? Math.floor(Number(qtyInput.value)) : 1;\n        return n > 0 ? n : 1;\n      }\n\n      function renumber() {\n        photos.forEach(function (p, i) {\n          p.input.name = photos.length === 1 ? 'properties[Photo]' : 'properties[Photo ' + (i + 1) + ']';\n        });\n      }\n\n      function refresh() {\n        renumber();\n        // Same greyed-out button state as before, now only once every frame has a photo\n        root.classList.toggle('is-filled', photos.length >= limit());\n      }\n\n      function remove(photo) {\n        URL.revokeObjectURL(photo.url);\n        photo.input.remove();\n        photo.row.remove();\n        photos.splice(photos.indexOf(photo), 1);\n        refresh();\n      }\n\n      function onPick() {\n        error.hidden = true;\n        var file = picker.files && picker.files[0];\n        if (!file) return;\n\n        if (!allowed.test(file.name) || photos.length >= limit()) {\n          picker.value = '';\n          if (!allowed.test(file.name)) error.hidden = false;\n          return;\n        }\n\n        // The picker now holds this photo: name it, put it on the cart\n        // form, and swap an empty picker into the button for the next one\n        var input = picker;\n        var fresh = input.cloneNode(); // a clone never carries the file\n        fresh.addEventListener('change', onPick);\n        input.parentNode.replaceChild(fresh, input);\n        picker = fresh;\n\n        input.removeAttribute('id');\n        input.classList.add('kt-upload__input--photo');\n        if (formId) input.setAttribute('form', formId);\n        holder.appendChild(input);\n\n        var row = template.cloneNode(true);\n        row.hidden = false;\n        row.removeAttribute('data-kt-upload-file');\n        var url = URL.createObjectURL(file);\n        row.querySelector('[data-kt-upload-link]').href = url;\n        row.querySelector('[data-kt-upload-name]').textContent = file.name;\n        list.appendChild(row);\n\n        var photo = { input: input, row: row, url: url };\n        row.querySelector('[data-kt-upload-remove]').addEventListener('click', function () {\n          remove(photo);\n          error.hidden = true;\n        });\n        photos.push(photo);\n        refresh();\n      }\n\n      picker.addEventListener('change', onPick);\n\n      // Fewer frames than photos: drop the newest photos to match\n      if (qtyInput) {\n        qtyInput.addEventListener('change', function () {\n          while (photos.length > limit()) remove(photos[photos.length - 1]);\n          refresh();\n        });\n      }\n\n      // Every frame has a photo, or an upload is running: the button does\n      // not open the file picker\n      button.addEventListener('click', function (event) {\n        if (root.classList.contains('is-filled') || root.classList.contains('is-uploading')) event.preventDefault();\n      });\n\n      // Add to Cart uploads the photos with the order, which can take a few\n      // seconds for big phone photos. Show that it's working, then clear the\n      // photos and quantity once the frames are in the cart. If it fails,\n      // keep everything so the customer can try again.\n      var label = root.querySelector('.kt-upload__text');\n      var labelText = label ? label.textContent : '';\n      var nativeFetch = window.fetch;\n      window.fetch = function (resource, options) {\n        var url = String(resource && resource.url ? resource.url : resource);\n        var body = options && options.body;\n        var carriesPhotos = /\\/cart\\/add/.test(url) && photos.length > 0 &&\n          typeof FormData !== 'undefined' && body instanceof FormData &&\n          photos.some(function (p) { return body.has(p.input.name); });\n        var request = nativeFetch.apply(this, arguments);\n        if (!carriesPhotos) return request;\n\n        root.classList.add('is-uploading');\n        if (label) label.textContent = 'Uploading…';\n        var done = function () {\n          root.classList.remove('is-uploading');\n          if (label) label.textContent = labelText;\n        };\n        request.then(function (response) {\n          done();\n          if (!response.ok) return;\n          while (photos.length) remove(photos[photos.length - 1]);\n          if (qtyInput) {\n            qtyInput.value = qtyInput.min || 1;\n            qtyInput.dispatchEvent(new Event('change', { bubbles: true }));\n          }\n          refresh();\n        }, done);\n        return request;\n      };\n\n      var style = document.createElement('style');\n      style.textContent = '[data-kt-upload].is-uploading .kt-upload__files { opacity: .5; }' +\n        '[data-kt-upload].is-uploading .kt-upload__button { cursor: progress; }';\n      root.appendChild(style);\n\n      refresh();\n    }\n\n    // Run after the whole page loads, so the Add to Cart form (which comes\n    // after this block) exists and the photos can be attached to it\n    if (document.readyState === 'loading') {\n      document.addEventListener('DOMContentLoaded', ktUploadInit);\n    } else {\n      ktUploadInit();\n    }\n  })();\n</script>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_XU3Twy": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "disabled": true,
+              "settings": {
+                "custom_liquid": "<div class=\"kt-select-field\">\n  <label class=\"kt-select-label\" for=\"kt-size-select\">Select Size:</label>\n\n  <div class=\"kt-select-wrap\">\n    <select\n      id=\"kt-size-select\"\n      class=\"kt-custom-select\"\n      name=\"properties[Size]\"\n      required\n      aria-label=\"Select Size\"\n    >\n     \n      <option value=\"8 x 10”\">8 x 10”</option>\n    </select>\n\n    <span class=\"kt-select-arrow\" aria-hidden=\"true\"></span>\n  </div>\n</div>\n\n<script>\n  document.addEventListener('DOMContentLoaded', function () {\n    var sizeSelect = document.getElementById('kt-size-select');\n    var productForm = document.querySelector('form[action*=\"/cart/add\"]');\n\n    if (!sizeSelect || !productForm) return;\n\n    if (!productForm.id) {\n      productForm.id = 'kt-product-form-' + Date.now();\n    }\n\n    sizeSelect.setAttribute('form', productForm.id);\n  });\n</script>\n\n<style>\n  .kt-select-field {\n    width: 100%;\n    margin: 22px 0 24px;\n  }\n\n  .kt-select-label {\n    display: block;\n    margin-bottom: 14px;\n    font-size: 16px;\n    line-height: 1.2;\n    font-weight: 400;\n    color: #2c221d;\n  }\n\n  .kt-select-wrap {\n    position: relative;\n    width: 100%;\n  }\n\n  .kt-custom-select {\n    width: 100%;\n    min-height: 50px;\n    padding: 0 72px 0 24px;\n    border: 3px solid #2c221d;\n    border-radius: 999px;\n    background: transparent;\n    color: #2c221d;\n    font-size: 18px;\n    font-weight: 800;\n    line-height: 1;\n    appearance: none;\n    -webkit-appearance: none;\n    cursor: pointer;\n  }\n\n  .kt-custom-select:focus {\n    outline: none;\n    box-shadow: 0 0 0 2px rgba(44, 34, 29, 0.15);\n  }\n\n  .kt-select-arrow {\n    position: absolute;\n    right: 28px;\n    top: 50%;\n    width: 18px;\n    height: 18px;\n    border-right: 3px solid #2c221d;\n    border-bottom: 3px solid #2c221d;\n    transform: translateY(-65%) rotate(45deg);\n    pointer-events: none;\n  }\n\n  @media screen and (max-width: 749px) {\n    .kt-custom-select {\n      min-height: 58px;\n      padding-left: 20px;\n      font-size: 16px;\n    }\n\n    .kt-select-label {\n      font-size: 16px;\n    }\n\n    .kt-select-arrow {\n      width: 20px;\n      height: 20px;\n      right: 24px;\n    }\n  }\n</style>"
+              },
+              "blocks": {}
+            },
+            "buy_buttons_YKfAWB": {
+              "type": "buy-buttons",
+              "name": "t:names.product_buy_buttons",
+              "settings": {
+                "stacking": false,
+                "text_color": "",
+                "show_pickup_availability": true,
+                "gift_card_form": true,
+                "recipient_button_style": "default",
+                "recipient_button_background": "{{ settings.color_palette.background }}",
+                "recipient_button_text": "{{ settings.color_palette.foreground }}",
+                "recipient_button_border": "{{ settings.color_palette.foreground }}",
+                "selected_recipient_button_style": "default",
+                "selected_recipient_button_background": "{{ settings.color_palette.foreground }}",
+                "selected_recipient_button_text": "{{ settings.color_palette.background }}",
+                "selected_recipient_button_border": "{{ settings.color_palette.foreground }}",
+                "input_style": "default",
+                "input_background_color": "{{ settings.color_palette.background }}",
+                "input_text_color": "{{ settings.color_palette.foreground }}",
+                "input_border_color": "{{ settings.color_palette.foreground }}",
+                "border_width": 1,
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "quantity": {
+                  "type": "quantity",
+                  "disabled": true,
+                  "static": true,
+                  "settings": {
+                    "input_style": "custom",
+                    "input_background_color": "{{ settings.color_palette.background }}",
+                    "input_text_color": "{{ settings.color_palette.foreground }}",
+                    "input_border_color": "{{ settings.color_palette.foreground }}",
+                    "border_width": 1,
+                    "border_radius": 0
+                  },
+                  "blocks": {}
+                },
+                "add-to-cart": {
+                  "type": "add-to-cart",
+                  "static": true,
+                  "settings": {
+                    "style_class": "button-custom",
+                    "custom_button_background": "#51b18c",
+                    "custom_button_text": "{{ settings.color_palette.background }}",
+                    "custom_button_border": "{{ settings.color_palette.background }}"
+                  },
+                  "blocks": {}
+                },
+                "accelerated-checkout": {
+                  "type": "accelerated-checkout",
+                  "disabled": true,
+                  "static": true,
+                  "settings": {},
+                  "blocks": {}
+                }
+              },
+              "block_order": []
+            },
+            "custom_liquid_tB6Wic": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<style>\n  button.add-to-cart-button {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 100%;\n    height: 55px;\n    padding: 0 20px;\n    border: none;\n    border-radius: 100px;\n    background: #51B18C;\n    color: #F7F2EC;\n    font-family: 'Handjet', sans-serif;\n    font-size: 16px;\n    line-height: 22px;\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n    letter-spacing: 0;\n    text-align: center;\n    cursor: pointer;\n    transition: opacity 120ms ease;\n  }\n\n  button.add-to-cart-button:hover {\n    opacity: 0.9;\n  }\n\n  button.add-to-cart-button:focus-visible {\n    outline: 2px solid #378CDA;\n    outline-offset: 2px;\n  }\n\n  button.add-to-cart-button[disabled] {\n    opacity: 0.5;\n    cursor: not-allowed;\n  }\n\n  @media (prefers-reduced-motion: reduce) {\n    button.add-to-cart-button { transition: none; }\n  }\n</style>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_weUTNt": {
+              "type": "custom-liquid",
+              "name": "Sold Out/Coming Soon + Waitlist",
+              "settings": {
+                "custom_liquid": "{%- comment -%}\n  Coming Soon / Sold Out (spec No. 17)\n  Driven by the product metafield custom.launch_status\n  (\"Available\" / \"Coming Soon\" / \"Sold Out\"). When it's Coming Soon or\n  Sold Out: hides Quantity, \"No polaroid?\" upload and Add to Cart, and\n  shows the pill + waitlist form instead. Set it back to \"Available\" and\n  the page is live again — no code changes.\n{%- endcomment -%}\n{%- liquid\n  assign kt_status = product.metafields.custom.launch_status.value | default: ''\n-%}\n{%- if kt_status == 'Coming Soon' or kt_status == 'Sold Out' -%}\n<style>\n  /* Buying is off while the product isn't live */\n  div:has(> .kt-qty),\n  div:has(> .kt-upload),\n  .buy-buttons-block {\n    display: none !important;\n  }\n\n  .kt-waitlist {\n    display: flex;\n    flex-direction: column;\n    align-items: stretch;\n    margin-top: 0.5rem;\n  }\n  .kt-waitlist__pill {\n    align-self: center;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    height: 4.125rem;\n    padding: 0 2rem;\n    border-radius: 100px;\n    background: #FADB4B;\n    color: var(--kt-ink);\n    font-family: 'Erica One', serif;\n    font-size: 1.375rem;\n    line-height: 1;\n    text-transform: uppercase;\n    white-space: nowrap;\n  }\n  .kt-waitlist__heading,\n  .kt-waitlist__body {\n    margin: 0;\n    color: var(--kt-ink);\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n  }\n  .kt-waitlist__heading {\n    margin-top: 2rem;\n    font-weight: 700;\n  }\n  .kt-waitlist__body {\n    font-weight: 400;\n  }\n  .kt-waitlist__form {\n    display: flex;\n    flex-direction: column;\n    gap: 1.375rem;\n    margin-top: 1.375rem;\n  }\n  /* input.* + !important: the theme's own input styles otherwise win */\n  .kt-waitlist input.kt-waitlist__input {\n    box-sizing: border-box;\n    width: 100%;\n    height: 55px;\n    padding: 0 1.375rem;\n    border: 2px solid var(--kt-ink) !important;\n    border-radius: 100px !important;\n    background: #FFFFFF !important;\n    box-shadow: none !important;\n    color: var(--kt-ink);\n    font-family: var(--kt-font);\n    font-size: var(--kt-type-button);\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 400;\n    outline: none;\n  }\n  .kt-waitlist__input::placeholder {\n    color: #9A7555;\n  }\n  .kt-waitlist input.kt-waitlist__input:focus {\n    border-color: #51B18C !important;\n  }\n  .kt-waitlist input.kt-waitlist__input.has-error {\n    border-color: #FF0004 !important;\n  }\n  .kt-waitlist__button {\n    width: 100%;\n    height: 55px;\n    border: 0;\n    border-radius: 100px;\n    background: #51B18C;\n    color: var(--kt-bg);\n    font-family: var(--kt-font);\n    font-size: var(--kt-type-button);\n    font-weight: 700;\n    font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n    cursor: pointer;\n    transition: background-color 0.18s ease;\n  }\n  .kt-waitlist__button:hover {\n    background: var(--kt-blue);\n  }\n  .kt-waitlist__button:disabled {\n    opacity: 0.6;\n    cursor: default;\n  }\n  .kt-waitlist__msg {\n    margin: 0;\n    min-height: 1rem;\n    color: var(--kt-ink);\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: 0.875rem;\n    line-height: 1.25rem;\n  }\n  .kt-waitlist__msg.is-error {\n    color: #FF0004;\n  }\n  .kt-waitlist.is-success .kt-waitlist__form {\n    display: none;\n  }\n  .kt-waitlist__done {\n    display: none;\n    margin: 1.375rem 0 0;\n    color: var(--kt-ink);\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n    font-weight: 700;\n  }\n  .kt-waitlist.is-success .kt-waitlist__done {\n    display: block;\n  }\n</style>\n\n<div class=\"kt-waitlist\" data-kt-waitlist>\n  <span class=\"kt-waitlist__pill\">{{ kt_status }}</span>\n\n  {%- if kt_status == 'Coming Soon' -%}\n    <p class=\"kt-waitlist__heading\">You got here early!</p>\n    <p class=\"kt-waitlist__body\">We're still dusting and not quite ready but happy you're here! Leave your email and we'll let you know when it goes live.</p>\n  {%- else -%}\n    <p class=\"kt-waitlist__heading\">Well, you have great taste.</p>\n    <p class=\"kt-waitlist__body\">This color is gone for now. Leave your email and we'll let you know when it's back. Can't wait? Take a peek at the other colors below.</p>\n  {%- endif -%}\n\n  <form class=\"kt-waitlist__form\" novalidate>\n    <input class=\"kt-waitlist__input\" type=\"email\" name=\"email\" placeholder=\"Email*\" autocomplete=\"email\" required aria-label=\"Email\">\n    <button class=\"kt-waitlist__button\" type=\"submit\">\n      {%- if kt_status == 'Coming Soon' -%}Keep me in the loop{%- else -%}Tell me when it's back!{%- endif -%}\n    </button>\n    <p class=\"kt-waitlist__msg\" aria-live=\"polite\"></p>\n  </form>\n  <p class=\"kt-waitlist__done\" aria-live=\"polite\">You're on the list! We'll email you as soon as it's ready.</p>\n</div>\n\n<script>\n  (() => {\n    // Waitlist endpoint (Google Apps Script web app → \"Waitlist\" tab of the\n    // \"KT_Contact Rolodex\" workbook; also emails a notification per signup).\n    const WAITLIST_URL = 'https://script.google.com/macros/s/AKfycbzfaUU_H7nVj6Xz_mUy2tCIvkaDfkN26kQ7i59UlnkgRZ_rqdrK9f5RZukGINHGgkOM5A/exec';\n\n    const root = document.querySelector('[data-kt-waitlist]');\n    if (!root) return;\n    const form = root.querySelector('form');\n    const input = form.querySelector('input[name=\"email\"]');\n    const button = form.querySelector('button');\n    const msg = form.querySelector('.kt-waitlist__msg');\n\n    // Single-variant products report \"Default Title\" — store that as blank.\n    const variants = { {%- for v in product.variants -%}\"{{ v.id }}\": {%- if v.title == 'Default Title' -%}\"\"{%- else -%}{{ v.title | json }}{%- endif -%}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%} };\n    const defaultVariant = \"{{ product.selected_or_first_available_variant.id }}\";\n    // Variant column = the colour shown under the title (e.g. \"Wasabi\"), plus the\n    // Shopify variant name if the product has real variants (e.g. a size).\n    const currentVariantTitle = () => {\n      const id = new URLSearchParams(location.search).get('variant') || defaultVariant;\n      const colorEl = document.querySelector('.kt-product-color');\n      const color = colorEl ? colorEl.textContent.trim() : '';\n      const variant = variants[id] || '';\n      return [color, variant].filter((v, i, all) => v && all.indexOf(v) === i).join(' / ');\n    };\n\n    const showError = (text) => {\n      msg.textContent = text;\n      msg.classList.add('is-error');\n      input.classList.add('has-error');\n    };\n\n    input.addEventListener('input', () => {\n      msg.textContent = '';\n      msg.classList.remove('is-error');\n      input.classList.remove('has-error');\n    });\n\n    form.addEventListener('submit', (e) => {\n      e.preventDefault();\n      const email = input.value.trim();\n      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {\n        showError('Please enter a valid email.');\n        return;\n      }\n      if (!WAITLIST_URL) {\n        showError('Waitlist is not connected yet.');\n        return;\n      }\n      // Apps Script can take ~20s to answer, so show success straight away\n      // (same as the footer mailing list) and let the request finish in the\n      // background. keepalive lets it complete even if the visitor leaves.\n      // The form hides on success, so it can't be submitted twice.\n      button.disabled = true;\n      root.classList.add('is-success');\n      fetch(WAITLIST_URL, {\n        method: 'POST',\n        mode: 'no-cors',\n        keepalive: true,\n        body: new URLSearchParams({\n          email,\n          status: {{ kt_status | json }},\n          product: {{ product.title | json }},\n          handle: {{ product.handle | json }},\n          variant: currentVariantTitle(),\n        }),\n      }).catch((err) => console.error('Waitlist signup failed to send', err));\n    });\n  })();\n</script>\n{%- endif -%}"
+              },
+              "blocks": {}
+            },
+            "accordion_8KQU9a": {
+              "type": "accordion",
+              "name": "t:names.accordion",
+              "settings": {
+                "icon": "caret",
+                "dividers": true,
+                "divider_color": "",
+                "type_preset": "h5",
+                "background_color": "",
+                "text_color": "",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 26,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {
+                "accordion_row_aAdWap": {
+                  "type": "_accordion-row",
+                  "disabled": true,
+                  "settings": {
+                    "heading": "Description",
+                    "open_by_default": true,
+                    "icon": "none",
+                    "width": 20
+                  },
+                  "blocks": {
+                    "text_y43pAw": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p>A colorful frame for your favorite tiny memories.</p>",
+                        "width": "100%",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "text_color": "",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_y43pAw"
+                  ]
+                },
+                "accordion_row_3paYzR": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "Tell Me More",
+                    "open_by_default": false,
+                    "icon": "none",
+                    "width": 28
+                  },
+                  "blocks": {
+                    "text_JxdBkK": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p>Designed in Brooklyn. Made in small runs, packed by hand.</p><p>What's in the box:</p><ul><li>Painted MDF frame, 8 × 10\"</li><li>Color-matched acid-free mat</li><li>Protective glass</li><li>Backboard</li><li>Hanging hardware</li></ul><p>Opening fits a 1.75 × 2.25\" mini polaroid. Tape your photo to the back of the mat, seat it in the frame, and hang portrait or landscape.</p>",
+                        "width": "100%",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "text_color": "",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_JxdBkK"
+                  ]
+                },
+                "accordion_row_HjkYjC": {
+                  "type": "_accordion-row",
+                  "settings": {
+                    "heading": "Shipping & Stuff",
+                    "open_by_default": false,
+                    "icon": "none",
+                    "width": 20
+                  },
+                  "blocks": {
+                    "text_WBYHAw": {
+                      "type": "text",
+                      "settings": {
+                        "text": "<p>$8 flat rate shipping in the US, free over $80. We ship from Brooklyn within 2–3 business days, and orders typically arrive in 5–10 days once they're on the way. You'll get tracking by email.</p><p>Not shipping internationally yet, but if you're outside the US email hello@knocktwice.studio and we'll see what we can do.</p><p>If something arrives damaged, email us within 7 days with your order number and a few photos and we'll send a replacement or refund. Change your mind? Returns accepted within 14 days on unused frames in original packaging. Custom polaroid prints are final sale.</p><p>Full details <a href=\"https://www.knocktwice.studio/returns\" title=\"https://www.knocktwice.studio/returns\"><strong>here</strong></a>.</p>",
+                        "width": "100%",
+                        "max_width": "normal",
+                        "alignment": "left",
+                        "type_preset": "rte",
+                        "font": "var(--font-body--family)",
+                        "font_size": "1rem",
+                        "line_height": "normal",
+                        "letter_spacing": "normal",
+                        "case": "none",
+                        "wrap": "pretty",
+                        "text_color": "",
+                        "background": false,
+                        "background_color": "#00000026",
+                        "corner_radius": 0,
+                        "padding-block-start": 0,
+                        "padding-block-end": 0,
+                        "padding-inline-start": 0,
+                        "padding-inline-end": 0
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": [
+                    "text_WBYHAw"
+                  ]
+                }
+              },
+              "block_order": [
+                "accordion_row_aAdWap",
+                "accordion_row_3paYzR",
+                "accordion_row_HjkYjC"
+              ]
+            },
+            "custom_liquid_xxWFHP": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<style>\n/* Product page \"Tell Me More\" / \"Shipping & Stuff\": match FAQ dropdowns (spec No. 10) */\ndetails[data-kt-single-accordion] > summary.details__header {\n  font-weight: 800 !important;\n  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 500;\n  transition: color 0.18s ease;\n}\ndetails[data-kt-single-accordion][open] > summary.details__header {\n  font-weight: 700 !important;\n  font-variation-settings: 'ELGR' 1, 'ELSH' 2, 'wght' 700;\n}\n@media (hover: hover) {\n  details[data-kt-single-accordion] > summary.details__header:hover {\n    color: var(--color-blue);\n  }\n}\ndetails[data-kt-single-accordion] > summary.details__header:focus-visible {\n  color: var(--color-blue);\n}\n\n/* \"Tell Me More\" / \"Shipping & Stuff\": match site type scale + FAQ dropdown sizing */\naccordion-custom details.details[data-kt-single-accordion] > summary.details__header {\n  font-size: var(--kt-type-nav);\n  line-height: var(--kt-leading-nav);\n  padding-block: 0.8125rem;\n}\ndetails.details[data-kt-single-accordion] > summary.details__header .icon-caret {\n  width: 2rem;\n  height: 2rem;\n  margin-block: -0.375rem;\n  margin-right: -0.4375rem;\n}\ndetails.details[data-kt-single-accordion] > summary.details__header .icon-caret svg {\n  width: 100%;\n  height: 100%;\n}\ndetails.details[data-kt-single-accordion] > summary.details__header .icon-caret path {\n  stroke-width: 2px;\n  vector-effect: non-scaling-stroke;\n}\ndetails.details[data-kt-single-accordion] .details-content :is(p, li) {\n  font-size: var(--kt-type-b1);\n  line-height: var(--kt-leading-b1);\n}\n  /* Links inside the product accordions (\"Tell Me More\", \"Shipping & Stuff\")\n     use the site's word-link style: blue, bold, no underline until hover\n     (same as .policy a in assets/policy.css). The text comes from the rich\n     text editor and often wraps the link text in <strong>, which the theme\n     colours separately, so that is pinned too. */\n  .accordion .details-content a {\n    color: #378CDA !important;\n    font-weight: 700 !important;\n    text-decoration: none !important;\n  }\n  .accordion .details-content a:hover {\n    text-decoration: underline !important;\n  }\n  .accordion .details-content a strong,\n  .accordion .details-content a b {\n    color: inherit !important;\n    font-weight: inherit !important;\n  }\n\n</style>\n\n<script>\n  document.addEventListener('DOMContentLoaded', function () {\n    function initSingleOpenAccordions() {\n      const accordionDetails = document.querySelectorAll(\n        'main details, .product details, .product__info-wrapper details, .product__accordion details'\n      );\n\n      accordionDetails.forEach(function (detail) {\n        if (detail.dataset.ktSingleAccordion === 'true') return;\n\n        detail.dataset.ktSingleAccordion = 'true';\n\n        detail.addEventListener('toggle', function () {\n          if (!detail.open) return;\n\n          accordionDetails.forEach(function (otherDetail) {\n            if (otherDetail !== detail) {\n              otherDetail.open = false;\n            }\n          });\n        });\n      });\n    }\n\n    initSingleOpenAccordions();\n\n    document.addEventListener('shopify:section:load', function () {\n      initSingleOpenAccordions();\n    });\n  });\n</script>"
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "custom_liquid_f6XJ3B",
+            "custom_liquid_JythCJ",
+            "custom_liquid_7bcj9k",
+            "custom_liquid_B4biNn",
+            "custom_liquid_Cm7Rt4",
+            "custom_liquid_XU3Twy",
+            "buy_buttons_YKfAWB",
+            "custom_liquid_tB6Wic",
+            "custom_liquid_weUTNt",
+            "accordion_8KQU9a",
+            "custom_liquid_xxWFHP"
+          ]
+        }
+      },
+      "settings": {
+        "content_width": "content-center-aligned",
+        "desktop_media_position": "left",
+        "equal_columns": true,
+        "limit_details_width": false,
+        "gap": 12,
+        "enable_sticky_add_to_cart": true,
+        "background_color": "#f7f2ec",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "product_recommendations_qggXJq": {
+      "type": "product-recommendations",
+      "blocks": {
+        "custom_liquid_Nq3hwa": {
+          "type": "custom-liquid",
+          "name": "t:names.custom_liquid",
+          "settings": {
+            "custom_liquid": "<h3 class=\"also-nice\" style=\"margin-left: 10px\">\nALSO NICE\n</h3>"
+          },
+          "blocks": {}
+        },
+        "text_cbcgyb": {
+          "type": "text",
+          "name": "t:names.header",
+          "disabled": true,
+          "settings": {
+            "text": "<h2>Also Nice</h2>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "left",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "1rem",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "text_color": "",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 0,
+            "background_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 8,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "custom_liquid_jcM7HU": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<style>\n[id*=\"product_recommendations\"] .product-card__content {\n  display: grid;\n  grid-template-columns: 1fr auto;\n  column-gap: 12px;\n  row-gap: 4px;\n  align-items: start;          /* baseline ki jagah */\n}\n\n[id*=\"product_recommendations\"] .product-card__content > .card-gallery {\n  grid-column: 1 / -1;\n  align-self: stretch;\n  margin: 0;\n}\n\n/* Baseline sirf naam aur price ke darmiyan */\n[id*=\"product_recommendations\"] .product-card__content > a,\n[id*=\"product_recommendations\"] .product-card__content > product-price {\n  align-self: baseline;\n}\n\n[id*=\"product_recommendations\"] .product-card__content > product-price {\n  justify-self: end;\n  text-align: right;\n  width: auto;\n}\n\n[id*=\"product_recommendations\"] .product-card__content > div:not([class]) {\n  display: none;\n}\n\n/* Card ka quick add button */\nquick-add-component,\n.quick-add {\n  display: none;\n}\n\n/* Neeche chipakne wali add to cart bar */\nsticky-add-to-cart,\n.sticky-add-to-cart {\n  display: none;\n}\n\nbody [class*=\"color-custom-template--\"],\nbody [class*=\"color-custom-template--\"] .text-block {\n  --color: #32261F;\n  --color-foreground: #32261F;\n}\n\n[id*=\"product_recommendations\"] product-price,\n[id*=\"product_recommendations\"] product-price .price {\n  font-family: 'Instrument Sans', sans-serif !important;\n  font-size: 14px;\n  font-weight: 700;\n  color: #32261F;\n}\n</style>"
+              },
+              "blocks": {}
+            },
+            "custom_liquid_WjiRCV": {
+              "type": "custom-liquid",
+              "name": "t:names.custom_liquid",
+              "settings": {
+                "custom_liquid": "<style>\n/* \"Also Nice\" tiles: 2px strokes, one shared line between tiles */\nproduct-recommendations .product-card__content {\n  border: 2px solid var(--kt-ink) !important;\n  border-left-width: 0 !important;\n}\nproduct-recommendations slideshow-container {\n  position: relative;\n}\n/* \"Also Nice\" tiles: 2px strokes, one shared line between tiles */\nproduct-recommendations .product-card__content {\n  border: 2px solid var(--kt-ink) !important;\n  border-left-width: 0 !important;\n}\nproduct-recommendations slideshow-container {\n  position: relative;\n}\n\n/* \"Also Nice\": left border on the first tile only */\nproduct-recommendations .resource-list__slide:first-child .product-card__content {\n  border-left-width: 2px !important;\n}\n</style>"
+              },
+              "blocks": {}
+            },
+            "product_card_gallery_DNizbJ": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "adapt",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_color": "",
+                "border_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_M7MJkb": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "wrap": "pretty",
+                "text_color": "",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 5,
+                "padding-block-end": 5,
+                "padding-inline-start": 5,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_gLWgA6": {
+              "type": "price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "text_color": "",
+                "padding-block-start": 5,
+                "padding-block-end": 5,
+                "padding-inline-start": 0,
+                "padding-inline-end": 5
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "custom_liquid_jcM7HU",
+            "custom_liquid_WjiRCV",
+            "product_card_gallery_DNizbJ",
+            "product_title_M7MJkb",
+            "price_gLWgA6"
+          ]
+        }
+      },
+      "block_order": [
+        "custom_liquid_Nq3hwa",
+        "text_cbcgyb"
+      ],
+      "custom_css": [
+        "product-card {display: grid !important; grid-template-columns: minmax(0, 1fr) auto !important; column-gap: 16px !important;}",
+        "product-card > .product-card__content,product-card > .product-card__link,.product-grid-view-zoom-out--details {grid-column: 1/-1;}",
+        "product-card > a:nth-of-type(2) {grid-column: 1 !important; grid-row: 4;}",
+        "product-card > product-price {grid-column: 2 !important; grid-row: 4; justify-self: end; width: auto !important;}"
+      ],
+      "name": "t:names.product_recommendations",
+      "settings": {
+        "product": "{{ closest.product }}",
+        "recommendation_type": "related",
+        "layout_type": "carousel",
+        "carousel_on_mobile": false,
+        "max_products": 6,
+        "columns": 4,
+        "mobile_columns": "2",
+        "columns_gap": 0,
+        "rows_gap": 24,
+        "icons_style": "chevron",
+        "icons_shape": "square",
+        "section_width": "full-width",
+        "gap": 28,
+        "background_color": "#f7f2ec",
+        "padding-block-start": 48,
+        "padding-block-end": 48
+      }
+    },
+    "custom_liquid_Bdr4nM": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<style>\n  html:root,\n  .color-custom-badge-sale,\n  .color-custom-badge-sold-out,\n  .color-custom-drawer,\n  .color-custom-popover,\n  [class*=\"color-custom-template--\"] {\n    --color: #32261F;\n    --color-foreground: #32261F;\n    --color-border: #32261F;\n    --color-rgb: 50 38 31;\n    --color-foreground-rgb: 50 38 31;\n    --color-border-rgb: 50 38 31;\n  }\n\n  html:root {\n    --palette-darkest: #32261F;\n    --color-variant-text-rgb: 50 38 31;\n  }\n\n  .custom-color-quick-add {\n    --quick-add-foreground: #32261F;\n  }\n\n\n@media screen and (max-width: 749px) {\n  /* Two products per view */\n  [id*=\"product_recommendations\"] .resource-list__carousel .resource-list__slide {\n    --slide-width: 50cqw;\n  }\n\n  /* Square image, as in Figma (223x221) */\n  [id*=\"product_recommendations\"] .card-gallery {\n    --gallery-aspect-ratio: calc(223 / 221) !important;\n  }\n\n  /* Name above price */\n  [id*=\"product_recommendations\"] .product-card__content {\n    grid-template-columns: 1fr;\n    row-gap: 0;\n    padding-bottom: 10px;\n  }\n\n  [id*=\"product_recommendations\"] .product-card__content a .text-block {\n    padding: 13px 20px 0;\n  }\n\n  [id*=\"product_recommendations\"] .product-card__content a .text-block p {\n    font-size: 12px;\n    line-height: 17px;\n    font-weight: 400;\n  }\n\n  [id*=\"product_recommendations\"] .product-card__content > product-price {\n    justify-self: start;\n    text-align: left;\n    padding: 2px 20px 0;\n  }\n\n  [id*=\"product_recommendations\"] product-price .price {\n    font-size: 12px;\n    line-height: 17px;\n    font-weight: 700;\n  }\n}\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_d6w7zw": {
+      "type": "custom-liquid",
+      "name": "t:names.custom_liquid",
+      "settings": {
+        "custom_liquid": "<style>\n  /* Knock Twice global type scale — same values as the main site's\n     assets/styles.css, so Shopify pages match the rest of the site. */\n  :root {\n    --kt-type-h2:        clamp(1.625rem, 3.13vw, 1.875rem);   /* 26 → 30 */\n    --kt-leading-h2:     clamp(1.8125rem, 3.18vw, 2.0625rem); /* 29 → 33 */\n    --kt-type-nav:       clamp(1.375rem, 2.13vw, 1.625rem);   /* 22 → 26 */\n    --kt-leading-nav:    clamp(1.6875rem, 2.22vw, 1.875rem);  /* 27 → 30 */\n    --kt-type-b1:        clamp(1rem, 1.54vw, 1.125rem);       /* 16 → 18 */\n    --kt-leading-b1:     clamp(1.375rem, 1.96vw, 1.5rem);     /* 22 → 24 */\n    --kt-type-button:    clamp(1rem, 1.3vw, 1.125rem);        /* 16 → 18 */\n    --kt-leading-button: clamp(1.375rem, 1.6vw, 1.4375rem);   /* 22 → 23 */\n\n    --kt-type-h1:    clamp(2.875rem, 5.23vw, 4.25rem);  /* 46 → 68 */\n    --kt-leading-h1: clamp(3rem, 5.35vw, 4.375rem);     /* 48 → 70 */\n  }\n\n    .kt-product-title {\n    font-size: var(--kt-type-h1);\n    line-height: var(--kt-leading-h1);\n  }\n\n  .kt-product-color,\n  .kt-product-price {\n    font-size: var(--kt-type-nav);\n    line-height: var(--kt-leading-nav);\n  }\n\n  .kt-product-description,\n  .kt-product-description p,\n  .kt-upload__heading,\n  .kt-upload__body,\n  .kt-upload__file,\n  .kt-qty__label {\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n  }\n\n  accordion-custom details.details > summary.details__header {\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n  }\n\n  .kt-upload__text,\n  .kt-qty__input,\n  .add-to-cart-text,\n  .add-to-cart-text__content {\n    font-size: var(--kt-type-button);\n    line-height: var(--kt-leading-button);\n  }\n\n  /* Mobile: replaces the old fixed 30px / 22px sizes */\n  @media screen and (max-width: 749px) {\n    .kt-product-title { font-size: var(--kt-type-h1); }\n    .kt-product-price { font-size: var(--kt-type-nav); }\n  }\n\n  /* (3) Remove the cart icon from the Add to Cart button */\n  .add-to-cart-text .svg-wrapper {\n    display: none;\n  }\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_npmXbx": {
+      "type": "custom-liquid",
+      "name": "also nice product tile name and price css",
+      "settings": {
+        "custom_liquid": "<style>\n /* Product page type — match staging (Global Font Edit) */\nh3.also-nice {\n  font-size: var(--kt-type-h2) !important;\n  line-height: var(--kt-leading-h2) !important;\n}\nproduct-recommendations .product-card__content .text-block p,\nproduct-recommendations .product-card__content product-price .price {\n  font-size: var(--kt-type-b1) !important;\n  line-height: var(--kt-leading-b1) !important;\n}\n.button.add-to-cart-button {\n  font-size: var(--kt-type-button) !important;\n  line-height: var(--kt-leading-button) !important;\n}\n.kt-qty .kt-qty__input {\n  font-size: var(--kt-type-button) !important;\n}\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    },
+    "custom_liquid_rbwPDn": {
+      "type": "custom-liquid",
+      "name": "images height miss aligned",
+      "settings": {
+        "custom_liquid": "<style>\n  /* \"Also Nice\" carousel: the first card had an extra left border inside its\n     width (border-box), so its image was ~1.6px narrower and, being\n     aspect-ratio sized, ~1.25px shorter than the others. Draw that left line\n     with ::before instead so every card's image is the same size. */\n  [id*=\"product_recommendations\"] product-recommendations .resource-list__slide:first-child .product-card__content {\n    border-left-width: 0 !important;\n    position: relative;\n  }\n  [id*=\"product_recommendations\"] product-recommendations .resource-list__slide:first-child .product-card__content::before {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    width: 2px;\n    background: #32261F;\n    z-index: 2;\n    pointer-events: none;\n  }\n</style>",
+        "background_color": "",
+        "section_width": "page-width",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
+    }
+  },
+  "order": [
+    "custom_liquid_km6hEj",
+    "custom_liquid_mbcBrH",
+    "custom_liquid_HYcthN",
+    "custom_liquid_LNbgEx",
+    "custom_liquid_PErLxU",
+    "custom_liquid_U73Ybk",
+    "main",
+    "product_recommendations_qggXJq",
+    "custom_liquid_Bdr4nM",
+    "custom_liquid_d6w7zw",
+    "custom_liquid_npmXbx",
+    "custom_liquid_rbwPDn"
+  ]
+}

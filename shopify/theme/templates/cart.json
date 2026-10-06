@@ -1,0 +1,91 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "cart-section": {
+      "type": "main-cart",
+      "blocks": {
+        "custom_liquid_6FgNe6": {
+          "type": "custom-liquid",
+          "name": "t:names.custom_liquid",
+          "settings": {
+            "custom_liquid": "<style>\n  /* ══ Spec 06: cart page reskin ══ */\n\n  /* Site type scale (same values as the main site) */\n  .cart-page {\n    --kt-type-h1: clamp(2.875rem, 5.23vw, 4.25rem);   /* 46 → 68 */\n    --kt-leading-h1: clamp(3rem, 5.35vw, 4.375rem);\n    --kt-type-b1: clamp(1rem, 1.54vw, 1.125rem);      /* 16 → 18 */\n    --kt-leading-b1: clamp(1.375rem, 1.96vw, 1.5rem);\n  }\n\n  /* (7) White summary panel + (all) black becomes chocolate */\n  .cart-page .section-background {\n    --color-background: #FFFFFF;\n    background: #FFFFFF;\n  }\n  .cart-page,\n  .cart-page .section-background {\n    --color-foreground: #32261F;\n    --color-foreground-rgb: 50 38 31;\n  }\n  .cart-page,\n  .cart-page *:not(svg):not(path) {\n    color: #32261F;\n  }\n\n  /* (1) Cart heading uses H1 */\n  .cart-page__title .cart-title h1,\n  .cart-page__title .cart-title h1.h4 {\n    font-family: 'Erica One', serif !important;\n    font-size: var(--kt-type-h1) !important;\n    line-height: var(--kt-leading-h1) !important;\n    font-weight: 400 !important;\n    text-transform: uppercase;\n    color: #32261F !important;\n  }\n  .cart-page__title .cart-bubble__background { background: #32261F !important; }\n  .cart-page__title .cart-bubble__text,\n  .cart-page__title .cart-bubble__text * { color: #F7F2EC !important; }\n\n  /* (2) Line items use B1 */\n  .cart-items,\n  .cart-items td,\n  .cart-items a,\n  .cart-items span {\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n  }\n\n  /* (3) Pill quantity stepper and discount field, in the site font */\n  cart-quantity-selector-component.quantity-selector,\n  .quantity-selector {\n    border-radius: 999px;\n    font-family: 'Instrument Sans', sans-serif;\n  }\n  .cart-discount__input {\n    border-radius: 999px;\n    font-family: 'Instrument Sans', sans-serif;\n    font-size: var(--kt-type-b1);\n    line-height: var(--kt-leading-b1);\n  }\n\n  /* (4) Shop Pay installments text */\n  shopify-payment-terms { font-family: 'Instrument Sans', sans-serif; }\n\n  /* (5) + (6) Pill buttons; Apply and Check out in green */\n  .cart__checkout-button,\n  .cart-discount__button {\n    background: #51B18C;\n    border-radius: 999px;\n  }\n  .cart-page .cart__checkout-button,\n  .cart-page .cart__checkout-button *,\n  .cart-page .cart-discount__button,\n  .cart-page .cart-discount__button * {\n    color: #F7F2EC !important;\n  }\n  .cart__checkout-button:hover,\n  .cart-discount__button:hover {\n    background: #45997A;\n  }\n\n  /* (5) Shop Pay / PayPal / G Pay buttons — Shopify only exposes the radius */\n  shopify-accelerated-checkout-cart,\n  .dynamic-checkout__content {\n    --shopify-accelerated-checkout-button-border-radius: 999px;\n  }\n\n  /* Spec 07: empty cart — green pill \"Continue shopping\" button */\n  .cart-page .cart-items__empty-button {\n    background: #51B18C;\n    border-radius: 999px;\n  }\n  .cart-page .cart-items__empty-button,\n  .cart-page .cart-items__empty-button * {\n    color: #F7F2EC !important;\n  }\n  .cart-page .cart-items__empty-button:hover {\n    background: #45997A;\n  }\n</style>"
+          },
+          "blocks": {}
+        },
+        "cart-page-title": {
+          "type": "_cart-title",
+          "static": true,
+          "settings": {
+            "title": "Cart",
+            "show_count": true,
+            "type_preset": "h4",
+            "alignment": "left",
+            "text_color": "",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "cart-page-items": {
+          "type": "_cart-products",
+          "static": true,
+          "settings": {
+            "gap": 24,
+            "image_ratio": "portrait",
+            "dividers": true,
+            "vendor": false,
+            "input_style": "default",
+            "input_background_color": "{{ settings.color_palette.background }}",
+            "input_text_color": "{{ settings.color_palette.foreground }}",
+            "input_border_color": "{{ settings.color_palette.foreground }}",
+            "border_width": 1,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {}
+        },
+        "cart-page-summary": {
+          "type": "_cart-summary",
+          "static": true,
+          "settings": {
+            "extend_summary": true,
+            "background_color": "{{ settings.color_palette.color2 }}",
+            "text_color": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_color": "",
+            "border_radius": 0
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "custom_liquid_6FgNe6"
+      ],
+      "settings": {
+        "section_width": "page-width",
+        "background_color": "#f7f2ec",
+        "text_color": "",
+        "padding-block-start": 24,
+        "padding-block-end": 0
+      }
+    }
+  },
+  "order": [
+    "cart-section"
+  ]
+}
