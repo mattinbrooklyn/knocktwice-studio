@@ -1,0 +1,20 @@
+<style>
+  /* Links inside the product accordions ("Tell Me More", "Shipping & Stuff")
+     use the site's word-link style: blue, bold, no underline until hover
+     (same as .policy a in assets/policy.css). The text comes from the rich
+     text editor and often wraps the link text in <strong>, which the theme
+     colours separately, so that is pinned too. */
+  .accordion .details-content a {
+    color: #378CDA !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+  }
+  .accordion .details-content a:hover {
+    text-decoration: underline !important;
+  }
+  .accordion .details-content a strong,
+  .accordion .details-content a b {
+    color: inherit !important;
+    font-weight: inherit !important;
+  }
+</style>
