@@ -1,0 +1,23 @@
+  /* ── Match the native side nav (assets/styles.css .logo / .nav) ──
+     Paste just above </style> in the side-nav Custom Liquid block. */
+  @media screen and (min-width: 990px) {
+    .kt-nav-shell {
+      top: 3.8125rem;                 /* --logo-top: 61px */
+    }
+    .kt-logo {
+      /* Menu starts at --nav-top (200px): 200 − 61 logo top − 100 logo */
+      margin-bottom: calc(12.5rem - 3.8125rem - 6.25rem);
+    }
+    .kt-nav a {
+      font-size: clamp(1.375rem, 2.13vw, 1.625rem);     /* --type-nav: 22 → 26 */
+      line-height: clamp(1.6875rem, 2.22vw, 1.875rem);  /* --leading-nav: 27 → 30 */
+      letter-spacing: -0.01375rem;                      /* --tracking-nav */
+    }
+    /* Current page: bold chocolate, like native. Blue is hover only. */
+    .kt-nav a.active {
+      color: var(--kt-ink);
+    }
+    .kt-nav a:hover {
+      color: var(--kt-blue);
+    }
+  }
