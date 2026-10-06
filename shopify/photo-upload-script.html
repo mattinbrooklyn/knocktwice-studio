@@ -111,10 +111,51 @@
         });
       }
 
-      // Every frame has a photo: the button does not open the file picker
+      // Every frame has a photo, or an upload is running: the button does
+      // not open the file picker
       button.addEventListener('click', function (event) {
-        if (root.classList.contains('is-filled')) event.preventDefault();
+        if (root.classList.contains('is-filled') || root.classList.contains('is-uploading')) event.preventDefault();
       });
+
+      // Add to Cart uploads the photos with the order, which can take a few
+      // seconds for big phone photos. Show that it's working, then clear the
+      // photos and quantity once the frames are in the cart. If it fails,
+      // keep everything so the customer can try again.
+      var label = root.querySelector('.kt-upload__text');
+      var labelText = label ? label.textContent : '';
+      var nativeFetch = window.fetch;
+      window.fetch = function (resource, options) {
+        var url = String(resource && resource.url ? resource.url : resource);
+        var body = options && options.body;
+        var carriesPhotos = /\/cart\/add/.test(url) && photos.length > 0 &&
+          typeof FormData !== 'undefined' && body instanceof FormData &&
+          photos.some(function (p) { return body.has(p.input.name); });
+        var request = nativeFetch.apply(this, arguments);
+        if (!carriesPhotos) return request;
+
+        root.classList.add('is-uploading');
+        if (label) label.textContent = 'Uploading…';
+        var done = function () {
+          root.classList.remove('is-uploading');
+          if (label) label.textContent = labelText;
+        };
+        request.then(function (response) {
+          done();
+          if (!response.ok) return;
+          while (photos.length) remove(photos[photos.length - 1]);
+          if (qtyInput) {
+            qtyInput.value = qtyInput.min || 1;
+            qtyInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          refresh();
+        }, done);
+        return request;
+      };
+
+      var style = document.createElement('style');
+      style.textContent = '[data-kt-upload].is-uploading .kt-upload__files { opacity: .5; }' +
+        '[data-kt-upload].is-uploading .kt-upload__button { cursor: progress; }';
+      root.appendChild(style);
 
       refresh();
     }
