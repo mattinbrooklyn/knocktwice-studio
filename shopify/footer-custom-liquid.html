@@ -34,6 +34,15 @@
     display: none !important;
   }
 
+  /* Horizon scrolls the page inside .page-wrapper and paints that
+     scrollbar's track cream, which reads as a cream strip down the right
+     edge of the blue footer. Use the browser's normal scrollbar, same as
+     the native site. */
+  .page-wrapper {
+    scrollbar-color: auto !important;
+    scrollbar-width: auto !important;
+  }
+
   #kt-footer {
     /* Design system values (assets/styles.css) */
     --color-bg: #F7F2EC;
