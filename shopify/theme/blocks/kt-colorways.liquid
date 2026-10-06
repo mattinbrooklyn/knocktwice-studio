@@ -1,0 +1,93 @@
+{%- comment -%}
+  Knock Twice — colorway swatches.
+  Each colorway is its own product. On each product, the field "Colorways"
+  (custom.colorways, list of products) lists its sibling colorways. Each
+  swatch links to that product; its colour comes from that product's
+  "Swatch color" field (custom.swatch_color) and its name from
+  "Colorway name" (custom.colorway_name, else the first tag).
+  Nothing renders when the list is empty, so single-colour products show
+  no selector.
+{%- endcomment -%}
+{%- liquid
+  assign product_resource = closest.product | default: product
+  assign siblings = product_resource.metafields.custom.colorways.value
+-%}
+
+{%- if siblings != blank -%}
+  {%- liquid
+    assign current_name = product_resource.metafields.custom.colorway_name.value | default: product_resource.tags.first
+    assign listed_self = false
+    for p in siblings
+      if p.id == product_resource.id
+        assign listed_self = true
+      endif
+    endfor
+  -%}
+  <div class="kt-colorways" {{ block.shopify_attributes }}>
+    <p class="kt-colorways__label">Color: <span>{{ current_name }}</span></p>
+    <ul class="kt-colorways__list" role="list">
+      {%- unless listed_self -%}
+        {%- render 'kt-colorway-swatch', item: product_resource, current: product_resource -%}
+      {%- endunless -%}
+      {%- for p in siblings -%}
+        {%- render 'kt-colorway-swatch', item: p, current: product_resource -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+
+  <style>
+    .kt-colorways {
+      width: 100%;
+      margin: 22px 0 0;
+    }
+    .kt-colorways__label {
+      margin: 0 0 12px;
+      font-family: 'Instrument Sans', sans-serif;
+      font-size: var(--kt-type-b1, 16px);
+      line-height: var(--kt-leading-b1, 22px);
+      font-weight: 700;
+      color: #32261F;
+    }
+    .kt-colorways__label span {
+      font-weight: 400;
+    }
+    .kt-colorways__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .kt-colorways__swatch {
+      display: block;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #32261F;
+      box-shadow: inset 0 0 0 2px #F7F2EC;
+      background: var(--kt-swatch, #F7F2EC);
+    }
+    .kt-colorways__swatch:hover {
+      box-shadow: inset 0 0 0 1px #F7F2EC;
+    }
+    .kt-colorways__swatch[aria-current="page"] {
+      outline: 2px solid #32261F;
+      outline-offset: 3px;
+    }
+  </style>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KT colorways",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows the other colorways listed in the product field \"Colorways\". Hidden when that list is empty."
+    }
+  ],
+  "presets": [{ "name": "KT colorways" }]
+}
+{% endschema %}

@@ -1,0 +1,77 @@
+{%- comment -%}
+  Knock Twice — colorway name + price row under the product title.
+  Colorway name: product field "Colorway name" (custom.colorway_name),
+  falling back to the product's first tag (how it worked before).
+  Price follows the selected variant, so it changes with the Size picker.
+{%- endcomment -%}
+{%- liquid
+  assign product_resource = closest.product | default: product
+  assign colorway = product_resource.metafields.custom.colorway_name.value | default: product_resource.tags.first
+  assign variant = product_resource.selected_or_first_available_variant
+-%}
+
+<div class="kt-product-meta" data-kt-product-meta {{ block.shopify_attributes }}>
+  <p class="kt-product-color">{{ colorway }}</p>
+  <p class="kt-product-price" data-kt-price>{{ variant.price | money }}</p>
+</div>
+
+<script type="module">
+  import { StandardEvents } from '@shopify/events';
+
+  // When a size is picked, the theme fetches the product page for that
+  // variant; copy the price from it.
+  const row = document.querySelector('[data-kt-product-meta]');
+  const section = row && row.closest('.shopify-section');
+  if (section && !section.dataset.ktPriceSync) {
+    section.dataset.ktPriceSync = 'true';
+    section.addEventListener(StandardEvents.productSelect, (event) => {
+      event.promise?.then(({ detail }) => {
+        const next = detail?.html?.querySelector('[data-kt-price]');
+        const price = section.querySelector('[data-kt-price]');
+        if (next && price) price.textContent = next.textContent;
+      }).catch(() => {});
+    });
+  }
+</script>
+
+<style>
+  .kt-product-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    margin-top: 15px; /* Figma: title ends 277, row starts 292 */
+  }
+
+  .kt-product-color,
+  .kt-product-price {
+    margin: 0;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 22px;
+    line-height: 27px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: #32261F;
+    text-transform: capitalize;
+  }
+
+  .kt-product-price {
+    text-align: right;
+    white-space: nowrap;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "KT colorway + price",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Colorway name comes from the product field \"Colorway name\". Price follows the selected size."
+    }
+  ],
+  "presets": [{ "name": "KT colorway + price" }]
+}
+{% endschema %}

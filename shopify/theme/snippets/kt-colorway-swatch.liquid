@@ -1,0 +1,18 @@
+{%- comment -%}
+  One colorway swatch for blocks/kt-colorways.liquid.
+  item: the colorway product. current: the product being viewed.
+{%- endcomment -%}
+{%- liquid
+  assign name = item.metafields.custom.colorway_name.value | default: item.tags.first | default: item.title
+  assign color = item.metafields.custom.swatch_color.value
+-%}
+<li>
+  <a
+    class="kt-colorways__swatch"
+    href="{{ item.url }}"
+    title="{{ name | escape }}"
+    aria-label="{{ name | escape }}"
+    {% if item.id == current.id %}aria-current="page"{% endif %}
+    {% if color != blank %}style="--kt-swatch: {{ color }};"{% endif %}
+  ></a>
+</li>

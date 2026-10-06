@@ -1,0 +1,24 @@
+{%- comment -%}
+  One dropdown row for blocks/kt-product-accordions.liquid, same markup as
+  the theme's _accordion-row block.
+  heading: row title. field: a rich text product metafield.
+{%- endcomment -%}
+{%- capture row -%}
+  <details class="details" data-testid="accordion-details">
+    <summary class="details__header">
+      {{ heading }}
+      <span class="svg-wrapper icon-caret icon-animated">
+        {{- 'icon-caret.svg' | inline_asset_content -}}
+      </span>
+      <span class="svg-wrapper icon-plus">
+        {{- 'icon-plus.svg' | inline_asset_content -}}
+      </span>
+    </summary>
+    <div class="details-content">
+      <rte-formatter class="text-block rte text-block--align-left" style="--width: 100%; --max-width: var(--max-width--body-normal); --text-align: left;">
+        {{ field | metafield_tag }}
+      </rte-formatter>
+    </div>
+  </details>
+{%- endcapture -%}
+{%- render 'accordion-custom-component', children: row -%}
