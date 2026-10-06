@@ -1,0 +1,51 @@
+<script>
+  (() => {
+    if (window.__ktCartCount) return;
+    window.__ktCartCount = true;
+
+    // Draw the count badge on the cart icon (hide it when the cart is empty)
+    const render = (count) => {
+      document.querySelectorAll('.kt-cart-button').forEach((btn) => {
+        let badge = btn.querySelector('.kt-cart-count');
+        if (count > 0) {
+          if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'kt-cart-count';
+            btn.appendChild(badge);
+          }
+          badge.textContent = count;
+        } else if (badge) {
+          badge.remove();
+        }
+      });
+    };
+
+    // Always ask Shopify for the live count, never a cached answer
+    const refresh = () =>
+      fetch('/cart.js', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+        .then((r) => r.json())
+        .then((cart) => render(cart.item_count))
+        .catch(() => {});
+
+    // Whenever the theme adds/changes/removes cart items, refresh the count
+    const originalFetch = window.fetch;
+    window.fetch = function (...args) {
+      const url = String(args[0] && args[0].url ? args[0].url : args[0]);
+      const request = originalFetch.apply(this, args);
+      if (/\/cart\/(add|change|update|clear)/.test(url)) {
+        request.then(() => refresh()).catch(() => {});
+      }
+      return request;
+    };
+
+    // Coming back to this page with the Back button (the browser may show
+    // the page exactly as it was left, old count included), or returning to
+    // this tab after changing the cart somewhere else: refresh the count
+    window.addEventListener('pageshow', refresh);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refresh();
+    });
+
+    refresh();
+  })();
+</script>
