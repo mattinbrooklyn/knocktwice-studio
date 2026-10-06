@@ -2,8 +2,9 @@
   Knock Twice — Size dropdown for products WITHOUT Shopify size options.
   Products that have real options (Variants → Size) get the theme's own
   Size picker instead, and this block shows nothing.
-  The sizes listed in this block's setting are offered, and the one chosen
-  is saved on the order line as "Size". Tick "Size" in the product's
+  Starts on "Pick a size" (Figma); the sizes listed in this block's setting
+  are offered, and the one chosen is saved on the order line as "Size".
+  Add to Cart is held until a size is picked. Tick "Size" in the product's
   "Hide on this product" field to hide it.
   Uses the same classes as the theme picker, so kt-size-picker-styles
   gives both the same look.
@@ -17,29 +18,56 @@
     <fieldset class="variant-option variant-option--dropdowns">
       <label for="kt-size-{{ block.id }}">{{ block.settings.label | default: 'Size' }}</label>
       <div class="variant-option__select-wrapper">
-        <select id="kt-size-{{ block.id }}" class="variant-option__select" name="properties[Size]" data-kt-size>
+        <select id="kt-size-{{ block.id }}" class="variant-option__select" name="properties[Size]" required data-kt-size>
+          <option value="" disabled selected hidden>{{ block.settings.placeholder | default: 'Pick a size' }}</option>
           {%- for s in sizes -%}
             {%- assign v = s | strip -%}
             {%- if v != blank -%}<option value="{{ v | escape }}">{{ v }}</option>{%- endif -%}
           {%- endfor -%}
         </select>
-        <span class="svg-wrapper icon-caret">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
       </div>
+      <p class="kt-size-fallback__error" data-kt-size-error hidden>{{ block.settings.error | default: 'Pick a size first.' }}</p>
     </fieldset>
   </div>
   <script>
     (function () {
       // Attach the dropdown to this section's Add to Cart form so the
-      // chosen size reaches the order
+      // chosen size reaches the order, and hold Add to Cart until a size
+      // is picked
       var select = document.getElementById('kt-size-{{ block.id }}');
       if (!select) return;
+      var error = select.closest('.kt-size-fallback').querySelector('[data-kt-size-error]');
+
+      function showError(on) {
+        select.classList.toggle('kt-size--invalid', on);
+        error.hidden = !on;
+      }
+
       function attach() {
         var section = select.closest('.shopify-section') || document;
         var form = section.querySelector('form[action*="/cart/add"]');
         // getAttribute, not form.id: Shopify's form has an input named "id"
         var formId = form && form.getAttribute('id');
         if (formId) select.setAttribute('form', formId);
+        if (!form) return;
+        // Capture phase: runs before the theme's own Add to Cart handler
+        form.addEventListener('submit', function (e) {
+          if (select.value) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          showError(true);
+          select.focus();
+        }, true);
       }
+
+      // Our own message instead of the browser's bubble
+      select.addEventListener('invalid', function (e) {
+        e.preventDefault();
+        showError(true);
+        select.focus();
+      });
+      select.addEventListener('change', function () { showError(false); });
+
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
       else attach();
     })();
@@ -63,9 +91,21 @@
     },
     {
       "type": "text",
+      "id": "placeholder",
+      "label": "Placeholder",
+      "default": "Pick a size"
+    },
+    {
+      "type": "text",
       "id": "sizes",
       "label": "Sizes (comma separated)",
       "default": "8 × 10"
+    },
+    {
+      "type": "text",
+      "id": "error",
+      "label": "Message when no size is picked",
+      "default": "Pick a size first."
     }
   ],
   "presets": [{ "name": "KT size (no options)" }]
