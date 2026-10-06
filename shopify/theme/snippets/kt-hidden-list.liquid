@@ -1,0 +1,11 @@
+{%- comment -%}
+  Outputs the product's "Hide on this product" choices as one string,
+  like |Size|Also Nice| , for `contains` checks. Capture it:
+    {% capture kt_hidden %}{% render 'kt-hidden-list', product_resource: product %}{% endcapture %}
+  The field (custom.hidden_sections) can be a list of "Product section"
+  entries (metaobjects, picked from a list in admin) or a list of text.
+{%- endcomment -%}
+|
+{%- for item in product_resource.metafields.custom.hidden_sections.value -%}
+  {{- item.name.value | default: item -}}|
+{%- endfor -%}

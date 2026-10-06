@@ -10,8 +10,10 @@
 {%- endcomment -%}
 {%- liquid
   assign product_resource = closest.product | default: product
+-%}
+{%- capture hidden -%}{%- render 'kt-hidden-list', product_resource: product_resource -%}{%- endcapture -%}
+{%- liquid
   assign siblings = product_resource.metafields.custom.colorways.value
-  assign hidden = product_resource.metafields.custom.hidden_sections.value | join: '|' | prepend: '|' | append: '|'
   if hidden contains '|Colors|'
     assign siblings = blank
   endif

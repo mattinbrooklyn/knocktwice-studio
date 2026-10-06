@@ -8,9 +8,11 @@
 {%- endcomment -%}
 {%- liquid
   assign product_resource = closest.product | default: product
+-%}
+{%- capture hidden -%}{%- render 'kt-hidden-list', product_resource: product_resource -%}{%- endcapture -%}
+{%- liquid
   assign tell_me_more = product_resource.metafields.custom.tell_me_more
   assign shipping = product_resource.metafields.custom.shipping_and_stuff
-  assign hidden = product_resource.metafields.custom.hidden_sections.value | join: '|' | prepend: '|' | append: '|'
   if hidden contains '|Tell Me More|'
     assign tell_me_more = blank
   endif
