@@ -23,6 +23,16 @@
     echo '--column-count: ' | append: section.settings.columns | append: ';'
     echo '--column-count-mobile: ' | append: section.settings.mobile_columns | append: ';'
   endcapture
+
+  # Knock Twice — "Also Nice": products picked on the product itself
+  # (field custom.also_nice, list of products) win over Shopify's automatic
+  # recommendations. Field left empty = automatic, as before.
+  assign kt_source = section.settings.product | default: product
+  assign kt_picked = kt_source.metafields.custom.also_nice.value
+  assign kt_has_picked = false
+  if kt_picked != blank and kt_picked.size > 0
+    assign kt_has_picked = true
+  endif
 %}
 
 {% render 'quick-add-styles' %}
@@ -38,7 +48,7 @@
   data-product-id="{{ section.settings.product.id | default: product.id }}"
   data-intent="{{ section.settings.recommendation_type }}"
   data-testid="product-recommendations-section"
-  data-recommendations-performed="{{ recommendations.performed }}"
+  data-recommendations-performed="{% if kt_has_picked %}true{% else %}{{ recommendations.performed }}{% endif %}"
   data-hydration-key="product-recommendations-{{ section.id }}"
   {{ section.shopify_attributes }}
 >
@@ -70,9 +80,12 @@
       {% content_for 'blocks' %}
     </div>
 
-    {%- if recommendations.performed or section.settings.product == blank -%}
+    {%- if kt_has_picked or recommendations.performed or section.settings.product == blank -%}
       {% liquid
-        if section.settings.product == blank
+        if kt_has_picked
+          # Knock Twice: the products picked in "Also Nice"
+          assign products = kt_picked
+        elsif section.settings.product == blank
           assign products = null
           # Onboarding mode: Show placeholder products
           for i in (1..section.settings.max_products)
