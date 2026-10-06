@@ -1,0 +1,130 @@
+<script>
+  (function () {
+    // "No polaroid? No problem." — one photo per frame ordered.
+    // The customer can add up to as many photos as the Quantity box says.
+    // Each photo rides on the Add to Cart form as its own line item
+    // property: "Photo" when there is one, "Photo 1", "Photo 2"… when more.
+    function ktUploadInit() {
+      var root = document.querySelector('[data-kt-upload]');
+      if (!root || root.dataset.ktUploadReady) return;
+      root.dataset.ktUploadReady = 'true';
+
+      var picker = root.querySelector('.kt-upload__input');
+      var button = root.querySelector('.kt-upload__button');
+      var error = root.querySelector('[data-kt-upload-error]');
+      var template = root.querySelector('[data-kt-upload-file]');
+      var allowed = /\.(jpe?g|png|tiff?)$/i;
+      var photos = []; // { input, row, url }
+
+      var section = root.closest('.shopify-section') || document;
+      var form = section.querySelector('form[action*="/cart/add"]');
+      var formId = form && form.getAttribute('id');
+      var qtyInput = section.querySelector('.kt-qty__input') || document.querySelector('.kt-qty__input');
+
+      // The picker only opens the file dialog; picked files move to their
+      // own hidden input so the picker is free for the next photo.
+      picker.removeAttribute('name');
+      picker.removeAttribute('form');
+
+      var holder = document.createElement('div');
+      holder.hidden = true;
+      root.appendChild(holder);
+
+      // Clones of the original file row go here, one per photo
+      var list = document.createElement('div');
+      list.className = 'kt-upload__files';
+      template.parentNode.insertBefore(list, template.nextSibling);
+
+      function limit() {
+        var n = qtyInput ? Math.floor(Number(qtyInput.value)) : 1;
+        return n > 0 ? n : 1;
+      }
+
+      function renumber() {
+        photos.forEach(function (p, i) {
+          p.input.name = photos.length === 1 ? 'properties[Photo]' : 'properties[Photo ' + (i + 1) + ']';
+        });
+      }
+
+      function refresh() {
+        renumber();
+        // Same greyed-out button state as before, now only once every frame has a photo
+        root.classList.toggle('is-filled', photos.length >= limit());
+      }
+
+      function remove(photo) {
+        URL.revokeObjectURL(photo.url);
+        photo.input.remove();
+        photo.row.remove();
+        photos.splice(photos.indexOf(photo), 1);
+        refresh();
+      }
+
+      function onPick() {
+        error.hidden = true;
+        var file = picker.files && picker.files[0];
+        if (!file) return;
+
+        if (!allowed.test(file.name) || photos.length >= limit()) {
+          picker.value = '';
+          if (!allowed.test(file.name)) error.hidden = false;
+          return;
+        }
+
+        // The picker now holds this photo: name it, put it on the cart
+        // form, and swap an empty picker into the button for the next one
+        var input = picker;
+        var fresh = input.cloneNode(); // a clone never carries the file
+        fresh.addEventListener('change', onPick);
+        input.parentNode.replaceChild(fresh, input);
+        picker = fresh;
+
+        input.removeAttribute('id');
+        input.classList.add('kt-upload__input--photo');
+        if (formId) input.setAttribute('form', formId);
+        holder.appendChild(input);
+
+        var row = template.cloneNode(true);
+        row.hidden = false;
+        row.removeAttribute('data-kt-upload-file');
+        var url = URL.createObjectURL(file);
+        row.querySelector('[data-kt-upload-link]').href = url;
+        row.querySelector('[data-kt-upload-name]').textContent = file.name;
+        list.appendChild(row);
+
+        var photo = { input: input, row: row, url: url };
+        row.querySelector('[data-kt-upload-remove]').addEventListener('click', function () {
+          remove(photo);
+          error.hidden = true;
+        });
+        photos.push(photo);
+        refresh();
+      }
+
+      picker.addEventListener('change', onPick);
+
+      // Fewer frames than photos: drop the newest photos to match
+      if (qtyInput) {
+        qtyInput.addEventListener('change', function () {
+          while (photos.length > limit()) remove(photos[photos.length - 1]);
+          refresh();
+        });
+      }
+
+      // Every frame has a photo: the button does not open the file picker
+      button.addEventListener('click', function (event) {
+        if (root.classList.contains('is-filled')) event.preventDefault();
+      });
+
+      refresh();
+    }
+
+    // Run after the whole page loads, so the Add to Cart form (which comes
+    // after this block) exists and the photos can be attached to it
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ktUploadInit);
+    } else {
+      ktUploadInit();
+    }
+  })();
+</script>
