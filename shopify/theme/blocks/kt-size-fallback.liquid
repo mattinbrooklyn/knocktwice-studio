@@ -1,0 +1,73 @@
+{%- comment -%}
+  Knock Twice — Size dropdown for products WITHOUT Shopify size options.
+  Products that have real options (Variants → Size) get the theme's own
+  Size picker instead, and this block shows nothing.
+  The sizes listed in this block's setting are offered, and the one chosen
+  is saved on the order line as "Size". Tick "Size" in the product's
+  "Hide on this product" field to hide it.
+  Uses the same classes as the theme picker, so kt-size-picker-styles
+  gives both the same look.
+{%- endcomment -%}
+{%- liquid
+  assign product_resource = closest.product | default: product
+  assign sizes = block.settings.sizes | split: ','
+-%}
+{%- if product_resource.has_only_default_variant and sizes.size > 0 -%}
+  <div class="variant-picker kt-size-fallback" {{ block.shopify_attributes }}>
+    <fieldset class="variant-option variant-option--dropdowns">
+      <label for="kt-size-{{ block.id }}">{{ block.settings.label | default: 'Size' }}</label>
+      <div class="variant-option__select-wrapper">
+        <select id="kt-size-{{ block.id }}" class="variant-option__select" name="properties[Size]" data-kt-size>
+          {%- for s in sizes -%}
+            {%- assign v = s | strip -%}
+            {%- if v != blank -%}<option value="{{ v | escape }}">{{ v }}</option>{%- endif -%}
+          {%- endfor -%}
+        </select>
+        <span class="svg-wrapper icon-caret">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+      </div>
+    </fieldset>
+  </div>
+  <script>
+    (function () {
+      // Attach the dropdown to this section's Add to Cart form so the
+      // chosen size reaches the order
+      var select = document.getElementById('kt-size-{{ block.id }}');
+      if (!select) return;
+      function attach() {
+        var section = select.closest('.shopify-section') || document;
+        var form = section.querySelector('form[action*="/cart/add"]');
+        // getAttribute, not form.id: Shopify's form has an input named "id"
+        var formId = form && form.getAttribute('id');
+        if (formId) select.setAttribute('form', formId);
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attach);
+      else attach();
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "KT size (no options)",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shown only on products that have no Size option in Shopify. Products with real Size options use the theme's Size picker instead."
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "Label",
+      "default": "Size"
+    },
+    {
+      "type": "text",
+      "id": "sizes",
+      "label": "Sizes (comma separated)",
+      "default": "8 × 10"
+    }
+  ],
+  "presets": [{ "name": "KT size (no options)" }]
+}
+{% endschema %}

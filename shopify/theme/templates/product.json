@@ -442,7 +442,17 @@
             },
             "kt_product_accordions": {
               "type": "kt-product-accordions",
-              "settings": {}
+              "settings": {
+                "default_tell_me_more": "<p>Designed in Brooklyn. Made in small runs, packed by hand.</p><p>What's in the box:</p><ul><li>Painted MDF frame, 8 × 10\"</li><li>Color-matched acid-free mat</li><li>Protective glass</li><li>Backboard</li><li>Hanging hardware</li></ul><p>Opening fits a 1.75 × 2.25\" mini polaroid. Tape your photo to the back of the mat, seat it in the frame, and hang portrait or landscape.</p>",
+                "default_shipping": "<p>$8 flat rate shipping in the US, free over $80. We ship from Brooklyn within 2–3 business days, and orders typically arrive in 5–10 days once they're on the way. You'll get tracking by email.</p><p>Not shipping internationally yet, but if you're outside the US email hello@knocktwice.studio and we'll see what we can do.</p><p>If something arrives damaged, email us within 7 days with your order number and a few photos and we'll send a replacement or refund. Change your mind? Returns accepted within 14 days on unused frames in original packaging. Custom polaroid prints are final sale.</p><p>Full details <a href=\"https://www.knocktwice.studio/returns/\" title=\"https://www.knocktwice.studio/returns\"><strong>here</strong></a>.</p>"
+              }
+            },
+            "kt_size_fallback": {
+              "type": "kt-size-fallback",
+              "settings": {
+                "label": "Size",
+                "sizes": "8 × 10"
+              }
             }
           },
           "block_order": [
@@ -452,6 +462,7 @@
             "custom_liquid_7bcj9k",
             "kt_colorways",
             "kt_variant_picker",
+            "kt_size_fallback",
             "custom_liquid_B4biNn",
             "custom_liquid_Cm7Rt4",
             "custom_liquid_XU3Twy",

@@ -1,7 +1,7 @@
 {%- comment -%}
   One dropdown row for blocks/kt-product-accordions.liquid, same markup as
   the theme's _accordion-row block.
-  heading: row title. field: a rich text product metafield.
+  heading: row title. content: the row's HTML.
 {%- endcomment -%}
 {%- capture row -%}
   <details class="details" data-testid="accordion-details">
@@ -16,7 +16,7 @@
     </summary>
     <div class="details-content">
       <rte-formatter class="text-block rte text-block--align-left" style="--width: 100%; --max-width: var(--max-width--body-normal); --text-align: left;">
-        {{ field | metafield_tag }}
+        {{ content }}
       </rte-formatter>
     </div>
   </details>

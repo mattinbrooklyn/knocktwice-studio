@@ -1,18 +1,26 @@
 {%- comment -%}
   Knock Twice — "Tell Me More" and "Shipping & Stuff" dropdowns.
-  Text comes from the product fields "Tell Me More" (custom.tell_me_more)
-  and "Shipping & Stuff" (custom.shipping_and_stuff). A dropdown with an
-  empty field is not shown; when both are empty nothing is shown.
+  Each dropdown shows the product's own text when its product field is
+  filled ("Tell Me More" custom.tell_me_more, "Shipping & Stuff"
+  custom.shipping_and_stuff), otherwise the default text set on this
+  block in the theme editor. Tick "Tell Me More" / "Shipping & Stuff" in
+  the product's "Hide on this product" field to hide one.
   Same markup and styles as the theme's own Accordion block, so the
-  existing FAQ-style dropdown look and single-open behaviour still apply.
+  FAQ-style dropdown look and single-open behaviour still apply.
 {%- endcomment -%}
 {%- liquid
   assign product_resource = closest.product | default: product
 -%}
 {%- capture hidden -%}{%- render 'kt-hidden-list', product_resource: product_resource -%}{%- endcapture -%}
 {%- liquid
-  assign tell_me_more = product_resource.metafields.custom.tell_me_more
-  assign shipping = product_resource.metafields.custom.shipping_and_stuff
+  assign tell_me_more = product_resource.metafields.custom.tell_me_more | metafield_tag
+  if product_resource.metafields.custom.tell_me_more == blank
+    assign tell_me_more = block.settings.default_tell_me_more
+  endif
+  assign shipping = product_resource.metafields.custom.shipping_and_stuff | metafield_tag
+  if product_resource.metafields.custom.shipping_and_stuff == blank
+    assign shipping = block.settings.default_shipping
+  endif
   if hidden contains '|Tell Me More|'
     assign tell_me_more = blank
   endif
@@ -38,10 +46,10 @@
     {{ block.shopify_attributes }}
   >
     {%- if tell_me_more != blank -%}
-      {%- render 'kt-accordion-row', heading: 'Tell Me More', field: tell_me_more -%}
+      {%- render 'kt-accordion-row', heading: 'Tell Me More', content: tell_me_more -%}
     {%- endif -%}
     {%- if shipping != blank -%}
-      {%- render 'kt-accordion-row', heading: 'Shipping & Stuff', field: shipping -%}
+      {%- render 'kt-accordion-row', heading: 'Shipping & Stuff', content: shipping -%}
     {%- endif -%}
   </div>
   {% render 'accordion-styles' %}
@@ -54,7 +62,17 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "\"Tell Me More\" and \"Shipping & Stuff\" text comes from the product fields of the same name. A dropdown is hidden when its field is empty."
+      "content": "Text shown when a product's own \"Tell Me More\" / \"Shipping & Stuff\" field is empty. Fill those product fields to use different text on one product."
+    },
+    {
+      "type": "richtext",
+      "id": "default_tell_me_more",
+      "label": "Default Tell Me More"
+    },
+    {
+      "type": "richtext",
+      "id": "default_shipping",
+      "label": "Default Shipping & Stuff"
     }
   ],
   "presets": [{ "name": "KT dropdowns" }]
