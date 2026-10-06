@@ -1,0 +1,21 @@
+<style>
+  /* "Also Nice" carousel: the first card had an extra left border inside its
+     width (border-box), so its image was ~1.6px narrower and, being
+     aspect-ratio sized, ~1.25px shorter than the others. Draw that left line
+     with ::before instead so every card's image is the same size. */
+  [id*="product_recommendations"] product-recommendations .resource-list__slide:first-child .product-card__content {
+    border-left-width: 0 !important;
+    position: relative;
+  }
+  [id*="product_recommendations"] product-recommendations .resource-list__slide:first-child .product-card__content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    background: #32261F;
+    z-index: 2;
+    pointer-events: none;
+  }
+</style>
