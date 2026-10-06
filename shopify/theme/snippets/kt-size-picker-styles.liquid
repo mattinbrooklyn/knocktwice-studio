@@ -1,5 +1,6 @@
 {%- comment -%}
   Knock Twice — Size dropdown, Figma "Shop_ShopifySkin_DummyLanding":
+  (script at the bottom: the theme picker starts on "Pick a size" too)
   bold "Size" label, white pill with a chocolate stroke (same box as
   Quantity), Handjet value at the Quantity number's size, thin wide
   chevron on the right. Covers the theme's variant picker (dropdown style)
@@ -91,3 +92,56 @@
     display: none;
   }
 </style>
+<script>
+  (function () {
+    // The theme's Size dropdown (products with Size variants) starts on
+    // "Pick a size", like Figma. Shopify always has a variant selected, so
+    // Add to Cart is held until the customer picks a size. Once a size is
+    // picked the theme re-renders the picker with that size, and this
+    // placeholder is gone. A link with ?variant= keeps that size.
+    if (new URL(window.location.href).searchParams.has('variant')) return;
+
+    function init() {
+      var picker = document.querySelector('.product-details variant-picker');
+      if (!picker) return;
+      var selects = picker.querySelectorAll('select.variant-option__select');
+      if (selects.length !== 1) return; // Size only; leave multi-option products alone
+      var select = selects[0];
+      var field = select.closest('.variant-option--dropdowns');
+
+      var placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.disabled = true;
+      placeholder.hidden = true;
+      placeholder.textContent = 'Pick a size';
+      for (var i = 0; i < select.options.length; i++) select.options[i].removeAttribute('selected');
+      select.insertBefore(placeholder, select.firstChild);
+      placeholder.setAttribute('selected', 'selected');
+      select.value = '';
+
+      var error = document.createElement('p');
+      error.className = 'kt-size-fallback__error';
+      error.hidden = true;
+      error.textContent = 'Pick a size first.';
+      field.appendChild(error);
+
+      var section = picker.closest('.shopify-section') || document;
+      var form = section.querySelector('form[action*="/cart/add"]');
+      if (!form) return;
+      // Capture phase: runs before the theme's own Add to Cart handler
+      form.addEventListener('submit', function (e) {
+        var current = document.querySelector('.product-details variant-picker select.variant-option__select');
+        if (!current || current.value) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        current.classList.add('kt-size--invalid');
+        var msg = current.closest('.variant-option--dropdowns').querySelector('.kt-size-fallback__error');
+        if (msg) msg.hidden = false;
+        current.focus();
+      }, true);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+</script>

@@ -449,6 +449,7 @@
             },
             "kt_size_fallback": {
               "type": "kt-size-fallback",
+              "disabled": true,
               "settings": {
                 "label": "Size",
                 "sizes": "8 × 10"
