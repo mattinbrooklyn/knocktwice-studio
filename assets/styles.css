@@ -102,6 +102,10 @@
   --wave-height-desktop:   6.875rem;
   --input-height:          3.4375rem;
   --button-height:         3.4375rem;
+  /* Pill field corners at exactly half the height. A bigger radius (like
+     --radius-button) gets scaled down by the browser, and Chrome can then
+     leave a hairline break where the curve meets the straight stroke. */
+  --radius-field:          calc(var(--input-height) / 2);
 
   /* Effects */
   --shadow-stack:          0px 4px 4px rgba(0, 0, 0, 0.25);
