@@ -34,13 +34,19 @@
     display: none !important;
   }
 
-  /* Horizon scrolls the page inside .page-wrapper and paints that
-     scrollbar's track cream, which reads as a cream strip down the right
-     edge of the blue footer. Use the browser's normal scrollbar, same as
-     the native site. */
+  /* Horizon scrolls the page inside .page-wrapper and shows its own
+     scrollbar, which reads as a strip down the right edge of the blue
+     footer. The native site hides the scrollbar (shop/index.html), so do
+     the same here. The page still scrolls normally. */
+  html,
+  body,
   .page-wrapper {
-    scrollbar-color: auto !important;
-    scrollbar-width: auto !important;
+    scrollbar-width: none !important;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  .page-wrapper::-webkit-scrollbar {
+    display: none !important;
   }
 
   #kt-footer {
