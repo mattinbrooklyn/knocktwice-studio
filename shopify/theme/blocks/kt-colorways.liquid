@@ -11,6 +11,10 @@
 {%- liquid
   assign product_resource = closest.product | default: product
   assign siblings = product_resource.metafields.custom.colorways.value
+  assign hidden = product_resource.metafields.custom.hidden_sections.value | join: '|' | prepend: '|' | append: '|'
+  if hidden contains '|Colors|'
+    assign siblings = blank
+  endif
 -%}
 
 {%- if siblings != blank -%}

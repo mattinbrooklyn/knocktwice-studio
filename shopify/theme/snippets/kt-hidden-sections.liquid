@@ -1,0 +1,27 @@
+{%- comment -%}
+  Knock Twice — per-product "Hide on this product" switches.
+  Product field custom.hidden_sections (list of single line text, preset
+  choices): Size, Colors, Quantity, Photo upload, Tell Me More,
+  Shipping & Stuff, Also Nice. Each ticked choice hides that part of the
+  product page for this product only.
+
+  Blocks that we own (colorways, dropdowns, quantity, upload) check the
+  list themselves. This snippet hides the parts that are theme blocks or
+  other sections (Size picker, Also Nice), and is rendered once from
+  blocks/kt-product-meta.liquid.
+{%- endcomment -%}
+{%- liquid
+  assign product_resource = closest.product | default: product
+  assign hidden = product_resource.metafields.custom.hidden_sections.value | join: '|' | prepend: '|' | append: '|'
+-%}
+{%- if hidden contains '|Size|' or hidden contains '|Also Nice|' -%}
+  <style>
+    {%- if hidden contains '|Size|' %}
+      .product-details variant-picker,
+      .product-details .variant-picker { display: none !important; }
+    {%- endif -%}
+    {%- if hidden contains '|Also Nice|' %}
+      [id*="__product_recommendations"] { display: none !important; }
+    {%- endif %}
+  </style>
+{%- endif -%}
