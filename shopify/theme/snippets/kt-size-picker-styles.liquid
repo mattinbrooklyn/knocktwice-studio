@@ -125,11 +125,13 @@
       error.textContent = 'Pick a size first.';
       field.appendChild(error);
 
-      var section = picker.closest('.shopify-section') || document;
-      var form = section.querySelector('form[action*="/cart/add"]');
-      if (!form) return;
-      // Capture phase: runs before the theme's own Add to Cart handler
-      form.addEventListener('submit', function (e) {
+      // Window, capture phase: the theme listens on document (capture), so
+      // this runs first. Click covers the button (and its fly-to-cart
+      // animation), submit covers Enter in the form.
+      function hold(e) {
+        var form = e.target.closest && e.target.closest('.product-details form[action*="/cart/add"]');
+        if (!form) return;
+        if (e.type === 'click' && !e.target.closest('[type="submit"], button[name="add"]')) return;
         var current = document.querySelector('.product-details variant-picker select.variant-option__select');
         if (!current || current.value) return;
         e.preventDefault();
@@ -138,7 +140,9 @@
         var msg = current.closest('.variant-option--dropdowns').querySelector('.kt-size-fallback__error');
         if (msg) msg.hidden = false;
         current.focus();
-      }, true);
+      }
+      window.addEventListener('click', hold, true);
+      window.addEventListener('submit', hold, true);
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
