@@ -901,6 +901,7 @@
               nodes {
                 title
                 handle
+                availableForSale
                 featuredImage {
                   url
                   altText
@@ -956,8 +957,12 @@
         const safePrice = escapeHtml(price);
         const safeUrl = escapeHtml(productUrl);
         const safeAlt = escapeHtml((image && image.altText) || title);
-        // Shopify product metafield custom.launch_status (spec No. 17)
-        const status = product.launchStatus && product.launchStatus.value;
+        // Shopify product metafield custom.launch_status (spec No. 17).
+        // Out of stock shows Sold Out too, unless it's set to Coming Soon.
+        let status = product.launchStatus && product.launchStatus.value;
+        if (product.availableForSale === false && status !== "Coming Soon") {
+          status = "Sold Out";
+        }
         const statusPill =
           status === "Coming Soon" || status === "Sold Out"
             ? `<span class="shop-card-status">${escapeHtml(status)}</span>`
